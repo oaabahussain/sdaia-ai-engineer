@@ -1,0 +1,14 @@
+{
+  "name": "SDAIA AI Engineer Study Space",
+  "short_name": "SDAIA AI",
+  "description": "Adaptive mobile-first study space for SDAIA AI Engineer Badge preparation.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#07101c",
+  "theme_color": "#08111f",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
