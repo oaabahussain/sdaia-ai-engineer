@@ -1,4 +1,4 @@
-name: Server tests
+name: Server and adapter contract tests
 
 on:
   push:
@@ -15,8 +15,14 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install server dependencies
-        run: pip install -r server/requirements.txt
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          pip install -r server/requirements.txt
+          npm ci --ignore-scripts
       - name: Run server tests
         env:
           DB_URL: sqlite:///./server-ci.db
@@ -24,3 +30,23 @@ jobs:
         run: pytest -q server/tests
       - name: SQLite schema smoke test
         run: python3 scripts/db_smoke.py
+      - name: Browser adapter contract
+        run: node scripts/contract_test.js browser
+      - name: API adapter contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=server DB_URL=sqlite:///./contract-ci.db python -m uvicorn app.main:app --app-dir server --host 127.0.0.1 --port 8000 > /tmp/sdaia-api.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid"' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8000/v1/health >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              cat /tmp/sdaia-api.log
+              exit 1
+            fi
+            sleep 1
+          done
+          SDAIA_API_BASE=http://127.0.0.1:8000/v1 node scripts/contract_test.js api
