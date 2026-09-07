@@ -7,11 +7,21 @@
     "anon_id",
     "created_at",
     "updated_at",
-    "answers",
-    "review",
-    "bookmarks",
+    "onboarded",
+    "profile",
+    "answer_map",
+    "attempts",
+    "confidence",
+    "mastered",
+    "review_map",
+    "errors",
+    "bookmark_map",
     "notes",
-    "settings"
+    "sessions",
+    "activity",
+    "diagnostic",
+    "theme",
+    "focus"
   ],
   "properties": {
     "version": {
@@ -30,95 +40,17 @@
       "type": "string",
       "format": "date-time"
     },
-    "answers": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "question_id",
-          "correct",
-          "confidence",
-          "answered_at"
-        ],
-        "properties": {
-          "question_id": {
-            "type": "string",
-            "pattern": "^q\\d+$"
-          },
-          "correct": {
-            "type": "boolean"
-          },
-          "confidence": {
-            "enum": [
-              "low",
-              "mid",
-              "high"
-            ]
-          },
-          "answered_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "additionalProperties": false
-      }
+    "onboarded": {
+      "type": "boolean"
     },
-    "review": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "question_id",
-          "due_at",
-          "interval_days"
-        ],
-        "properties": {
-          "question_id": {
-            "type": "string",
-            "pattern": "^q\\d+$"
-          },
-          "due_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "interval_days": {
-            "enum": [
-              1,
-              3,
-              7,
-              14
-            ]
-          }
-        },
-        "additionalProperties": false
-      }
-    },
-    "bookmarks": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^q\\d+$"
-      },
-      "uniqueItems": true
-    },
-    "notes": {
-      "type": "object",
-      "propertyNames": {
-        "pattern": "^q\\d+$"
-      },
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "settings": {
+    "profile": {
       "type": "object",
       "required": [
-        "session_minutes",
-        "dark",
-        "focus"
+        "minutes",
+        "examDate"
       ],
       "properties": {
-        "session_minutes": {
+        "minutes": {
           "type": "integer",
           "enum": [
             15,
@@ -127,36 +59,26 @@
             30
           ]
         },
-        "exam_date": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date"
-        },
-        "dark": {
-          "type": "boolean"
-        },
-        "focus": {
-          "type": "boolean"
+        "examDate": {
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "onboarded": {
-      "type": "boolean"
-    },
-    "profile": {
-      "type": "object"
-    },
     "answer_map": {
       "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
       "additionalProperties": {
         "type": "boolean"
       }
     },
     "attempts": {
       "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
       "additionalProperties": {
         "type": "integer",
         "minimum": 0
@@ -164,6 +86,9 @@
     },
     "confidence": {
       "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
       "additionalProperties": {
         "enum": [
           1,
@@ -174,24 +99,84 @@
     },
     "mastered": {
       "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
       "additionalProperties": {
         "type": "boolean"
       }
     },
     "review_map": {
-      "type": "object"
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "stage",
+          "next"
+        ],
+        "properties": {
+          "stage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "next": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "errors": {
-      "type": "object"
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "type",
+          "at"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "at": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "bookmark_map": {
       "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
       "additionalProperties": {
         "type": "boolean"
       }
     },
+    "notes": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^q\\d+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "sessions": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
     },
     "activity": {
       "type": "object",
@@ -201,7 +186,20 @@
       }
     },
     "diagnostic": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "done",
+        "answers"
+      ],
+      "properties": {
+        "done": {
+          "type": "boolean"
+        },
+        "answers": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
     },
     "theme": {
       "enum": [

@@ -30,44 +30,26 @@ const searchBox=$('searchBox'), searchResults=$('searchResults'), caseGrid=$('ca
       resetBtn=$('resetBtn');
 
 
-let state=(await loadState())||{}
+let state=migrateState((await loadState())||{});
 const nowIso=()=>new Date().toISOString();
-const confidenceName=(value)=>value===1?'low':value===3?'high':'mid';
 const uuidV4=()=>globalThis.crypto?.randomUUID?.() ?? '00000000-0000-4000-8000-'+Math.random().toString(16).slice(2,14).padEnd(12,'0').slice(0,12);
-const legacyAnswers=!Array.isArray(state.answers)&&state.answers?state.answers:{};
-const legacyReview=!Array.isArray(state.review)&&state.review?state.review:{};
-const legacyBookmarks=!Array.isArray(state.bookmarks)&&state.bookmarks?state.bookmarks:{};
-state.version=1;
-state.anon_id=state.anon_id||uuidV4();
-state.created_at=state.created_at||nowIso();
-state.updated_at=state.updated_at||state.created_at;
-state.onboarded=!!state.onboarded;
-state.profile=state.profile||{minutes:20,examDate:''};
-state.answer_map=state.answer_map||legacyAnswers;
-state.answers=Array.isArray(state.answers)?state.answers:[];
-state.attempts=state.attempts||{};
-state.confidence=state.confidence||{};
-state.mastered=state.mastered||{};
-state.review_map=state.review_map||legacyReview;
-state.review=Array.isArray(state.review)?state.review:[];
-state.errors=state.errors||{};
-state.bookmark_map=state.bookmark_map||legacyBookmarks;
-state.bookmarks=Array.isArray(state.bookmarks)?state.bookmarks:Object.entries(state.bookmark_map).filter(([,v])=>v).map(([id])=>id);
-state.notes=state.notes||{};
-state.sessions=state.sessions||{};
-state.activity=state.activity||{};
-state.diagnostic=state.diagnostic||{done:false,answers:{}};
-state.theme=state.theme||'auto';
-state.focus=!!state.focus;
-state.settings=state.settings||{session_minutes:state.profile.minutes||20,exam_date:state.profile.examDate||null,dark:state.theme==='dark',focus:state.focus};
-function recordAnswer(questionId,correct,confidence){state.answers.push({question_id:questionId,correct,confidence:confidenceName(confidence),answered_at:nowIso()})}
-function syncReview(){state.review=Object.entries(state.review_map).map(([question_id,value])=>({question_id,due_at:new Date(value.next).toISOString(),interval_days:[1,3,7,14][value.stage]||14}))}
-function syncBookmarks(){state.bookmarks=Object.entries(state.bookmark_map).filter(([,value])=>value).map(([id])=>id)}
+function migrateState(raw){
+ const s=raw&&typeof raw==='object'?{...raw}:{};
+ const confidenceNumber=(value)=>value==='low'?1:value==='high'?3:2;
+ if(!s.answer_map||typeof s.answer_map!=='object'||Array.isArray(s.answer_map)){s.answer_map={};if(Array.isArray(s.answers))s.answers.forEach(item=>{if(item?.question_id){s.answer_map[item.question_id]=!!item.correct;if(item.confidence)s.confidence={...(s.confidence||{}),[item.question_id]:confidenceNumber(item.confidence)}}})}
+ if(!s.review_map||typeof s.review_map!=='object'||Array.isArray(s.review_map)){s.review_map={};if(Array.isArray(s.review))s.review.forEach(item=>{if(item?.question_id){const stage=Math.max(0,[1,3,7,14].indexOf(item.interval_days));s.review_map[item.question_id]={stage,next:Date.parse(item.due_at)||Date.now()}}})}
+ if(!s.bookmark_map||typeof s.bookmark_map!=='object'||Array.isArray(s.bookmark_map)){s.bookmark_map={};if(Array.isArray(s.bookmarks))s.bookmarks.forEach(id=>{s.bookmark_map[id]=true})}
+ if(s.settings&&typeof s.settings==='object'){s.profile=s.profile||{};if(!s.profile.minutes)s.profile.minutes=s.settings.session_minutes||20;if(s.profile.examDate===undefined)s.profile.examDate=s.settings.exam_date||'';if(s.theme===undefined)s.theme=s.settings.dark?'dark':'auto';if(s.focus===undefined)s.focus=!!s.settings.focus}
+ delete s.answers;delete s.review;delete s.bookmarks;delete s.settings;
+ s.version=1;s.anon_id=s.anon_id||uuidV4();s.created_at=s.created_at||nowIso();s.updated_at=s.updated_at||s.created_at;
+ s.onboarded=!!s.onboarded;s.profile={minutes:s.profile?.minutes||20,examDate:s.profile?.examDate||''};s.answer_map=s.answer_map||{};s.attempts=s.attempts||{};s.confidence=s.confidence||{};s.mastered=s.mastered||{};s.review_map=s.review_map||{};s.errors=s.errors||{};s.bookmark_map=s.bookmark_map||{};s.notes=s.notes||{};s.sessions=s.sessions||{};s.activity=s.activity||{};s.diagnostic=s.diagnostic||{done:false,answers:{}};s.diagnostic.done=!!s.diagnostic.done;s.diagnostic.answers=s.diagnostic.answers||{};s.theme=s.theme||'auto';s.focus=!!s.focus;
+ return s;
+}
 
 let active={type:'session',id:1,ids:[],index:0,selected:null,confidence:null,shownLearn:false};
 let diag={ids:[],index:0,selected:null,confidence:null};
 
-function save(){state.updated_at=nowIso();state.settings={session_minutes:state.profile.minutes||20,exam_date:state.profile.examDate||null,dark:state.theme==='dark',focus:state.focus};syncReview();syncBookmarks();void saveState(state).catch(error=>console.error('State save failed',error))}
+function save(){state.updated_at=nowIso();void saveState(state).catch(error=>console.error('State save failed',error))}
 function today(){return new Date().toISOString().slice(0,10)}
 function touch(){const d=today();state.activity[d]=(state.activity[d]||0)+1}
 function qById(id){return QUESTIONS.find(q=>q.id===id)}
@@ -122,7 +104,7 @@ function schedule(id,correct){
  let r=state.review_map[id]||{stage:0};
  if(!correct)r.stage=0; else r.stage=Math.min(3,(r.stage||0)+1);
  const days=[1,3,7,14][r.stage]||14;
- r.next=Date.now()+days*86400000; state.review_map[id]=r;syncReview();
+ r.next=Date.now()+days*86400000; state.review_map[id]=r;
 }
 function classifyError(id,correct,conf){
  if(correct&&conf===1) state.errors[id]={type:'Lucky / low confidence',at:Date.now()};
@@ -178,7 +160,7 @@ function renderDiag(){
    if(diag.selected===null||diag.confidence===null){dfbEl.textContent='اختر إجابة ومستوى ثقة.';dfbEl.classList.add('show');return}
    const ok=diag.selected===q.answer;
    state.diagnostic.answers[q.id]={ok,confidence:diag.confidence,domain:q.domain};
-   state.answer_map[q.id]=ok;recordAnswer(q.id,ok,diag.confidence);state.confidence[q.id]=diag.confidence;state.attempts[q.id]=(state.attempts[q.id]||0)+1;state.mastered[q.id]=ok&&diag.confidence>=2;
+   state.answer_map[q.id]=ok;state.confidence[q.id]=diag.confidence;state.attempts[q.id]=(state.attempts[q.id]||0)+1;state.mastered[q.id]=ok&&diag.confidence>=2;
    classifyError(q.id,ok,diag.confidence);schedule(q.id,ok);touch();save();diag.index++;renderDiag();
  };
 }
@@ -217,15 +199,15 @@ function renderStudy(){
  q.options.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{active.selected=i;opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};opts.appendChild(b)});
  document.querySelectorAll('.conf button').forEach(b=>{b.classList.remove('on');b.onclick=()=>{active.confidence=+b.dataset.c;document.querySelectorAll('.conf button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}})
  feedback.className='feedback';feedback.textContent='';checkBtn.style.display='block';nextBtn.style.display='none';
- bookmarkBtn.textContent=state.bookmark_map[q.id]?'★':'☆';bookmarkBtn.onclick=()=>{state.bookmark_map[q.id]=!state.bookmark_map[q.id];syncBookmarks();save();bookmarkBtn.textContent=state.bookmark_map[q.id]?'★':'☆'};
+ bookmarkBtn.textContent=state.bookmark_map[q.id]?'★':'☆';bookmarkBtn.onclick=()=>{state.bookmark_map[q.id]=!state.bookmark_map[q.id];save();bookmarkBtn.textContent=state.bookmark_map[q.id]?'★':'☆'};
  qnote.value=state.notes[q.id]||'';qnote.onchange=()=>{state.notes[q.id]=qnote.value.trim();save()};
  const lc=LEARN[q.topic];learnArea.innerHTML=lc?`<details><summary>90 ثانية قبل السؤال — ${lc.title}</summary><div class="learnCard"><ul>${lc.bullets.map(x=>`<li>${x}</li>`).join('')}</ul><div class="mental">${lc.mental}</div></div></details>`:'';
 }
 checkBtn.onclick=()=>{
  const q=qById(active.ids[active.index]);if(active.selected===null||active.confidence===null){feedback.textContent='اختر إجابة ومستوى ثقة أولًا.';feedback.classList.add('show');return}
  state.attempts[q.id]=(state.attempts[q.id]||0)+1;const ok=active.selected===q.answer;const buttons=[...opts.children];
- if(ok){buttons[active.selected].classList.add('good');feedback.textContent='صحيح. '+q.explanation;state.answer_map[q.id]=true;recordAnswer(q.id,true,active.confidence);state.mastered[q.id]=true;state.confidence[q.id]=active.confidence;classifyError(q.id,true,active.confidence);schedule(q.id,true);checkBtn.style.display='none';nextBtn.style.display='block'}
- else {buttons[active.selected].classList.add('bad');state.answer_map[q.id]=false;recordAnswer(q.id,false,active.confidence);state.mastered[q.id]=false;state.confidence[q.id]=active.confidence;classifyError(q.id,false,active.confidence);
+ if(ok){buttons[active.selected].classList.add('good');feedback.textContent='صحيح. '+q.explanation;state.answer_map[q.id]=true;state.mastered[q.id]=true;state.confidence[q.id]=active.confidence;classifyError(q.id,true,active.confidence);schedule(q.id,true);checkBtn.style.display='none';nextBtn.style.display='block'}
+ else {buttons[active.selected].classList.add('bad');state.answer_map[q.id]=false;state.mastered[q.id]=false;state.confidence[q.id]=active.confidence;classifyError(q.id,false,active.confidence);
    if((state.attempts[q.id]||0)%2===1){feedback.textContent='ليست الصحيحة. جرّب مرة ثانية قبل كشف الحل.';active.selected=null}
    else{buttons[q.answer].classList.add('good');feedback.textContent='الحل: '+q.explanation;schedule(q.id,false);checkBtn.style.display='none';nextBtn.style.display='block'}
  }
@@ -255,8 +237,8 @@ searchBox.oninput=()=>{
 patterns.innerHTML=PATTERNS.map(p=>`<details><summary>${p[0]}</summary><p>${p[1]}</p></details>`).join('');
 
 exportBtn.onclick=()=>{const a=document.createElement('a'),blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});a.href=URL.createObjectURL(blob);a.download='sdaia-study-v3-progress.json';a.click();URL.revokeObjectURL(a.href)}
-importFile.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);save();applyTheme();applyFocus();renderLibrary();renderHome();go('home')}catch(_){alert('ملف غير صالح')}};r.readAsText(f)}
-resetBtn.onclick=async()=>{if(confirm('تصفير كل التقدم؟')){state={};await saveState(state);location.reload()}}
+importFile.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=migrateState(JSON.parse(r.result));save();applyTheme();applyFocus();renderLibrary();renderHome();go('home')}catch(_){alert('ملف غير صالح')}};r.readAsText(f)}
+resetBtn.onclick=async()=>{if(confirm('تصفير كل التقدم؟')){state=migrateState({});await saveState(state);location.reload()}}
 
 async function initializeStudyApp() {
   if(storageStatus)storageStatus.textContent='✓ التخزين المحلي متاح، مع fallback داخل الذاكرة عند تعذر التخزين الدائم';
