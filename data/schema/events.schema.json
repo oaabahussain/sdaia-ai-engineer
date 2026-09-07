@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "events.schema.json",
+  "type": "array",
+  "maxItems": 100,
+  "items": {
+    "$ref": "event.schema.json"
+  }
+}

@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: SDAIA AI Engineer Study Space API
+  version: 1.0.0
+  description: Future private backend contract. No server is deployed by this repository.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: /v1
+components:
+  securitySchemes:
+    AnonId:
+      type: apiKey
+      in: header
+      name: X-Anon-Id
+  parameters:
+    AnonHeader:
+      name: X-Anon-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AnonPath:
+      name: anon_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: ../data/schema/error.schema.json
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Check service liveness
+      security: []
+      responses:
+        '200':
+          description: Liveness
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, const: ok }
+                additionalProperties: false
+  /bank:
+    get:
+      operationId: getBank
+      summary: Load the full study bank
+      security: [{ AnonId: [] }]
+      parameters: [{ $ref: '#/components/parameters/AnonHeader' }]
+      responses:
+        '200':
+          description: Full study bank
+          content:
+            application/json:
+              schema: { $ref: ../data/schema/bank.schema.json }
+        '400': { $ref: '#/components/responses/Error' }
+  /progress/{anon_id}:
+    parameters:
+      - { $ref: '#/components/parameters/AnonPath' }
+      - { $ref: '#/components/parameters/AnonHeader' }
+    get:
+      operationId: getProgress
+      summary: Load anonymous progress
+      security: [{ AnonId: [] }]
+      description: X-Anon-Id must match anon_id.
+      responses:
+        '200':
+          description: Saved state
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: ../data/schema/state.schema.json }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+    put:
+      operationId: putProgress
+      summary: Replace anonymous progress
+      security: [{ AnonId: [] }]
+      description: Full replace. X-Anon-Id and state anon_id must match anon_id. If-Match carries the current numeric version; use 0 for first create.
+      parameters:
+        - { $ref: '#/components/parameters/IfMatch' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: ../data/schema/state.schema.json }
+      responses:
+        '200':
+          description: Saved state
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: ../data/schema/state.schema.json }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /feedback:
+    post:
+      operationId: postFeedback
+      summary: Submit anonymous question feedback
+      security: [{ AnonId: [] }]
+      parameters: [{ $ref: '#/components/parameters/AnonHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: ../data/schema/feedback.schema.json }
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, ref]
+                properties:
+                  ok: { type: boolean, const: true }
+                  ref: { type: string }
+                additionalProperties: false
+        '400': { $ref: '#/components/responses/Error' }
+  /events:
+    post:
+      operationId: postEvents
+      summary: Submit anonymous event batch
+      security: [{ AnonId: [] }]
+      parameters: [{ $ref: '#/components/parameters/AnonHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: ../data/schema/events.schema.json }
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean, const: true }
+                additionalProperties: false
+        '400': { $ref: '#/components/responses/Error' }
