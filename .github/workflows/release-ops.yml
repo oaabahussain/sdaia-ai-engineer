@@ -1,0 +1,283 @@
+name: Release operations
+
+on:
+  push:
+    branches: [release-ops]
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout operations branch
+        uses: actions/checkout@v6
+        with:
+          ref: release-ops
+          fetch-depth: 0
+
+      - name: Read release task and checkout main
+        shell: bash
+        run: |
+          set -euo pipefail
+          task="$(tr -d '[:space:]' < release-task.txt)"
+          case "$task" in
+            verify|4|5|6) ;;
+            *) echo "Unsupported release task: $task"; exit 1 ;;
+          esac
+          echo "RELEASE_TASK=$task" >> "$GITHUB_ENV"
+          git fetch origin main
+          git checkout -B work-main origin/main
+
+      - name: Apply task 4 - PWA icons and manifest
+        if: env.RELEASE_TASK == '4'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          render_icon() {
+            size="$1"
+            output="$2"
+            if command -v rsvg-convert >/dev/null 2>&1; then
+              rsvg-convert --width "$size" --height "$size" icon.svg > "$output"
+            elif command -v convert >/dev/null 2>&1; then
+              convert -background none icon.svg -resize "${size}x${size}" "$output"
+            else
+              echo "No SVG renderer is available on the runner."
+              exit 1
+            fi
+          }
+
+          render_icon 180 icon-180.png
+          render_icon 192 icon-192.png
+          render_icon 512 icon-512.png
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import struct
+
+          html_path = Path("index.html")
+          text = html_path.read_text(encoding="utf-8")
+          replacements = {
+              '<link rel="apple-touch-icon" href="./icon.svg">': '<link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">',
+              '<link rel="icon" type="image/png" sizes="192x192" href="./icon.svg">': '<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">',
+              '<link rel="icon" type="image/png" sizes="512x512" href="./icon.svg">': '<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f"Expected icon link not found: {old}")
+              text = text.replace(old, new, 1)
+          html_path.write_text(text, encoding="utf-8")
+
+          manifest_path = Path("manifest.webmanifest")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          manifest["icons"] = [
+              {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+              {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+          ]
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          sw_path = Path("sw.js")
+          sw = sw_path.read_text(encoding="utf-8")
+          old_asset = "  './icon.svg'\n"
+          new_assets = "  './icon.svg',\n  './icon-180.png',\n  './icon-192.png',\n  './icon-512.png'\n"
+          if old_asset not in sw:
+              raise SystemExit("Service worker icon asset marker not found")
+          sw_path.write_text(sw.replace(old_asset, new_assets, 1), encoding="utf-8")
+
+          expected = {"icon-180.png": 180, "icon-192.png": 192, "icon-512.png": 512}
+          signature = b"\x89PNG\r\n\x1a\n"
+          for filename, size in expected.items():
+              payload = Path(filename).read_bytes()
+              if payload[:8] != signature:
+                  raise SystemExit(f"{filename} is not a PNG")
+              width, height = struct.unpack(">II", payload[16:24])
+              if (width, height) != (size, size):
+                  raise SystemExit(f"{filename} has dimensions {width}x{height}; expected {size}x{size}")
+              print(f"PNG validation: PASS ({filename}, {width}x{height})")
+
+          json.loads(manifest_path.read_text(encoding="utf-8"))
+          print("Manifest JSON validation: PASS")
+          PY
+
+          python3 scripts/verify_release.py index.html
+
+      - name: Apply task 5 - license and About section
+        if: env.RELEASE_TASK == '5'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > LICENSE <<'EOF'
+          MIT License
+
+          Copyright (c) 2026 oaabahussain
+
+          Permission is hereby granted, free of charge, to any person obtaining a copy
+          of this software and associated documentation files (the "Software"), to deal
+          in the Software without restriction, including without limitation the rights
+          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+          copies of the Software, and to permit persons to whom the Software is
+          furnished to do so, subject to the following conditions:
+
+          The above copyright notice and this permission notice shall be included in all
+          copies or substantial portions of the Software.
+
+          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+          SOFTWARE.
+          EOF
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+          start = text.index('<section id="settings" class="screen">')
+          end = text.index('</section>', start)
+          section = text[start:end]
+          if 'id="about"' in section:
+              raise SystemExit("About section already exists")
+
+          about = '''
+            <div class="panel wide" id="about">
+              <h2>About</h2>
+              <p>هذه أداة مجتمعية غير رسمية وليست تابعة لسدايا أو معتمدة منها.</p>
+              <p class="tiny">Official facts used by this tool are limited to the seven exam domains and their weights. The questions, sessions, diagnostic, mastery/readiness scores, study plans, and recommendations are unofficial preparation content.</p>
+            </div>
+          '''
+          insert_at = section.rfind('</div>')
+          if insert_at < 0:
+              raise SystemExit("Settings grid closing tag not found")
+          section = section[:insert_at] + about + section[insert_at:]
+          text = text[:start] + section + text[end:]
+          path.write_text(text, encoding="utf-8")
+          PY
+
+          grep -Fq "MIT License" LICENSE
+          grep -Fq 'id="about"' index.html
+          grep -Fq "ليست تابعة لسدايا أو معتمدة منها" index.html
+          grep -Fq "limited to the seven exam domains and their weights" index.html
+          python3 scripts/verify_release.py index.html
+
+      - name: Apply task 6 - question reporting
+        if: env.RELEASE_TASK == '6'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/ISSUE_TEMPLATE
+          cat > .github/ISSUE_TEMPLATE/question-report.md <<'EOF'
+          ---
+          name: Report a question
+          about: Report an incorrect, unclear, or outdated study question
+          title: "Question report: "
+          labels: ""
+          assignees: ""
+          ---
+
+          Question ID:
+
+          Describe the problem:
+
+          Suggested correction or source, if available:
+          EOF
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+
+          css_marker = ".noteBox{width:100%;min-height:90px;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:10px}.book{font-size:18px}"
+          css_replacement = css_marker + ".reportLink{display:inline-block;margin-top:7px;font-size:11px;color:var(--accent);text-decoration:underline;text-underline-offset:2px}"
+          if css_marker not in text:
+              raise SystemExit("Report-link CSS marker not found")
+          text = text.replace(css_marker, css_replacement, 1)
+
+          card_marker = '<div class="qtext" id="qtext"></div><div class="opts" id="opts"></div>'
+          card_replacement = '<div class="qtext" id="qtext"></div><a class="reportLink" id="reportQuestionLink" target="_blank" rel="noopener">Report a question</a><div class="opts" id="opts"></div>'
+          if card_marker not in text:
+              raise SystemExit("Study question card marker not found")
+          text = text.replace(card_marker, card_replacement, 1)
+
+          binding_marker = "bookmarkBtn=$('bookmarkBtn'), feedback=$('feedback'), qnote=$('qnote'),"
+          binding_replacement = "bookmarkBtn=$('bookmarkBtn'), reportQuestionLink=$('reportQuestionLink'), feedback=$('feedback'), qnote=$('qnote'),"
+          if binding_marker not in text:
+              raise SystemExit("Question link DOM binding marker not found")
+          text = text.replace(binding_marker, binding_replacement, 1)
+
+          qbyid_marker = "function qById(id){return QUESTIONS.find(q=>q.id===id)}"
+          helper = r'''function qById(id){return QUESTIONS.find(q=>q.id===id)}
+          function questionReportUrl(id){
+            const params=new URLSearchParams({
+              template:'question-report.md',
+              title:`Question report: ${id}`,
+              body:`Question ID: ${id}\n\nDescribe the problem:\n`
+            });
+            return `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}`;
+          }'''
+          if qbyid_marker not in text:
+              raise SystemExit("qById marker not found")
+          text = text.replace(qbyid_marker, helper, 1)
+
+          diag_marker = '<div class="qcard"><div class="qtext">${q.question}</div><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join(\'\')}</div>'
+          diag_replacement = '<div class="qcard"><div class="qtext">${q.question}</div><a class="reportLink" href="${questionReportUrl(q.id)}" target="_blank" rel="noopener">Report a question</a><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join(\'\')}</div>'
+          if diag_marker not in text:
+              raise SystemExit("Diagnostic question template marker not found")
+          text = text.replace(diag_marker, diag_replacement, 1)
+
+          study_marker = "const q=qById(active.ids[active.index]);active.selected=null;active.confidence=null;active.shownLearn=false;"
+          study_replacement = "const q=qById(active.ids[active.index]);reportQuestionLink.href=questionReportUrl(q.id);active.selected=null;active.confidence=null;active.shownLearn=false;"
+          if study_marker not in text:
+              raise SystemExit("Study render marker not found")
+          text = text.replace(study_marker, study_replacement, 1)
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+          grep -Fq "questionReportUrl" index.html
+          grep -Fq "Report a question" index.html
+          grep -Fq "Question ID:" .github/ISSUE_TEMPLATE/question-report.md
+          python3 scripts/verify_release.py index.html
+
+      - name: Commit release task
+        if: env.RELEASE_TASK != 'verify'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "oaabahussain"
+          git config user.email "147952589+oaabahussain@users.noreply.github.com"
+          case "$RELEASE_TASK" in
+            4) message="Add platform-specific PWA icons" ;;
+            5) message="Add MIT license and About disclosure" ;;
+            6) message="Add per-question reporting workflow" ;;
+            *) echo "Unexpected release task: $RELEASE_TASK"; exit 1 ;;
+          esac
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Release task $RELEASE_TASK produced no changes"
+            exit 1
+          fi
+          git commit -m "$message"
+          git push origin HEAD:main
+
+      - name: Dispatch Pages verification
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/pages.yml/dispatches" \
+            --data '{"ref":"main"}'
+          echo "Pages workflow dispatched for main."
