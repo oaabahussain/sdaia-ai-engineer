@@ -1,4 +1,4 @@
-name: Release task 5
+name: Release task 6
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   actions: write
 
 jobs:
-  task5:
+  task6:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout operations branch
@@ -25,32 +25,25 @@ jobs:
           git fetch origin main
           git checkout -B work-main origin/main
 
-      - name: Add MIT license and About disclosure
+      - name: Add per-question reporting
         shell: bash
         run: |
           set -euo pipefail
-          cat > LICENSE <<'EOF'
-          MIT License
+          mkdir -p .github/ISSUE_TEMPLATE
+          cat > .github/ISSUE_TEMPLATE/question-report.md <<'EOF'
+          ---
+          name: Report a question
+          about: Report an incorrect, unclear, or outdated study question
+          title: "Question report: "
+          labels: ""
+          assignees: ""
+          ---
 
-          Copyright (c) 2026 oaabahussain
+          Question ID:
 
-          Permission is hereby granted, free of charge, to any person obtaining a copy
-          of this software and associated documentation files (the "Software"), to deal
-          in the Software without restriction, including without limitation the rights
-          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-          copies of the Software, and to permit persons to whom the Software is
-          furnished to do so, subject to the following conditions:
+          Describe the problem:
 
-          The above copyright notice and this permission notice shall be included in all
-          copies or substantial portions of the Software.
-
-          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-          SOFTWARE.
+          Suggested correction or source, if available:
           EOF
 
           python3 - <<'PY'
@@ -58,45 +51,83 @@ jobs:
 
           path = Path("index.html")
           text = path.read_text(encoding="utf-8")
-          start = text.index('<section id="settings" class="screen">')
-          end = text.index('</section>', start)
-          section = text[start:end]
-          if 'id="about"' in section:
-              raise SystemExit("About section already exists")
 
-          about = '''
-            <div class="panel wide" id="about">
-              <h2>About</h2>
-              <p>هذه أداة مجتمعية غير رسمية وليست تابعة لسدايا أو معتمدة منها.</p>
-              <p class="tiny">Official facts used by this tool are limited to the seven exam domains and their weights. The questions, sessions, diagnostic, mastery/readiness scores, study plans, and recommendations are unofficial preparation content.</p>
-            </div>
-          '''
-          insert_at = section.rfind('</div>')
-          if insert_at < 0:
-              raise SystemExit("Settings grid closing tag not found")
-          section = section[:insert_at] + about + section[insert_at:]
-          text = text[:start] + section + text[end:]
+          css_marker = ".noteBox{width:100%;min-height:90px;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:10px}.book{font-size:18px}"
+          if css_marker not in text:
+              raise SystemExit("Report-link CSS marker not found")
+          text = text.replace(
+              css_marker,
+              css_marker + ".reportLink{display:inline-block;margin-top:7px;font-size:11px;color:var(--accent);text-decoration:underline;text-underline-offset:2px}",
+              1,
+          )
+
+          card_marker = '<div class="qtext" id="qtext"></div><div class="opts" id="opts"></div>'
+          if card_marker not in text:
+              raise SystemExit("Study question card marker not found")
+          text = text.replace(
+              card_marker,
+              '<div class="qtext" id="qtext"></div><a class="reportLink" id="reportQuestionLink" target="_blank" rel="noopener">Report a question</a><div class="opts" id="opts"></div>',
+              1,
+          )
+
+          binding_marker = "bookmarkBtn=$('bookmarkBtn'), feedback=$('feedback'), qnote=$('qnote'),"
+          if binding_marker not in text:
+              raise SystemExit("Question link DOM binding marker not found")
+          text = text.replace(
+              binding_marker,
+              "bookmarkBtn=$('bookmarkBtn'), reportQuestionLink=$('reportQuestionLink'), feedback=$('feedback'), qnote=$('qnote'),",
+              1,
+          )
+
+          qbyid_marker = "function qById(id){return QUESTIONS.find(q=>q.id===id)}"
+          if qbyid_marker not in text:
+              raise SystemExit("qById marker not found")
+          helper = r'''function qById(id){return QUESTIONS.find(q=>q.id===id)}
+          function questionReportUrl(id){
+            const params=new URLSearchParams({
+              template:'question-report.md',
+              title:`Question report: ${id}`,
+              body:`Question ID: ${id}\n\nDescribe the problem:\n`
+            });
+            return `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}`;
+          }'''
+          text = text.replace(qbyid_marker, helper, 1)
+
+          diagnostic_marker = '<div class="qcard"><div class="qtext">${q.question}</div><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join(\'\')}</div>'
+          if diagnostic_marker not in text:
+              raise SystemExit("Diagnostic question template marker not found")
+          diagnostic_replacement = '<div class="qcard"><div class="qtext">${q.question}</div><a class="reportLink" href="${questionReportUrl(q.id)}" target="_blank" rel="noopener">Report a question</a><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join(\'\')}</div>'
+          text = text.replace(diagnostic_marker, diagnostic_replacement, 1)
+
+          study_marker = "const q=qById(active.ids[active.index]);active.selected=null;active.confidence=null;active.shownLearn=false;"
+          if study_marker not in text:
+              raise SystemExit("Study render marker not found")
+          text = text.replace(
+              study_marker,
+              "const q=qById(active.ids[active.index]);reportQuestionLink.href=questionReportUrl(q.id);active.selected=null;active.confidence=null;active.shownLearn=false;",
+              1,
+          )
+
           path.write_text(text, encoding="utf-8")
           PY
 
-          grep -Fq "MIT License" LICENSE
-          grep -Fq 'id="about"' index.html
-          grep -Fq "ليست تابعة لسدايا أو معتمدة منها" index.html
-          grep -Fq "limited to the seven exam domains and their weights" index.html
+          grep -Fq "questionReportUrl" index.html
+          grep -Fq "Report a question" index.html
+          grep -Fq "Question ID:" .github/ISSUE_TEMPLATE/question-report.md
           python3 scripts/verify_release.py index.html
 
-      - name: Commit task 5
+      - name: Commit task 6
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "oaabahussain"
           git config user.email "147952589+oaabahussain@users.noreply.github.com"
-          git add LICENSE index.html
+          git add index.html .github/ISSUE_TEMPLATE/question-report.md
           if git diff --cached --quiet; then
-            echo "Task 5 produced no changes"
+            echo "Task 6 produced no changes"
             exit 1
           fi
-          git commit -m "Add MIT license and About disclosure"
+          git commit -m "Add per-question reporting workflow"
           git push origin HEAD:main
 
       - name: Dispatch Pages verification
@@ -105,6 +136,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          sleep 3
           curl --fail --silent --show-error \
             --request POST \
             --header "Accept: application/vnd.github+json" \
