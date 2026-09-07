@@ -64,7 +64,7 @@ s = s.replace(
 
 s = s.replace(
     '    run("PYTHONPATH=server .venv/bin/pytest -q server/tests")\n    run("python3 scripts/db_smoke.py")\n    run("node scripts/verify_html.js index.html")\n    commit_task(10, "Document server-ready architecture and operations")',
-    '    run("rm -f task10.db")\n    run("DB_URL=sqlite:///./task10.db PYTHONPATH=server .venv/bin/pytest -q server/tests")\n    run("rm -f task10.db")\n    run("python3 scripts/db_smoke.py")\n    run("node scripts/verify_html.js index.html")\n    commit_task(10, "Document server-ready architecture and operations")',
+    '    run("rm -rf .venv task10.db")\n    run("python3.12 -m venv .venv")\n    run(".venv/bin/pip install -q -r server/requirements.txt")\n    run("DB_URL=sqlite:///./task10.db PYTHONPATH=server .venv/bin/pytest -q server/tests")\n    run("rm -f task10.db")\n    run("python3 scripts/db_smoke.py")\n    run("node scripts/verify_html.js index.html")\n    commit_task(10, "Document server-ready architecture and operations")',
     1,
 )
 
