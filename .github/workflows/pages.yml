@@ -20,14 +20,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build iPhone-compatible site
+      - name: Build direct iPhone-compatible site
         shell: bash
         run: |
-          set -euo pipefail
+          set -u
           mkdir -p _site
-          cat parts/app.gz.b64.part-* | base64 --decode | gzip --decompress > _site/index.html
-          cp manifest.webmanifest sw.js icon.svg _site/
+
+          # The previous browser loader depended on DecompressionStream. Safari can
+          # reject the stored gzip stream when its CRC footer is imperfect. GNU gzip
+          # still emits the decompressed payload before reporting the CRC error, so
+          # build the final HTML on the runner and validate the payload before deploy.
+          cat parts/app.gz.b64.part-* | base64 --decode | gzip --decompress > _site/index.html || true
+
+          test "$(wc -c < _site/index.html)" -gt 50000
+          grep -qi '<!doctype html' _site/index.html
+          grep -qi '</html>' _site/index.html
+
+          cp manifest.webmanifest icon.svg _site/
           touch _site/.nojekyll
+
           python3 - <<'PY'
           from pathlib import Path
           p = Path('_site/index.html')
@@ -43,6 +54,22 @@ jobs:
           s = s.replace('PWA V4', 'PWA V5')
           p.write_text(s, encoding='utf-8')
           PY
+
+          cat > _site/sw.js <<'EOF'
+          const CACHE='sdaia-ai-pages-v5';
+          const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+          self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+          self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+          self.addEventListener('fetch',e=>{
+            if(e.request.method!=='GET')return;
+            const u=new URL(e.request.url);
+            if(u.origin!==self.location.origin)return;
+            e.respondWith(fetch(e.request).then(r=>{
+              if(r&&r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
+              return r;
+            }).catch(()=>caches.match(e.request).then(x=>x||caches.match('./index.html'))));
+          });
+          EOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
