@@ -1,0 +1,43 @@
+name: Npm audit inspection
+
+on:
+  push:
+    branches: [audit-fix-runner]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Inspect npm audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          set +e
+          npm audit --json > /tmp/npm-audit.json
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] && [ "$status" -ne 1 ]; then
+            echo "Unexpected npm audit exit: $status"
+            exit "$status"
+          fi
+          node - <<'NODE'
+          const fs=require('fs');
+          const audit=JSON.parse(fs.readFileSync('/tmp/npm-audit.json','utf8'));
+          console.log('AUDIT_METADATA='+JSON.stringify(audit.metadata?.vulnerabilities || {}));
+          for (const [name,item] of Object.entries(audit.vulnerabilities || {})) {
+            if (item.severity !== 'high') continue;
+            const via=(item.via || []).map(v => typeof v === 'string' ? v : `${v.name || name}: ${v.title || 'advisory'} (${v.url || 'no-url'})`);
+            console.log(`HIGH_PACKAGE=${name} VIA=${via.join(' | ')}`);
+          }
+          NODE
