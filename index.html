@@ -50,7 +50,7 @@ button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} 
 .caseGrid{display:grid;gap:10px}.case{border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--card)}.case b{display:block}.case .tag{display:inline-block;margin:5px 0;font-size:9px;background:var(--soft);padding:3px 6px;border-radius:999px}.case p{font-size:12px;margin:5px 0}.source{font-size:10px;color:var(--muted)}
 .search{width:100%;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:11px}.results{display:grid;gap:7px;margin-top:8px}.result{border:1px solid var(--line);border-radius:13px;padding:9px;background:var(--card);font-size:11px}
 .heat{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.day{aspect-ratio:1;border-radius:5px;background:var(--line)}.day.l1{background:color-mix(in srgb,var(--good) 30%,var(--line))}.day.l2{background:color-mix(in srgb,var(--good) 55%,var(--line))}.day.l3{background:var(--good)}
-.noteBox{width:100%;min-height:90px;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:10px}.book{font-size:18px}
+.noteBox{width:100%;min-height:90px;border:1px solid var(--line);background:var(--card);border-radius:13px;padding:10px}.book{font-size:18px}.reportLink{display:inline-block;margin-top:7px;font-size:11px;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .bottom{position:fixed;bottom:0;left:0;right:0;z-index:50;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--line)}.bottomin{max-width:960px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}.nav{border:0;background:transparent;padding:9px 2px;color:var(--muted);font-size:9px}.nav span{display:block;font-size:17px}.nav.active{color:var(--accent);font-weight:800}
 .onboard{max-width:590px;margin:30px auto}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:11px;color:var(--muted)}.field input,.field select{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:11px}
 .diagIntro{text-align:center;padding:20px}.readiness{font-size:42px;font-weight:950;color:var(--accent)}.legend{font-size:10px;color:var(--muted)}
@@ -149,7 +149,7 @@ body.focus .nonfocus{display:none!important}.focusHint{display:none}.focusHint.o
   <div id="learnArea"></div>
   <div class="qcard">
     <div style="display:flex;justify-content:space-between;gap:8px"><span class="tiny" id="qTopic"></span><button class="icon book" id="bookmarkBtn">☆</button></div>
-    <div class="qtext" id="qtext"></div><div class="opts" id="opts"></div>
+    <div class="qtext" id="qtext"></div><a class="reportLink" id="reportQuestionLink" target="_blank" rel="noopener">Report a question</a><div class="opts" id="opts"></div>
     <div class="conf"><button data-c="1">غير واثق</button><button data-c="2">متوسط</button><button data-c="3">واثق</button></div>
     <div class="feedback" id="feedback"></div>
     <textarea class="noteBox" id="qnote" placeholder="ملاحظة قصيرة لهذا السؤال (اختياري)" style="margin-top:10px"></textarea>
@@ -270,7 +270,7 @@ const readinessBar=$('readinessBar'), due=$('due'), errors=$('errors'),
       missionChips=$('missionChips'), missionBtn=$('missionBtn');
 const studyLabel=$('studyLabel'), studyProgress=$('studyProgress'), studyBar=$('studyBar'),
       learnArea=$('learnArea'), qTopic=$('qTopic'), qtext=$('qtext'), opts=$('opts'),
-      bookmarkBtn=$('bookmarkBtn'), feedback=$('feedback'), qnote=$('qnote'),
+      bookmarkBtn=$('bookmarkBtn'), reportQuestionLink=$('reportQuestionLink'), feedback=$('feedback'), qnote=$('qnote'),
       checkBtn=$('checkBtn'), nextBtn=$('nextBtn');
 const errorList=$('errorList'), dueList=$('dueList'), reviewDueBtn=$('reviewDueBtn');
 const storageStatus=$('storageStatus');
@@ -303,6 +303,14 @@ function save(){try{STORAGE.set(KEY,JSON.stringify(state))}catch(e){}}
 function today(){return new Date().toISOString().slice(0,10)}
 function touch(){const d=today();state.activity[d]=(state.activity[d]||0)+1}
 function qById(id){return QUESTIONS.find(q=>q.id===id)}
+function questionReportUrl(id){
+  const params=new URLSearchParams({
+    template:'question-report.md',
+    title:`Question report: ${id}`,
+    body:`Question ID: ${id}\n\nDescribe the problem:\n`
+  });
+  return `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}`;
+}
 function domainQs(d){return QUESTIONS.filter(q=>q.domain===d)}
 function dueIds(){const n=Date.now();return Object.entries(state.review).filter(([id,v])=>v&&v.next<=n).map(([id])=>id)}
 function errIds(){return Object.keys(state.errors).filter(id=>state.errors[id])}
@@ -397,7 +405,7 @@ function renderDiag(){
  diag.selected=null;diag.confidence=null;
  diagQuiz.innerHTML=`<div class="quizHead"><span class="tiny">${q.domain}</span><b>${diag.index+1}/${diag.ids.length}</b></div>
  <div class="progress"><i style="width:${Math.round(diag.index/diag.ids.length*100)}%"></i></div>
- <div class="qcard"><div class="qtext">${q.question}</div><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join('')}</div>
+ <div class="qcard"><div class="qtext">${q.question}</div><a class="reportLink" href="${questionReportUrl(q.id)}" target="_blank" rel="noopener">Report a question</a><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join('')}</div>
  <div class="conf"><button data-c="1">غير واثق</button><button data-c="2">متوسط</button><button data-c="3">واثق</button></div>
  <div class="feedback" id="dfb"></div><div class="actions"><button class="btn primary" id="dcheck">تحقق</button></div></div>`;
  diagQuiz.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{diag.selected=+b.dataset.o;diagQuiz.querySelectorAll('[data-o]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});
@@ -440,7 +448,7 @@ function startStudy(m){
 function renderStudy(){
  if(active.index>=active.ids.length){finishStudy();return}
  const studyConf=document.querySelector('#study .conf'); if(studyConf)studyConf.style.display='grid'; qnote.style.display='block';
- const q=qById(active.ids[active.index]);active.selected=null;active.confidence=null;active.shownLearn=false;
+ const q=qById(active.ids[active.index]);reportQuestionLink.href=questionReportUrl(q.id);active.selected=null;active.confidence=null;active.shownLearn=false;
  studyLabel.textContent=(active.id?'جلسة '+active.id:'مراجعة')+' · '+q.domain;studyProgress.textContent=(active.index+1)+' / '+active.ids.length;studyBar.style.width=Math.round(active.index/active.ids.length*100)+'%';
  qTopic.textContent=q.topic;qtext.textContent=q.question;opts.innerHTML='';
  q.options.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{active.selected=i;opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};opts.appendChild(b)});
