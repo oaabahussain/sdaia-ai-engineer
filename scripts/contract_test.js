@@ -12,23 +12,41 @@ class FakeLocalStorage {
 }
 
 globalThis.localStorage = new FakeLocalStorage();
-    const id = crypto.randomUUID();
+const id = crypto.randomUUID();
 globalThis.localStorage.setItem('sdaia.anon_id.v1', id);
 globalThis.location = { protocol: 'https:' };
 
 const now = new Date().toISOString();
 const state = {
-  version: 1, anon_id: id, created_at: now, updated_at: now,
-  answers: [], review: [], bookmarks: [], notes: {},
-  settings: { session_minutes: 20, exam_date: null, dark: false, focus: false },
-  onboarded: false, profile: {}, answer_map: {}, attempts: {}, confidence: {}, mastered: {},
-  review_map: {}, errors: {}, bookmark_map: {}, sessions: {}, activity: {}, diagnostic: {}, theme: 'auto', focus: false,
+  version: 1,
+  anon_id: id,
+  created_at: now,
+  updated_at: now,
+  onboarded: false,
+  profile: { minutes: 20, examDate: '' },
+  answer_map: {},
+  attempts: {},
+  confidence: {},
+  mastered: {},
+  review_map: {},
+  errors: {},
+  bookmark_map: {},
+  notes: {},
+  sessions: {},
+  activity: {},
+  diagnostic: { done: false, answers: {} },
+  theme: 'auto',
+  focus: false,
 };
 
 let adapter;
 if (adapterName === 'browser') {
   const fs = await import('node:fs/promises');
-  globalThis.fetch = async (url) => ({ ok: true, status: 200, json: async () => JSON.parse(await fs.readFile(new URL(`../${url.replace('./','')}`, import.meta.url), 'utf8')) });
+  globalThis.fetch = async (url) => ({
+    ok: true,
+    status: 200,
+    json: async () => JSON.parse(await fs.readFile(new URL(`../${url.replace('./', '')}`, import.meta.url), 'utf8')),
+  });
   adapter = await import('../src/storage/browser.js');
 } else {
   globalThis.__SDAIA_API_BASE__ = process.env.SDAIA_API_BASE || 'http://127.0.0.1:8000/v1';
