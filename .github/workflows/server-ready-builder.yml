@@ -1,0 +1,30 @@
+name: Server-ready foundation builder
+
+on:
+  push:
+    branches: [server-ready-bootstrap]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v6
+        with:
+          ref: server-ready-bootstrap
+          fetch-depth: 0
+
+      - name: Fetch target branch
+        run: git fetch origin server-ready-foundation
+
+      - name: Run builder
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: server-ready-foundation
+        run: python3 .github/agent/server_ready_builder.py .
