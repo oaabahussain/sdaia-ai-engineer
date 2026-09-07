@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "bank.schema.json",
+  "type": "object",
+  "required": [
+    "questions",
+    "sessions",
+    "learn",
+    "cases",
+    "weights"
+  ],
+  "properties": {
+    "questions": {
+      "type": "array",
+      "items": {
+        "$ref": "question.schema.json"
+      }
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "$ref": "session.schema.json"
+      }
+    },
+    "learn": {
+      "type": "object"
+    },
+    "cases": {
+      "type": "array"
+    },
+    "weights": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    }
+  },
+  "additionalProperties": false
+}
