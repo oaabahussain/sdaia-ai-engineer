@@ -1,0 +1,1575 @@
+[
+  {
+    "id": "q1",
+    "domain": "Data / ML / Evaluation",
+    "question": "نموذج فحص لمرض نادر: 1% فقط من العينات إيجابية. نموذج يتنبأ دائمًا «سلبي» ويحقق 99% Accuracy. ما المشكلة الأساسية؟",
+    "options": [
+      "النموذج ممتاز لأن Accuracy عالية",
+      "Accuracy مضللة بسبب عدم توازن الفئات",
+      "المشكلة الوحيدة هي حجم الـbatch"
+    ],
+    "answer": 1,
+    "explanation": "مع فئة إيجابية نادرة، يمكن لنموذج عديم الفائدة أن يحقق Accuracy مرتفعة جدًا.",
+    "topic": "Metrics & classification"
+  },
+  {
+    "id": "q2",
+    "domain": "Data / ML / Evaluation",
+    "question": "في فحص Screening، تكلفة الـFalse Negative أعلى بكثير من الـFalse Positive. أي مقياس تعطيه أولوية غالبًا؟",
+    "options": [
+      "Recall / Sensitivity",
+      "Precision",
+      "R²"
+    ],
+    "answer": 0,
+    "explanation": "عندما يكون تفويت الحالة الإيجابية أخطر، يصبح Recall/Sensitivity مهمًا.",
+    "topic": "Metrics & classification"
+  },
+  {
+    "id": "q3",
+    "domain": "Data / ML / Evaluation",
+    "question": "نظام تنبيه يرسل مراجعة بشرية مكلفة جدًا لكل Positive. تريد تقليل الإنذارات الكاذبة. أي مقياس يهم أكثر؟",
+    "options": [
+      "Precision",
+      "Recall",
+      "RMSE"
+    ],
+    "answer": 0,
+    "explanation": "ارتفاع Precision يعني أن نسبة أكبر من التنبؤات الإيجابية صحيحة، فيقل عدد الإنذارات الكاذبة.",
+    "topic": "Metrics & classification"
+  },
+  {
+    "id": "q4",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي تقسيم هو الأفضل لضبط hyperparameters ثم إعطاء تقدير نهائي غير متحيز للأداء؟",
+    "options": [
+      "Train فقط",
+      "Train + Validation + Test",
+      "Train + Test مع استخدام Test أثناء الضبط"
+    ],
+    "answer": 1,
+    "explanation": "Validation للضبط، وTest يبقى معزولًا للتقييم النهائي.",
+    "topic": "Metrics & classification"
+  },
+  {
+    "id": "q5",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي مثال يمثل Data Leakage؟",
+    "options": [
+      "استخدام نتيجة لا تُعرف إلا بعد الحدث كـfeature أثناء التدريب",
+      "إزالة الصفوف المكررة",
+      "استخدام Stratified Split"
+    ],
+    "answer": 0,
+    "explanation": "الميزة التي لن تكون متاحة وقت inference تسرب معلومات مستقبلية للنموذج.",
+    "topic": "Metrics & classification"
+  },
+  {
+    "id": "q6",
+    "domain": "Data / ML / Evaluation",
+    "question": "عند تقسيم dataset غير متوازنة، ما الذي يساعد على الحفاظ على نسب الفئات في كل جزء؟",
+    "options": [
+      "Stratified split",
+      "Random seed فقط",
+      "زيادة learning rate"
+    ],
+    "answer": 0,
+    "explanation": "Stratification يحافظ على توزيع الفئات تقريبًا بين train/validation/test.",
+    "topic": "Validation & generalization"
+  },
+  {
+    "id": "q7",
+    "domain": "Data / ML / Evaluation",
+    "question": "ما الغرض الأساسي من Cross-Validation؟",
+    "options": [
+      "تقدير generalization بشكل أكثر استقرارًا",
+      "تحويل classification إلى regression",
+      "زيادة عدد features"
+    ],
+    "answer": 0,
+    "explanation": "Cross-validation يكرر التدريب/التقييم على طيات متعددة لتقليل حساسية النتيجة لتقسيم واحد.",
+    "topic": "Validation & generalization"
+  },
+  {
+    "id": "q8",
+    "domain": "Data / ML / Evaluation",
+    "question": "أداء النموذج 99% على train و70% على validation. ما التشخيص الأقرب؟",
+    "options": [
+      "Overfitting",
+      "Underfitting",
+      "Perfect calibration"
+    ],
+    "answer": 0,
+    "explanation": "الفجوة الكبيرة بين train وvalidation علامة نموذجية على overfitting.",
+    "topic": "Validation & generalization"
+  },
+  {
+    "id": "q9",
+    "domain": "Data / ML / Evaluation",
+    "question": "الأداء ضعيف على train وضعيف على validation معًا. ما التشخيص الأقرب؟",
+    "options": [
+      "Underfitting",
+      "Data leakage",
+      "Overfitting فقط"
+    ],
+    "answer": 0,
+    "explanation": "ضعف التدريب نفسه يشير عادةً إلى أن النموذج أبسط من اللازم أو لا يتعلم الإشارة المطلوبة.",
+    "topic": "Validation & generalization"
+  },
+  {
+    "id": "q10",
+    "domain": "Data / ML / Evaluation",
+    "question": "ماذا قد يحدث عند استخدام Regularization قوية جدًا؟",
+    "options": [
+      "Underfitting",
+      "زيادة leakage",
+      "تحويل classification إلى clustering"
+    ],
+    "answer": 0,
+    "explanation": "الـregularization المفرطة تقيد النموذج أكثر من اللازم فتزيد bias.",
+    "topic": "Validation & generalization"
+  },
+  {
+    "id": "q11",
+    "domain": "Data / ML / Evaluation",
+    "question": "في classification شديد عدم التوازن مع Positive class نادرة، أي curve تكون غالبًا أكثر إفادة؟",
+    "options": [
+      "PR curve",
+      "R² curve",
+      "Residual plot"
+    ],
+    "answer": 0,
+    "explanation": "Precision-Recall تركز مباشرة على أداء الفئة الإيجابية وتكون مفيدة في rare positives.",
+    "topic": "Imbalance & model choice"
+  },
+  {
+    "id": "q12",
+    "domain": "Data / ML / Evaluation",
+    "question": "لماذا قد يكون RMSE أكبر بكثير من MAE؟",
+    "options": [
+      "لأن RMSE يعاقب الأخطاء الكبيرة أكثر",
+      "لأن MAE لا يقيس الخطأ",
+      "لأن RMSE مخصص للتصنيف"
+    ],
+    "answer": 0,
+    "explanation": "تربيع الأخطاء يجعل RMSE أكثر حساسية للأخطاء الكبيرة/outliers.",
+    "topic": "Imbalance & model choice"
+  },
+  {
+    "id": "q13",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي metric للـregression أكثر مقاومة نسبيًا لتأثير outliers الكبيرة؟",
+    "options": [
+      "MAE",
+      "RMSE",
+      "Accuracy"
+    ],
+    "answer": 0,
+    "explanation": "MAE لا يربّع الأخطاء، لذلك يتأثر بدرجة أقل بالقيم الشاذة الكبيرة.",
+    "topic": "Imbalance & model choice"
+  },
+  {
+    "id": "q14",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي خوارزمية من الآتي تُستخدم عادةً للتصنيف الثنائي رغم اسمها؟",
+    "options": [
+      "Logistic Regression",
+      "Linear Regression",
+      "PCA"
+    ],
+    "answer": 0,
+    "explanation": "Logistic Regression نمذجة احتمالية شائعة للتصنيف.",
+    "topic": "Imbalance & model choice"
+  },
+  {
+    "id": "q15",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي خوارزمية شجرية لا تتطلب عادةً Standardization للميزات كي تعمل بشكل صحيح؟",
+    "options": [
+      "Decision Tree",
+      "k-NN",
+      "Gradient Descent linear model"
+    ],
+    "answer": 0,
+    "explanation": "الأشجار تعتمد على حدود تقسيم ولا تعتمد على المسافات/المقاييس بالطريقة نفسها.",
+    "topic": "Imbalance & model choice"
+  },
+  {
+    "id": "q16",
+    "domain": "Data / ML / Evaluation",
+    "question": "ماذا يعني Standardization غالبًا؟",
+    "options": [
+      "تحويل feature لتصبح بمتوسط ≈0 وانحراف معياري ≈1",
+      "حصر القيم دائمًا بين 0 و1",
+      "حذف القيم المفقودة"
+    ],
+    "answer": 0,
+    "explanation": "هذا هو Z-score standardization الشائع.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q17",
+    "domain": "Data / ML / Evaluation",
+    "question": "ماذا يعني Min-Max Normalization غالبًا؟",
+    "options": [
+      "إعادة قياس القيم إلى نطاق مثل 0–1",
+      "جعل الانحراف المعياري دائمًا 1",
+      "تحويل النص إلى embeddings"
+    ],
+    "answer": 0,
+    "explanation": "Min-Max يعيد قياس القيم إلى نطاق محدد.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q18",
+    "domain": "Data / ML / Evaluation",
+    "question": "لديك feature اسمها Blood Type = A/B/AB/O بدون ترتيب طبيعي. أي encoding مناسب عادةً؟",
+    "options": [
+      "One-hot encoding",
+      "ترتيب A=1,B=2,AB=3,O=4 كترتيب حقيقي",
+      "PCA فقط"
+    ],
+    "answer": 0,
+    "explanation": "One-hot يتجنب فرض ترتيب عددي غير موجود على الفئات الاسمية.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q19",
+    "domain": "Data / ML / Evaluation",
+    "question": "ما الوظيفة الأساسية لـPCA؟",
+    "options": [
+      "تقليل الأبعاد مع الاحتفاظ بأكبر قدر ممكن من التباين",
+      "زيادة عدد الفئات",
+      "توليد labels جديدة"
+    ],
+    "answer": 0,
+    "explanation": "PCA أسلوب تقليل أبعاد غير خاضع للإشراف.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q20",
+    "domain": "Data / ML / Evaluation",
+    "question": "أي مهمة من الآتي Unsupervised Learning؟",
+    "options": [
+      "Clustering",
+      "Binary classification",
+      "Forecasting بقيم target معروفة"
+    ],
+    "answer": 0,
+    "explanation": "Clustering يبحث عن بنية في البيانات دون labels.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q21",
+    "domain": "Data / ML / Evaluation",
+    "question": "خفضت classification threshold من 0.5 إلى 0.3. ماذا يحدث غالبًا؟",
+    "options": [
+      "يزداد Recall وقد تنخفض Precision",
+      "تنخفض Recall دائمًا وترتفع Precision",
+      "لا يتغير شيء إطلاقًا"
+    ],
+    "answer": 0,
+    "explanation": "خفض threshold يزيد عدد الحالات المصنفة Positive؛ غالبًا يرفع Recall على حساب مزيد من false positives.",
+    "topic": "Preprocessing & thresholds"
+  },
+  {
+    "id": "q22",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "لماذا نستخدم Activation Function غير خطية في neural network؟",
+    "options": [
+      "لتمكين النموذج من تمثيل علاقات غير خطية",
+      "لإلغاء الحاجة للبيانات",
+      "لضمان Accuracy=100%"
+    ],
+    "answer": 0,
+    "explanation": "بدون nonlinearity تصبح طبقات خطية متعددة مكافئة تقريبًا لتحويل خطي واحد.",
+    "topic": "Neural network basics"
+  },
+  {
+    "id": "q23",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما وظيفة Backpropagation؟",
+    "options": [
+      "حساب gradients لنشر خطأ الـloss عبر الشبكة",
+      "اختيار الـGPU",
+      "تقسيم dataset"
+    ],
+    "answer": 0,
+    "explanation": "Backpropagation يستخدم قاعدة السلسلة لحساب gradients للأوزان.",
+    "topic": "Neural network basics"
+  },
+  {
+    "id": "q24",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "Learning rate مرتفع جدًا. ما السلوك المحتمل؟",
+    "options": [
+      "تدريب غير مستقر أو تجاوز minimum",
+      "تدريب أبطأ دائمًا لكن أكثر استقرارًا",
+      "لا تأثير له"
+    ],
+    "answer": 0,
+    "explanation": "خطوات كبيرة قد تجعل optimizer يتجاوز مناطق جيدة أو يتذبذب.",
+    "topic": "Neural network basics"
+  },
+  {
+    "id": "q25",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما معنى Epoch؟",
+    "options": [
+      "مرور كامل على بيانات التدريب مرة واحدة",
+      "تحديث وزن واحد فقط",
+      "طبقة واحدة من الشبكة"
+    ],
+    "answer": 0,
+    "explanation": "Epoch هو مرور كامل على training set.",
+    "topic": "Neural network basics"
+  },
+  {
+    "id": "q26",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما المقصود بـBatch في التدريب؟",
+    "options": [
+      "مجموعة فرعية من عينات التدريب تُستخدم في تحديث واحد أو سلسلة تحديثات",
+      "مجموعة الاختبار النهائية",
+      "طبقة attention"
+    ],
+    "answer": 0,
+    "explanation": "التدريب غالبًا يستخدم mini-batches بدل dataset كاملة في كل خطوة.",
+    "topic": "Neural network basics"
+  },
+  {
+    "id": "q27",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "أي architecture ارتبط تاريخيًا بقوة باستخراج الأنماط المحلية من الصور؟",
+    "options": [
+      "CNN",
+      "RNN فقط",
+      "k-means"
+    ],
+    "answer": 0,
+    "explanation": "Convolutional Neural Networks فعالة في البنى المكانية والصور.",
+    "topic": "Sequence & CNN models"
+  },
+  {
+    "id": "q28",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما القيد الشائع في RNN التقليدية عند sequences طويلة؟",
+    "options": [
+      "صعوبة التقاط dependencies بعيدة بسبب vanishing/exploding gradients",
+      "لا تستطيع استقبال أرقام",
+      "تعمل فقط على الصور"
+    ],
+    "answer": 0,
+    "explanation": "RNNs التقليدية قد تعاني من تلاشي/انفجار gradients عبر سلاسل طويلة.",
+    "topic": "Sequence & CNN models"
+  },
+  {
+    "id": "q29",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما الذي صُممت LSTM لتحسينه مقارنةً بـRNN البسيطة؟",
+    "options": [
+      "الاحتفاظ بالمعلومات عبر dependencies أطول",
+      "تحويل الصور إلى صوت فقط",
+      "إلغاء training"
+    ],
+    "answer": 0,
+    "explanation": "Gates في LSTM تساعد على التحكم في تدفق الذاكرة.",
+    "topic": "Sequence & CNN models"
+  },
+  {
+    "id": "q30",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما الفكرة الأساسية وراء Attention؟",
+    "options": [
+      "إعطاء أوزان مختلفة لأجزاء الإدخال حسب صلتها بالمهمة الحالية",
+      "حذف embeddings",
+      "منع parallelism"
+    ],
+    "answer": 0,
+    "explanation": "Attention يحسب أهمية نسبية للعناصر.",
+    "topic": "Sequence & CNN models"
+  },
+  {
+    "id": "q31",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "في Self-Attention، ماذا يتفاعل مع ماذا؟",
+    "options": [
+      "Tokens في نفس sequence مع بعضها",
+      "GPU مع CPU فقط",
+      "Dataset مع optimizer"
+    ],
+    "answer": 0,
+    "explanation": "Self-attention يبني تمثيل كل token بالاستفادة من tokens أخرى في السياق نفسه.",
+    "topic": "Sequence & CNN models"
+  },
+  {
+    "id": "q32",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "لماذا سمحت Transformers بقدر أكبر من parallelism أثناء التدريب مقارنةً بـRNN؟",
+    "options": [
+      "لا تعتمد على معالجة token-by-token بالطريقة التسلسلية نفسها",
+      "لا تستخدم matrices",
+      "لا تحتاج بيانات"
+    ],
+    "answer": 0,
+    "explanation": "Self-attention يمكن حسابه على مواقع متعددة بالتوازي أثناء التدريب.",
+    "topic": "Transformers"
+  },
+  {
+    "id": "q33",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما الوصف الأفضل لـEmbedding؟",
+    "options": [
+      "تمثيل عددي كثيف يحمل معلومات دلالية/علاقية",
+      "نسخة مضغوطة من Docker image",
+      "قيمة Boolean"
+    ],
+    "answer": 0,
+    "explanation": "Embeddings تحول عناصر مثل النصوص إلى vectors في فضاء مستمر.",
+    "topic": "Transformers"
+  },
+  {
+    "id": "q34",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما وظيفة Tokenization؟",
+    "options": [
+      "تحويل النص إلى وحدات/معرّفات يستطيع النموذج معالجتها",
+      "إضافة labels يدويًا",
+      "تقليل عدد GPUs"
+    ],
+    "answer": 0,
+    "explanation": "النموذج يعالج tokens رقمية لا النص الخام مباشرة.",
+    "topic": "Transformers"
+  },
+  {
+    "id": "q35",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "لماذا تحتاج Transformer إلى معلومات Position؟",
+    "options": [
+      "لأن self-attention وحدها لا تمثل ترتيب tokens تلقائيًا",
+      "لتشفير كلمة المرور",
+      "لتحسين سرعة الشبكة فقط"
+    ],
+    "answer": 0,
+    "explanation": "Positional information يضيف ترتيب/موضع العناصر.",
+    "topic": "Transformers"
+  },
+  {
+    "id": "q36",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما المقصود بـPretraining لنموذج لغوي؟",
+    "options": [
+      "تعلم واسع على بيانات كبيرة قبل تخصيصه لمهمة محددة",
+      "تقييم نهائي على test set فقط",
+      "ضغط النموذج بعد النشر"
+    ],
+    "answer": 0,
+    "explanation": "Pretraining يبني تمثيلات وقدرات عامة قبل fine-tuning أو instruction tuning.",
+    "topic": "Transformers"
+  },
+  {
+    "id": "q37",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "متى يكون Fine-tuning مناسبًا أكثر من Prompting فقط؟",
+    "options": [
+      "عندما تحتاج تعديل سلوك/قدرات النموذج بشكل متكرر على مهمة أو أسلوب محدد",
+      "عندما تريد معرفة وثائق تتغير كل ساعة فقط",
+      "عندما لا توجد بيانات إطلاقًا"
+    ],
+    "answer": 0,
+    "explanation": "Fine-tuning يغيّر weights ويمكن أن يثبت سلوكًا خاصًا؛ المعرفة المتغيرة قد تكون أنسب لـRAG.",
+    "topic": "RAG, grounding & tools"
+  },
+  {
+    "id": "q38",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "متى يكون RAG خيارًا قويًا؟",
+    "options": [
+      "عند الحاجة لمعلومات خارجية قابلة للتحديث مع grounding في مصادر",
+      "عندما نريد حذف retrieval تمامًا",
+      "عندما نريد فقط زيادة GPU RAM"
+    ],
+    "answer": 0,
+    "explanation": "RAG يسترجع معرفة خارجية وقت الطلب بدل الاعتماد على weights وحدها.",
+    "topic": "RAG, grounding & tools"
+  },
+  {
+    "id": "q39",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما فائدة Reranking بعد retrieval؟",
+    "options": [
+      "إعادة ترتيب النتائج المرشحة لتحسين relevance قبل إدخالها للنموذج",
+      "زيادة عدد tokens عشوائيًا",
+      "تشفير secret keys"
+    ],
+    "answer": 0,
+    "explanation": "Reranker يختار/يرتب أفضل chunks من مجموعة مسترجعة أولية.",
+    "topic": "RAG, grounding & tools"
+  },
+  {
+    "id": "q40",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "أي إجراء يساعد أكثر على تقليل Hallucination في إجابات معرفية؟",
+    "options": [
+      "Grounding بمصادر موثوقة مع تقييم جودة retrieval",
+      "رفع temperature دائمًا",
+      "إزالة كل system instructions"
+    ],
+    "answer": 0,
+    "explanation": "Grounding وربط الإجابات بأدلة قابلة للتحقق يقلل الادعاءات غير المسندة.",
+    "topic": "RAG, grounding & tools"
+  },
+  {
+    "id": "q41",
+    "domain": "Core AI / Deep Learning / GenAI",
+    "question": "ما المقصود بـTool Calling في LLM application؟",
+    "options": [
+      "أن يختار النموذج استدعاء وظيفة/خدمة خارجية وفق schema محدد",
+      "أن يغيّر أوزانه أثناء كل محادثة",
+      "أن يحول كل prompt إلى صورة"
+    ],
+    "answer": 0,
+    "explanation": "Tool calling يسمح للنموذج بطلب تنفيذ وظيفة خارجية بدل توليد النص فقط.",
+    "topic": "RAG, grounding & tools"
+  },
+  {
+    "id": "q42",
+    "domain": "AI Software Engineering",
+    "question": "AI endpoint يستغرق 45 ثانية وقد يتذبذب زمنه. ما النمط الأنسب غالبًا عند أحمال كبيرة؟",
+    "options": [
+      "Queue + worker + job status/result",
+      "طلب synchronous طويل لكل مستخدم دائمًا",
+      "إلغاء timeouts"
+    ],
+    "answer": 0,
+    "explanation": "الأعمال الطويلة تستفيد من فصل request عن execution عبر queue/workers.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q43",
+    "domain": "AI Software Engineering",
+    "question": "متى تكون async I/O مفيدة أكثر؟",
+    "options": [
+      "عندما تقضي الخدمة وقتًا في انتظار network/database calls",
+      "عندما تكون المهمة CPU-bound ثقيلة بالكامل دون I/O",
+      "عندما لا توجد أي عمليات انتظار"
+    ],
+    "answer": 0,
+    "explanation": "Async يفيد workloads التي تنتظر I/O.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q44",
+    "domain": "AI Software Engineering",
+    "question": "لماذا نستخدم Queue بين API وworkers؟",
+    "options": [
+      "امتصاص spikes وفصل استقبال الطلبات عن المعالجة",
+      "زيادة coupling",
+      "إلغاء الحاجة للmonitoring"
+    ],
+    "answer": 0,
+    "explanation": "Queues تساعد في buffering، backpressure، وإدارة workers.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q45",
+    "domain": "AI Software Engineering",
+    "question": "طلب إنشاء تقرير أعيد بسبب network timeout. كيف تمنع إنشاء التقرير مرتين؟",
+    "options": [
+      "Idempotency key",
+      "زيادة temperature",
+      "حذف request ID"
+    ],
+    "answer": 0,
+    "explanation": "Idempotency تجعل retries لا تكرر side effects.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q46",
+    "domain": "AI Software Engineering",
+    "question": "أي أخطاء تكون أنسب للـretry؟",
+    "options": [
+      "Transient network/service errors",
+      "Validation error دائم في input",
+      "Unauthorized بسبب credential خاطئ دائم"
+    ],
+    "answer": 0,
+    "explanation": "Retries تفيد الأخطاء المؤقتة، لا الأخطاء الدائمة المتوقعة.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q47",
+    "domain": "AI Software Engineering",
+    "question": "لماذا نستخدم Exponential Backoff؟",
+    "options": [
+      "لتقليل الضغط على خدمة متعثرة بين المحاولات",
+      "لزيادة عدد retries بأقصى سرعة",
+      "لإلغاء timeout"
+    ],
+    "answer": 0,
+    "explanation": "Backoff يوسع الفاصل بين المحاولات لتقليل thundering herd.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q48",
+    "domain": "AI Software Engineering",
+    "question": "ما وظيفة Circuit Breaker؟",
+    "options": [
+      "إيقاف الطلبات مؤقتًا إلى dependency متعطلة لتجنب cascading failures",
+      "زيادة payload size",
+      "تشفير database"
+    ],
+    "answer": 0,
+    "explanation": "Circuit breaker يفشل سريعًا عند dependency غير صحية ثم يجرب لاحقًا.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q49",
+    "domain": "AI Software Engineering",
+    "question": "لماذا يجب تحديد Timeout واضح لاستدعاء model API؟",
+    "options": [
+      "حتى لا تبقى الموارد معلقة بلا حد عند تعطل الخدمة",
+      "لزيادة accuracy",
+      "لإلغاء الحاجة للretry"
+    ],
+    "answer": 0,
+    "explanation": "Timeouts تحدد أقصى انتظار وتحمي الموارد.",
+    "topic": "Async, queues & reliability"
+  },
+  {
+    "id": "q50",
+    "domain": "AI Software Engineering",
+    "question": "ما الغرض من Rate Limiting؟",
+    "options": [
+      "حماية الخدمة من الاستخدام المفرط/الانفجارات وتنظيم الحصص",
+      "زيادة context window",
+      "تدريب النموذج"
+    ],
+    "answer": 0,
+    "explanation": "Rate limits تحمي availability والميزانية.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q51",
+    "domain": "AI Software Engineering",
+    "question": "متى يفيد Caching في AI application؟",
+    "options": [
+      "عندما تتكرر طلبات أو نتائج قابلة لإعادة الاستخدام مع سياسة invalidation مناسبة",
+      "عندما يجب أن تكون كل إجابة آنية وفريدة دومًا",
+      "لإخفاء أخطاء authorization"
+    ],
+    "answer": 0,
+    "explanation": "Caching يقلل latency/cost للنتائج المتكررة إذا كان التحديث مضبوطًا.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q52",
+    "domain": "AI Software Engineering",
+    "question": "ما الفرق الأساسي بين Authentication وAuthorization؟",
+    "options": [
+      "Authentication يثبت الهوية؛ Authorization يحدد الصلاحيات",
+      "هما الشيء نفسه دائمًا",
+      "Authorization يثبت كلمة المرور فقط"
+    ],
+    "answer": 0,
+    "explanation": "الهوية أولًا ثم ما يُسمح لهذه الهوية بفعله.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q53",
+    "domain": "AI Software Engineering",
+    "question": "أين يجب تخزين API keys في production؟",
+    "options": [
+      "Secret manager / environment injection آمنة",
+      "داخل Git repository العام",
+      "داخل JavaScript المرسل للمتصفح"
+    ],
+    "answer": 0,
+    "explanation": "Secrets لا يجب تضمينها في source أو client-side bundles.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q54",
+    "domain": "AI Software Engineering",
+    "question": "لماذا نستخدم API Versioning؟",
+    "options": [
+      "لتطوير العقود دون كسر العملاء الحاليين فجأة",
+      "لزيادة GPU throughput مباشرة",
+      "لإلغاء schema validation"
+    ],
+    "answer": 0,
+    "explanation": "Versioning يدعم تغييرات متوافقة/منظمة في العقود.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q55",
+    "domain": "AI Software Engineering",
+    "question": "ما الذي يختبره Unit Test غالبًا؟",
+    "options": [
+      "وظيفة/وحدة صغيرة بمعزل نسبيًا عن dependencies",
+      "النظام كاملًا مع database حقيقية دائمًا",
+      "أداء GPU فقط"
+    ],
+    "answer": 0,
+    "explanation": "Unit tests تستهدف منطقًا صغيرًا ومعزولًا.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q56",
+    "domain": "AI Software Engineering",
+    "question": "ما الذي يختبره Integration Test؟",
+    "options": [
+      "تفاعل مكونات متعددة مثل API وDB وqueue",
+      "سطرًا واحدًا فقط دون dependencies",
+      "UX فقط"
+    ],
+    "answer": 0,
+    "explanation": "Integration tests تتحقق من عقود وتفاعل المكونات.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q57",
+    "domain": "AI Software Engineering",
+    "question": "ما فائدة Structured Logging؟",
+    "options": [
+      "إنتاج logs قابلة للبحث/التحليل بfields ثابتة مثل request_id",
+      "منع كل الأخطاء",
+      "استبدال tracing بالكامل"
+    ],
+    "answer": 0,
+    "explanation": "Structured logs تسهل الربط والبحث والتحليل الآلي.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q58",
+    "domain": "AI Software Engineering",
+    "question": "لماذا نستخدم Schema Validation لمدخلات/مخرجات AI API؟",
+    "options": [
+      "لمنع بيانات غير متوقعة وكسر العقود مبكرًا",
+      "لزيادة model parameters",
+      "لإلغاء authorization"
+    ],
+    "answer": 0,
+    "explanation": "التحقق من schema يجعل الحدود بين المكونات واضحة وقابلة للاختبار.",
+    "topic": "API safety & testing"
+  },
+  {
+    "id": "q59",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الذي يوفره Experiment Tracking؟",
+    "options": [
+      "ربط runs بالـparameters والmetrics والartifacts",
+      "استبدال dataset",
+      "منع الحاجة للتقييم"
+    ],
+    "answer": 0,
+    "explanation": "التتبع يسهل المقارنة وإعادة الإنتاج.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q60",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الغرض الأساسي من Model Registry؟",
+    "options": [
+      "Versioning + lineage + lifecycle management",
+      "ضغط الصور",
+      "إلغاء deployment"
+    ],
+    "answer": 0,
+    "explanation": "Registry يدير نسخ النماذج ومعلوماتها وانتقالها بين البيئات.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q61",
+    "domain": "MLOps / LLMOps",
+    "question": "ما معنى Lineage في ML؟",
+    "options": [
+      "تتبع العلاقة بين البيانات والكود والتجربة والنموذج والإصدار",
+      "عدد GPUs",
+      "نوع الترخيص فقط"
+    ],
+    "answer": 0,
+    "explanation": "Lineage يسمح بمعرفة كيف تم إنتاج artifact معين.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q62",
+    "domain": "MLOps / LLMOps",
+    "question": "لماذا نحتاج Dataset Versioning؟",
+    "options": [
+      "لإعادة بناء نفس التجربة ومعرفة أي بيانات أنتجت النموذج",
+      "لزيادة RAM",
+      "لإلغاء test set"
+    ],
+    "answer": 0,
+    "explanation": "البيانات جزء من reproducibility وليست ثابتة بالضرورة.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q63",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الذي يجعل تجربة ML قابلة لإعادة الإنتاج أكثر؟",
+    "options": [
+      "تثبيت versions/seeds/configs والاحتفاظ بالartifacts والبيانات",
+      "الاعتماد على الذاكرة البشرية",
+      "تغيير dependencies كل تشغيل"
+    ],
+    "answer": 0,
+    "explanation": "Reproducibility تحتاج ضبط البيئة والمدخلات والإعدادات.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q64",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الذي يختبره CI في ML pipeline عادةً؟",
+    "options": [
+      "الكود والاختبارات والعقود وربما checks للبيانات قبل الدمج",
+      "النموذج في production فقط",
+      "SLA المالي فقط"
+    ],
+    "answer": 0,
+    "explanation": "CI يتحقق من التغييرات مبكرًا قبل التسليم.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q65",
+    "domain": "MLOps / LLMOps",
+    "question": "ما المقصود بـCD في سياق MLOps؟",
+    "options": [
+      "أتمتة تسليم/نشر artifacts أو pipelines وفق ضوابط",
+      "جمع البيانات يدويًا فقط",
+      "حذف monitoring"
+    ],
+    "answer": 0,
+    "explanation": "Continuous Delivery/Deployment ينقل تغييرات موثقة نحو البيئات.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q66",
+    "domain": "MLOps / LLMOps",
+    "question": "ما المقصود بـContinuous Training (CT)؟",
+    "options": [
+      "إعادة تدريب منظمة عند triggers مثل بيانات جديدة/تدهور وفق pipeline",
+      "تدريب لا يتوقف على نفس batch",
+      "تغيير prompt فقط"
+    ],
+    "answer": 0,
+    "explanation": "CT يعني pipeline قابلة للتكرار لإعادة التدريب عند الحاجة.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q67",
+    "domain": "MLOps / LLMOps",
+    "question": "ما ميزة Canary Deployment؟",
+    "options": [
+      "تعريض نسبة صغيرة من traffic للإصدار الجديد أولًا",
+      "استبدال كل traffic فورًا",
+      "تشغيل الإصدار الجديد دون metrics"
+    ],
+    "answer": 0,
+    "explanation": "Canary يقلل blast radius ويتيح المقارنة قبل التوسع.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q68",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الفكرة في Blue-Green Deployment؟",
+    "options": [
+      "بيئتان متوازيتان مع تحويل traffic بينهما",
+      "تدريب نموذجين في نفس GPU دائمًا",
+      "إلغاء rollback"
+    ],
+    "answer": 0,
+    "explanation": "وجود بيئتين يسهل التبديل والرجوع.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q69",
+    "domain": "MLOps / LLMOps",
+    "question": "ما فائدة Shadow Deployment؟",
+    "options": [
+      "إرسال نسخة من traffic للنموذج الجديد دون أن تؤثر مخرجاته على المستخدم",
+      "إظهار النموذج الجديد لكل المستخدمين مباشرة",
+      "إلغاء logging"
+    ],
+    "answer": 0,
+    "explanation": "Shadow يسمح بالمقارنة على traffic حقيقي دون user impact.",
+    "topic": "MLOps lifecycle"
+  },
+  {
+    "id": "q70",
+    "domain": "MLOps / LLMOps",
+    "question": "متى نستخدم Rollback؟",
+    "options": [
+      "عندما يظهر degradation أو فشل في الإصدار الجديد ونحتاج الرجوع لنسخة سليمة",
+      "لزيادة feature count",
+      "لإلغاء registry"
+    ],
+    "answer": 0,
+    "explanation": "Rollback يقلل زمن التعافي من إصدار سيئ.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q71",
+    "domain": "MLOps / LLMOps",
+    "question": "أي metric تشغيلي يقيس زمن استجابة inference؟",
+    "options": [
+      "Latency",
+      "Recall فقط",
+      "R²"
+    ],
+    "answer": 0,
+    "explanation": "Latency metric تشغيلية أساسية للخدمات.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q72",
+    "domain": "MLOps / LLMOps",
+    "question": "تغير توزيع input مقارنة ببيانات التدريب يسمى:",
+    "options": [
+      "Data drift",
+      "Concept drift",
+      "Overfitting فقط"
+    ],
+    "answer": 0,
+    "explanation": "Data drift يتعلق بتغير توزيع المدخلات.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q73",
+    "domain": "MLOps / LLMOps",
+    "question": "العلاقة بين features وtarget تغيرت بمرور الوقت رغم بقاء توزيع inputs قريبًا. ما الاسم الأقرب؟",
+    "options": [
+      "Concept drift",
+      "Data compression",
+      "Batch normalization"
+    ],
+    "answer": 0,
+    "explanation": "Concept drift يعني تغير العلاقة/المفهوم الذي يتعلمه النموذج.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q74",
+    "domain": "MLOps / LLMOps",
+    "question": "Model accuracy في production انخفضت دون تغير واضح في latency. ماذا تحتاج أولًا؟",
+    "options": [
+      "مراقبة جودة النموذج وربطها بالبيانات/الـdrift",
+      "زيادة CPU فقط",
+      "إخفاء logs"
+    ],
+    "answer": 0,
+    "explanation": "تدهور الجودة يحتاج diagnostics على data/model quality.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q75",
+    "domain": "MLOps / LLMOps",
+    "question": "ما معنى Training-Serving Skew؟",
+    "options": [
+      "اختلاف preprocessing/features بين التدريب وinference",
+      "اختلاف لون UI",
+      "استخدام GPU مختلفة فقط"
+    ],
+    "answer": 0,
+    "explanation": "عدم اتساق features بين train وserve قد يسبب تدهورًا.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q76",
+    "domain": "MLOps / LLMOps",
+    "question": "ما فائدة Feature Store عند استخدامه بشكل مناسب؟",
+    "options": [
+      "توحيد تعريفات/features بين التدريب والخدمة وتقليل skew",
+      "استبدال model registry",
+      "منع drift دائمًا"
+    ],
+    "answer": 0,
+    "explanation": "Feature stores تساعد على إعادة استخدام features واتساقها.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q77",
+    "domain": "MLOps / LLMOps",
+    "question": "ما الذي يضيفه Distributed Tracing مقارنةً بالlogs فقط؟",
+    "options": [
+      "رؤية مسار الطلب عبر الخدمات ووقت كل span",
+      "زيادة accuracy مباشرة",
+      "تشفير النموذج"
+    ],
+    "answer": 0,
+    "explanation": "Tracing مفيد في الأنظمة الموزعة لتحديد أين يضيع الوقت أو يحدث الفشل.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q78",
+    "domain": "MLOps / LLMOps",
+    "question": "متى يجب إطلاق Alert؟",
+    "options": [
+      "عند تجاوز threshold له معنى تشغيلي/جودة مع action واضح",
+      "على كل log message",
+      "فقط عند توقف الإنترنت بالكامل"
+    ],
+    "answer": 0,
+    "explanation": "Alerts يجب أن تكون actionable لتجنب alert fatigue.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q79",
+    "domain": "MLOps / LLMOps",
+    "question": "لماذا نحتاج Prompt Versioning في LLMOps؟",
+    "options": [
+      "لتتبع أثر تغير التعليمات وإعادة إنتاج النتائج",
+      "لإخفاء prompts عن الفريق فقط",
+      "لزيادة context window"
+    ],
+    "answer": 0,
+    "explanation": "Prompts جزء من سلوك النظام ويجب أن تُدار كartifacts.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q80",
+    "domain": "MLOps / LLMOps",
+    "question": "ما فائدة Golden Evaluation Dataset للـLLM/Agent؟",
+    "options": [
+      "مجموعة ثابتة ممثلة للحالات المهمة لاكتشاف regressions",
+      "مجموعة تدريب سرية دائمًا",
+      "بديل عن كل production monitoring"
+    ],
+    "answer": 0,
+    "explanation": "Golden sets تسمح بمقارنة الإصدارات بصورة متكررة ومنظمة.",
+    "topic": "Deployment, drift & LLMOps"
+  },
+  {
+    "id": "q81",
+    "domain": "Architecture / Infrastructure",
+    "question": "ماذا يعني Horizontal Scaling؟",
+    "options": [
+      "زيادة عدد instances/replicas",
+      "زيادة CPU/RAM لنفس instance فقط",
+      "تقليل عدد الخدمات"
+    ],
+    "answer": 0,
+    "explanation": "Horizontal scaling يضيف وحدات معالجة متوازية.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q82",
+    "domain": "Architecture / Infrastructure",
+    "question": "ماذا يعني Vertical Scaling؟",
+    "options": [
+      "زيادة موارد instance نفسها",
+      "زيادة عدد replicas",
+      "إرسال traffic إلى CDN فقط"
+    ],
+    "answer": 0,
+    "explanation": "Vertical scaling يرفع CPU/RAM/GPU للوحدة نفسها.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q83",
+    "domain": "Architecture / Infrastructure",
+    "question": "لماذا تفيد Stateless Services في horizontal scaling؟",
+    "options": [
+      "يمكن توزيع الطلبات على replicas دون اعتماد كبير على ذاكرة محلية للجلسة",
+      "تمنع الحاجة لأي database",
+      "تجعل كل request أبطأ"
+    ],
+    "answer": 0,
+    "explanation": "Statelessness تسهل التوزيع والاستبدال والautoscaling.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q84",
+    "domain": "Architecture / Infrastructure",
+    "question": "ما وظيفة Load Balancer؟",
+    "options": [
+      "توزيع traffic على backends صحية",
+      "تدريب model",
+      "تشفير embeddings"
+    ],
+    "answer": 0,
+    "explanation": "Load balancer يوزع الحمل ويدعم health checks.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q85",
+    "domain": "Architecture / Infrastructure",
+    "question": "متى يكون Cache مفيدًا معماريًا؟",
+    "options": [
+      "عندما تتكرر قراءة/نتيجة ويمكن قبول freshness policy واضحة",
+      "عندما يجب أن تكون كل قراءة أحدث nanosecond دون استثناء",
+      "كبديل للauthorization"
+    ],
+    "answer": 0,
+    "explanation": "Cache يقلل latency والحمل مع trade-off للfreshness.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q86",
+    "domain": "Architecture / Infrastructure",
+    "question": "لماذا نستخدم Queue في architecture عالية الحمل؟",
+    "options": [
+      "لفصل producers عن consumers وامتصاص spikes",
+      "لجعل كل شيء synchronous",
+      "لإلغاء backpressure"
+    ],
+    "answer": 0,
+    "explanation": "Queues توازن معدلات الإنتاج والاستهلاك.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q87",
+    "domain": "Architecture / Infrastructure",
+    "question": "ما فائدة Batching في inference؟",
+    "options": [
+      "رفع throughput على hardware مناسب عبر معالجة عدة طلبات معًا",
+      "تقليل كل latency دائمًا إلى صفر",
+      "إلغاء الحاجة للGPU"
+    ],
+    "answer": 0,
+    "explanation": "Batching قد يحسن utilization/throughput مع trade-off محتمل في latency.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q88",
+    "domain": "Architecture / Infrastructure",
+    "question": "ما الفرق بين Throughput وLatency؟",
+    "options": [
+      "Throughput حجم العمل/الزمن؛ Latency زمن الاستجابة لطلب",
+      "هما الشيء نفسه",
+      "Latency عدد users"
+    ],
+    "answer": 0,
+    "explanation": "قياسان مختلفان ويحتاج التصميم لموازنة بينهما.",
+    "topic": "Scaling & performance"
+  },
+  {
+    "id": "q89",
+    "domain": "Architecture / Infrastructure",
+    "question": "متى تكون GPU أنسب غالبًا من CPU؟",
+    "options": [
+      "عمليات tensor/matrix واسعة ومتوازية مثل deep learning inference/training",
+      "تنفيذ شرط if بسيط فقط",
+      "تخزين logs"
+    ],
+    "answer": 0,
+    "explanation": "GPUs ممتازة للتوازي العددي واسع النطاق.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q90",
+    "domain": "Architecture / Infrastructure",
+    "question": "متى يعمل Autoscaling جيدًا؟",
+    "options": [
+      "عند ربطه بmetrics مناسبة وقيود warm-up/capacity",
+      "عند عدم وجود metrics",
+      "إذا كان start-up يستغرق ساعة ولا توجد أي خطة"
+    ],
+    "answer": 0,
+    "explanation": "Autoscaling يحتاج إشارات مناسبة وفهم زمن التوسع.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q91",
+    "domain": "Architecture / Infrastructure",
+    "question": "لماذا نستخدم Replicas؟",
+    "options": [
+      "لزيادة السعة/التوافر وتقليل نقطة الفشل الواحدة",
+      "لزيادة حجم model file فقط",
+      "لإلغاء backups"
+    ],
+    "answer": 0,
+    "explanation": "Replicas تساعد في availability وscale.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q92",
+    "domain": "Architecture / Infrastructure",
+    "question": "ما المقصود بـHigh Availability؟",
+    "options": [
+      "تصميم يقلل الانقطاع رغم فشل بعض المكونات",
+      "ضمان عدم حدوث أي فشل في الكون",
+      "تشغيل نسخة واحدة فقط"
+    ],
+    "answer": 0,
+    "explanation": "HA يبني redundancy وfailover لتقليل downtime.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q93",
+    "domain": "Architecture / Infrastructure",
+    "question": "RTO يشير إلى:",
+    "options": [
+      "الوقت المستهدف لاستعادة الخدمة بعد الانقطاع",
+      "أقصى فقد بيانات مقبول",
+      "عدد replicas"
+    ],
+    "answer": 0,
+    "explanation": "Recovery Time Objective هو هدف زمن الاستعادة.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q94",
+    "domain": "Architecture / Infrastructure",
+    "question": "RPO يشير إلى:",
+    "options": [
+      "أقصى نقطة فقد بيانات مقبولة زمنيًا",
+      "زمن استعادة الخدمة",
+      "معدل requests"
+    ],
+    "answer": 0,
+    "explanation": "Recovery Point Objective يحدد مقدار فقد البيانات المقبول.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q95",
+    "domain": "Architecture / Infrastructure",
+    "question": "ما المقصود بـGraceful Degradation؟",
+    "options": [
+      "استمرار الخدمة بقدرات محدودة عند تعطل جزء غير أساسي",
+      "إيقاف كل النظام عند أي خطأ",
+      "إخفاء الخطأ فقط"
+    ],
+    "answer": 0,
+    "explanation": "التدهور المتدرج يحافظ على الوظائف الأساسية بدل الانهيار الكامل.",
+    "topic": "Availability & recovery"
+  },
+  {
+    "id": "q96",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما المقصود بـFairness في AI بصورة عامة؟",
+    "options": [
+      "تقييم وتقليل الفروق غير المبررة في النتائج بين مجموعات ذات صلة",
+      "جعل كل predictions متطابقة",
+      "رفع accuracy فقط"
+    ],
+    "answer": 0,
+    "explanation": "Fairness تتطلب تعريفًا سياقيًا وقياس الأثر على المجموعات.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q97",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما أحد مصادر Bias في AI system؟",
+    "options": [
+      "بيانات تاريخية غير ممثلة أو قرارات labeling متحيزة",
+      "استخدام HTTPS",
+      "كتابة unit tests"
+    ],
+    "answer": 0,
+    "explanation": "التحيز قد يدخل من البيانات أو القياس أو التصميم أو الاستخدام.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q98",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما فائدة Explainability؟",
+    "options": [
+      "مساعدة أصحاب المصلحة على فهم العوامل/الأسباب المؤثرة في القرار بحسب الحاجة",
+      "ضمان أن النموذج صحيح دائمًا",
+      "استبدال validation"
+    ],
+    "answer": 0,
+    "explanation": "Explainability تدعم الفهم والمراجعة لكنها ليست ضمان صحة.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q99",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما المقصود بـTransparency؟",
+    "options": [
+      "وضوح كافٍ حول استخدام AI وحدوده ومصادره/عملياته المناسبة للسياق",
+      "نشر كل secrets علنًا",
+      "إخفاء النموذج عن المستخدمين دائمًا"
+    ],
+    "answer": 0,
+    "explanation": "الشفافية لا تعني كشف الأسرار بل الإفصاح المناسب.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q100",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "من المسؤول عن قرار AI عالي الأثر في مؤسسة ناضجة؟",
+    "options": [
+      "المؤسسة/الأدوار المحددة، وليس النموذج نفسه",
+      "النموذج وحده",
+      "المستخدم النهائي دائمًا فقط"
+    ],
+    "answer": 0,
+    "explanation": "Accountability يجب أن تُسند لبشر/جهات ومسؤوليات واضحة.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q101",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما مبدأ Data Minimization؟",
+    "options": [
+      "جمع/معالجة أقل قدر ضروري لتحقيق الغرض",
+      "جمع كل شيء احتياطًا",
+      "الاحتفاظ بالبيانات للأبد"
+    ],
+    "answer": 0,
+    "explanation": "تقليل البيانات يقلل مخاطر الخصوصية والهجوم.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q102",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "لماذا يجب حماية PII في prompts/logs؟",
+    "options": [
+      "لتقليل مخاطر التسرب والامتثال للسياسات/الخصوصية",
+      "لزيادة tokens",
+      "لتحسين GPU utilization"
+    ],
+    "answer": 0,
+    "explanation": "PII قد تتسرب عبر logs أو providers أو traces إذا لم تُدار.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q103",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "متى يكون Human Oversight مهمًا خصوصًا؟",
+    "options": [
+      "في قرارات عالية الأثر أو منخفضة الثقة أو عند الاستثناءات",
+      "فقط في ألعاب بسيطة",
+      "لا حاجة له أبدًا"
+    ],
+    "answer": 0,
+    "explanation": "الرقابة البشرية أحد controls المهمة للأنظمة عالية الأثر.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q104",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما فائدة Audit Trail؟",
+    "options": [
+      "إعادة بناء من فعل ماذا ومتى وبأي إصدار/قرار",
+      "زيادة model size",
+      "استبدال authentication"
+    ],
+    "answer": 0,
+    "explanation": "Auditability تدعم التحقيق والمساءلة.",
+    "topic": "Responsible AI & privacy"
+  },
+  {
+    "id": "q105",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما فائدة Model/System Card؟",
+    "options": [
+      "توثيق الغرض والحدود والبيانات/التقييم والمخاطر والاستخدام المتوقع",
+      "إخفاء القيود",
+      "استبدال كل الاختبارات"
+    ],
+    "answer": 0,
+    "explanation": "التوثيق المنهجي يساعد على الاستخدام المسؤول والمراجعة.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q106",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "Prompt Injection هو:",
+    "options": [
+      "تعليمات خبيثة تحاول تغيير سلوك النموذج أو تجاوز قيوده",
+      "زيادة طول prompt فقط",
+      "ضغط النموذج"
+    ],
+    "answer": 0,
+    "explanation": "Prompt injection يستهدف طبقة التعليمات/السياق.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q107",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "Indirect Prompt Injection يحدث عندما:",
+    "options": [
+      "تأتي التعليمات الخبيثة من محتوى خارجي يسترجعه/يقرأه النظام",
+      "يكتب المستخدم كلمة مرور خاطئة",
+      "تنقطع الشبكة"
+    ],
+    "answer": 0,
+    "explanation": "المحتوى الخارجي مثل صفحة أو وثيقة قد يحتوي تعليمات خبيثة.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q108",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "Data/Model Poisoning يعني:",
+    "options": [
+      "التلاعب ببيانات/مصادر أو artifacts للتأثير الخبيث على سلوك النموذج",
+      "ضغط dataset",
+      "إضافة cache"
+    ],
+    "answer": 0,
+    "explanation": "Poisoning يلوث سلسلة البيانات/التدريب أو المعرفة.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q109",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "Excessive Agency يعني:",
+    "options": [
+      "منح agent صلاحيات/قدرة تنفيذ أوسع من اللازم دون ضوابط",
+      "استخدام model صغير",
+      "كثرة logging"
+    ],
+    "answer": 0,
+    "explanation": "الـagent يجب أن يمتلك أقل صلاحيات لازمة وقيودًا على الإجراءات.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q110",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "أي control يقلل مخاطر tool abuse؟",
+    "options": [
+      "Least privilege + allowlists + approval للعمليات الحساسة",
+      "منح admin access دائمًا",
+      "إلغاء logs"
+    ],
+    "answer": 0,
+    "explanation": "تقليل الصلاحيات والتحقق من الأدوات والإجراءات يحد من blast radius.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q111",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "لماذا يجب Validation/Sanitization لمخرجات LLM قبل تنفيذها؟",
+    "options": [
+      "لأن output قد يكون غير موثوق أو خبيثًا ويجب ألا يتحول مباشرة إلى command",
+      "لأن LLM output صحيح دائمًا",
+      "فقط لتقليل حجم النص"
+    ],
+    "answer": 0,
+    "explanation": "Improper output handling قد يحول نصًا غير موثوق إلى SQL/HTML/commands خطرة.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q112",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما المقصود بـSupply Chain Risk في AI system؟",
+    "options": [
+      "مخاطر من models/libraries/datasets/services خارجية أو compromised dependencies",
+      "مخاطر UI colors",
+      "زمن الاستجابة فقط"
+    ],
+    "answer": 0,
+    "explanation": "سلسلة التوريد تشمل كل artifact/provider تعتمد عليه المنظومة.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q113",
+    "domain": "Responsible AI / Security / Governance",
+    "question": "ما فائدة Red Teaming قبل/بعد النشر؟",
+    "options": [
+      "البحث المنهجي عن حالات فشل وهجمات وسلوكيات غير متوقعة",
+      "زيادة training data تلقائيًا دائمًا",
+      "استبدال monitoring"
+    ],
+    "answer": 0,
+    "explanation": "Red teaming يكشف ثغرات وسلوكيات قد لا تظهر في الاختبارات العادية.",
+    "topic": "LLM/Agent security"
+  },
+  {
+    "id": "q114",
+    "domain": "Business / Professional Practice",
+    "question": "نموذج جديد يحسن F1 بـ0.2% لكنه يضاعف التكلفة 10×. ما القرار الصحيح؟",
+    "options": [
+      "يعتمد على business value وSLA والمخاطر والتكلفة",
+      "اعتمده دائمًا لأن F1 أعلى",
+      "ارفضه دائمًا لأن التكلفة أعلى"
+    ],
+    "answer": 0,
+    "explanation": "قرار الإنتاج يجب أن يوازن model metrics مع business outcomes.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q115",
+    "domain": "Business / Professional Practice",
+    "question": "ما الفرق بين Model Metric وBusiness KPI؟",
+    "options": [
+      "الأول يقيس أداء النموذج؛ الثاني يقيس أثرًا تجاريًا/تشغيليًا مطلوبًا",
+      "هما دائمًا الشيء نفسه",
+      "KPI خاص بالـGPU فقط"
+    ],
+    "answer": 0,
+    "explanation": "نجاح النموذج لا يضمن نجاح business outcome.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q116",
+    "domain": "Business / Professional Practice",
+    "question": "متى يكون Build vs Buy تحليلًا مهمًا؟",
+    "options": [
+      "عند موازنة التخصيص والسرعة والتكلفة والمخاطر والقدرات الداخلية",
+      "فقط بعد فشل المشروع",
+      "لا علاقة له بـAI"
+    ],
+    "answer": 0,
+    "explanation": "القرار يوازن قدرات المؤسسة ضد حلول جاهزة.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q117",
+    "domain": "Business / Professional Practice",
+    "question": "ما المقصود بـSLA؟",
+    "options": [
+      "اتفاق/هدف مستوى خدمة مثل availability/latency/support",
+      "معيار لدقة التدريب فقط",
+      "نوع embedding"
+    ],
+    "answer": 0,
+    "explanation": "SLA يترجم متطلبات الخدمة إلى أهداف قابلة للقياس.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q118",
+    "domain": "Business / Professional Practice",
+    "question": "قبل بناء AI use case، ما أول سؤال مهم؟",
+    "options": [
+      "ما المشكلة/النتيجة التجارية المطلوب تحسينها وكيف سنقيس النجاح؟",
+      "أي LLM هو الأكبر؟",
+      "أي لون للواجهة؟"
+    ],
+    "answer": 0,
+    "explanation": "ابدأ بالهدف والقيمة والقياس قبل اختيار التقنية.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q119",
+    "domain": "Business / Professional Practice",
+    "question": "Stakeholder يطلب Accuracy=100% دون تحديد تكلفة أو أثر الأخطاء. ماذا تفعل؟",
+    "options": [
+      "توضح trade-offs وتطلب متطلبات الخطر/التكلفة/العمليات",
+      "تعده بـ100%",
+      "تتجاهله"
+    ],
+    "answer": 0,
+    "explanation": "المتطلبات يجب تحويلها إلى مقاييس واقعية مرتبطة بالأثر.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q120",
+    "domain": "Business / Professional Practice",
+    "question": "ما أهمية Change Management عند إدخال AI في workflow؟",
+    "options": [
+      "لأن النجاح يعتمد على تبني الناس والعمليات والتدريب والمسؤوليات، لا النموذج فقط",
+      "لا أهمية له إذا كان model دقيقًا",
+      "هو خاص بالـdatabase فقط"
+    ],
+    "answer": 0,
+    "explanation": "AI system جزء من socio-technical system.",
+    "topic": "Business & collaboration"
+  },
+  {
+    "id": "q121",
+    "domain": "Business / Professional Practice",
+    "question": "متى يجب Escalation إلى Human Reviewer؟",
+    "options": [
+      "عند حالات عالية المخاطر أو منخفضة الثقة أو خارج النطاق المحدد",
+      "عند كل request مهما كان",
+      "لا يجب التصعيد أبدًا"
+    ],
+    "answer": 0,
+    "explanation": "Human-in-the-loop يُستخدم وفق risk/uncertainty policies.",
+    "topic": "Business & collaboration"
+  }
+]

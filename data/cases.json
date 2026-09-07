@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Uber Michelangelo — end-to-end ML in production",
+    "domain": "MLOps / LLMOps",
+    "what": "Uber built Michelangelo to standardize data management, training, evaluation, deployment, prediction, and monitoring. UberEATS ETA was one published production use case.",
+    "lesson": "Treat an ML model as one component in a lifecycle. Reproducibility, feature consistency, deployment, A/B testing, and live monitoring matter as much as training.",
+    "source": "Uber Engineering — Meet Michelangelo (2017)"
+  },
+  {
+    "title": "Air Canada chatbot — wrong policy, real liability",
+    "domain": "Responsible AI / Governance",
+    "what": "A Canadian tribunal found Air Canada liable after its website chatbot gave incorrect information about bereavement fares and a customer relied on it.",
+    "lesson": "A production chatbot is a publishing/decision surface. Grounding, policy consistency, monitoring, escalation, and accountability are controls—not optional extras.",
+    "source": "Moffatt v. Air Canada, 2024 BCCRT 149"
+  },
+  {
+    "title": "Amazon recruiting model — historical bias",
+    "domain": "Responsible AI / Fairness",
+    "what": "Reuters reported that Amazon abandoned an experimental recruiting system after it learned patterns that disadvantaged women for some technical roles.",
+    "lesson": "Historical labels can encode social bias. Accuracy alone is insufficient; subgroup evaluation, data review, and governance are necessary.",
+    "source": "Reuters reporting, 2018"
+  },
+  {
+    "title": "Zillow Offers — forecasting uncertainty became business risk",
+    "domain": "Business / Model Risk",
+    "what": "Zillow said it would wind down Zillow Offers after concluding that home-price forecasting unpredictability was greater than anticipated and created excessive earnings and balance-sheet volatility.",
+    "lesson": "Model error becomes business risk when decisions scale. Evaluate uncertainty, downside exposure, operating constraints, and rollback/exit conditions.",
+    "source": "Zillow Group Q3 2021 results"
+  }
+]

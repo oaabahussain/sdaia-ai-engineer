@@ -1,0 +1,172 @@
+{
+  "Metrics & classification": {
+    "title": "اختر المقياس على حسب تكلفة الخطأ",
+    "bullets": [
+      "Accuracy قد تخدعك مع rare classes.",
+      "Recall/Sensitivity مهم عندما يكون تفويت الإيجابي خطيرًا.",
+      "Precision مهم عندما تكون الإنذارات الكاذبة مكلفة.",
+      "غيّر threshold عندما تتغير تكلفة FP/FN."
+    ],
+    "mental": "السؤال في الاختبار غالبًا ليس: «ما تعريف Recall؟» بل: «أي metric يخدم هذا القرار؟»"
+  },
+  "Validation & generalization": {
+    "title": "اختبر قدرة النموذج على التعميم، لا حفظ التدريب",
+    "bullets": [
+      "Train للتعلم، Validation للضبط، Test للحكم النهائي.",
+      "لا تستخدم معلومة لن تكون متاحة وقت inference.",
+      "فجوة train≫validation = غالبًا overfitting.",
+      "Cross-validation يقلل حساسية النتيجة لتقسيم واحد."
+    ],
+    "mental": "أي feature «من المستقبل» أو من بعد حدوث النتيجة = اشتبه في leakage."
+  },
+  "Imbalance & model choice": {
+    "title": "Rare events تحتاج metrics ونماذج مناسبة",
+    "bullets": [
+      "PR curve مفيدة عندما positive نادرة.",
+      "الأشجار لا تحتاج scaling مثل k-NN/gradient methods.",
+      "MAE أقل حساسية للأخطاء الكبيرة من RMSE.",
+      "PCA تقليل أبعاد؛ clustering تعلم غير مراقب."
+    ],
+    "mental": "اربط السؤال بطبيعة البيانات قبل اختيار algorithm أو metric."
+  },
+  "Preprocessing & thresholds": {
+    "title": "Preprocessing جزء من النظام، وليس خطوة تنظيف فقط",
+    "bullets": [
+      "Standardization ≈ mean 0/std 1.",
+      "Min-Max يعيد القياس إلى نطاق.",
+      "One-hot للفئات الاسمية بلا ترتيب.",
+      "خفض threshold يرفع positives وغالبًا Recall."
+    ],
+    "mental": "أي preprocessing يجب أن يكون متسقًا بين train وserve."
+  },
+  "Neural network basics": {
+    "title": "Forward → Loss → Backprop → Update",
+    "bullets": [
+      "Activation غير خطية تمنح الشبكة قدرة تمثيل معقدة.",
+      "Backprop يحسب gradients.",
+      "Learning rate كبير جدًا قد يسبب عدم استقرار.",
+      "Epoch = مرور كامل على train set."
+    ],
+    "mental": "احفظ الدورة كعملية واحدة، لا كتعريفات منفصلة."
+  },
+  "Sequence & CNN models": {
+    "title": "اختيار المعمارية حسب بنية البيانات",
+    "bullets": [
+      "CNN قوية للأنماط المحلية/المكانية.",
+      "RNN تعالج التسلسل لكن تعاني dependencies طويلة.",
+      "LSTM تضيف gates للذاكرة.",
+      "Transformer قلل الاعتماد على المعالجة التسلسلية."
+    ],
+    "mental": "اسأل: ما البنية التي أحتاج أن أمثلها—مكان، تسلسل، أم علاقات عامة داخل السياق؟"
+  },
+  "Transformers": {
+    "title": "Token → Embedding → Position → Attention",
+    "bullets": [
+      "Self-attention يربط tokens داخل السياق.",
+      "Embeddings تمثيلات عددية كثيفة.",
+      "Positional info يعطي ترتيبًا.",
+      "Pretraining يبني قدرات عامة قبل التخصيص."
+    ],
+    "mental": "Transformer لا «يفهم النص الخام»؛ يعمل على tokens وتمثيلات عددية."
+  },
+  "RAG, grounding & tools": {
+    "title": "RAG للمعرفة المتغيرة؛ Tools للأفعال",
+    "bullets": [
+      "RAG يجلب معرفة خارجية وقت الطلب.",
+      "Reranking يرتب أفضل chunks.",
+      "Grounding يقلل ادعاءات بلا سند.",
+      "Tool calling يحتاج schema وصلاحيات وضوابط."
+    ],
+    "mental": "المعرفة ≠ الفعل. retrieval يعطي سياق؛ tools قد تغيّر العالم."
+  },
+  "Async, queues & reliability": {
+    "title": "افصل استقبال الطلب عن العمل الطويل",
+    "bullets": [
+      "Queue تمتص spikes وتفصل producer/consumer.",
+      "Retries للأخطاء المؤقتة مع backoff.",
+      "Circuit breaker يمنع cascading failures.",
+      "Idempotency تمنع تكرار side effects."
+    ],
+    "mental": "كل retry قد يكون عملية مكررة ما لم تصمم idempotency."
+  },
+  "API safety & testing": {
+    "title": "حدود النظام يجب أن تكون واضحة وقابلة للاختبار",
+    "bullets": [
+      "Timeout لكل dependency.",
+      "Rate limits تحمي السعة والميزانية.",
+      "Secrets خارج source/client.",
+      "Unit ≠ Integration; schema validation يحمي العقود."
+    ],
+    "mental": "الـAPI الجيد يفشل بطريقة متوقعة، لا بطريقة غامضة."
+  },
+  "MLOps lifecycle": {
+    "title": "Model artifact جزء من lifecycle كامل",
+    "bullets": [
+      "Track experiments + data/code/config versions.",
+      "Registry يدير versions/lineage/lifecycle.",
+      "CI يفحص التغييرات؛ CD ينقلها؛ CT يعيد التدريب.",
+      "Training-serving consistency أساسية."
+    ],
+    "mental": "إذا لم تستطع إعادة بناء النموذج نفسه، فليس لديك reproducibility حقيقية."
+  },
+  "Deployment, drift & LLMOps": {
+    "title": "النشر بداية التشغيل، وليس نهاية المشروع",
+    "bullets": [
+      "Canary يقلل blast radius.",
+      "Shadow يقيس على traffic حقيقي بلا أثر للمستخدم.",
+      "Data drift ≠ concept drift.",
+      "Prompts وeval sets وtraces يجب versioning ومراقبتها."
+    ],
+    "mental": "راقب جودة النظام، لا CPU وlatency فقط."
+  },
+  "Scaling & performance": {
+    "title": "Latency وThroughput trade-off مستمر",
+    "bullets": [
+      "Horizontal = replicas؛ Vertical = موارد أكبر.",
+      "Stateless يسهل scaling.",
+      "Batching يرفع throughput وقد يزيد latency.",
+      "GPU ممتازة للعمليات المتوازية الكثيفة."
+    ],
+    "mental": "اختر metric التشغيلية حسب SLA: P95 latency؟ throughput؟ cost/request؟"
+  },
+  "Availability & recovery": {
+    "title": "صمّم للفشل المتوقع",
+    "bullets": [
+      "Replicas + health checks + failover.",
+      "RTO = زمن الاستعادة.",
+      "RPO = فقد البيانات المقبول زمنيًا.",
+      "Graceful degradation أفضل من انهيار كامل."
+    ],
+    "mental": "اسأل دائمًا: ماذا يحدث إذا فشل هذا المكوّن الآن؟"
+  },
+  "Responsible AI & privacy": {
+    "title": "Risk → Control → Evidence → Monitor",
+    "bullets": [
+      "Fairness تحتاج subgroup evaluation.",
+      "Transparency لا تعني كشف secrets.",
+      "Data minimization يقلل مخاطر الخصوصية.",
+      "High-impact decisions تحتاج oversight وauditability."
+    ],
+    "mental": "حوكمة AI تشبه نظام جودة: لا يكفي control بلا evidence ومراقبة."
+  },
+  "LLM/Agent security": {
+    "title": "عامل كل نص خارجي كمدخل غير موثوق",
+    "bullets": [
+      "Prompt injection قد تأتي مباشرة أو من وثيقة مسترجعة.",
+      "Least privilege للأدوات.",
+      "Validate output قبل SQL/HTML/commands.",
+      "Supply-chain risk يشمل models, datasets, libraries, providers."
+    ],
+    "mental": "Agent + tool permissions = blast radius. قلّل الصلاحيات قبل تحسين الذكاء."
+  },
+  "Business & collaboration": {
+    "title": "النجاح = أثر مفيد، لا metric أعلى فقط",
+    "bullets": [
+      "اربط model metric بـbusiness KPI.",
+      "Build vs Buy = سرعة + تكلفة + تحكم + مخاطر.",
+      "SLA يحوّل التوقعات إلى أرقام تشغيلية.",
+      "Accuracy أعلى قد لا تستحق تكلفة/latency أعلى."
+    ],
+    "mental": "اسأل: ما القرار الذي سيتغير إذا تحسن هذا النموذج؟"
+  }
+}
