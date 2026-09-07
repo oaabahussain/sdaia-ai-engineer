@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {masteryForDomain} from '../src/logic/mastery.js';import {calculateReadiness} from '../src/logic/readiness.js';
+const state=JSON.parse(fs.readFileSync('tests/fixtures/state.sample.json','utf8'));const expected=JSON.parse(fs.readFileSync('tests/fixtures/state.sample.expected.json','utf8'));const questions=JSON.parse(fs.readFileSync('data/questions.json','utf8'));const weights=JSON.parse(fs.readFileSync('data/weights.json','utf8'));
+test('refactored mastery matches recorded old inline metrics',()=>{for(const domain of Object.keys(weights))assert.equal(masteryForDomain(domain,questions,state),expected.mastery[domain],domain)});
+test('refactored readiness matches recorded old inline metric',()=>assert.equal(calculateReadiness(weights,questions,state),expected.readiness));
