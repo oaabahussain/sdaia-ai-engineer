@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "session.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "domain",
+    "minutes",
+    "qs"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "qs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^q\\d+$"
+      }
+    }
+  },
+  "additionalProperties": false
+}
