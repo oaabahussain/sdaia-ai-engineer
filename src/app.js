@@ -71,14 +71,8 @@ function save(){state.updated_at=nowIso();state.settings={session_minutes:state.
 function today(){return new Date().toISOString().slice(0,10)}
 function touch(){const d=today();state.activity[d]=(state.activity[d]||0)+1}
 function qById(id){return QUESTIONS.find(q=>q.id===id)}
-function questionReportUrl(id){
-  const params=new URLSearchParams({
-    template:'question-report.md',
-    title:`Question report: ${id}`,
-    body:`Question ID: ${id}\n\nDescribe the problem:\n`
-  });
-  return `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}`;
-}
+async function openQuestionReport(id,issueType='other'){const result=await submitFeedback({question_id:id,issue_type:issueType,details:''});if(result.ok&&result.ref)window.open(result.ref,'_blank','noopener')}
+function questionReportUrl(id){return '#'}
 function domainQs(d){return QUESTIONS.filter(q=>q.domain===d)}
 function dueIds(){const n=Date.now();return Object.entries(state.review_map).filter(([id,v])=>v&&v.next<=n).map(([id])=>id)}
 function errIds(){return Object.keys(state.errors).filter(id=>state.errors[id])}
@@ -176,6 +170,7 @@ function renderDiag(){
  <div class="qcard"><div class="qtext">${q.question}</div><a class="reportLink" href="${questionReportUrl(q.id)}" target="_blank" rel="noopener">Report a question</a><div class="opts">${q.options.map((o,i)=>`<button class="opt" data-o="${i}">${o}</button>`).join('')}</div>
  <div class="conf"><button data-c="1">غير واثق</button><button data-c="2">متوسط</button><button data-c="3">واثق</button></div>
  <div class="feedback" id="dfb"></div><div class="actions"><button class="btn primary" id="dcheck">تحقق</button></div></div>`;
+ const diagReport=diagQuiz.querySelector('.reportLink');if(diagReport)diagReport.onclick=(event)=>{event.preventDefault();void openQuestionReport(q.id)};
  diagQuiz.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{diag.selected=+b.dataset.o;diagQuiz.querySelectorAll('[data-o]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});
  diagQuiz.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{diag.confidence=+b.dataset.c;diagQuiz.querySelectorAll('[data-c]').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
  diagQuiz.querySelector('#dcheck').onclick=()=>{
@@ -216,7 +211,7 @@ function startStudy(m){
 function renderStudy(){
  if(active.index>=active.ids.length){finishStudy();return}
  const studyConf=document.querySelector('#study .conf'); if(studyConf)studyConf.style.display='grid'; qnote.style.display='block';
- const q=qById(active.ids[active.index]);reportQuestionLink.href=questionReportUrl(q.id);active.selected=null;active.confidence=null;active.shownLearn=false;
+ const q=qById(active.ids[active.index]);reportQuestionLink.href='#';reportQuestionLink.onclick=(event)=>{event.preventDefault();void openQuestionReport(q.id)};active.selected=null;active.confidence=null;active.shownLearn=false;
  studyLabel.textContent=(active.id?'جلسة '+active.id:'مراجعة')+' · '+q.domain;studyProgress.textContent=(active.index+1)+' / '+active.ids.length;studyBar.style.width=Math.round(active.index/active.ids.length*100)+'%';
  qTopic.textContent=q.topic;qtext.textContent=q.question;opts.innerHTML='';
  q.options.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{active.selected=i;opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};opts.appendChild(b)});

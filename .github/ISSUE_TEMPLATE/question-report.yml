@@ -1,0 +1,32 @@
+name: Report a question
+description: Report a possible problem with a study-bank question.
+title: "Question report: "
+labels: ["question-report", "needs-triage"]
+body:
+  - type: input
+    id: question_id
+    attributes:
+      label: Question ID
+      description: Use the q-number shown in the app, for example q42.
+      placeholder: q42
+    validations:
+      required: true
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue type
+      options:
+        - wrong_answer
+        - unclear
+        - typo
+        - too_easy
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Explain the problem. Do not include personal information.
+    validations:
+      required: true
