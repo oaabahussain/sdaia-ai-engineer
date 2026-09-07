@@ -46,6 +46,10 @@ jobs:
           node scripts/verify_sw_assets.js _site
           source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           echo "SOURCE_INDEX_SHA256=$source_sha"
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Run Level 0 browser smoke
+        run: npx playwright test tests/e2e/boot.spec.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
