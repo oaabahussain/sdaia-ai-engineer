@@ -1,0 +1,35 @@
+name: Audit remediation builder
+
+on:
+  push:
+    branches: [audit-fix-runner]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  remediate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: audit-fix-runner
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies needed by remediation
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          pip install -r server/requirements.txt
+      - name: Execute audit remediation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/agent/audit_fix_builder.py
