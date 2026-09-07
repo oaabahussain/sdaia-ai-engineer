@@ -1,17 +1,21 @@
 name: Deploy GitHub Pages
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: true
+
 jobs:
-  deploy:
+  verify-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,56 +24,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build direct iPhone-compatible site
+      - name: Verify source release
         shell: bash
         run: |
-          set -u
-          mkdir -p _site
-
-          # The previous browser loader depended on DecompressionStream. Safari can
-          # reject the stored gzip stream when its CRC footer is imperfect. GNU gzip
-          # still emits the decompressed payload before reporting the CRC error, so
-          # build the final HTML on the runner and validate the payload before deploy.
-          cat parts/app.gz.b64.part-* | base64 --decode | gzip --decompress > _site/index.html || true
-
-          test "$(wc -c < _site/index.html)" -gt 50000
-          grep -qi '<!doctype html' _site/index.html
-          grep -qi '</html>' _site/index.html
-
-          cp manifest.webmanifest icon.svg _site/
-          touch _site/.nojekyll
-
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('_site/index.html')
-          s = p.read_text(encoding='utf-8')
-          for old in (
-              './apple-touch-icon.png',
-              './icon-192.png',
-              './icon-512.png',
-              './icon-maskable-512.png',
-          ):
-              s = s.replace(old, './icon.svg')
-          s = s.replace('Adaptive Study Space V3', 'PWA V5')
-          s = s.replace('PWA V4', 'PWA V5')
-          p.write_text(s, encoding='utf-8')
-          PY
-
-          cat > _site/sw.js <<'EOF'
-          const CACHE='sdaia-ai-pages-v5';
-          const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
-          self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-          self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-          self.addEventListener('fetch',e=>{
-            if(e.request.method!=='GET')return;
-            const u=new URL(e.request.url);
-            if(u.origin!==self.location.origin)return;
-            e.respondWith(fetch(e.request).then(r=>{
-              if(r&&r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
-              return r;
-            }).catch(()=>caches.match(e.request).then(x=>x||caches.match('./index.html'))));
-          });
-          EOF
+          set -euo pipefail
+          python3 scripts/verify_release.py index.html
+          source_sha="$(sha256sum index.html | awk '{print $1}')"
+          echo "SOURCE_INDEX_SHA256=$source_sha"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -77,8 +38,31 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: _site
+          path: .
 
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify live release
+        shell: bash
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          source_sha="$(sha256sum index.html | awk '{print $1}')"
+          live_sha=""
+          for attempt in $(seq 1 12); do
+            curl --fail --silent --show-error --location --output live-index.html "${PAGE_URL}?verify=${GITHUB_SHA}-${attempt}"
+            python3 scripts/verify_release.py live-index.html --html-only
+            live_sha="$(sha256sum live-index.html | awk '{print $1}')"
+            echo "LIVE_INDEX_SHA256=$live_sha"
+            if [ "$live_sha" = "$source_sha" ]; then
+              echo "Live index matches the deployed source."
+              exit 0
+            fi
+            echo "Live index is not current yet; retrying in 5 seconds."
+            sleep 5
+          done
+          echo "Live index SHA-256 did not match source after retries."
+          exit 1
