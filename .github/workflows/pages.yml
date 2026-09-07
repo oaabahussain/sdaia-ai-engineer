@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Validate and deploy GitHub Pages
 
 on:
   push:
@@ -15,54 +15,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify-and-deploy:
+  validate-tests-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Verify source release
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Validate data and schemas
+        run: node scripts/validate.js
+      - name: Run Node tests
+        run: node --test tests/*.test.js
+      - name: Run browser adapter contract
+        run: node scripts/contract_test.js browser
+      - name: Build Pages artifact
         shell: bash
         run: |
           set -euo pipefail
-          python3 scripts/verify_release.py index.html
-          source_sha="$(sha256sum index.html | awk '{print $1}')"
+          rm -rf _site
+          mkdir _site
+          cp index.html manifest.webmanifest sw.js icon.svg icon-180.png icon-192.png icon-512.png _site/
+          cp -R src data _site/
+          touch _site/.nojekyll
+          node scripts/verify_html.js _site/index.html
+          source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           echo "SOURCE_INDEX_SHA256=$source_sha"
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
         with:
-          path: .
-
+          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
       - name: Verify live release
-        shell: bash
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
         run: |
           set -euo pipefail
-          source_sha="$(sha256sum index.html | awk '{print $1}')"
-          live_sha=""
+          source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           for attempt in $(seq 1 12); do
             curl --fail --silent --show-error --location --output live-index.html "${PAGE_URL}?verify=${GITHUB_SHA}-${attempt}"
-            python3 scripts/verify_release.py live-index.html --html-only
             live_sha="$(sha256sum live-index.html | awk '{print $1}')"
             echo "LIVE_INDEX_SHA256=$live_sha"
             if [ "$live_sha" = "$source_sha" ]; then
-              echo "Live index matches the deployed source."
-              exit 0
+              break
             fi
-            echo "Live index is not current yet; retrying in 5 seconds."
+            if [ "$attempt" -eq 12 ]; then
+              echo 'Live index SHA mismatch'
+              exit 1
+            fi
             sleep 5
           done
-          echo "Live index SHA-256 did not match source after retries."
-          exit 1
+          node scripts/verify_html.js live-index.html
+          curl --fail --silent --show-error --location --output live-questions.json "${PAGE_URL}data/questions.json?verify=${GITHUB_SHA}"
+          node -e "JSON.parse(require('fs').readFileSync('live-questions.json','utf8')); console.log('live questions JSON.parse: PASS')"
+          test "$(node -e \"console.log(JSON.parse(require('fs').readFileSync('live-questions.json','utf8')).length)\")" -eq 121
+          echo 'live questions count: PASS (121)'
