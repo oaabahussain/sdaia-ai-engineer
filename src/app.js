@@ -1,4 +1,8 @@
 import { loadState, saveState, loadBank, submitFeedback, logEvent } from './storage/interface.js';
+import { masteryForDomain } from './logic/mastery.js';
+import { calculateReadiness } from './logic/readiness.js';
+import { nextReview } from './logic/review.js';
+import { rankSessions } from './logic/mission.js';
 
 const BANK = await loadBank();
 let QUESTIONS = BANK.questions;
@@ -37,7 +41,7 @@ function migrateState(raw){
  const s=raw&&typeof raw==='object'?{...raw}:{};
  const confidenceNumber=(value)=>value==='low'?1:value==='high'?3:2;
  if(!s.answer_map||typeof s.answer_map!=='object'||Array.isArray(s.answer_map)){s.answer_map={};if(Array.isArray(s.answers))s.answers.forEach(item=>{if(item?.question_id){s.answer_map[item.question_id]=!!item.correct;if(item.confidence)s.confidence={...(s.confidence||{}),[item.question_id]:confidenceNumber(item.confidence)}}})}
- if(!s.review_map||typeof s.review_map!=='object'||Array.isArray(s.review_map)){s.review_map={};if(Array.isArray(s.review))s.review.forEach(item=>{if(item?.question_id){const stage=Math.max(0,[1,3,7,14].indexOf(item.interval_days));s.review_map[item.question_id]={stage,next:Date.parse(item.due_at)||Date.now()}}})}
+ if(!s.review_map||typeof s.review_map!=='object'||Array.isArray(s.review_map)){s.review_map={};if(Array.isArray(s.review))s.review.forEach(item=>{if(item?.question_id){const stage=({1:0,3:1,7:2,14:3}[item.interval_days]??0);s.review_map[item.question_id]={stage,next:Date.parse(item.due_at)||Date.now()}}})}
  if(!s.bookmark_map||typeof s.bookmark_map!=='object'||Array.isArray(s.bookmark_map)){s.bookmark_map={};if(Array.isArray(s.bookmarks))s.bookmarks.forEach(id=>{s.bookmark_map[id]=true})}
  if(s.settings&&typeof s.settings==='object'){s.profile=s.profile||{};if(!s.profile.minutes)s.profile.minutes=s.settings.session_minutes||20;if(s.profile.examDate===undefined)s.profile.examDate=s.settings.exam_date||'';if(s.theme===undefined)s.theme=s.settings.dark?'dark':'auto';if(s.focus===undefined)s.focus=!!s.settings.focus}
  delete s.answers;delete s.review;delete s.bookmarks;delete s.settings;
@@ -60,23 +64,8 @@ function dueIds(){const n=Date.now();return Object.entries(state.review_map).fil
 function errIds(){return Object.keys(state.errors).filter(id=>state.errors[id])}
 function bookmarkCount(){return Object.values(state.bookmark_map).filter(Boolean).length}
 
-function masteryFor(domain){
- const qs=domainQs(domain); if(!qs.length)return 0;
- let pts=0, possible=0;
- qs.forEach(q=>{
-   possible+=1;
-   if(state.mastered[q.id]) pts+=1;
-   else if(state.answer_map[q.id]===true) pts+=0.75;
-   else if(state.answer_map[q.id]===false) pts+=0;
- });
- return Math.round(pts/possible*100);
-}
-function readiness(){
- let total=0;
- Object.entries(WEIGHTS).forEach(([d,w])=>{total+=masteryFor(d)*(w/100)});
- if(!state.diagnostic.done) total*=0.9;
- return Math.round(total);
-}
+function masteryFor(domain){return masteryForDomain(domain,QUESTIONS,state)}
+function readiness(){return calculateReadiness(WEIGHTS,QUESTIONS,state)}
 function errorPriority(id){
  const q=qById(id), c=state.confidence[id]||1, a=state.attempts[id]||1;
  return (c===3?3:c===2?2:1)+Math.min(3,a)+(WEIGHTS[q.domain]||10)/10;
@@ -86,12 +75,7 @@ function nextMission(){
  if(due.length)return {kind:'review',title:'مراجعة '+Math.min(10,due.length)+' أسئلة مستحقة',why:'لأن التوقيت الآن أهم من إضافة محتوى جديد.',ids:due.slice(0,10),minutes:state.profile.minutes};
  const candidates=SESSIONS.filter(s=>s.id<=13&&!state.sessions[s.id]);
  if(candidates.length){
-   candidates.sort((a,b)=>{
-     const pa=(WEIGHTS[a.domain]||0)*(1-masteryFor(a.domain)/100);
-     const pb=(WEIGHTS[b.domain]||0)*(1-masteryFor(b.domain)/100);
-     return pb-pa;
-   });
-   const s=candidates[0]; return {kind:'session',id:s.id,title:s.title,why:'اختيرت حسب وزن المجال × ضعفك الحالي.',ids:s.qs,minutes:s.minutes};
+    const s=rankSessions(candidates,WEIGHTS,QUESTIONS,state)[0]; return {kind:'session',id:s.id,title:s.title,why:'اختيرت حسب وزن المجال × ضعفك الحالي.',ids:s.qs,minutes:s.minutes};
  }
  return {kind:'mock',id:15,title:'Weighted Mixed Mock',why:'أنهيت المحتوى الأساسي. الآن نختبر الاستدعاء المختلط.',ids:randomIds(25),minutes:30};
 }
@@ -100,12 +84,7 @@ function randomIds(n,domain=null){
  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
  return arr.slice(0,n);
 }
-function schedule(id,correct){
- let r=state.review_map[id]||{stage:0};
- if(!correct)r.stage=0; else r.stage=Math.min(3,(r.stage||0)+1);
- const days=[1,3,7,14][r.stage]||14;
- r.next=Date.now()+days*86400000; state.review_map[id]=r;
-}
+function schedule(id,correct){state.review_map[id]=nextReview(state.review_map[id],correct,Date.now())}
 function classifyError(id,correct,conf){
  if(correct&&conf===1) state.errors[id]={type:'Lucky / low confidence',at:Date.now()};
  else if(!correct&&conf===3) state.errors[id]={type:'High-confidence misconception',at:Date.now()};

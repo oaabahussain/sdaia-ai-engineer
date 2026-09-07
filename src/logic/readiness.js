@@ -1,5 +1,9 @@
-export function weightedReadiness(weights, masteryByDomain, diagnosticDone = true) {
-  let total = Object.entries(weights).reduce((sum, [domain, weight]) => sum + (masteryByDomain(domain) * weight / 100), 0);
-  if (!diagnosticDone) total *= 0.9;
-  return Math.round(total);
+import { masteryForDomain } from './mastery.js';
+
+export function calculateReadiness(weights, questions, state) {
+  const weighted = Object.entries(weights).reduce(
+    (total, [domain, weight]) => total + masteryForDomain(domain, questions, state) * (weight / 100),
+    0,
+  );
+  return Math.round(weighted * (state.diagnostic?.done ? 1 : 0.9));
 }

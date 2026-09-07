@@ -1,6 +1,10 @@
 export function masteryForDomain(domain, questions, state) {
-  const qs = questions.filter((q) => q.domain === domain);
-  if (!qs.length) return 0;
-  const points = qs.reduce((sum, q) => sum + (state.mastered?.[q.id] ? 1 : state.answers?.[q.id] === true ? 0.75 : 0), 0);
-  return Math.round((points / qs.length) * 100);
+  const domainQuestions = questions.filter((question) => question.domain === domain);
+  if (!domainQuestions.length) return 0;
+  const points = domainQuestions.reduce((total, question) => {
+    if (state.mastered?.[question.id]) return total + 1;
+    if (state.answer_map?.[question.id] === true) return total + 0.75;
+    return total;
+  }, 0);
+  return Math.round((points / domainQuestions.length) * 100);
 }
