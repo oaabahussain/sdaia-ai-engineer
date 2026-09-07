@@ -34,9 +34,9 @@ const searchBox=$('searchBox'), searchResults=$('searchResults'), caseGrid=$('ca
       resetBtn=$('resetBtn');
 
 
-let state=migrateState((await loadState())||{});
 const nowIso=()=>new Date().toISOString();
 const uuidV4=()=>globalThis.crypto?.randomUUID?.() ?? '00000000-0000-4000-8000-'+Math.random().toString(16).slice(2,14).padEnd(12,'0').slice(0,12);
+let state=migrateState((await loadState())||{});
 function migrateState(raw){
  const s=raw&&typeof raw==='object'?{...raw}:{};
  const confidenceNumber=(value)=>value==='low'?1:value==='high'?3:2;
