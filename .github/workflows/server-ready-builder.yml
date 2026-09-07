@@ -33,11 +33,16 @@ jobs:
           s = source.read_text(encoding='utf-8')
           s = s.replace("التخزين المحلي متاح، مع fallback داخل الذاكرة عند تعذر localStorage", "التخزين المحلي متاح، مع fallback داخل الذاكرة عند تعذر التخزين الدائم")
           s = s.replace("node --test tests/", "node --test tests/*.test.js")
+          s = s.replace("run(\"test $(grep -cE 'localStorage|fetch\\\\(' src/app.js || true) -eq 0\")", "run(\"python3 -c \\\"from pathlib import Path; s=Path('src/app.js').read_text(); assert 'localStorage' not in s and 'fetch(' not in s; print('direct storage/fetch references: PASS (0)')\\\"\")")
+          s = s.replace('"minutes": {"type": "integer", "minimum": 1},\n            "qs":', '"minutes": {"type": "integer", "minimum": 1},\n            "topics": {"type": "array", "items": {"type": "string", "minLength": 1}},\n            "qs":')
+          s = s.replace("    task1(); task2(); task3(); task4(); task5(); task6(); task7(); task8(); task9(); task10()", "    completed = run(\"git log --format=%s e715c688900c7b0259143c6ea8d74eb6fba93575..HEAD\").stdout.splitlines()\n    tasks = [(task1, 'Add storage interface and browser adapter'), (task2, 'Add versioned anonymous state schema'), (task3, 'Define future v1 OpenAPI contract'), (task4, 'Add portable database schema'), (task5, 'Add tested FastAPI server skeleton'), (task6, 'Add API storage adapter and shared contract tests'), (task7, 'Replace question reports with GitHub Issue Form'), (task8, 'Add least-privilege daily review proposal workflow'), (task9, 'Harden Pages validation and live release gates'), (task10, 'Document server-ready architecture and operations')]\n    for function, message in tasks:\n        if message in completed:\n            print(f'SKIP_COMPLETED={message}')\n            continue\n        function()")
           needle = "    main_script, pwa_script = scripts[0], scripts[1]\n"
           replacement = needle + "    pwa_script = pwa_script.replace(\"localStorage.getItem('pwaInstallDismissed') !== '1'\", \"globalThis.__pwaInstallDismissed !== true\")\n    pwa_script = pwa_script.replace(\"try{ localStorage.setItem('pwaInstallDismissed','1'); }catch(e){}\", \"globalThis.__pwaInstallDismissed = true;\")\n"
           if needle not in s:
               raise SystemExit('builder patch anchor not found')
           s = s.replace(needle, replacement, 1)
+          if '|| true' in s:
+              raise SystemExit('patched builder still contains forbidden || true')
           Path('/tmp/server_ready_builder.py').write_text(s, encoding='utf-8')
           PY
           python3 -m py_compile /tmp/server_ready_builder.py
