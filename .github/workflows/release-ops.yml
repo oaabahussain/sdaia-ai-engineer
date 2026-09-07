@@ -1,4 +1,4 @@
-name: Release task 4
+name: Release task 5
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   actions: write
 
 jobs:
-  task4:
+  task5:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout operations branch
@@ -25,83 +25,78 @@ jobs:
           git fetch origin main
           git checkout -B work-main origin/main
 
-      - name: Render PWA icons and update manifest
+      - name: Add MIT license and About disclosure
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --no-input cairosvg==2.7.1
+          cat > LICENSE <<'EOF'
+          MIT License
+
+          Copyright (c) 2026 oaabahussain
+
+          Permission is hereby granted, free of charge, to any person obtaining a copy
+          of this software and associated documentation files (the "Software"), to deal
+          in the Software without restriction, including without limitation the rights
+          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+          copies of the Software, and to permit persons to whom the Software is
+          furnished to do so, subject to the following conditions:
+
+          The above copyright notice and this permission notice shall be included in all
+          copies or substantial portions of the Software.
+
+          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+          SOFTWARE.
+          EOF
+
           python3 - <<'PY'
           from pathlib import Path
-          import json
-          import struct
-          import cairosvg
 
-          for size in (180, 192, 512):
-              cairosvg.svg2png(
-                  url="icon.svg",
-                  write_to=f"icon-{size}.png",
-                  output_width=size,
-                  output_height=size,
-              )
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+          start = text.index('<section id="settings" class="screen">')
+          end = text.index('</section>', start)
+          section = text[start:end]
+          if 'id="about"' in section:
+              raise SystemExit("About section already exists")
 
-          html_path = Path("index.html")
-          text = html_path.read_text(encoding="utf-8")
-          replacements = {
-              '<link rel="apple-touch-icon" href="./icon.svg">': '<link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">',
-              '<link rel="icon" type="image/png" sizes="192x192" href="./icon.svg">': '<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">',
-              '<link rel="icon" type="image/png" sizes="512x512" href="./icon.svg">': '<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">',
-          }
-          for old, new in replacements.items():
-              if old not in text:
-                  raise SystemExit(f"Expected icon link not found: {old}")
-              text = text.replace(old, new, 1)
-          html_path.write_text(text, encoding="utf-8")
-
-          manifest_path = Path("manifest.webmanifest")
-          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-          manifest["icons"] = [
-              {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-              {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
-          ]
-          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-          sw_path = Path("sw.js")
-          sw = sw_path.read_text(encoding="utf-8")
-          old_asset = "  './icon.svg'\n"
-          new_assets = "  './icon.svg',\n  './icon-180.png',\n  './icon-192.png',\n  './icon-512.png'\n"
-          if old_asset not in sw:
-              raise SystemExit("Service worker icon asset marker not found")
-          sw_path.write_text(sw.replace(old_asset, new_assets, 1), encoding="utf-8")
-
-          signature = b"\x89PNG\r\n\x1a\n"
-          for size in (180, 192, 512):
-              filename = f"icon-{size}.png"
-              payload = Path(filename).read_bytes()
-              if payload[:8] != signature:
-                  raise SystemExit(f"{filename} is not a PNG")
-              width, height = struct.unpack(">II", payload[16:24])
-              if (width, height) != (size, size):
-                  raise SystemExit(f"{filename} has dimensions {width}x{height}; expected {size}x{size}")
-              print(f"PNG validation: PASS ({filename}, {width}x{height})")
-
-          json.loads(manifest_path.read_text(encoding="utf-8"))
-          print("Manifest JSON validation: PASS")
+          about = '''
+            <div class="panel wide" id="about">
+              <h2>About</h2>
+              <p>هذه أداة مجتمعية غير رسمية وليست تابعة لسدايا أو معتمدة منها.</p>
+              <p class="tiny">Official facts used by this tool are limited to the seven exam domains and their weights. The questions, sessions, diagnostic, mastery/readiness scores, study plans, and recommendations are unofficial preparation content.</p>
+            </div>
+          '''
+          insert_at = section.rfind('</div>')
+          if insert_at < 0:
+              raise SystemExit("Settings grid closing tag not found")
+          section = section[:insert_at] + about + section[insert_at:]
+          text = text[:start] + section + text[end:]
+          path.write_text(text, encoding="utf-8")
           PY
 
+          grep -Fq "MIT License" LICENSE
+          grep -Fq 'id="about"' index.html
+          grep -Fq "ليست تابعة لسدايا أو معتمدة منها" index.html
+          grep -Fq "limited to the seven exam domains and their weights" index.html
           python3 scripts/verify_release.py index.html
 
-      - name: Commit task 4
+      - name: Commit task 5
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "oaabahussain"
           git config user.email "147952589+oaabahussain@users.noreply.github.com"
-          git add index.html manifest.webmanifest sw.js icon-180.png icon-192.png icon-512.png
+          git add LICENSE index.html
           if git diff --cached --quiet; then
-            echo "Task 4 produced no changes"
+            echo "Task 5 produced no changes"
             exit 1
           fi
-          git commit -m "Add platform-specific PWA icons"
+          git commit -m "Add MIT license and About disclosure"
           git push origin HEAD:main
 
       - name: Dispatch Pages verification
