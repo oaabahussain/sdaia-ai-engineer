@@ -1,0 +1,154 @@
+name: Apply release task 3
+
+on:
+  push:
+    branches: [release-bootstrap]
+
+permissions:
+  contents: write
+
+jobs:
+  extract-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Extract data and add external loading with fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+
+          def extract(name, next_name):
+              start_marker = f"const {name}="
+              end_marker = f";\nconst {next_name}="
+              start = text.index(start_marker) + len(start_marker)
+              end = text.index(end_marker, start)
+              raw = text[start:end]
+              return raw, json.loads(raw)
+
+          questions_raw, questions = extract("QUESTIONS", "SESSIONS")
+          sessions_raw, sessions = extract("SESSIONS", "LEARN")
+          learn_raw, learn = extract("LEARN", "CASES")
+          cases_raw, cases = extract("CASES", "PATTERNS")
+
+          weights_start_marker = "const WEIGHTS="
+          weights_end_marker = ";\nconst KEY="
+          weights_start = text.index(weights_start_marker) + len(weights_start_marker)
+          weights_end = text.index(weights_end_marker, weights_start)
+          weights_raw = text[weights_start:weights_end]
+          weights = json.loads(weights_raw)
+
+          data_dir = Path("data")
+          data_dir.mkdir(exist_ok=True)
+          outputs = {
+              "questions.json": questions,
+              "sessions.json": sessions,
+              "learn.json": learn,
+              "cases.json": cases,
+              "weights.json": weights,
+          }
+          for filename, payload in outputs.items():
+              (data_dir / filename).write_text(
+                  json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                  encoding="utf-8",
+              )
+
+          replacements = {
+              f"const QUESTIONS={questions_raw};": f"const FALLBACK_QUESTIONS={questions_raw};\nlet QUESTIONS=FALLBACK_QUESTIONS;",
+              f"const SESSIONS={sessions_raw};": f"const FALLBACK_SESSIONS={sessions_raw};\nlet SESSIONS=FALLBACK_SESSIONS;",
+              f"const LEARN={learn_raw};": f"const FALLBACK_LEARN={learn_raw};\nlet LEARN=FALLBACK_LEARN;",
+              f"const CASES={cases_raw};": f"const FALLBACK_CASES={cases_raw};\nlet CASES=FALLBACK_CASES;",
+              f"const WEIGHTS={weights_raw};": f"const FALLBACK_WEIGHTS={weights_raw};\nlet WEIGHTS=FALLBACK_WEIGHTS;",
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f"Expected declaration not found: {old[:40]}")
+              text = text.replace(old, new, 1)
+
+          loader = r'''
+          async function loadExternalStudyData() {
+            if (window.location.protocol === 'file:') return false;
+            const resources = [
+              ['questions', './data/questions.json'],
+              ['sessions', './data/sessions.json'],
+              ['learn', './data/learn.json'],
+              ['cases', './data/cases.json'],
+              ['weights', './data/weights.json']
+            ];
+            try {
+              const entries = await Promise.all(resources.map(async ([name, url]) => {
+                const response = await fetch(url, {cache: 'no-cache'});
+                if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
+                return [name, await response.json()];
+              }));
+              const loaded = Object.fromEntries(entries);
+              QUESTIONS = loaded.questions;
+              SESSIONS = loaded.sessions;
+              LEARN = loaded.learn;
+              CASES = loaded.cases;
+              WEIGHTS = loaded.weights;
+              return true;
+            } catch (error) {
+              console.warn('External study data unavailable; using inline fallback.', error);
+              return false;
+            }
+          }
+          '''.strip()
+
+          key_marker = "const KEY='sdaia_adaptive_v3';"
+          if key_marker not in text:
+              raise SystemExit("KEY marker not found")
+          text = text.replace(key_marker, loader + "\n" + key_marker, 1)
+
+          old_startup = """if(storageStatus)storageStatus.textContent=STORAGE.persistent?'✓ التخزين المحلي الدائم متاح':'⚠ التخزين المحلي الدائم غير متاح في طريقة الفتح الحالية — استخدم Export/Import';
+          applyTheme();applyFocus();renderLibrary();
+          if(state.onboarded){enterBtn.textContent='استأنف الخطة';}"""
+          new_startup = """async function initializeStudyApp() {
+            await loadExternalStudyData();
+            if(storageStatus)storageStatus.textContent=STORAGE.persistent?'✓ التخزين المحلي الدائم متاح':'⚠ التخزين المحلي الدائم غير متاح في طريقة الفتح الحالية — استخدم Export/Import';
+            applyTheme();applyFocus();renderLibrary();
+            if(state.onboarded){enterBtn.textContent='استأنف الخطة';}
+          }
+          initializeStudyApp();"""
+          if old_startup not in text:
+              raise SystemExit("Startup block not found")
+          text = text.replace(old_startup, new_startup, 1)
+          path.write_text(text, encoding="utf-8")
+
+          if len(questions) != 121:
+              raise SystemExit(f"Expected 121 questions, found {len(questions)}")
+          total = sum(float(value) for value in weights.values())
+          if abs(total - 100.0) > 1e-9:
+              raise SystemExit(f"Weights must sum to 100.0, found {total}")
+          for filename in outputs:
+              json.loads((data_dir / filename).read_text(encoding="utf-8"))
+          print("JSON.parse equivalent validation: PASS")
+          print("Weights sum: 100.0")
+          print("Inline fallback retained: PASS")
+          PY
+
+          python3 scripts/verify_release.py index.html
+
+      - name: Commit task 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "oaabahussain"
+          git config user.email "147952589+oaabahussain@users.noreply.github.com"
+          git add index.html data/questions.json data/sessions.json data/learn.json data/cases.json data/weights.json
+          if git diff --cached --quiet; then
+            echo "Task 3 produced no changes"
+            exit 1
+          fi
+          git commit -m "Extract study data with inline fallback"
+          git push origin HEAD:main
