@@ -1,329 +1,107 @@
 # Analyze Report: Public-Readiness Foundation
 
 Date: 2026-09-07
-Scope: constitution, specification, research, data model, contracts, plan, tasks
-Result: READY FOR OWNER REVIEW; implementation remains prohibited
+Result: READY FOR OWNER REVIEW AFTER COMPLETION COMMIT; implementation remains prohibited until confirmation
 
-## Analyze summary
-
-Critical constitution violations in the pre-implementation artifacts: 0
+Critical constitution violations: 0
 Unresolved high-severity specification conflicts: 0
-Owner decisions still required before/during later implementation: 8
-Known production/runtime defects intentionally not fixed in this phase: yes
+Owner decisions unresolved from previous package: 0
+Owner-only external blockers remaining: physical iPhone Safari evidence; needs_review technical dispositions at Level 6; future provider/moderation/branch-administration decisions as applicable.
+Known runtime defect intentionally not implemented in this completion commit: yes.
 
-The repository main baseline inspected for this package is 059b90fca83d20b950b5c83e751a55180387fd53. The baseline src/app.js still calls migrateState before initializing const nowIso and uuidV4, so the owner-reported temporal-dead-zone defect is consistent with the repository state. The pre-implementation branch intentionally does not modify src/app.js.
+## Owner decisions incorporated
 
-## Consistency review — conflict resolutions
+1. Start Level 0 after review: YES.
+2. About footer “الإصدار 6.0” is the only UI version string: YES.
+3. Semantic selectors first, data-testid where needed: YES.
+4. Four options remain provisional through 2026-10-07: YES.
+5. Automatic rollback in first release: NO.
+6. Comments/ratings in this feature: NO.
+7. Login in this feature: NO.
+8. Runtime/browser/PWA/gates precede bulk rewrite: YES.
 
-Conflict 1 — Owner orders immediate hotfix vs approved pre-implementation stop
-Sources in conflict:
-- Public-readiness spec: Task 0 says apply corrected src/app.js before anything else.
-- Current owner instruction: complete Spec Kit pre-implementation end to end and STOP before implementation; “not even the known Level 0 hotfix.”
-Resolution:
-- Current owner instruction is later and explicit; no hotfix is applied on pre-implementation branch.
-- T0001 is first implementation task after review.
-Reason:
-- Preserves specification-driven workflow and obeys explicit stop condition.
-Status: RESOLVED
+## Required completion checks resolved
 
-Conflict 2 — Baseline release was previously described as green vs real-browser failure
-Sources in conflict:
-- Existing repository CI/preflight can be green.
-- Owner-provided independent browser evidence reports TDZ ReferenceError, no saved state, no service-worker registration, and dead entry action.
-Resolution:
-- Browser execution becomes a release gate; syntax/unit/static checks remain necessary but insufficient.
-Reason:
-- The failure is runtime ordering, not parse syntax, so browser execution is the evidence class that can detect it.
-Status: RESOLVED
+C1 — Full tasks.md: RESOLVED. Every T0001–T0805 now states files touched, acceptance criterion, and evidence required. Mandatory owner-review stops after Level 0 and Level 3 are explicit.
 
-Conflict 3 — data-testid-only selectors vs accessibility-first testing
-Sources in conflict:
-- Public-readiness spec: tests select by testid only.
-- Project direction/modern testing practice: prefer role/accessibility-name locators; add testid when semantic selection is insufficient.
-Resolution:
-- Semantic locators first; stable testids required for generated/ambiguous controls.
-Reason:
-- This improves accessibility and test resilience while still providing deterministic selectors for repeated option/session controls.
-Status: RESOLVED
+C2 — Research URL/DOI column: RESOLVED. Every research row contains a URL/DOI field. A11, C1, C2, C7, C9, and C10 could not be independently resolved to a stable URL/DOI in this pass and are explicitly downgraded to PARTIAL; they cannot be sole evidence for a release gate. Owner reviewer spot-check for B1/B2/B5 is recorded.
 
-Conflict 4 — Automatic rollback requirement vs unverified rollback mechanism
-Sources in conflict:
-- Public-readiness spec: post-deploy failure automatically redeploys previous artifact.
-- Owner-approved planning amendment: do not promise automatic rollback if it cannot be made reliable.
-Resolution:
-- Initial implementation must fail red, record the last known-good release, and expose a tested rollback procedure.
-- Automatic rollback is a later improvement only after deterministic proof.
-Reason:
-- An untested rollback mechanism creates a second production risk during failure handling.
-Status: RESOLVED
+C3 — daily-review scope: RESOLVED. spec.md and plan.md state that .github/workflows/daily-review.yml and .github/agent/* remain untouched and operationally disabled until Level 7. Rationale: internal content-review automation is not required to stabilize the learner-facing public runtime and changing it earlier would mix governance scope with runtime readiness.
 
-Conflict 5 — Exactly four options vs 2026 distractor-quality evidence
-Sources in conflict:
-- Owner amendment: four options required, provisional.
-- 2026 randomized research: distractor quality can matter more than distractor quantity and fewer well-functioning distractors can perform comparably.
-Resolution:
-- Four options remains a PROVISIONAL engineering gate through 2026-10-07, not a claim of psychometric optimality.
-- Any change requires measured data and recorded rationale.
-Reason:
-- Obeys owner gate while preserving scientific uncertainty.
-Status: RESOLVED
+C4 — needs_review reviewer: RESOLVED. T0605 names owner Othman as independent technical reviewer. The agent prepares a per-item review sheet with exact claim, source(s), why uncertain, proposed resolution, and question ID. Owner disposition is an explicit external blocker to clearing needs_review.
 
-Conflict 6 — Hard numeric content heuristics vs assessment validity
-Sources in conflict:
-- Public-readiness spec proposes answer-index <=35%, longest-correct <=40%, option >=12 characters, definition count <=15.
-- Current assessment research supports flaw detection, plausible distractors, blueprinting, structured review, and empirical analysis, but not those exact constants as universal validity thresholds.
-Resolution:
-- Thresholds retained as provisional anti-pattern gates.
-- Future measured item-response data is required to change/validate them.
-Reason:
-- Prevents heuristics from being mislabeled as psychometric truth.
-Status: RESOLVED
+Plan Level 4 owner evidence addition: RESOLVED. Physical iPhone Safari evidence must be supplied by the owner as screenshots plus exact steps; it is a separate evidence class and the agent never marks it VERIFIED on its own.
 
-Conflict 7 — AI/vendor deny list vs legitimate AI-engineering education
-Sources in conflict:
-- Public-readiness copy deny list includes Claude, ChatGPT, GPT, OpenAI.
-- Product is an AI-engineering study app where vendor/model terminology can be legitimate technical content.
-Resolution:
-- Deny list applies to UI chrome/About/developer residue, not educational bank/learn/case content.
-Reason:
-- Removes internal development artifacts without censoring legitimate exam-relevant terminology.
-Status: RESOLVED
+## Resolved conflicts
 
-Conflict 8 — “No version anywhere in UI” vs approved About version footer
-Sources in conflict:
-- Public-readiness cleanup says no version in title/header.
-- Same spec allows About footer “الإصدار 6.0”.
-Resolution:
-- No version in normal chrome/title/header/changelog; About may show the single approved public version footer.
-Reason:
-- This is internally consistent once scope is explicit.
-Status: RESOLVED
+1. Immediate hotfix vs stop-before-implementation: owner’s later instruction wins; hotfix remains T0001 and is not applied in this commit.
+2. Green syntax/unit CI vs broken browser runtime: real browser execution is a mandatory release gate.
+3. testid-only vs accessibility-first selectors: semantic role/name first; testid for generated/ambiguous controls.
+4. automatic rollback vs unverified rollback: first release uses fail-red plus tested manual rollback; automatic rollback remains off.
+5. exactly four options vs 2026 distractor evidence: retain as provisional owner gate, not psychometric truth.
+6. numeric content heuristics vs assessment validity: keep provisional; review with measured learner data after 2026-10-07.
+7. AI/vendor deny list vs legitimate education: deny development residue in UI chrome/About; allow educational usage.
+8. no versions vs About footer: exactly one About footer version “الإصدار 6.0” is allowed.
+9. 121 current bank vs 142 future bank: browser tests use current release count before Level 6; after accepted additions use actual release count.
+10. random runtime answer-position audit vs CI determinism: seed runtime sampling; full-bank static histogram remains authoritative.
+11. empty sessions 14/15 vs population requirement: empty stored qs remain valid; E2E proves runtime population.
+12. service worker vs Safari installability: SW evidence proves offline/reliability, not installability.
+13. WebKit automation vs physical Safari: separate evidence classes.
+14. test-only server vs backend-free public product: no server deployment in this feature.
+15. GitHub Issue Form custom prefill assumption: tests assert only supported URL/template/title/labels/question metadata.
+16. >=4 questions per learn topic vs unmeasured blueprint: measure first; escalate if infeasible rather than padding content.
+17. Lighthouse >=90 vs measure-first policy: Lighthouse baseline is mandatory; hard thresholds follow baseline/applicability review.
+18. daily-review internal automation vs public-readiness scope: leave disabled/untouched until Level 7.
+19. agent technical review vs independent verification: owner Othman clears every needs_review item; agent cannot self-clear uncertainty.
 
-Conflict 9 — Current bank count 121 vs Level-6 target 142
-Sources in conflict:
-- Early E2E requirements assert landing shows 121.
-- Content rewrite asks to add 21 flagship questions, producing 142.
-Resolution:
-- Level-3 tests before content rewrite assert current release count 121.
-- After Level 6, bank-count assertions and public statistics must use the release bank count (expected 142 if all 21 additions are accepted).
-Reason:
-- Tests must reflect the feature level being released rather than freezing a pre-rewrite count forever.
-Status: RESOLVED
+## Consistency result
 
-Conflict 10 — Random 60-question answer-position audit vs deterministic release gate
-Sources in conflict:
-- Public-readiness spec asks to answer 60 random questions and assert no correct-option index exceeds 35%.
-- A random sample can violate the threshold by chance even when the full bank meets it.
-Resolution:
-- Full-bank static distribution is authoritative.
-- Runtime test uses a deterministic seeded sample to verify rendered answer mapping and detect implementation bias.
-Reason:
-- Removes probabilistic CI flakiness without weakening the actual content-distribution gate.
-Status: RESOLVED
-
-Conflict 11 — Sessions 14/15 stored qs empty vs E2E must prove population
-Sources in conflict:
-- Data design intentionally composes adaptive/mixed sessions at runtime.
-- Static validation could incorrectly interpret empty qs as missing content.
-Resolution:
-- Empty stored qs remain allowed specifically for sessions 14/15.
-- Runtime E2E must prove non-empty valid composition.
-Reason:
-- The runtime composition is a feature, not a data defect.
-Status: RESOLVED
-
-Conflict 12 — Service worker as PWA install requirement vs modern Safari behavior
-Sources in conflict:
-- Generic PWA terminology often equates service worker with installability.
-- Safari/iOS 26 allows sites to be added as web apps without a service worker; service workers primarily improve offline/reliability capabilities.
-Resolution:
-- Do not use service-worker presence as proof of Safari installability.
-- Test service-worker registration/offline behavior separately.
-Reason:
-- Aligns product claims with current Safari behavior.
-Status: RESOLVED
-
-Conflict 13 — WebKit automation vs “Safari iOS tested” language
-Sources in conflict:
-- Playwright supports WebKit.
-- Physical iOS Safari includes OS/device integration not proven by desktop/headless WebKit automation.
-Resolution:
-- Automated WebKit evidence and physical iPhone Safari evidence are separate report columns/statuses.
-Reason:
-- Prevents false verification claims.
-Status: RESOLVED
-
-Conflict 14 — Server-ready foundation has test-only FastAPI vs public-readiness backend-free product
-Sources in conflict:
-- Existing server-ready work defines API/server skeleton.
-- Current public product must run with zero deployed backend.
-Resolution:
-- Server code remains test-only and contract/reference infrastructure.
-- No server deployment is included in Levels 0–8 unless separately specified.
-Reason:
-- Preserves current deployment simplicity while retaining future extensibility.
-Status: RESOLVED
-
-Conflict 15 — Issue Form custom-field prefill assumptions
-Sources in conflict:
-- Earlier spec expects URL query params to prefill question_id/issue_type fields in GitHub Issue Forms.
-- GitHub Issue Forms do not provide a dependable arbitrary custom-field prefill contract equivalent to HTML forms.
-Resolution:
-- Future E2E verifies the report URL/title/template/labels/question metadata that GitHub actually supports; no false claim that custom form controls are guaranteed prefilled.
-Reason:
-- Test the real integration contract rather than an unsupported assumption.
-Status: RESOLVED
-
-Conflict 16 — Every learn topic >=4 questions vs current blueprint unknown at plan time
-Sources in conflict:
-- Public-readiness content gate proposes >=4 questions per learn topic.
-- No measured current per-topic distribution was produced during this no-data-edit pre-implementation phase.
-Resolution:
-- T0504 measures the inventory before enabling this as a blocking gate.
-- If infeasible, implementation must stop for owner decision rather than silently relax or remap content.
-Reason:
-- This threshold was not included in the owner’s explicit provisional amendment and needs measured feasibility.
-Status: RESOLVED
-
-Conflict 17 — Lighthouse all categories >=90 vs measure-first performance policy
-Sources in conflict:
-- Public-readiness spec sets >=90 for Performance, Accessibility, Best Practices, PWA.
-- The owner’s broader working method requires evidence before arbitrary gates; PWA scoring/audits also evolve across Lighthouse versions.
-Resolution:
-- Lighthouse evidence is mandatory, but the first implementation measures baseline before hard performance thresholds are adopted.
-- Accessibility has separate semantic/axe gates regardless of Lighthouse score.
-Reason:
-- Avoids copying a number without baseline/applicability evidence.
-Status: RESOLVED
-
-## Coverage analysis
-
-Constitution -> specification coverage:
-- Specification-before-code: FR-030 and entire pre-implementation stop condition.
-- Evidence-before-claims: FR-012, FR-013, FR-017, FR-027.
-- Research freshness/diversity: research.md covers three foundation decisions.
-- Public/private separation: FR-002 through FR-004 and public-copy requirements.
-- Privacy/identity: FR-005 through FR-010.
-- Layering: FR-011 and architecture plan.
-- Content integrity: FR-020 through FR-026.
-- Release discipline: FR-012, FR-018, FR-019 and Level-8 plan.
-- Accessibility/performance/offline: FR-016, FR-028, FR-029.
-
-Specification -> tasks coverage:
-- Runtime/browser: T0001–T0004, T0301–T0322.
-- State/foundation: T0101–T0104.
-- Public copy: T0201–T0206.
-- PWA/offline: T0401–T0404.
-- Content gates: T0501–T0505.
-- Content rewrite: T0601–T0605.
-- Future identity/community: T0701–T0703.
-- Release/report: T0801–T0805.
-
-Unmapped MUST requirements: none identified.
-Tasks with no specification basis: none identified.
-
-## Quality gates and release pipeline consistency
-
-Planned gate sequence is consistent across constitution, spec, plan, tasks, and release-evidence contract:
-validate -> unit logic -> adapters/contracts -> build -> service-worker asset check -> local browser E2E -> copy/accessibility -> deploy -> live smoke -> hash/live asset verification -> readiness report.
-
-Known deliberate exception:
-- automatic rollback is not a first-implementation MUST because it is not yet proven deterministic.
+Constitution -> specification: CONSISTENT.
+Specification -> research: CONSISTENT with explicit PARTIAL source records.
+Specification -> plan: CONSISTENT.
+Plan -> tasks: CONSISTENT; all levels 0–8 mapped to executable tasks.
+Tasks -> evidence model: CONSISTENT; every task states evidence required.
+Contracts/data model -> future-scope constraints: CONSISTENT; no current login/comments/server activation.
+Owner decisions -> all artifacts: CONSISTENT.
+Implementation prohibition -> completion commit: CONSISTENT; only specification/research/planning/package files are changed.
 
 ## Risks
 
-R1 — Production baseline is currently reported/believed broken by TDZ startup ordering.
-Impact: Critical user-facing failure until Level 0 implementation.
-Mitigation: T0001–T0004 are first implementation work; no other feature work before browser smoke green.
-
-R2 — Browser E2E could become slow/flaky if the full matrix is implemented without deterministic clocks/seeds/state fixtures.
-Impact: Release friction and ignored failures.
-Mitigation: Shared fixtures, seeded randomization, controlled clock, explicit engine applicability, no arbitrary sleeps.
-
-R3 — Playwright WebKit can create false confidence about physical iOS Safari.
-Impact: Misleading PWA claim.
-Mitigation: Separate evidence class and explicit MISSING label for physical device.
-
-R4 — Service-worker cache bugs can preserve stale broken builds.
-Impact: Returning users remain broken after deploy.
-Mitigation: cache-version/update tests and last-known-good rollback procedure.
-
-R5 — Numeric content heuristics can encourage “passing the validator” rather than improving assessment validity.
-Impact: Superficially balanced but weak questions.
-Mitigation: provisional labels, plausible distractor review, blueprint review, empirical post-use metrics, needs_review.
-
-R6 — AI-assisted bulk rewriting can introduce subtle technical errors/automation bias.
-Impact: Incorrect study content.
-Mitigation: structured gate, independent technical review, no guessed claim, explicit needs_review list.
-
-R7 — Future comments/ratings can introduce abuse, moderation, privacy, and storage obligations.
-Impact: Product/security scope explosion.
-Mitigation: contracts only now; separate feature before activation.
-
-R8 — Future identity provider choice can create vendor lock-in or region/recovery constraints.
-Impact: costly migration or inaccessible users.
-Mitigation: provider-neutral boundary and later provider matrix.
-
-R9 — Repository dev dependencies currently have known audit findings from prior work.
-Impact: CI/toolchain supply-chain risk, mostly not shipped browser code.
-Mitigation: handle in separate dependency housekeeping work; do not mix with public-readiness runtime/content commits.
-
-R10 — Three-working-day pre-implementation timebox may be insufficient for perfect external research breadth.
-Impact: incomplete evidence matrix.
-Mitigation: current package captures 10+ independent source families and identifies any undated current docs; no implementation starts merely because timebox expires.
+R1. Public baseline runtime remains broken until Level 0 if the reported TDZ defect is still present.
+R2. Browser E2E can become flaky if randomness/time are not seeded/controlled.
+R3. Playwright WebKit can create false confidence about physical iPhone Safari if evidence classes are conflated.
+R4. Stale service-worker caches can preserve broken releases.
+R5. Static content heuristics can be gamed and do not prove psychometric validity.
+R6. AI-assisted rewriting can introduce subtle technical errors/automation bias.
+R7. Comments/ratings create moderation/privacy/retention obligations and remain out of scope.
+R8. Identity-provider choice can create lock-in, region, recovery and data-residency constraints.
+R9. Some 2026 research records remain PARTIAL because their exact source URL/DOI could not be resolved during this pass.
+R10. Three-day timebox must not pressure implementation before the completion gate.
 
 ## Unknowns
 
-U1. Official SDAIA question count is unknown from verified official material available to this project.
-U2. Official exam duration is unknown.
-U3. Official passing score is unknown.
-U4. Official coding/lab component is unknown.
-U5. Physical iPhone Safari behavior for the next implementation is unverified until a real device test is supplied/performed.
-U6. Future authentication provider is undecided.
-U7. Future account-link merge policy is undecided.
-U8. Future ratings scale is undecided.
-U9. Future comments moderation/retention policy is undecided.
-U10. Current real-learner psychometric item statistics do not exist in the public static product.
-U11. Exact optimal content-gate thresholds are unknown; current values are provisional.
-U12. Whether every learn topic can satisfy >=4 items without harming blueprint quality must be measured at Level 5.
+Official SDAIA question count, duration, passing score, and coding/lab component remain unknown from verified official material.
+Physical iPhone Safari remains unverified until owner supplies evidence.
+Future auth provider, anonymous/account merge policy, rating scale, moderation/retention policy, empirical item statistics, optimal content thresholds and >=4/topic feasibility remain unresolved.
 
-## External blockers — owner-controlled actions
+## External blockers
 
-B1. A real iPhone/Safari verification requires access to a physical iPhone or owner-supplied evidence.
-B2. Future authentication requires the owner to select/authorize an identity provider and any paid account/project.
-B3. Future LLM review workflow requires repository variables/secrets; no secret may be pasted into public docs/chat/source.
-B4. Branch-protection/ruleset administration may require owner GitHub settings access not available to a managed connector.
-B5. Community comments/ratings require owner product decisions on moderation, privacy, retention, and acceptable-use policy.
-B6. Official exam-format claims require newer official SDAIA evidence supplied or independently verified; the project must not infer them.
+1. Physical iPhone Safari evidence: owner must supply screenshots plus exact steps for a physical-Safari VERIFIED claim.
+2. Level 6 needs_review clearance: owner Othman must independently review and disposition every item using the agent-prepared review sheet.
+3. Future identity provider: owner authorization/account/configuration decision.
+4. Future comments/ratings: owner decisions on moderation, privacy, retention, abuse handling and product policy.
+5. Future repository administration that requires unavailable admin APIs may require owner action.
+6. Any future LLM review automation requires repository variables/secrets; daily-review remains disabled and untouched until Level 7.
+7. New official SDAIA exam-format claims require owner-supplied or independently verified official evidence.
 
-## Owner decisions required
+## Implementation control
 
-1. Should Level 0 be the first implementation immediately after review?
-Recommended answer: YES. The baseline runtime defect is user-blocking and must precede all cleanup/content work.
+After this completion commit is confirmed, implementation is authorized to begin at Level 0.
+Mandatory stop points:
+- STOP and wait for owner review after Level 0 report.
+- STOP and wait for owner review after Level 3 report.
+Other levels continue autonomously in order unless a gate fails or an owner-only blocker is reached.
 
-2. Should the project retain the single About footer version “الإصدار 6.0” while removing version labels elsewhere?
-Recommended answer: YES. One quiet About version is useful operationally and does not clutter the study experience.
-
-3. Should semantic accessibility locators take precedence over mandatory testid-only tests?
-Recommended answer: YES. Use role/name first and testid for generated/ambiguous controls.
-
-4. Should four options remain required despite current research showing distractor quality matters more than quantity?
-Recommended answer: YES for the first rewrite because it is owner-approved, but keep it PROVISIONAL and review with measured data on 2026-10-07.
-
-5. Should an automatic rollback be implemented in the first public-readiness release?
-Recommended answer: NO. First build a tested manual/controlled rollback and add automation only after deterministic proof.
-
-6. Should comments and ratings be implemented in this public-readiness feature?
-Recommended answer: NO. Keep contracts only; create a separate community feature after auth/moderation/privacy decisions.
-
-7. Should login be implemented in this public-readiness feature?
-Recommended answer: NO. Preserve anonymous local study; create a separate authentication feature using a managed passkey/WebAuthn-capable provider.
-
-8. Should content rewrite wait until runtime/browser/PWA gates are stable?
-Recommended answer: YES. Runtime reliability and quality measurement must exist before the 121-item rewrite and 21-item expansion.
-
-## Analyze conclusion
-
-The pre-implementation artifacts are internally consistent after the resolutions above. No implementation is authorized by this report. The only critical product condition identified is the known baseline runtime startup defect, which is intentionally queued as Level 0 rather than fixed in this documentation-only phase.
+Analyze conclusion: the pre-implementation artifacts are internally consistent after the four required completions. Implementation has not started.
 
 READY FOR REVIEW — implementation not started

@@ -3,362 +3,69 @@
 Date: 2026-09-07
 Research window: prioritize material published or materially updated after 2026-05-01; older material is used only where it remains normative or necessary background.
 
-Research standard: the three foundation-shaping decisions below are supported by multiple independent source families. Dates marked “current documentation; retrieved 2026-09-07” mean the page is current vendor/standards documentation but did not expose a reliable publication date in the retrieved result.
+Record format:
+ID | Source | Date | URL/DOI | Recommendation | Relevance | Conflict | Final decision | Confidence
+
+A record without a resolvable URL/DOI is explicitly downgraded to PARTIAL confidence until resolved.
 
 ## Decision A — Identity boundary and future passkeys
 
-Final decision:
-- Do not implement authentication in the current phase.
-- Preserve anonymous UUID identity today.
-- Define a provider-neutral IdentityProvider boundary for future sign-in/sign-out/account-linking.
-- Prefer a managed provider that supports standards-based WebAuthn/passkeys and secure server-side session management.
-- Do not build a bespoke password database.
-- Treat recovery, credential management, cross-device use, account linking, and passkey loss as first-class future requirements rather than assuming passkeys eliminate account-recovery work.
+Final decision: do not implement authentication now; preserve anonymous UUID; define a provider-neutral identity boundary; prefer a managed WebAuthn/passkey-capable provider later; never build bespoke password storage.
+Decision confidence: HIGH for architecture direction, MEDIUM for future provider choice.
 
-Confidence: HIGH for the architectural boundary and passkey direction; MEDIUM for eventual provider choice because no provider has been selected and future commercial/operational requirements are unknown.
+A1 | W3C Web Authentication Level 3 Candidate Recommendation Snapshot | 2026-05-26 | https://www.w3.org/TR/webauthn-3/ | Use browser-mediated scoped public-key credentials | Standards basis for future passkeys | None | Future provider must support standards-compatible WebAuthn | HIGH
+A2 | W3C proposed advancement of WebAuthn Level 3 | 2026-07-20 | https://www.w3.org/news/2026/proposed-advancement-of-webauthn-3-to-w3c-recommendation/ | Current standards trajectory is public-key WebAuthn | Avoid password-first architecture | None | Design for current WebAuthn generation | HIGH
+A3 | MDN Passkeys guide | 2026-09-03 | https://developer.mozilla.org/en-US/docs/Web/Security/Authentication/Passkeys | Treat registration, authentication, and lost-credential/recovery paths as first-class | Recovery remains part of identity architecture | None | Provider evaluation must include recovery | HIGH
+A4 | MDN Authentication security guide | 2026-05-11 | https://developer.mozilla.org/en-US/docs/Web/Security/Authentication | Separate authentication method from session management | Auth secrets should not live in study localStorage | Local study state can remain local | Keep auth/session secrets outside study state | HIGH
+A5 | Microsoft Entra ID passkeys-by-default security update | 2026-07-13 | https://www.microsoft.com/en-us/security/blog/2026/07/13/microsoft-entra-id-security-updates-passkeys-are-the-default-authentication-method-in-entra-id/ | Prefer phishing-resistant passkeys over phishable methods | Current enterprise identity direction | None | Prefer phishing-resistant managed auth | HIGH
+A6 | Microsoft Learn — Support for passkeys in Windows | 2026-05-13 | https://learn.microsoft.com/en-us/windows/security/identity-protection/passkeys/ | Support platform and cross-device passkey flows; account for consent and Bluetooth/cross-device constraints | Cross-platform requirements | None | Avoid ecosystem-specific identity design | HIGH
+A7 | Apple Authentication Services | current; retrieved 2026-09-07 | https://developer.apple.com/documentation/authenticationservices/ | Delegate credentials to platform identity frameworks and standards | Mature Apple passkey support | Apple-specific APIs must not dictate cross-platform architecture | Standards-first provider boundary | HIGH
+A8 | Apple Passkey use in web browsers | current; retrieved 2026-09-07 | https://developer.apple.com/documentation/authenticationservices/passkey-use-in-web-browsers | Browser/OS mediates WebAuthentication challenges and credential use | Do not build a credential vault in frontend code | None | Delegate credential handling to platform/provider | HIGH
+A9 | OWASP Authentication Cheat Sheet | current; retrieved 2026-09-07 | https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html | Do not assume all passkeys are hardware-bound/non-exportable; understand authenticator properties | Prevents overclaiming assurance | None | Document actual assurance level of chosen provider/authenticator | HIGH
+A10 | FIDO Alliance State of Passkeys 2026 | 2026-05-07 | https://fidoalliance.org/the-state-of-passkeys-2026-global-consumer-and-workforce-report/ | Passkeys have mainstream consumer/workforce adoption | Makes passkeys a realistic future option | Adoption does not remove recovery/lifecycle needs | Prefer passkeys with recovery planning | MEDIUM-HIGH
+A11 | FIDO/HID enterprise identity research referenced in initial review | 2026-06-17 | UNRESOLVED — no stable source URL confirmed during this pre-implementation pass | Treat governance/offboarding as part of identity lifecycle | Sign-in is not the full identity architecture | Evidence not independently resolvable | Keep lifecycle/offboarding as a planning requirement, but do not cite this record as VERIFIED evidence | PARTIAL
 
-Source A1
-Decision: Identity/passkeys
-Source: W3C Web Authentication Level 3 Candidate Recommendation Snapshot
-Date: 2026-05-26
-Recommendation: Web applications can strongly authenticate users using scoped public-key credentials with browser-mediated access to authenticators; privacy/security considerations belong in the relying-party design.
-Relevance: Establishes the standards basis for future passkey/WebAuthn support and argues against embedding a proprietary credential model into the frontend.
-Conflict: None with the project direction.
-Final decision: Define identity around standards-compatible credentials, but defer actual auth implementation.
-Confidence: HIGH
+## Decision B — PWA, service worker, Safari/iOS, browser verification
 
-Source A2
-Decision: Identity/passkeys
-Source: W3C proposed advancement of WebAuthn Level 3 to Recommendation
-Date: 2026-07-20
-Recommendation: WebAuthn Level 3 was proposed for advancement after implementation experience; it remains the current standards trajectory for strong public-key web authentication.
-Relevance: Confirms that the project should design for the current WebAuthn generation rather than an older password-first architecture.
-Conflict: None.
-Final decision: Future provider must be WebAuthn/passkey capable.
-Confidence: HIGH
+Final decision: GitHub Pages HTTPS remains the supported runtime; service worker is offline/reliability infrastructure, not proof of Safari installability; test Chromium and WebKit; physical iPhone Safari is a separate owner-supplied evidence class; prefer feature detection and explicit registration/cache/offline/update tests.
+Decision confidence: HIGH for strategy, MEDIUM for physical iOS behavior until owner device evidence exists.
 
-Source A3
-Decision: Identity/passkeys
-Source: MDN Passkeys guide
-Date: 2026-09-03 (page result published four days before research date)
-Recommendation: Passkeys use WebAuthn registration/sign-in flows and require explicit planning for lost credentials, management, migration, and recovery.
-Relevance: Reinforces that passkeys simplify credential handling but do not remove account lifecycle design.
-Conflict: None.
-Final decision: Keep authentication behind a provider boundary and include recovery/linking requirements in the future spec.
-Confidence: HIGH
+Owner reviewer spot-check: B1, B2, and B5 were independently confirmed against webkit.org and developer.apple.com.
 
-Source A4
-Decision: Identity/passkeys
-Source: MDN Authentication security guide
-Date: 2026-05-11
-Recommendation: Passkeys authenticate without site-entered passwords; sessions remain a separate post-authentication concern typically implemented with secure server-side/session-cookie mechanisms.
-Relevance: Separates identity proof from session persistence and supports avoiding secret auth tokens in localStorage.
-Conflict: Existing public app uses localStorage for study state; that is acceptable because it is not an auth token.
-Final decision: Study state may remain local; future auth/session secrets must not be stored in localStorage.
-Confidence: HIGH
-
-Source A5
-Decision: Identity/passkeys
-Source: Microsoft Learn — passkeys by default / retirement of Microsoft-provided SMS and voice authentication
-Date: 2026-08-10
-Recommendation: Microsoft is moving users toward passkeys/phishing-resistant methods and away from weaker telecom-delivered authentication.
-Relevance: Current enterprise direction supports passkeys as a mainstream future identity option.
-Conflict: None.
-Final decision: Prefer phishing-resistant managed authentication over bespoke password/SMS-first design.
-Confidence: HIGH
-
-Source A6
-Decision: Identity/passkeys
-Source: Microsoft Learn — Windows passkey support
-Date: 2026-06 (page published approximately three months before research date)
-Recommendation: Passkeys are OS-integrated and include permission/recovery/cross-device operational considerations.
-Relevance: Supports provider-neutral design rather than assuming one device ecosystem.
-Conflict: None.
-Final decision: Avoid Apple-only identity assumptions; choose a cross-platform standards-capable provider later.
-Confidence: HIGH
-
-Source A7
-Decision: Identity/passkeys
-Source: Apple Developer — Passkeys overview / AuthenticationServices current documentation
-Date: current documentation; retrieved 2026-09-07
-Recommendation: Passkeys support passwordless sign-in using public/private credentials, platform authenticators, credential providers, import/export, account creation, and automatic upgrades.
-Relevance: Demonstrates that Apple’s current passkey platform is mature and integrated with browser/app authentication flows.
-Conflict: Apple platform details must not dictate the web app’s provider abstraction.
-Final decision: Identity boundary remains standards-first and cross-platform.
-Confidence: HIGH
-
-Source A8
-Decision: Identity/passkeys
-Source: Apple Developer — passkey use in web browsers
-Date: current documentation; retrieved 2026-09-07
-Recommendation: WebAuthentication challenges are mediated by the browser/OS credential system; browser-app integration is platform controlled.
-Relevance: Reinforces that the frontend should not implement its own credential vault or device-specific credential logic.
-Conflict: None.
-Final decision: Future auth integration delegates credential handling to browser/OS/managed identity mechanisms.
-Confidence: HIGH
-
-Source A9
-Decision: Identity/passkeys
-Source: OWASP Authentication Cheat Sheet
-Date: current documentation; retrieved 2026-09-07
-Recommendation: Passkeys provide strong authentication, but authenticator properties vary; relying parties should not assume all credentials are hardware-backed/non-exportable.
-Relevance: Prevents overclaiming security properties and informs future threat modeling.
-Conflict: None.
-Final decision: Future auth documentation must state actual assurance properties rather than generic “passkey = hardware-bound” assumptions.
-Confidence: HIGH
-
-Source A10
-Decision: Identity/passkeys
-Source: FIDO Alliance — State of Passkeys 2026 / World Passkey Day
-Date: 2026-05-07
-Recommendation: Passkey adoption is mainstream and growing across consumers and enterprises.
-Relevance: Supports future investment in passkeys as a realistic user-facing option rather than experimental technology.
-Conflict: Adoption statistics do not prove universal user readiness or eliminate fallback/recovery needs.
-Final decision: Passkeys are preferred, but recovery/fallback remains part of the future auth plan.
-Confidence: MEDIUM-HIGH
-
-Source A11
-Decision: Identity/passkeys
-Source: FIDO Alliance / HID enterprise identity research summary
-Date: 2026-06-17
-Recommendation: Operational identity governance and offboarding remain difficult even when strong authentication technology exists.
-Relevance: Prevents reducing future identity architecture to the sign-in ceremony alone.
-Conflict: None.
-Final decision: Future account feature must include lifecycle, unlink/recovery, and data-ownership rules.
-Confidence: MEDIUM
-
-## Decision B — PWA, Service Worker, Safari/iOS, and browser verification
-
-Final decision:
-- GitHub Pages HTTPS remains the supported public runtime.
-- Service worker remains an offline/reliability enhancement, not an “installability proof”.
-- Test built artifacts in Chromium and Playwright WebKit before deployment.
-- Treat physical iPhone Safari as a separate verification class; never infer it from WebKit automation.
-- Prefer feature detection over user-agent branching.
-- Version and enumerate cache assets explicitly and verify that every listed asset exists in the built site.
-- Test first online load, service-worker registration, cache creation, offline reload, update/cache invalidation, and persistence.
-- Do not hide service-worker registration failures from test/diagnostic paths.
-
-Confidence: HIGH for testing and service-worker strategy; MEDIUM for physical iOS behavior until a real device test is performed.
-
-Source B1
-Decision: PWA/Safari/iOS
-Source: WebKit — WebKit Features for Safari 26.6
-Date: 2026-07-27
-Recommendation: Safari 26.6 fixed service-worker registration cleanup bugs that could block re-registration when service-worker scripts disappear.
-Relevance: Demonstrates that service-worker lifecycle edge cases are real Safari release concerns and should be tested rather than assumed.
-Conflict: None.
-Final decision: Browser E2E must explicitly verify registration and upgrade/re-registration behavior.
-Confidence: HIGH
-
-Source B2
-Decision: PWA/Safari/iOS
-Source: Apple Safari 26.6 Release Notes
-Date: 2026-07-27
-Recommendation: Documents the same production Safari service-worker fixes for iOS/iPadOS/macOS.
-Relevance: Confirms that the WebKit behavior affects shipping Safari, not just experimental builds.
-Conflict: None.
-Final decision: Safari/iOS service-worker verification remains a first-class release concern.
-Confidence: HIGH
-
-Source B3
-Decision: PWA/Safari/iOS
-Source: WebKit — WWDC26 web technology sessions
-Date: 2026-06-08
-Recommendation: Safari 27 work emphasizes quality and broad web-platform interoperability.
-Relevance: Supports keeping tests standards-based and cross-browser instead of relying on browser-specific assumptions.
-Conflict: None.
-Final decision: Keep browser tests portable across Chromium/WebKit and use feature detection.
-Confidence: MEDIUM-HIGH
-
-Source B4
-Decision: PWA/Safari/iOS
-Source: WebKit — Safari 27 beta news
-Date: 2026-06-08
-Recommendation: Safari 27 adds Service Worker Static Routing API and continues service-worker evolution.
-Relevance: Reinforces that service-worker behavior is actively evolving; the project should use conservative well-supported primitives and test them.
-Conflict: The project does not need new Safari-27-only APIs.
-Final decision: Do not adopt static routing in the current plan; test the existing simple caching design.
-Confidence: HIGH
-
-Source B5
-Decision: PWA/Safari/iOS
-Source: WebKit — Safari 26.0 web apps/installability behavior
-Date: current Safari 26 documentation, retrieved 2026-09-07; underlying release predates the research window
-Recommendation: On iOS/iPadOS 26, any site can be added to the Home Screen and open as a web app; a manifest/service worker is not required merely for Safari “installability”. Feature detection is preferred over UA detection.
-Relevance: Corrects a common PWA assumption and prevents treating service-worker registration as proof of installability.
-Conflict: Older Chromium PWA guidance often ties installability more closely to manifest/service-worker criteria.
-Final decision: Define service worker as offline/reliability infrastructure; test install-related UX separately and browser-specifically.
-Confidence: HIGH
-
-Source B6
-Decision: PWA/Safari/iOS
-Source: WebKit Safari Technology Preview 251 release notes
-Date: 2026-08/09 window (published approximately one week before research date)
-Recommendation: Ongoing service-worker streaming, headers, fallback, and request-body fixes continue to land.
-Relevance: Evidence that WebKit service workers require real execution coverage as browser implementations evolve.
-Conflict: None.
-Final decision: Maintain WebKit E2E coverage and avoid declaring static syntax tests sufficient.
-Confidence: HIGH
-
-Source B7
-Decision: PWA/Safari/iOS
-Source: Playwright documentation — projects/browsers/WebKit
-Date: current documentation; retrieved 2026-09-07
-Recommendation: Execute the same end-to-end behavior against browser projects including Chromium and WebKit; use deterministic browser automation and explicit viewport/device configuration.
-Relevance: Directly supports the planned cross-engine release gate.
-Conflict: Playwright WebKit is not physical iPhone Safari.
-Final decision: Use Playwright Chromium + WebKit CI, label physical Safari separately.
-Confidence: HIGH
-
-Source B8
-Decision: PWA/Safari/iOS
-Source: MDN Service Worker / Cache Storage current documentation
-Date: current documentation; retrieved 2026-09-07
-Recommendation: Service workers operate only in secure contexts (with localhost development exceptions), have independent lifecycle, and rely on Cache Storage/fetch handling for offline behavior.
-Relevance: Supports GitHub Pages HTTPS as public runtime and explicit offline tests.
-Conflict: Direct file:// opening is not a supported service-worker runtime.
-Final decision: GitHub Pages/HTTP local server is supported; file:// is not a release target.
-Confidence: HIGH
-
-Source B9
-Decision: PWA/Safari/iOS
-Source: Web App Manifest / web-platform standards current documentation
-Date: normative/current standards; retrieved 2026-09-07
-Recommendation: Manifest describes application metadata but does not itself prove offline readiness or runtime correctness.
-Relevance: Separates metadata validation from behavioral validation.
-Conflict: None.
-Final decision: Validate manifest syntax and separately prove browser behavior.
-Confidence: HIGH
-
-Source B10
-Decision: PWA/Safari/iOS
-Source: Existing repository sw.js and public-readiness owner specification
-Date: repository baseline 2026-09-07
-Recommendation: Current cache version is sdaia-ai-pages-v6 and explicitly lists src/* and data/*.json; owner requires offline E2E and live browser smoke.
-Relevance: Provides exact project state and target evidence.
-Conflict: Current app code swallows registration failures, so static asset enumeration alone is insufficient.
-Final decision: Implementation plan adds runtime service-worker observability in tests and explicit offline/browser gates without altering the current pre-implementation branch.
-Confidence: HIGH
+B1 | WebKit Features for Safari 26.6 | 2026-07-27 | https://webkit.org/blog/18178/webkit-features-for-safari-26-6/ | Treat service-worker lifecycle bugs as real browser-specific failure modes | Confirms need for browser execution | None | Explicit registration/update tests are mandatory | HIGH
+B2 | Apple Safari 26.6 Release Notes | 2026-07-27 | https://developer.apple.com/documentation/safari-release-notes/safari-26_6-release-notes | Shipping Safari fixed service-worker registration cleanup issues | Confirms iOS/macOS impact | None | Safari service-worker behavior remains a release concern | HIGH
+B3 | WebKit WWDC26 / Safari 27 beta web platform update | 2026-06-08 | https://webkit.org/blog/17967/news-from-wwdc26-webkit-in-safari-27-beta/ | Browser capabilities evolve; prefer interoperable primitives and explicit testing | Supports conservative cross-browser design | None | Do not depend on Safari-27-only APIs for current app | HIGH
+B4 | WebKit Safari 27 beta — Service Worker Static Routing API | 2026-06-08 | https://webkit.org/blog/17967/news-from-wwdc26-webkit-in-safari-27-beta/ | New SW routing API can improve advanced PWAs but is not necessary for this product | Avoid needless new-platform dependency | None | Stay with simpler cache/fetch primitives unless later evidence justifies change | HIGH
+B5 | Apple/WebKit current Safari web-app behavior referenced by owner reviewer | current; retrieved 2026-09-07 | https://developer.apple.com/safari/ | Do not equate service-worker presence with Safari installability; treat web-app install and offline behavior as separate properties | Corrects Chromium-centric PWA assumptions | Browser terminology differs | Separate installability evidence from offline/service-worker evidence | HIGH
+B6 | Safari Technology Preview 251 | 2026-08-26 | https://webkit.org/blog/18194/release-notes-for-safari-technology-preview-251/ | Ongoing service-worker fixes/features demonstrate implementation churn | Supports continued WebKit E2E | None | Keep WebKit coverage current | HIGH
+B7 | Playwright Projects | current; retrieved 2026-09-07 | https://playwright.dev/docs/test-projects | Run the same user flows across Chromium/WebKit projects and device profiles | Direct CI strategy | Playwright WebKit is not physical Safari | Use Playwright for automated cross-engine evidence and label device evidence separately | HIGH
+B8 | MDN CacheStorage / Service Worker secure-context behavior | current; retrieved 2026-09-07 | https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage | CacheStorage/service-worker behavior depends on secure contexts; test over HTTP localhost/HTTPS, not file:// | Defines supported test/runtime model | file:// cannot be treated as release runtime | GitHub Pages HTTPS is supported public runtime | HIGH
+B9 | W3C Web Application Manifest | 2026-08-13 | https://www.w3.org/TR/appmanifest/ | Manifest metadata describes the application but does not prove runtime/offline correctness | Separates static validation from behavior | None | Validate manifest separately from browser E2E | HIGH
+B10 | Current repository sw.js + owner public-readiness specification | 2026-09-07 | https://github.com/oaabahussain/sdaia-ai-engineer/blob/059b90fca83d20b950b5c83e751a55180387fd53/sw.js | Cache v6 already lists src/data assets; owner requires offline E2E | Exact project baseline | App registration errors are currently swallowed | Preserve asset coverage and add runtime observability/tests later | HIGH
 
 ## Decision C — Content-quality gates and MCQ rewrite policy
 
-Final decision:
-- Preserve the owner-mandated numeric content gates as PROVISIONAL through 2026-10-07.
-- Treat them as engineering anti-pattern controls, not universal psychometric truths.
-- Add measured post-use data before changing thresholds.
-- Prioritize plausible distractors, blueprint/domain/topic coverage, scenario/context richness, item-writing-flaw review, and empirical item analysis.
-- Require human/independent technical review for uncertain claims and record needs_review instead of guessing.
-- Do not begin bulk rewrite until the content validator and reporting metrics exist.
+Final decision: preserve owner numeric gates as PROVISIONAL through 2026-10-07; treat them as engineering anti-pattern controls, not universal psychometric truths; prioritize plausible distractors, blueprinting, structured flaw review, empirical item analysis, and independent technical review; do not rewrite before validator exists.
+Decision confidence: HIGH for review principles; MEDIUM-LOW for exact numeric thresholds.
 
-Confidence: HIGH that structured review, distractor quality, and empirical validation matter; MEDIUM-LOW that the current numeric thresholds are optimal, which is why they remain provisional.
-
-Source C1
-Decision: Content quality
-Source: Journal of Rawalpindi Medical College — “Enhancing Assessment Integrity: The Role of Plausible Distractors in Multiple-Choice Question Design”
-Date: 2026-06-30
-Recommendation: Plausible distractors are central to MCQ quality and assessment integrity; non-plausible distractors undermine item function.
-Relevance: Supports prohibiting trivial/implausible distractors and measuring distractor quality.
-Conflict: Does not establish a universal option-count rule.
-Final decision: Enforce plausible full-statement distractors; keep four-option count provisional.
-Confidence: HIGH
-
-Source C2
-Decision: Content quality
-Source: PubMed/PMC randomized study — “Reducing the Number of Distractors in Multiple-Choice Questions”
-Date: 2026 (published approximately May 2026; current 2026 study)
-Recommendation: Distractor quality mattered more than quantity; two distractors performed comparably to three distractors, with fewer writing flaws and more functional distractors.
-Relevance: Directly challenges any claim that exactly four options is psychometrically superior.
-Conflict: Owner amendment requires four options for the first rewrite.
-Final decision: Keep four options as a provisional engineering gate only; review with real data on 2026-10-07.
-Confidence: HIGH
-
-Source C3
-Decision: Content quality
-Source: Journal of Taibah University Medical Sciences — “Improving MCQ quality using a self-evaluation checklist”
-Date: 2026-06-03
-Recommendation: Standardized self-evaluation checklists can improve MCQ quality and item-writing practice.
-Relevance: Supports a machine-enforced validator plus structured human/AI review rubric.
-Conflict: Automated gates alone cannot prove technical correctness.
-Final decision: Combine automated gates with content review and needs_review handling.
-Confidence: HIGH
-
-Source C4
-Decision: Content quality
-Source: American Board of Radiology — “The Life Cycle of an ABR Exam Question”
-Date: 2026-08 (article issue references June 2026)
-Recommendation: High-stakes item development begins with a blueprint and relies on subject-matter committees to refine and assemble valid/relevant content.
-Relevance: Supports domain/topic blueprinting and independent technical review rather than unreviewed bulk generation.
-Conflict: The study tool is not an official high-stakes exam program and lacks an SME committee today.
-Final decision: Use domain/topic blueprint metrics and mark unresolved technical claims for review; do not claim official-equivalent validation.
-Confidence: HIGH
-
-Source C5
-Decision: Content quality
-Source: Wiley, European Journal of Dental Education — evaluation of AI-generated MCQs
-Date: 2026-07-25
-Recommendation: AI-generated assessment items require explicit quality assessment; generation alone is not evidence of validity.
-Relevance: Directly relevant because this project’s bank was generated/edited with AI assistance.
-Conflict: None.
-Final decision: Every rewritten item must pass gates and content review; uncertain claims remain needs_review.
-Confidence: HIGH
-
-Source C6
-Decision: Content quality
-Source: Frontiers in Medicine — LLM MCQ quality versus expert consensus
-Date: 2026-07-09
-Recommendation: AI-generated question quality should be evaluated against expert criteria/consensus rather than accepted from model output.
-Relevance: Reinforces independent review and structured evaluation.
-Conflict: The project currently lacks a formal expert panel.
-Final decision: The readiness report must list needs_review claims and cannot call the bank technically verified without appropriate review.
-Confidence: HIGH
-
-Source C7
-Decision: Content quality
-Source: Frontiers in Computer Science — AI-assisted MCQ creation and automation bias
-Date: 2026-05-26
-Recommendation: AI-assisted authoring can increase item-writing flaws through automation bias; structured flaw rubrics and human review remain necessary.
-Relevance: Strong warning against “agent rewrote 121 questions, therefore quality improved”.
-Conflict: None.
-Final decision: Bulk rewrite must be gated, audited, and treated as a content-engineering project, not a text-generation task.
-Confidence: HIGH
-
-Source C8
-Decision: Content quality
-Source: Computers & Education: Artificial Intelligence — impact of item-writing flaws on difficulty/discrimination
-Date: 2026
-Recommendation: Item-writing flaws correlate with empirical item difficulty/discrimination; automated flaw detection is useful for initial screening but does not replace domain-aware validation.
-Relevance: Supports validator rules plus later learner-data analysis.
-Conflict: Some proposed gates (character length, longest-option ratio) are heuristic proxies rather than direct psychometric measures.
-Final decision: Keep heuristics provisional and add future empirical difficulty/discrimination reporting.
-Confidence: HIGH
-
-Source C9
-Decision: Content quality
-Source: Nurse Education in Practice — human vs AI NCLEX-style item review using a rubric
-Date: 2026-07
-Recommendation: Structured rubrics enable comparison of human/AI review consistency, but reliability/agreement must be measured rather than presumed.
-Relevance: Supports future dual-review workflows and prevents treating LLM review as ground truth.
-Conflict: None.
-Final decision: AI content review is advisory unless independently validated; uncertain items remain needs_review.
-Confidence: HIGH
-
-Source C10
-Decision: Content quality
-Source: Language Testing in Asia — item-writer intention versus test-taker processes
-Date: 2026
-Recommendation: What writers intend an item to measure may differ from how test takers actually solve it; option-level intentions and empirical/test-taker evidence matter.
-Relevance: Supports future learner-response analysis and caution around purely static style gates.
-Conflict: None.
-Final decision: Post-launch threshold review uses measured item behavior, not only static formatting metrics.
-Confidence: MEDIUM-HIGH
+C1 | Journal of Rawalpindi Medical College plausible-distractor study referenced in initial research | 2026-06-30 | UNRESOLVED — no stable URL/DOI confirmed during this pre-implementation pass | Plausible distractors are central to MCQ quality | Supports banning trivial distractors | Exact source unresolved | Retain plausible-distractor requirement but do not cite this record as VERIFIED evidence | PARTIAL
+C2 | 2026 randomized distractor-count study referenced in initial research | 2026 | UNRESOLVED — no stable URL/DOI confirmed during this pre-implementation pass | Distractor quality may matter more than simply adding options | Challenges claim that four options are inherently optimal | Exact source unresolved | Keep four options only as owner-approved provisional gate | PARTIAL
+C3 | Improving MCQ quality using a self-evaluation checklist: a quasi-experimental study | 2026-06-03 | DOI 10.1016/j.jtumed.2026.05.006 ; https://pubmed.ncbi.nlm.nih.gov/42292512/ | Structured self-evaluation/checklists can improve item quality | Supports validator plus review rubric | Automation alone is not technical proof | Combine automated gates with review | HIGH
+C4 | American Board of Radiology — The Life Cycle of an ABR Exam Question | 2026-06/2026-08 issue | https://www.theabr.org/beam/from-the-board-of-trustees-august-2026/ | Start from blueprint; use SME refinement; write plausible distractors; validate answers with references | Supports domain/topic blueprint and review workflow | Project lacks formal SME committee | Use blueprint and owner review; mark uncertain claims needs_review | HIGH
+C5 | Evaluation of AI-Generated Multiple-Choice Questions for Periodontology Exams | 2026-07-25 | DOI 10.1111/eje.70262 ; https://pubmed.ncbi.nlm.nih.gov/42501401/ | AI-generated MCQs require explicit quality assessment and expert supervision | Directly relevant to AI-assisted rewrite | None | Gate and independently review every rewrite batch | HIGH
+C6 | Frontiers in Medicine — Assessing MCQ quality against expert consensus | 2026-07-09 | DOI 10.3389/fmed.2026.1866674 ; https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2026.1866674/full | Compare AI evaluation with expert criteria rather than treating model judgment as ground truth | Independent review required | No standing external expert panel | Owner review required for uncertain technical claims | HIGH
+C7 | Frontiers in Computer Science automation-bias MCQ study referenced in initial research | 2026-05-26 | UNRESOLVED — no stable URL/DOI confirmed during this pre-implementation pass | AI-assisted authoring can create systematic item-writing flaws | Warns against bulk-generation confidence | Exact source unresolved | Keep structured audit requirement; do not cite this record as VERIFIED evidence | PARTIAL
+C8 | Computers & Education: Artificial Intelligence — The impact of item-writing flaws on difficulty and discrimination in item response theory | 2026 | DOI 10.1016/j.caeai.2026.100632 ; https://doi.org/10.1016/j.caeai.2026.100632 | Static item-writing-flaw analysis is useful but empirical IRT/item data remains important | Supports later empirical metrics | Numeric heuristics are proxies | Keep static gates provisional and revisit with learner data | HIGH
+C9 | Nurse Education in Practice human-vs-AI rubric review referenced in initial research | 2026-07 | UNRESOLVED — no stable URL/DOI confirmed during this pre-implementation pass | Reviewer reliability itself must be assessed | AI review should remain advisory | Exact source unresolved | Do not clear needs_review items using agent judgment alone | PARTIAL
+C10 | Language Testing in Asia item-writer intention/test-taker process study referenced in initial research | 2026 | UNRESOLVED — no stable URL/DOI confirmed during this pre-implementation pass | Intended construct may differ from how learners actually solve an item | Supports post-launch response analysis | Exact source unresolved | Use learner-response evidence before changing provisional gates | PARTIAL
 
 ## Cross-decision conclusions
 
-1. “Modern” does not mean “newest API everywhere.” The project should use conservative standards-compatible primitives, strong automated browser coverage, and explicit evidence.
-2. The frontend remains backend-free today, but provider boundaries should prevent future identity/community features from forcing a rewrite.
-3. Service-worker correctness is behavioral and browser-specific; syntax/asset checks are insufficient.
-4. Passkeys are the preferred future direction, but account lifecycle and recovery remain design work.
-5. Content-quality metrics must separate useful anti-pattern gates from claims of psychometric validity.
-6. Physical iPhone Safari remains a separate evidence category from Playwright WebKit.
-7. No implementation is authorized by this research document.
+1. Prefer conservative standards-compatible primitives plus strong browser evidence.
+2. Keep the frontend backend-free today but preserve provider/service boundaries.
+3. Service-worker correctness is behavioral and browser-specific.
+4. Passkeys are preferred later, but recovery, account lifecycle, and provider choice remain future work.
+5. Content metrics must distinguish anti-pattern gates from psychometric-validity claims.
+6. Physical iPhone Safari is separate owner-supplied evidence from Playwright WebKit.
+7. Records A11, C1, C2, C7, C9, and C10 are PARTIAL because no resolvable URL/DOI was confirmed during this pass; they cannot be used as sole support for a release gate.
+8. No implementation is authorized by this research alone.

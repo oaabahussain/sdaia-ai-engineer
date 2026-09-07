@@ -3,13 +3,13 @@
 Feature branch: pre-implementation
 Feature directory: specs/001-public-readiness
 Date: 2026-09-07
-Status: Ready for planning; implementation prohibited in this phase
+Status: Pre-implementation complete pending completion-commit confirmation; implementation prohibited until that confirmation
 
 ## Purpose
 
 Prepare the existing SDAIA AI Engineer Study Space for a future implementation phase that can make it reliable for public learners without losing its current backend-free deployment model or blocking future identity, feedback, ratings, comments, and synchronized progress.
 
-This specification reconciles the owner-supplied Server-Ready Foundation specification and Public-Readiness / Real Tests / Content Quality specification. Neither supplied specification exists as a repository file at the inspected baseline, so they are treated as owner-approved conversation specifications and reconciled here.
+This specification reconciles the owner-supplied Server-Ready Foundation specification and Public-Readiness / Real Tests / Content Quality specification plus the owner amendments dated 2026-09-07.
 
 ## Product context
 
@@ -20,212 +20,129 @@ The current product is a static GitHub Pages application with separated storage 
 ## User scenarios
 
 ### Scenario 1 — New learner opens the public site
-
-A learner opens the site on a mobile browser and can immediately understand what the product is, start onboarding, and proceed without seeing developer history or owner-private material.
-
-Acceptance outcome:
-- the page boots without page errors;
-- the public interface is Arabic-first;
-- internal version/changelog/developer text is absent;
-- mobile layout does not overflow horizontally;
-- the learner can enter onboarding.
+A learner opens the site on a mobile browser and can understand what the product is, start onboarding, and proceed without seeing developer history or owner-private material.
+Acceptance: page boots without page errors; UI is Arabic-first; internal version/changelog/developer text is absent; no horizontal overflow; entry works.
 
 ### Scenario 2 — Learner completes onboarding and diagnostic
-
-A learner enters an optional exam date, selects a session length and start mode, completes the diagnostic, and sees a preparation-readiness result and domain mastery values.
-
-Acceptance outcome:
-- state persists locally under the versioned browser state key;
-- anonymous identity is UUID v4;
-- the diagnostic draws exactly three questions per official domain;
-- the final readiness value equals the shared readiness logic for the resulting state;
-- no server account is required.
+A learner sets optional exam date/session length/start mode, completes diagnostic, and sees preparation-readiness and mastery.
+Acceptance: state persists under versioned browser key; anon_id is UUID v4; diagnostic draws exactly three questions per official domain; readiness equals shared logic; no account required.
 
 ### Scenario 3 — Returning learner resumes study
-
-A learner reloads the site later and retains progress, bookmarks, notes, review schedule, theme, and focus preferences.
-
-Acceptance outcome:
-- saved state migrates safely from known older local formats;
-- exported state validates against the canonical state schema;
-- bookmarks and notes persist;
-- import/export round-trips without changing readiness/mastery.
+A learner reloads and retains progress, bookmarks, notes, review schedule, theme, and focus preferences.
+Acceptance: known older local shapes migrate safely; exported state validates; persistence survives reload; import/export preserves readiness/mastery.
 
 ### Scenario 4 — Learner studies with adaptive review
-
-A learner answers questions, gets the two-attempt behavior, receives explanations, accumulates spaced review, and gets a daily mission chosen from the shared logic layer.
-
-Acceptance outcome:
-- mastery/readiness/review/mission calculations use the pure logic modules;
-- wrong/high-confidence errors rank ahead of lower-priority review items;
-- review intervals follow the configured 1/3/7/14-day behavior;
-- adaptive and mixed sessions populate at runtime and are verified in browser tests.
+A learner answers with the two-attempt behavior, receives explanations, accumulates spaced review, and receives a daily mission.
+Acceptance: mastery/readiness/review/mission use shared pure logic; error priority is deterministic; review intervals follow current model; adaptive sessions populate at runtime.
 
 ### Scenario 5 — Learner uses the product offline
-
-After a successful online load, a learner loses connectivity and reloads the installed or cached application.
-
-Acceptance outcome:
-- service worker registration is proven in a browser;
-- the expected cache version exists;
-- required application modules and public JSON data are available offline;
-- the same saved state remains usable.
+After one successful online load, learner loses connectivity and reloads.
+Acceptance: service-worker registration proven; expected cache exists; required modules/data available offline; saved state remains usable.
 
 ### Scenario 6 — Learner reports a questionable item
+A learner opens a public reporting flow without app-side PII collection.
+Acceptance: action identifies question; public label Arabic; current mechanism is honest about using GitHub rather than a nonexistent feedback server.
 
-A learner can open a public reporting flow from a question without the application collecting PII.
-
-Acceptance outcome:
-- report action identifies the question;
-- public UI label is Arabic;
-- current implementation routes to a GitHub issue mechanism rather than silently pretending a server feedback service exists;
-- future backend feedback remains behind the storage/service contract.
-
-### Scenario 7 — Future account capability is added
-
-At a later date, the owner introduces login, synchronized progress, ratings, and comments.
-
-Acceptance outcome:
-- UI/study logic does not need to be rewritten around a provider-specific auth SDK;
-- identity is accessed through a narrow provider boundary;
-- anonymous local state can be linked to an authenticated account under an explicit migration/linking flow;
-- passkeys/WebAuthn-capable managed identity is preferred over a bespoke password system.
+### Scenario 7 — Future account capability
+At a later date the owner may introduce login, sync, ratings and comments.
+Acceptance: current UI/study logic does not need provider-specific rewrite; identity is behind a boundary; anonymous state linking has an explicit future policy; managed passkey/WebAuthn-capable identity preferred.
 
 ## Functional requirements
 
-FR-001. The public product MUST remain usable without a production backend until a separate server-deployment feature is approved.
-
-FR-002. The public UI MUST remain Arabic-first. Technical English terminology may appear when educationally relevant.
-
-FR-003. UI chrome and About copy MUST NOT expose developer-agent/provider names, internal version history, task IDs, owner-only language, changelog language, debugging text, TODO/FIXME content, or model/provider references used only during development.
-
-FR-004. Educational content MAY mention AI vendors, models, standards, APIs, and products when technically relevant to the learning objective.
-
+FR-001. Public product MUST remain usable without a production backend until separately approved.
+FR-002. Public UI MUST remain Arabic-first. Technical English terminology may appear when educationally relevant.
+FR-003. UI chrome/About MUST NOT expose developer-agent/provider names, internal version history, task IDs, owner-only language, changelog language, debugging text, TODO/FIXME, or development-model/provider references.
+FR-004. Educational content MAY mention AI vendors, models, standards, APIs, and products when relevant to learning.
 FR-005. Runtime state MUST have one canonical persisted representation and a versioned migration path from known pre-v6 shapes.
-
-FR-006. The anonymous UUID MUST remain the only user identifier in the public application before authentication is separately implemented.
-
-FR-007. The public application MUST NOT collect names, emails, phone numbers, device fingerprints, passwords, or secret credentials.
-
-FR-008. Future authentication MUST be introduced through an identity-provider boundary. The current phase defines the boundary only; it does not implement login.
-
-FR-009. Future authentication SHOULD use a managed, standards-based, passkey/WebAuthn-capable provider rather than a bespoke password database.
-
-FR-010. Future ratings and comments MUST be introduced through service contracts with moderation and abuse-control requirements defined before activation.
-
-FR-011. Mastery, readiness, review scheduling, and adaptive mission ranking MUST remain in pure shared logic modules and MUST be testable independently of DOM code.
-
-FR-012. Browser behavior MUST be tested by executing the built site in real browser engines before deployment. Chromium and WebKit are mandatory. Chromium desktop and mobile-size coverage are required.
-
-FR-013. Core E2E flows MUST fail on pageerror or unexpected console.error.
-
-FR-014. Browser tests SHOULD prefer role/accessibility-name locators. Stable data-testid values MUST be added where generated or ambiguous interactions cannot be reliably selected semantically.
-
-FR-015. The core E2E scope MUST include boot, onboarding, complete diagnostic, two-attempt behavior, session progress, adaptive session 14, mixed session 15, error bank, spaced review, bookmark/note persistence, search, cases, settings, export/import, state migration, report flow, offline behavior, accessibility smoke, public-copy audit, and answer-position runtime audit.
-
-FR-016. Service-worker behavior MUST be verified in browser execution, including registration, expected cache version, offline reload, and cache-asset availability.
-
-FR-017. Playwright WebKit evidence MUST NOT be represented as physical iPhone/Safari evidence.
-
-FR-018. Post-deploy live verification MUST execute at least boot/onboarding/offline smoke against the live URL once a safe release mechanism is defined.
-
-FR-019. Automatic rollback MUST NOT be claimed until a deterministic rollback mechanism has itself been verified. Until then, a post-deploy failure must mark release red, identify the last known-good release, and provide a tested rollback procedure.
-
-FR-020. Content-quality gates MUST be applied before any bulk rewrite is accepted.
-
-FR-021. The following content gates are PROVISIONAL through 2026-10-07 and may change only with measured data recorded alongside the change: four options per question; answer-index maximum 35%; correct-is-longest maximum 40%; no option shorter than 12 characters; at most 15 definition-style items; difficulty 1–3 on every item; explanation covers the correct answer and every wrong option.
-
-FR-022. The content gate MUST require unique options and a valid answer index.
-
-FR-023. Each question topic MUST map to a defined learn topic, and topic coverage MUST be measured before final minimum-per-topic thresholds are enforced.
-
-FR-024. Uncertain technical claims MUST be marked needs_review and MUST NOT be guessed into correctness.
-
-FR-025. Content rewrite MUST be a separate level after runtime, architecture, browser tests, and quality gates are stable.
-
-FR-026. The existing official domain weights MUST remain unchanged unless the owner supplies newer official material.
-
-FR-027. The public-release readiness report MUST distinguish VERIFIED, PARTIAL, and MISSING and include evidence appropriate to each claim.
-
-FR-028. Accessibility MUST be validated on core screens with automated tooling plus a documented manual-review requirement. The root document MUST remain Arabic/RTL and interactive controls MUST have accessible names.
-
-FR-029. Performance thresholds MUST be derived from a measured baseline before becoming hard release gates. Lighthouse measurements are required, but an arbitrary all-categories >=90 threshold is not adopted until the baseline and failure modes are recorded.
-
-FR-030. No code, CI, data, or runtime implementation is part of the current pre-implementation feature. This feature stops after Spec Kit analyze.
+FR-006. Anonymous UUID MUST remain the only public user identifier before auth implementation.
+FR-007. Public app MUST NOT collect names, emails, phones, device fingerprints, passwords, or secret credentials.
+FR-008. Future authentication MUST be introduced through an identity-provider boundary; current feature defines the boundary only.
+FR-009. Future authentication SHOULD use a managed standards-based passkey/WebAuthn-capable provider rather than a bespoke password database.
+FR-010. Future ratings/comments MUST have service contracts plus moderation/abuse/privacy policy before activation.
+FR-011. Mastery/readiness/review/mission calculations MUST remain pure shared logic and independently testable.
+FR-012. Browser behavior MUST be tested by executing built site before deployment. Chromium and WebKit mandatory; Chromium desktop/mobile-size mandatory.
+FR-013. Core E2E MUST fail on pageerror or unexpected console.error.
+FR-014. Tests SHOULD prefer semantic role/accessibility-name selectors. Stable data-testid MUST be added for generated/ambiguous interactions.
+FR-015. Core E2E scope MUST cover boot, onboarding, diagnostic, two-attempt rule, session progress, sessions 14/15, error bank, spaced review, bookmark/note persistence, search, cases, settings, export/import, migration, report flow, offline/SW, accessibility, rendered copy audit, and seeded answer-position runtime audit.
+FR-016. Service-worker behavior MUST be verified in browser execution including registration, expected cache version, offline reload, and cache-asset availability.
+FR-017. Playwright WebKit MUST NOT be represented as physical iPhone Safari evidence.
+FR-018. Physical iPhone Safari evidence, when supplied, MUST come from owner screenshots plus exact reproduction steps and be recorded as a separate evidence class.
+FR-019. Post-deploy live verification MUST execute boot/state/assets and offline/SW smoke when deterministic.
+FR-020. Automatic rollback MUST NOT be claimed in the first release. Post-deploy failure marks release red, identifies last known good, and exposes a tested manual rollback procedure.
+FR-021. Content-quality gates MUST exist before bulk rewrite.
+FR-022. Through 2026-10-07 the following gates are PROVISIONAL and may change only with measured data: exactly 4 options; answer-index max 35%; correct-is-longest max 40%; no option <12 chars; at most 15 definition-style items; difficulty 1–3 on every item; explanation covers correct and every wrong option.
+FR-023. Content gate MUST require unique options and valid answer index.
+FR-024. Each question topic MUST map to a defined learn topic; topic counts are measured before enforcing a minimum-per-topic threshold.
+FR-025. Uncertain technical claims MUST be marked needs_review and MUST NOT be guessed into correctness.
+FR-026. Owner Othman is the required independent technical reviewer for every needs_review item in Level 6. Agent MUST prepare one review sheet per item with exact claim, source, why uncertain, proposed resolution, and affected question ID.
+FR-027. Content rewrite MUST be separate after runtime, architecture, browser tests, PWA reliability and quality gates are stable.
+FR-028. Existing official domain weights MUST remain unchanged unless newer official material is supplied.
+FR-029. Readiness reporting MUST distinguish VERIFIED/PARTIAL/MISSING and provide appropriate evidence.
+FR-030. Accessibility MUST be validated on core screens with automated tooling plus documented manual-review requirement; html remains lang=ar dir=rtl and interactive controls have accessible names.
+FR-031. Performance thresholds MUST be derived from measured baseline before becoming hard release gates. Lighthouse measurement required; arbitrary >=90 across all categories is not adopted as a universal rule before baseline review.
+FR-032. No production FastAPI/PostgreSQL/n8n deployment is part of this feature.
+FR-033. Existing .github/workflows/daily-review.yml and .github/agent/* MUST remain untouched and operationally disabled until Level 7 review. They currently require repository LLM configuration and are not part of learner-facing stabilization. Rationale: changing/activating internal review automation earlier would mix agent-governance work with runtime/public-readiness work.
+FR-034. This pre-implementation feature stops after Spec Kit analyze. No application code, CI, data, or runtime implementation is part of the completion commit.
 
 ## Public copy requirements
 
-The public interface must remove or avoid:
-- V2, V3, V4, V5, or PWA V* as public product labels;
-- developer changelog headings;
-- owner-specific references such as “the image you have”;
-- English “Report a question” chrome;
-- legacy-version export filenames;
-- Claude, ChatGPT, GPT, or OpenAI when they are development residue rather than educational content;
-- Markdown artifacts, TODO/FIXME, placeholder prose, and debug logs.
+Public UI must remove/avoid V2/V3/V4/V5/PWA V* labels, developer changelog headings, owner-specific references, English “Report a question” chrome, legacy-version export filenames, developer AI/agent names, Markdown artifacts, TODO/FIXME, placeholder prose and debug logs.
 
-The About area may expose a single public product version string if the owner keeps that policy; the current requested value for the next public-ready implementation is “6.0”. Vendor/model names remain forbidden in About copy unless the product truly depends on them as a user-facing service and that dependency is separately approved.
+Approved exception: About footer may show exactly “الإصدار 6.0”, and this is the only UI version string.
+
+Educational content may contain AI/vendor/model terminology when technically relevant.
 
 ## Content-quality requirements
 
-The current content-quality thresholds are intentionally provisional. Research reviewed during pre-implementation shows strong support for plausible distractors, structured item-review rubrics, scenario/context-rich items, blueprint coverage, and empirical item analysis; it does not establish that exactly four options, a 35% answer-position cap, a 40% longest-answer cap, or a 12-character minimum are universally optimal psychometric constants. Those values are therefore engineering anti-pattern gates for the first rewrite, not claims of psychometric optimality.
+The numeric thresholds are owner-approved PROVISIONAL engineering gates, not claims of universal psychometric optimality. Research supports plausible distractors, structured review rubrics, scenario/context-rich items, blueprint coverage and empirical item analysis. Exact option-count and length/distribution thresholds must be revisited with measured learner-response data on 2026-10-07 or later.
 
-After real learner-response data exists, review must consider item difficulty, discrimination, distractor functioning, response-time anomalies, and option-selection distribution before threshold changes.
+After response data exists, threshold review should consider item difficulty, discrimination, distractor functioning, response-time anomalies, option-selection distribution, and high-confidence-wrong behavior.
 
 ## Non-goals
 
-- No production FastAPI/PostgreSQL/n8n deployment.
-- No accounts or login implementation.
+- No production server deployment.
+- No login/accounts in this feature.
 - No email collection.
-- No user comments or ratings implementation.
-- No current-question rewrite during runtime recovery.
-- No claim that the training bank reproduces the official SDAIA exam.
-- No claim that WebKit automation equals physical Safari on iPhone.
+- No comments/ratings in this feature.
+- No activation or redesign of .github/workflows/daily-review.yml or .github/agent/* before Level 7.
+- No bulk question rewrite during Levels 0–5.
+- No claim that training bank reproduces official SDAIA exam format.
+- No claim that WebKit automation equals physical Safari/iPhone.
+- No automatic rollback claim in first release.
+
+## Owner decisions resolved 2026-09-07
+
+1. Start Level 0 after completion review: YES.
+2. About footer “الإصدار 6.0” only version in UI: YES.
+3. Semantic selectors first, data-testid where needed: YES.
+4. Four options provisional through 2026-10-07: YES.
+5. Automatic rollback first release: NO.
+6. Comments/ratings in this feature: NO.
+7. Login in this feature: NO.
+8. Runtime/browser/PWA/gates before bulk rewrite: YES.
 
 ## Success criteria
 
-SC-001. Pre-implementation artifacts pass a consistency analysis with no unresolved constitution violations.
-
-SC-002. The implementation plan has explicit levels 0–8 and each level has entry/exit gates.
-
-SC-003. Every implementation task has files touched, acceptance criterion, and evidence required.
-
-SC-004. The three foundation-shaping decisions have a current multi-source research record and explicit confidence.
-
-SC-005. All conflicts between the two owner-supplied specifications are recorded and resolved.
-
-SC-006. The package stops before implementation and ends with “READY FOR REVIEW — implementation not started”.
+SC-001. Pre-implementation artifacts pass consistency analysis with no unresolved constitution violations.
+SC-002. Plan has Levels 0–8 with clear goals and gates.
+SC-003. Every T0001–T0805 task states files touched, acceptance criterion, and evidence required.
+SC-004. Three foundation-shaping decisions have multi-source research records with URL/DOI and confidence; unresolved sources explicitly PARTIAL.
+SC-005. Conflicts between owner specs are recorded/resolved.
+SC-006. daily-review internal automation is explicitly scoped to remain disabled/untouched until Level 7.
+SC-007. needs_review owner-review dependency is explicit.
+SC-008. Package stops before implementation and ends with “READY FOR REVIEW — implementation not started”.
 
 ## Clarifications
 
-### Session 2026-09-07
-
-Q1. Does “10-source research standard” mean every small decision needs ten sources?
-A1. No. Per owner amendment, it applies to identity/passkeys, PWA/Safari/iOS, and content-quality gates. Other decisions may rely on repository evidence or owner specs with a one-line rationale.
-
-Q2. Are the numeric content gates psychometric best-practice claims?
-A2. No. They are provisional engineering gates with review date 2026-10-07. Changing them requires measured data.
-
-Q3. Should test selectors be data-testid only?
-A3. No. Semantic role/accessibility-name selectors are preferred; data-testid is required for unstable/generated interactions. This resolves the conflict between the public-readiness spec’s testid-only rule and the project constitution’s accessibility-first direction.
-
-Q4. Must live E2E automatically roll back production after a post-deploy failure?
-A4. Not in the first implementation unless rollback is separately proven deterministic. The initial gate must fail red and provide a tested rollback path. This avoids introducing an unverified destructive release mechanism.
-
-Q5. Is physical iPhone Safari required to declare all implementation tasks green?
-A5. No for automated CI readiness; yes for a claim specifically labeled “physical iPhone Safari verified”. Without owner/device evidence that item remains MISSING.
-
-Q6. Should the next implementation immediately rewrite all questions?
-A6. No. Runtime recovery, foundation, copy cleanup, browser E2E, offline reliability, and content gates precede bulk rewrite.
-
-Q7. Should future login be built now?
-A7. No. Only the identity boundary and future data/linking model are planned now.
-
-Q8. Should the project build passwords itself later?
-A8. No. Prefer a managed standards-based identity service with WebAuthn/passkey support.
-
-Q9. Are community comments and ratings current scope?
-A9. No. Contracts and future data model only; activation requires backend persistence, moderation, abuse controls, privacy policy, and identity decisions.
-
-Q10. Is a production server part of this feature?
-A10. No. Existing server code remains test-only. No server deployment is planned here.
+Q1. Does ten-source standard apply to every small decision? A1. No; only identity/passkeys, PWA/Safari/iOS, content-quality gates.
+Q2. Are numeric content gates psychometric truths? A2. No; provisional through 2026-10-07.
+Q3. data-testid only? A3. No; semantics first, testid where needed.
+Q4. automatic rollback first release? A4. No; tested manual rollback first.
+Q5. physical Safari required for automated CI green? A5. No; required only for a physical-Safari VERIFIED claim and supplied by owner.
+Q6. bulk rewrite immediately? A6. No; Levels 0–5 first.
+Q7. future login now? A7. No.
+Q8. build password system later? A8. No; prefer managed standards-based identity.
+Q9. comments/ratings current scope? A9. No.
+Q10. production server current scope? A10. No.
+Q11. daily-review current scope? A11. No; remain disabled/untouched until Level 7.
+Q12. who clears needs_review? A12. Owner Othman after agent-prepared per-item review sheet.
