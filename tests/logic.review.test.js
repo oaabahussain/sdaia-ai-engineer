@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { nextReview } from '../src/logic/review.js';
+const day=86400000,now=1000;
+test('first correct schedules 1 day',()=>assert.deepEqual(nextReview(undefined,true,now),{stage:0,next:now+day}));
+test('second correct schedules 3 days',()=>assert.deepEqual(nextReview({stage:0},true,now),{stage:1,next:now+3*day}));
+test('third correct schedules 7 days',()=>assert.deepEqual(nextReview({stage:1},true,now),{stage:2,next:now+7*day}));
+test('fourth correct schedules 14 days',()=>assert.deepEqual(nextReview({stage:2},true,now),{stage:3,next:now+14*day}));
+test('stage 3 remains 14 days',()=>assert.deepEqual(nextReview({stage:3},true,now),{stage:3,next:now+14*day}));
+test('wrong resets to 1 day',()=>assert.deepEqual(nextReview({stage:3},false,now),{stage:0,next:now+day}));
