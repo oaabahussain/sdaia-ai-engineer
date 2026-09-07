@@ -60,7 +60,7 @@ export async function submitFeedback(item) {
   const issueType = String(item?.issue_type ?? 'other');
   const params = new URLSearchParams({
     template: 'question-report.yml',
-    title: `Question report: ${questionId}`,
+    title: `Question report: ${questionId} [${issueType}]`,
     question_id: questionId,
     issue_type: issueType,
   });
