@@ -32,38 +32,35 @@ jobs:
           fi
 
           python3 - <<'PY'
+          from html.parser import HTMLParser
           from pathlib import Path
+          import hashlib
+          import subprocess
+          import tempfile
 
           source = Path("owner-index.raw.html").read_bytes()
           start = source.index(b'{"id": "q99"')
           end = source.index(b'{"id": "q100"', start)
           q99 = '''{"id": "q99", "domain": "Responsible AI / Security / Governance", "question": "ما المقصود بـTransparency؟", "options": ["وضوح كافٍ حول استخدام AI وحدوده ومصادره/عملياته المناسبة للسياق", "نشر كل secrets علنًا", "إخفاء النموذج عن المستخدمين دائمًا"], "answer": 0, "explanation": "الشفافية لا تعني كشف الأسرار بل الإفصاح المناسب.", "topic": "Responsible AI & privacy"}, '''.encode("utf-8")
           fixed = source[:start] + q99 + source[end:]
-          Path("owner-index.fixed.html").write_bytes(fixed)
-          PY
+          output = Path("owner-index.fixed.html")
+          output.write_bytes(fixed)
 
-          test "$(wc -c < owner-index.fixed.html)" -gt 100000
-          test "$(grep -o '"'"'"id"'"'": "'"'"q' owner-index.fixed.html | wc -l)" -eq 121
-
-          python3 - <<'PY'
-          from html.parser import HTMLParser
-          from pathlib import Path
-          import subprocess
-          import tempfile
+          if len(fixed) <= 100000:
+              raise SystemExit(f"Owner HTML too small: {len(fixed)} bytes")
+          count = fixed.count(b'"id": "q')
+          if count != 121:
+              raise SystemExit(f"Expected 121 questions, found {count}")
 
           class ScriptParser(HTMLParser):
               def __init__(self):
                   super().__init__()
                   self.scripts = []
                   self.current = None
-                  self.external = False
 
               def handle_starttag(self, tag, attrs):
-                  if tag != "script":
-                      return
-                  attrs = dict(attrs)
-                  self.external = "src" in attrs
-                  self.current = [] if not self.external else None
+                  if tag == "script" and "src" not in dict(attrs):
+                      self.current = []
 
               def handle_data(self, data):
                   if self.current is not None:
@@ -74,27 +71,30 @@ jobs:
                       self.scripts.append("".join(self.current))
                       self.current = None
 
-          text = Path("owner-index.fixed.html").read_text(encoding="utf-8")
           parser = ScriptParser()
-          parser.feed(text)
+          parser.feed(fixed.decode("utf-8"))
           if not parser.scripts:
               raise SystemExit("No inline scripts found")
+
           for index, script in enumerate(parser.scripts):
               with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as handle:
                   handle.write(script)
-                  path = handle.name
-              result = subprocess.run(["node", "--check", path], text=True, capture_output=True)
+                  script_path = handle.name
+              result = subprocess.run(["node", "--check", script_path], text=True, capture_output=True)
               if result.returncode != 0:
                   print(result.stdout)
                   print(result.stderr)
                   raise SystemExit(f"Inline script {index} failed Node syntax check")
-          print(f"Node syntax check passed for {len(parser.scripts)} inline script(s).")
-          PY
 
-          actual_sha="$(sha256sum owner-index.fixed.html | awk '{print $1}')"
-          expected_sha="6a7c531962288f64c26f82414cd97b9d7db2b8f64db48989ec30ebbb418547c8"
-          echo "Owner index SHA-256: $actual_sha"
-          test "$actual_sha" = "$expected_sha"
+          actual_sha = hashlib.sha256(fixed).hexdigest()
+          expected_sha = "6a7c531962288f64c26f82414cd97b9d7db2b8f64db48989ec30ebbb418547c8"
+          print(f"Owner HTML bytes: {len(fixed)}")
+          print(f"Question count: {count}")
+          print(f"Node syntax check passed for {len(parser.scripts)} inline script(s).")
+          print(f"Owner index SHA-256: {actual_sha}")
+          if actual_sha != expected_sha:
+              raise SystemExit("Owner HTML SHA-256 mismatch")
+          PY
 
       - name: Commit only index.html to main
         shell: bash
@@ -106,6 +106,9 @@ jobs:
           git checkout -B release-main origin/main
           cp owner-index.fixed.html index.html
           git add index.html
-          git diff --cached --exit-code && { echo "No index.html change detected"; exit 1; }
+          if git diff --cached --quiet; then
+            echo "No index.html change detected"
+            exit 1
+          fi
           git commit -m "Replace loader with verified full app HTML"
           git push origin HEAD:main
