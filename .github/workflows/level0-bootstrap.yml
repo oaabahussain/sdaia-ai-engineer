@@ -99,7 +99,7 @@ jobs:
 
             await page.locator('#enterBtn').click();
             await expect(page.locator('#onboarding')).toHaveClass(/active/);
-            await page.locator('#startMode').selectOption('quick');
+            await page.locator('#startMode').selectOption('plan');
             await page.locator('#finishOnboard').click();
 
             const state = await page.evaluate(key => {
