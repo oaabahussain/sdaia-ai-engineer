@@ -23,25 +23,27 @@ jobs:
       - name: Fetch target branch
         run: git fetch origin server-ready-foundation
 
-      - name: Patch builder bootstrap defects
+      - name: Prepare patched builder copy
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          p = Path('.github/agent/server_ready_builder.py')
-          s = p.read_text(encoding='utf-8')
+          source = Path('.github/agent/server_ready_builder.py')
+          s = source.read_text(encoding='utf-8')
           s = s.replace("التخزين المحلي متاح، مع fallback داخل الذاكرة عند تعذر localStorage", "التخزين المحلي متاح، مع fallback داخل الذاكرة عند تعذر التخزين الدائم")
           needle = "    main_script, pwa_script = scripts[0], scripts[1]\n"
           replacement = needle + "    pwa_script = pwa_script.replace(\"localStorage.getItem('pwaInstallDismissed') !== '1'\", \"globalThis.__pwaInstallDismissed !== true\")\n    pwa_script = pwa_script.replace(\"try{ localStorage.setItem('pwaInstallDismissed','1'); }catch(e){}\", \"globalThis.__pwaInstallDismissed = true;\")\n"
           if needle not in s:
               raise SystemExit('builder patch anchor not found')
           s = s.replace(needle, replacement, 1)
-          p.write_text(s, encoding='utf-8')
+          Path('/tmp/server_ready_builder.py').write_text(s, encoding='utf-8')
           PY
+          python3 -m py_compile /tmp/server_ready_builder.py
+          git status --short
 
       - name: Run builder
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET_BRANCH: server-ready-foundation
-        run: python3 .github/agent/server_ready_builder.py .
+        run: python3 /tmp/server_ready_builder.py .
