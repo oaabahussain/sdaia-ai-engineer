@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "feedback.schema.json",
+  "type": "object",
+  "required": [
+    "question_id",
+    "issue_type",
+    "details"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "pattern": "^q\\d+$"
+    },
+    "issue_type": {
+      "enum": [
+        "wrong_answer",
+        "unclear",
+        "typo",
+        "too_easy",
+        "other"
+      ]
+    },
+    "details": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  },
+  "additionalProperties": false
+}
