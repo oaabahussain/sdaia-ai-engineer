@@ -23,30 +23,6 @@ jobs:
       - name: Fetch target branch
         run: git fetch origin server-ready-foundation
 
-      - name: Repair task 2 history if dependencies were tracked
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'Server Ready Foundation Agent'
-          git config user.email '147952589+oaabahussain@users.noreply.github.com'
-          git checkout server-ready-foundation
-          if git ls-tree -r --name-only HEAD | grep -q '^node_modules/'; then
-            git reset --soft 86e375167bda2b0a3e1949ec4272409c709846c4
-            rm -rf node_modules
-            cat > .gitignore <<'EOF'
-          node_modules/
-          .venv/
-          *.db
-          __pycache__/
-          .pytest_cache/
-          EOF
-            git add -A
-            git commit -m 'Add versioned anonymous state schema'
-            git push --force-with-lease origin HEAD:server-ready-foundation
-          fi
-          git checkout server-ready-bootstrap
-          git fetch origin server-ready-foundation
-
       - name: Prepare patched builder copy
         shell: bash
         run: |
@@ -73,6 +49,13 @@ jobs:
           }
           for old, new in replacements.items():
               s = s.replace(old, new)
+          old_validator = """    from jsonschema import Draft7Validator, FormatChecker\n\n    ROOT = Path(__file__).resolve().parents[2]\n    SCHEMA_DIR = ROOT / 'data' / 'schema'\n    DATA_DIR = ROOT / 'data'\n    RATE = defaultdict(deque)\n\n    def load_schema(name):\n        return json.loads((SCHEMA_DIR / name).read_text(encoding='utf-8'))\n\n    VALIDATORS = {\n        'state': Draft7Validator(load_schema('state.schema.json'), format_checker=FormatChecker()),\n        'feedback': Draft7Validator(load_schema('feedback.schema.json'), format_checker=FormatChecker()),\n        'events': Draft7Validator(load_schema('events.schema.json'), format_checker=FormatChecker()),\n    }\n"""
+          new_validator = """    from jsonschema import Draft7Validator, FormatChecker, RefResolver\n\n    ROOT = Path(__file__).resolve().parents[2]\n    SCHEMA_DIR = ROOT / 'data' / 'schema'\n    DATA_DIR = ROOT / 'data'\n    RATE = defaultdict(deque)\n\n    def load_schema(name):\n        return json.loads((SCHEMA_DIR / name).read_text(encoding='utf-8'))\n\n    def make_validator(name):\n        schema = load_schema(name)\n        resolver = RefResolver(base_uri=SCHEMA_DIR.resolve().as_uri() + '/', referrer=schema)\n        return Draft7Validator(schema, resolver=resolver, format_checker=FormatChecker())\n\n    VALIDATORS = {\n        'state': make_validator('state.schema.json'),\n        'feedback': make_validator('feedback.schema.json'),\n        'events': make_validator('events.schema.json'),\n    }\n"""
+          if old_validator not in s:
+              raise SystemExit('server validator patch anchor not found')
+          s = s.replace(old_validator, new_validator, 1)
+          s = s.replace("run(\"gh api -X POST repos/$GITHUB_REPOSITORY/labels -f name=question-report -f color=1d76db >/dev/null 2>&1 || gh api repos/$GITHUB_REPOSITORY/labels/question-report >/dev/null\")", "run(\"if ! gh api -X POST repos/$GITHUB_REPOSITORY/labels -f name=question-report -f color=1d76db >/dev/null 2>&1; then gh api repos/$GITHUB_REPOSITORY/labels/question-report >/dev/null; fi\")")
+          s = s.replace("run(\"gh api -X POST repos/$GITHUB_REPOSITORY/labels -f name=needs-triage -f color=fbca04 >/dev/null 2>&1 || gh api repos/$GITHUB_REPOSITORY/labels/needs-triage >/dev/null\")", "run(\"if ! gh api -X POST repos/$GITHUB_REPOSITORY/labels -f name=needs-triage -f color=fbca04 >/dev/null 2>&1; then gh api repos/$GITHUB_REPOSITORY/labels/needs-triage >/dev/null; fi\")")
           s = s.replace("    task1(); task2(); task3(); task4(); task5(); task6(); task7(); task8(); task9(); task10()", "    completed = run(\"git log --format=%s e715c688900c7b0259143c6ea8d74eb6fba93575..HEAD\").stdout.splitlines()\n    tasks = [(task1, 'Add storage interface and browser adapter'), (task2, 'Add versioned anonymous state schema'), (task3, 'Define future v1 OpenAPI contract'), (task4, 'Add portable database schema'), (task5, 'Add tested FastAPI server skeleton'), (task6, 'Add API storage adapter and shared contract tests'), (task7, 'Replace question reports with GitHub Issue Form'), (task8, 'Add least-privilege daily review proposal workflow'), (task9, 'Harden Pages validation and live release gates'), (task10, 'Document server-ready architecture and operations')]\n    for function, message in tasks:\n        if message in completed:\n            print(f'SKIP_COMPLETED={message}')\n            continue\n        function()")
           needle = "    main_script, pwa_script = scripts[0], scripts[1]\n"
           replacement = needle + "    pwa_script = pwa_script.replace(\"localStorage.getItem('pwaInstallDismissed') !== '1'\", \"globalThis.__pwaInstallDismissed !== true\")\n    pwa_script = pwa_script.replace(\"try{ localStorage.setItem('pwaInstallDismissed','1'); }catch(e){}\", \"globalThis.__pwaInstallDismissed = true;\")\n"
@@ -84,7 +67,6 @@ jobs:
           Path('/tmp/server_ready_builder.py').write_text(s, encoding='utf-8')
           PY
           python3 -m py_compile /tmp/server_ready_builder.py
-          git status --short
 
       - name: Run builder
         env:
