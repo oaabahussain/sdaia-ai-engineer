@@ -43,6 +43,7 @@ jobs:
           cp -R src data _site/
           touch _site/.nojekyll
           node scripts/verify_html.js _site/index.html
+          node scripts/verify_sw_assets.js _site
           source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           echo "SOURCE_INDEX_SHA256=$source_sha"
       - uses: actions/configure-pages@v5
@@ -73,7 +74,9 @@ jobs:
             sleep 5
           done
           node scripts/verify_html.js live-index.html
+          curl --fail --silent --show-error --location --output live-app.js --write-out 'LIVE_APP_HTTP=%{http_code}\n' "${PAGE_URL}src/app.js?verify=${GITHUB_SHA}"
           curl --fail --silent --show-error --location --output live-questions.json "${PAGE_URL}data/questions.json?verify=${GITHUB_SHA}"
-          node -e "JSON.parse(require('fs').readFileSync('live-questions.json','utf8')); console.log('live questions JSON.parse: PASS')"
-          test "$(node -e \"console.log(JSON.parse(require('fs').readFileSync('live-questions.json','utf8')).length)\")" -eq 121
-          echo 'live questions count: PASS (121)'
+          node -e "const q=JSON.parse(require('fs').readFileSync('live-questions.json','utf8')); if(q.length!==121)process.exit(1); console.log('live questions: PASS (121)')"
+          curl --fail --silent --show-error --location --output live-sw.js "${PAGE_URL}sw.js?verify=${GITHUB_SHA}"
+          grep -n "sdaia-ai-pages-v6" live-sw.js
+          echo 'live service worker cache: PASS (v6)'
