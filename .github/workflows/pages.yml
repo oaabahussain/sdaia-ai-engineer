@@ -19,14 +19,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Setup and enable Pages
+
+      - name: Build iPhone-compatible site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cat parts/app.gz.b64.part-* | base64 --decode | gzip --decompress > _site/index.html
+          cp manifest.webmanifest sw.js icon.svg _site/
+          touch _site/.nojekyll
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('_site/index.html')
+          s = p.read_text(encoding='utf-8')
+          for old in (
+              './apple-touch-icon.png',
+              './icon-192.png',
+              './icon-512.png',
+              './icon-maskable-512.png',
+          ):
+              s = s.replace(old, './icon.svg')
+          s = s.replace('Adaptive Study Space V3', 'PWA V5')
+          s = s.replace('PWA V4', 'PWA V5')
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
