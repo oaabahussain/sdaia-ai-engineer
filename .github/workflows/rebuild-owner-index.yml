@@ -1,0 +1,111 @@
+name: Rebuild verified owner index
+on:
+  push:
+    branches: [release-bootstrap]
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v6
+        with:
+          ref: release-bootstrap
+          fetch-depth: 0
+
+      - name: Rebuild corrected owner HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cat parts/app.gz.b64.part-* | base64 --decode | gzip --decompress > owner-index.raw.html 2> gzip.err
+          pipeline_status=$?
+          set -e
+
+          if [ "$pipeline_status" -ne 0 ]; then
+            if ! grep -qi "crc error" gzip.err; then
+              cat gzip.err
+              exit "$pipeline_status"
+            fi
+            echo "Known source CRC error detected; validating recovered payload against owner SHA-256 after q99 replacement."
+          fi
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source = Path("owner-index.raw.html").read_bytes()
+          start = source.index(b'{"id": "q99"')
+          end = source.index(b'{"id": "q100"', start)
+          q99 = '''{"id": "q99", "domain": "Responsible AI / Security / Governance", "question": "ما المقصود بـTransparency؟", "options": ["وضوح كافٍ حول استخدام AI وحدوده ومصادره/عملياته المناسبة للسياق", "نشر كل secrets علنًا", "إخفاء النموذج عن المستخدمين دائمًا"], "answer": 0, "explanation": "الشفافية لا تعني كشف الأسرار بل الإفصاح المناسب.", "topic": "Responsible AI & privacy"}, '''.encode("utf-8")
+          fixed = source[:start] + q99 + source[end:]
+          Path("owner-index.fixed.html").write_bytes(fixed)
+          PY
+
+          test "$(wc -c < owner-index.fixed.html)" -gt 100000
+          test "$(grep -o '"'"'"id"'"'": "'"'"q' owner-index.fixed.html | wc -l)" -eq 121
+
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess
+          import tempfile
+
+          class ScriptParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.scripts = []
+                  self.current = None
+                  self.external = False
+
+              def handle_starttag(self, tag, attrs):
+                  if tag != "script":
+                      return
+                  attrs = dict(attrs)
+                  self.external = "src" in attrs
+                  self.current = [] if not self.external else None
+
+              def handle_data(self, data):
+                  if self.current is not None:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag == "script" and self.current is not None:
+                      self.scripts.append("".join(self.current))
+                      self.current = None
+
+          text = Path("owner-index.fixed.html").read_text(encoding="utf-8")
+          parser = ScriptParser()
+          parser.feed(text)
+          if not parser.scripts:
+              raise SystemExit("No inline scripts found")
+          for index, script in enumerate(parser.scripts):
+              with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as handle:
+                  handle.write(script)
+                  path = handle.name
+              result = subprocess.run(["node", "--check", path], text=True, capture_output=True)
+              if result.returncode != 0:
+                  print(result.stdout)
+                  print(result.stderr)
+                  raise SystemExit(f"Inline script {index} failed Node syntax check")
+          print(f"Node syntax check passed for {len(parser.scripts)} inline script(s).")
+          PY
+
+          actual_sha="$(sha256sum owner-index.fixed.html | awk '{print $1}')"
+          expected_sha="6a7c531962288f64c26f82414cd97b9d7db2b8f64db48989ec30ebbb418547c8"
+          echo "Owner index SHA-256: $actual_sha"
+          test "$actual_sha" = "$expected_sha"
+
+      - name: Commit only index.html to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "oaabahussain"
+          git config user.email "147952589+oaabahussain@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B release-main origin/main
+          cp owner-index.fixed.html index.html
+          git add index.html
+          git diff --cached --exit-code && { echo "No index.html change detected"; exit 1; }
+          git commit -m "Replace loader with verified full app HTML"
+          git push origin HEAD:main
