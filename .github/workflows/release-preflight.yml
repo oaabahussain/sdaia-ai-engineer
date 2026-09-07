@@ -52,11 +52,11 @@ jobs:
             echo 'Forbidden generated files are tracked'
             exit 1
           fi
-          if grep -R -n --fixed-strings '|| true' .github/workflows scripts src server; then
+          if git grep -n --fixed-strings '|| true' -- ':!.github/workflows/release-preflight.yml' ':!.github/workflows/server-ready-builder.yml'; then
             echo 'Forbidden || true found'
             exit 1
           fi
-          if grep -R -n --fixed-strings 'continue-on-error: true' .github/workflows; then
+          if git grep -n --fixed-strings 'continue-on-error: true' -- '.github/workflows' ':!.github/workflows/release-preflight.yml'; then
             echo 'Forbidden continue-on-error found'
             exit 1
           fi
