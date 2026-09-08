@@ -8,20 +8,41 @@ from pathlib import Path
 
 from fastapi import FastAPI, Header, Request, Response
 from fastapi.responses import JSONResponse
-from jsonschema import Draft7Validator, FormatChecker, RefResolver
+from jsonschema import Draft7Validator, FormatChecker
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT7
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
 DATA_DIR = ROOT / 'data'
 RATE = defaultdict(deque)
 
+
 def load_schema(name):
     return json.loads((SCHEMA_DIR / name).read_text(encoding='utf-8'))
 
+
+def make_registry():
+    registry = Registry()
+    base_uri = SCHEMA_DIR.resolve().as_uri() + '/'
+    for path in SCHEMA_DIR.glob('*.json'):
+        schema = json.loads(path.read_text(encoding='utf-8'))
+        resource = Resource.from_contents(schema, default_specification=DRAFT7)
+        registry = registry.with_resource(base_uri + path.name, resource)
+        registry = registry.with_resource(path.name, resource)
+    return registry
+
+
+SCHEMA_REGISTRY = make_registry()
+
+
 def make_validator(name):
-    schema = load_schema(name)
-    resolver = RefResolver(base_uri=SCHEMA_DIR.resolve().as_uri() + '/', referrer=schema)
-    return Draft7Validator(schema, resolver=resolver, format_checker=FormatChecker())
+    return Draft7Validator(
+        load_schema(name),
+        registry=SCHEMA_REGISTRY,
+        format_checker=FormatChecker(),
+    )
+
 
 VALIDATORS = {
     'state': make_validator('state.schema.json'),
@@ -29,8 +50,10 @@ VALIDATORS = {
     'events': make_validator('events.schema.json'),
 }
 
+
 def error(code, message, status):
     return JSONResponse({'error': {'code': code, 'message': message}}, status_code=status)
+
 
 def valid_uuid4(value):
     try:
@@ -39,6 +62,7 @@ def valid_uuid4(value):
     except (ValueError, AttributeError, TypeError):
         return False
 
+
 def sqlite_path(db_url=None):
     value = db_url or os.getenv('DB_URL', 'sqlite:///./dev.db')
     if not value.startswith('sqlite:///'):
@@ -46,21 +70,25 @@ def sqlite_path(db_url=None):
     path = value[len('sqlite:///'):]
     return path or './dev.db'
 
+
 def connect(db_url=None):
     connection = sqlite3.connect(sqlite_path(db_url), check_same_thread=False)
     connection.row_factory = sqlite3.Row
     connection.execute('PRAGMA foreign_keys = ON')
     return connection
 
+
 def init_db(db_url=None):
     with connect(db_url) as db:
         db.executescript((ROOT / 'db' / 'schema.sql').read_text(encoding='utf-8'))
+
 
 def validate(name, payload):
     errors = sorted(VALIDATORS[name].iter_errors(payload), key=lambda item: list(item.path))
     if errors:
         return '; '.join(error.message for error in errors)
     return None
+
 
 def check_rate(anon_id):
     now = time.monotonic()
@@ -72,10 +100,12 @@ def check_rate(anon_id):
     bucket.append(now)
     return True
 
+
 def require_anon(value):
     if not valid_uuid4(value):
         return error('invalid_anon_id', 'X-Anon-Id must be a UUID v4', 400)
     return None
+
 
 def create_app(db_url=None):
     app = FastAPI(title='SDAIA AI Engineer Study Space API')
@@ -166,5 +196,6 @@ def create_app(db_url=None):
         return {'ok': True}
 
     return app
+
 
 app = create_app()
