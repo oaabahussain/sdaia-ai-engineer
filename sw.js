@@ -1,6 +1,6 @@
-const CACHE = 'sdaia-ai-pages-v7';
+const CACHE = 'sdaia-ai-pages-v8';
 const ASSETS = [
-  './','./index.html','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png',
+  './','./index.html','./feedback.html','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png',
   './src/app.js','./src/config.js','./src/logic/exam.js','./src/logic/questionBank.js','./src/logic/conceptFiles.js','./src/storage/interface.js','./src/storage/browser.js','./src/storage/api.js',
   './data/concepts/data-ml.json','./data/concepts/core-ai.json','./data/concepts/ai-software-engineering.json','./data/concepts/mlops-llmops.json','./data/concepts/architecture-infrastructure.json','./data/concepts/responsible-ai-security-governance.json','./data/concepts/business-professional-practice.json','./data/sessions.json','./data/learn.json','./data/cases.json','./data/weights.json'
 ];

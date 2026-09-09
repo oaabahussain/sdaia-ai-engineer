@@ -1,0 +1,42 @@
+name: Site rating
+description: Rate your experience with the practice site
+title: "[Rating] "
+labels: []
+assignees: []
+body:
+  - type: dropdown
+    id: rating
+    attributes:
+      label: Overall rating
+      options:
+        - 5 / 5
+        - 4 / 5
+        - 3 / 5
+        - 2 / 5
+        - 1 / 5
+    validations:
+      required: true
+  - type: dropdown
+    id: most_useful
+    attributes:
+      label: Most useful part
+      options:
+        - Full 200-question exam
+        - Domain exams
+        - Arabic/English support
+        - Answer review
+        - Question bank
+        - Interface and navigation
+        - Other
+  - type: textarea
+    id: comments
+    attributes:
+      label: Comments
+      description: What worked well, and what should improve?
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Public submission
+      options:
+        - label: I understand this rating is posted publicly on GitHub.
+          required: true
