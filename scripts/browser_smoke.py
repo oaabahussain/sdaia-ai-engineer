@@ -64,7 +64,7 @@ def main():
     driver=subprocess.Popen([chromedriver,'--port=9515','--allowed-ips='],stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
     session=None
     try:
-        wait_http(BASE+'/index.html'); wait_driver()
+        wait_http(BASE+'/index.html'); wait_http(BASE+'/feedback.html'); wait_driver()
         value=req('POST','/session',{'capabilities':{'alwaysMatch':{'browserName':'chrome','goog:chromeOptions':{'args':['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--window-size=1400,1000']}}}},timeout=60)
         session=value['sessionId'] if isinstance(value,dict) and 'sessionId' in value else None
         if not session: raise RuntimeError(f'no webdriver session id: {value}')
@@ -77,19 +77,22 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
-        # Trigger the same DOM click handler from inside the real browser. This avoids
-        # headless Chrome geometry/interception quirks while still exercising app code.
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
         wait_until(lambda:'1 of 200' in text(session,find(session,'#questionCounter')),label='200-question exam')
         opts=finds(session,'#options .option'); assert len(opts)==4
         click(session,opts[0])
-        # Confidence is deliberately left blank. Moving on must still work.
         next_ok=execute(session,"const b=document.getElementById('nextBtn'); if(!b||b.disabled) return false; b.click(); return true;")
         assert next_ok is True
         wait_until(lambda:'2 of 200' in text(session,find(session,'#questionCounter')),label='next without confidence')
         assert len(finds(session,'#palette .qjump'))==200
-        print('BROWSER_SMOKE: PASS bank=1120 bilingual=PASS theme=PASS full_exam=200 confidence_optional=PASS palette=200')
+        req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html?smoke=1'})
+        wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='three feedback cards')
+        assert find(session,'#suggestionForm')
+        assert find(session,'#contributionForm')
+        assert find(session,'#ratingForm')
+        assert len(finds(session,'#stars .star'))==5
+        print('BROWSER_SMOKE: PASS bank=1120 bilingual=PASS theme=PASS full_exam=200 confidence_optional=PASS feedback=PASS')
     finally:
         if session:
             try:req('DELETE',f'/session/{session}')

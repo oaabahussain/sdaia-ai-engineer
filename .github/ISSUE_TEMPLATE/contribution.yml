@@ -1,0 +1,47 @@
+name: Content contribution
+description: Propose a question, correction, translation, explanation, or learning resource
+title: "[Contribution] "
+labels: []
+assignees: []
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Contribution type
+      options:
+        - New question or concept
+        - Correction
+        - Arabic translation
+        - English translation
+        - Explanation improvement
+        - Learning resource
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: contribution
+    attributes:
+      label: Proposed contribution
+      description: Provide the exact content or change you propose.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this improves the project
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Include reliable references where applicable.
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Confirmation
+      options:
+        - label: This contribution does not include confidential exam material or content I am not allowed to share.
+          required: true
+        - label: I understand this submission is public.
+          required: true

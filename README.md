@@ -1,63 +1,74 @@
-# SDAIA AI Engineer Study Space
+# SDAIA AI Engineer Practice
 
-## What this is
+A bilingual, community-oriented practice site for AI Engineer exam preparation.
 
-This is an unofficial community study tool. It is not affiliated with, endorsed by, or certified by SDAIA. The only exam facts treated as official by the app are the seven domains and the weights supplied by the owner from the badge material. The 121 questions, sessions, diagnostics, mastery/readiness scores, and study recommendations are preparation content.
+> **Unofficial project:** This repository and website are independent study resources and are not affiliated with, endorsed by, or certified by SDAIA. Exam questions and explanations are training content.
 
-## Architecture
+## Live site
 
-The public product is a static GitHub Pages application. `index.html` contains markup and an inline data fallback; `src/app.js` owns UI wiring; storage access is behind `src/storage/interface.js`; study data lives under `data/`; pure calculation helpers live under `src/logic/`. A future API contract is documented in `api/openapi.yaml`, a portable database design is in `db/schema.sql`, and the FastAPI implementation under `server/` is test-only and is never deployed by CI.
+**https://oaabahussain.github.io/sdaia-ai-engineer/**
 
-## Storage adapters
+## What the site includes
 
-`src/config.js` selects the storage implementation:
+- Arabic and English interface with RTL/LTR support.
+- 1,120 bilingual practice-question instances across seven AI engineering domains.
+- A 200-question weighted full exam.
+- Standalone domain exams with 25, 50, 100, or all available questions.
+- Randomized question order and randomized answer-option order on every attempt.
+- Balanced displayed correct-answer positions in the 200-question exam.
+- Optional confidence selection; it never blocks answering, navigation, or submission.
+- Resume support, question flags, direct question navigation, results by domain, and answer review.
+- Light and dark themes.
+- Local progress storage in the browser.
 
-```js
-export const STORAGE = 'browser';
-export const API_BASE = '';
+## Community
+
+The project welcomes useful feedback and contributions.
+
+- **Suggestions, contributions, and ratings:** https://oaabahussain.github.io/sdaia-ai-engineer/feedback.html
+- **Question problem:** use the report action available from the project issue templates.
+- **Code or content contribution:** see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+GitHub submissions are public. Do not include personal, confidential, or sensitive information.
+
+## Project structure
+
+```text
+.
+├── index.html                 # Main practice interface
+├── feedback.html              # Suggestions, contributions, and rating page
+├── src/                       # Application, exam logic, and storage adapters
+├── data/                      # Domain concepts, study data, and schemas
+├── tests/                     # Automated application tests
+├── scripts/                   # Validation and browser smoke tests
+├── server/                    # Optional/test API implementation
+├── api/                       # API contract
+└── .github/                   # CI, Pages deployment, and community templates
 ```
 
-Today `browser` stores progress locally and loads the public JSON bank. To use a future private API, set `STORAGE` to `api` and set `API_BASE` to the deployed `/v1` base URL. `src/app.js` does not call `localStorage` or `fetch` directly.
-
-## Add a question
-
-1. Add the question to `data/questions.json` without changing existing IDs.
-2. Conform to `data/schema/question.schema.json`.
-3. Run `npm ci --ignore-scripts` and `node scripts/validate.js`.
-4. Open a PR and allow CI to validate the bank before merging.
-
-## Feedback today
-
-The browser adapter creates a GitHub Issue Form URL. No feedback server is deployed. Reports are public GitHub issues and users are instructed not to include personal information. The scheduled review workflow can propose a PR when an `OPENAI_API_KEY` repository secret is configured; it never merges changes automatically.
-
-## What requires a server
-
-A server is required for private question banks, centrally synchronized progress, anonymous event collection, server-side feedback storage, and multi-device state. None of those services is deployed in this phase.
+The public GitHub Pages site currently uses browser storage. The optional API code is not required to use the website.
 
 ## Run locally
 
-Static app over HTTP:
-```sh
+```bash
 python3 -m http.server 8080
 ```
 
-Validation and Node tests:
-```sh
+Then open `http://localhost:8080/`.
+
+Run validation and tests:
+
+```bash
 npm ci --ignore-scripts
 node scripts/validate.js
 node --test tests/*.test.js
-node scripts/contract_test.js browser
+python3 scripts/browser_smoke.py
 ```
 
-Test-only API:
-```sh
-cd server
-pip install -r requirements.txt && uvicorn app.main:app
-```
+## Content quality
 
-Server tests:
-```sh
-PYTHONPATH=server pytest -q server/tests
-```
+Changes to questions, concepts, translations, answer choices, domain weights, or scoring logic should include evidence where appropriate and must pass the automated validation suite before merge.
 
-Direct `file://` opening is not a supported release path because browser ES module security policies vary. GitHub Pages is the supported public runtime; the inline bank remains as a data fallback when a browser permits local module loading.
+## License
+
+See [LICENSE](LICENSE).
