@@ -5,10 +5,10 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE='http://127.0.0.1:4173'
 DRIVER='http://127.0.0.1:9515'
 
-def req(method,path,payload=None):
+def req(method,path,payload=None,timeout=30):
     data=None if payload is None else json.dumps(payload).encode()
     r=urllib.request.Request(DRIVER+path,data=data,method=method,headers={'Content-Type':'application/json'})
-    with urllib.request.urlopen(r,timeout=10) as x:
+    with urllib.request.urlopen(r,timeout=timeout) as x:
         body=json.loads(x.read().decode() or '{}')
     return body.get('value')
 
@@ -61,7 +61,7 @@ def main():
     session=None
     try:
         wait_http(BASE+'/index.html'); wait_driver()
-        value=req('POST','/session',{'capabilities':{'alwaysMatch':{'browserName':'chrome','goog:chromeOptions':{'args':['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1400,1000']}}}})
+        value=req('POST','/session',{'capabilities':{'alwaysMatch':{'browserName':'chrome','goog:chromeOptions':{'args':['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--window-size=1400,1000']}}}},timeout=60)
         session=value['sessionId'] if isinstance(value,dict) and 'sessionId' in value else None
         if not session: raise RuntimeError(f'no webdriver session id: {value}')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
