@@ -15,14 +15,57 @@ function storageAccess() {
 
 function memoryGet(key) { return memory.has(key) ? memory.get(key) : null; }
 function memorySet(key, value) { memory.set(key, value); }
+function memoryDelete(key) { memory.delete(key); }
+
+function uuidV4() {
+  return globalThis.crypto?.randomUUID?.()
+    ?? '00000000-0000-4000-8000-' + Math.random().toString(16).slice(2, 14).padEnd(12, '0').slice(0, 12);
+}
+
+function bootstrapState(value) {
+  const state = value && typeof value === 'object' && !Array.isArray(value) ? { ...value } : {};
+  const createdAt = state.created_at || new Date().toISOString();
+  state.anon_id = state.anon_id || uuidV4();
+  state.created_at = createdAt;
+  state.updated_at = state.updated_at || createdAt;
+  return state;
+}
+
+function persistBootstrap(storage, state) {
+  const raw = JSON.stringify(state);
+  if (storage) storage.setItem(STATE_KEY, raw);
+  else memorySet(STATE_KEY, raw);
+}
 
 export async function loadState() {
   const storage = storageAccess();
   const raw = storage
     ? (storage.getItem(STATE_KEY) ?? storage.getItem(LEGACY_STATE_KEY))
     : (memoryGet(STATE_KEY) ?? memoryGet(LEGACY_STATE_KEY));
-  if (!raw) return null;
-  return JSON.parse(raw);
+
+  if (!raw) {
+    const state = bootstrapState({});
+    persistBootstrap(storage, state);
+    return state;
+  }
+
+  try {
+    const state = bootstrapState(JSON.parse(raw));
+    persistBootstrap(storage, state);
+    return state;
+  } catch (error) {
+    console.warn('Ignoring unreadable saved study state and starting clean.', error);
+    if (storage) {
+      storage.removeItem(STATE_KEY);
+      storage.removeItem(LEGACY_STATE_KEY);
+    } else {
+      memoryDelete(STATE_KEY);
+      memoryDelete(LEGACY_STATE_KEY);
+    }
+    const state = bootstrapState({});
+    persistBootstrap(storage, state);
+    return state;
+  }
 }
 
 export async function saveState(state) {
@@ -41,18 +84,24 @@ function inlineBank() {
 export async function loadBank() {
   const protocol = globalThis.location?.protocol ?? 'file:';
   if (protocol === 'file:') return inlineBank();
-  const entries = await Promise.all([
-    ['questions', './data/questions.json'],
-    ['sessions', './data/sessions.json'],
-    ['learn', './data/learn.json'],
-    ['cases', './data/cases.json'],
-    ['weights', './data/weights.json'],
-  ].map(async ([name, url]) => {
-    const response = await fetch(url, { cache: 'no-cache' });
-    if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
-    return [name, await response.json()];
-  }));
-  return Object.fromEntries(entries);
+
+  try {
+    const entries = await Promise.all([
+      ['questions', './data/questions.json'],
+      ['sessions', './data/sessions.json'],
+      ['learn', './data/learn.json'],
+      ['cases', './data/cases.json'],
+      ['weights', './data/weights.json'],
+    ].map(async ([name, url]) => {
+      const response = await fetch(url, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
+      return [name, await response.json()];
+    }));
+    return Object.fromEntries(entries);
+  } catch (error) {
+    console.warn('Network study bank unavailable; using the validated inline bank.', error);
+    return inlineBank();
+  }
 }
 
 export async function submitFeedback(item) {
