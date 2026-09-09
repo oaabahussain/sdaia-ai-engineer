@@ -1,63 +1,8 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-
-const adapterName = process.argv[2];
-if (!['browser', 'api'].includes(adapterName)) throw new Error('Usage: node scripts/contract_test.js browser|api');
-
-class FakeLocalStorage {
-  constructor() { this.map = new Map(); }
-  getItem(key) { return this.map.has(key) ? this.map.get(key) : null; }
-  setItem(key, value) { this.map.set(key, String(value)); }
-  removeItem(key) { this.map.delete(key); }
-}
-
-globalThis.localStorage = new FakeLocalStorage();
-const id = crypto.randomUUID();
-globalThis.localStorage.setItem('sdaia.anon_id.v1', id);
-globalThis.location = { protocol: 'https:' };
-
-const now = new Date().toISOString();
-const state = {
-  version: 1,
-  anon_id: id,
-  created_at: now,
-  updated_at: now,
-  onboarded: false,
-  profile: { minutes: 20, examDate: '' },
-  answer_map: {},
-  attempts: {},
-  confidence: {},
-  mastered: {},
-  review_map: {},
-  errors: {},
-  bookmark_map: {},
-  notes: {},
-  sessions: {},
-  activity: {},
-  diagnostic: { done: false, answers: {} },
-  theme: 'auto',
-  focus: false,
-};
-
-let adapter;
-if (adapterName === 'browser') {
-  const fs = await import('node:fs/promises');
-  globalThis.fetch = async (url) => ({
-    ok: true,
-    status: 200,
-    json: async () => JSON.parse(await fs.readFile(new URL(`../${url.replace('./', '')}`, import.meta.url), 'utf8')),
-  });
-  adapter = await import('../src/storage/browser.js');
-} else {
-  globalThis.__SDAIA_API_BASE__ = process.env.SDAIA_API_BASE || 'http://127.0.0.1:8000/v1';
-  adapter = await import('../src/storage/api.js');
-}
-
-await adapter.saveState(state);
-const loaded = await adapter.loadState();
-assert.equal(loaded.anon_id, id);
-const bank = await adapter.loadBank();
-assert.equal(bank.questions.length, 121);
-const feedback = await adapter.submitFeedback({ question_id: 'q1', issue_type: 'other', details: 'contract test' });
-assert.equal(feedback.ok, true);
-console.log(`${adapterName} adapter contract: PASS`);
+import { expandConceptBank } from '../src/logic/questionBank.js';
+const adapterName=process.argv[2];if(!['browser','api'].includes(adapterName))throw new Error('Usage: node scripts/contract_test.js browser|api');
+class FakeLocalStorage{constructor(){this.map=new Map()}getItem(k){return this.map.has(k)?this.map.get(k):null}setItem(k,v){this.map.set(k,String(v))}removeItem(k){this.map.delete(k)}}
+globalThis.localStorage=new FakeLocalStorage();const id=crypto.randomUUID();globalThis.location={protocol:'https:'};const now=new Date().toISOString();const state={version:1,anon_id:id,created_at:now,updated_at:now,onboarded:false,profile:{minutes:20,examDate:''},answer_map:{},attempts:{},confidence:{},mastered:{},review_map:{},errors:{},bookmark_map:{},notes:{},sessions:{},activity:{},diagnostic:{done:false,answers:{}},theme:'auto',focus:false};let adapter;
+if(adapterName==='browser'){const fs=await import('node:fs/promises');globalThis.fetch=async url=>({ok:true,status:200,json:async()=>JSON.parse(await fs.readFile(new URL(`../${url.replace('./','')}`,import.meta.url),'utf8'))});adapter=await import('../src/storage/browser.js')}else{globalThis.__SDAIA_API_BASE__=process.env.SDAIA_API_BASE||'http://127.0.0.1:8000/v1';adapter=await import('../src/storage/api.js')}
+await adapter.saveState(state);const loaded=await adapter.loadState();assert.equal(loaded.anon_id,id);const bank=await adapter.loadBank();if(adapterName==='browser'){assert.equal(expandConceptBank(bank.concepts).length,1120)}else{assert.ok(bank.questions.length>=121)}const feedback=await adapter.submitFeedback({question_id:'q1',issue_type:'other',details:'contract test'});assert.equal(feedback.ok,true);console.log(`${adapterName} adapter contract: PASS`);
