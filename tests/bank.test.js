@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { expandConceptBank } from '../src/logic/questionBank.js';
+import { loadConcepts } from '../scripts/load_concepts.js';
+const concepts=loadConcepts(new URL('..',import.meta.url).pathname);
+const q=expandConceptBank(concepts);
+test('generated bank has 1120 bilingual questions',()=>{assert.equal(q.length,1120);assert.ok(q.every(x=>x.question&&x.question_en&&x.options.length===4&&x.options_en.length===4))});
+test('question IDs and bilingual prompts are unique',()=>{assert.equal(new Set(q.map(x=>x.id)).size,q.length);assert.equal(new Set(q.map(x=>`${x.domain}|${x.question}|${x.question_en}`)).size,q.length)});
+test('canonical answer positions are balanced',()=>{const c=[0,0,0,0];q.forEach(x=>c[x.answer]++);assert.ok(Math.max(...c)-Math.min(...c)<=Math.ceil(q.length*.08),c.join(','))});
+test('every domain has 160 questions',()=>{const c={};q.forEach(x=>c[x.domain]=(c[x.domain]||0)+1);Object.values(c).forEach(n=>assert.equal(n,160))});

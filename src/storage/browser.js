@@ -1,3 +1,4 @@
+import { CONCEPT_FILES } from '../logic/conceptFiles.js';
 const STATE_KEY = 'sdaia.state.v1';
 const LEGACY_STATE_KEY = 'sdaia_adaptive_v3';
 const memory = new Map();
@@ -86,18 +87,20 @@ export async function loadBank() {
   if (protocol === 'file:') return inlineBank();
 
   try {
-    const entries = await Promise.all([
-      ['questions', './data/questions.json'],
-      ['sessions', './data/sessions.json'],
-      ['learn', './data/learn.json'],
-      ['cases', './data/cases.json'],
-      ['weights', './data/weights.json'],
-    ].map(async ([name, url]) => {
+    const loadJson = async (url) => {
       const response = await fetch(url, { cache: 'no-cache' });
       if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
-      return [name, await response.json()];
-    }));
-    return Object.fromEntries(entries);
+      return response.json();
+    };
+    const [conceptDocs, sessions, learn, cases, weights] = await Promise.all([
+      Promise.all(CONCEPT_FILES.map(loadJson)),
+      loadJson('./data/sessions.json'),
+      loadJson('./data/learn.json'),
+      loadJson('./data/cases.json'),
+      loadJson('./data/weights.json'),
+    ]);
+    const concepts = Object.fromEntries(conceptDocs.map(doc => [doc.domain, doc.concepts]));
+    return { concepts, sessions, learn, cases, weights };
   } catch (error) {
     console.warn('Network study bank unavailable; using the validated inline bank.', error);
     return inlineBank();
