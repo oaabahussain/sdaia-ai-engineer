@@ -34,7 +34,7 @@
 2. **First-time API-backed user whose GET returns 404:** the bootstrap state and API adapter must use exactly the same anonymous ID, so the first save succeeds. Covered in Task 4.
 3. **Old service worker/cache plus new manifest:** the app must either load a compatible cached release or fail clearly/recover, never silently combine incompatible shell/config. Covered in Task 7.
 4. **Browser vs API runtime bundle:** both adapters must expose the same contract/version and generate the same 1,120 foundation items from the same manifest; the old 121-question API divergence must disappear. Covered in Task 5.
-5. **Feedback form submission with blank issues disabled/enabled transition:** typed content must still reach a usable GitHub issue path instead of being discarded at the template chooser. Covered in Task 8.
+5. **Feedback form submission while blank issues remain disabled:** typed content must reach the defined `public-feedback.md` template instead of being discarded at the template chooser. Covered in Task 8.
 
 ---
 
@@ -60,7 +60,7 @@
 - `data/legacy/static-bank-v1/README.md` — explicit disposition of the 121-question legacy bank.
 - `data/legacy/static-bank-v1/questions.json` — moved legacy content pending later semantic migration.
 - `data/legacy/static-bank-v1/sessions.json` — moved legacy sessions pending later semantic migration.
-- `ARCHITECTURE.md`, `MIGRATIONS.md`, `TESTING.md`, `SECURITY.md`, `HANDOFF.md` — current operational/handoff baseline.
+- `ARCHITECTURE.md`, `MIGRATIONS.md`, `TESTING.md`, `DEPLOYMENT.md`, `DATA-MODEL.md`, `SECURITY.md`, `HANDOFF.md`, `CHANGELOG.md` — current operational/handoff baseline.
 
 ### Files intentionally removed after references are eliminated
 
