@@ -61,6 +61,22 @@ A feature is not complete if it leaves duplicate sources of truth, stale scripts
 
 SDAIA content remains clearly presented as independent/unofficial unless an explicit written relationship changes that status. Core platform naming, storage, APIs, schemas, and internal namespaces must not imply that SDAIA owns, endorses, or is the only intended subject of the platform.
 
+### 2.8 Explicit non-goals for this architecture stage
+
+This constitution deliberately does **not** require:
+
+- a React/Next or other framework rewrite
+- a full authoring CMS in Programme A
+- production authentication in Programme A
+- a production multi-tenant/SaaS billing system
+- CAT/IRT before calibration evidence exists
+- a proprietary vector database or unrelated infrastructure migration
+- hiding public learning content that is intentionally shipped to a browser
+- recreating or obtaining confidential real exam questions
+- claiming official SDAIA affiliation, weights, or exam rules without primary evidence
+
+These may be reconsidered later through an explicit design/ADR when a demonstrated requirement exists.
+
 ---
 
 ## 3. Current repository baseline
@@ -192,6 +208,8 @@ Each track must define at least:
 - evidence registry reference
 - public/protected content policy
 - compatibility metadata
+- minimum/maximum supported core contract version where needed
+- declared content/item capabilities required by the track
 
 ### 6.2 Versioning
 
@@ -202,6 +220,20 @@ Example:
 `sdaia-ai-engineer@2`
 
 Updating a curriculum must not silently reinterpret historical results generated under version 1.
+
+### 6.3 Cross-track competency reuse
+
+Shared competencies may be mapped across tracks, but score/mastery transfer is never inferred merely because two topics have similar names.
+
+A cross-track mapping must have:
+
+- stable source and target competency IDs
+- mapping/equivalence type
+- mapping version
+- evidence/reviewer status
+- transfer policy
+
+Historical learner evidence stays attached to the track/version in which it was earned. A derived shared-competency view may reuse that evidence only through an explicit versioned mapping.
 
 ---
 
@@ -407,6 +439,14 @@ It may represent:
 - review scheduling
 - assessment history
 
+### 12.1 Raw evidence versus derived state
+
+Attempts, responses, exposure, confidence, timing, and review outcomes are the durable **learning evidence**.
+
+Mastery, readiness, learner level, weak-topic rankings, and next-best-action recommendations are **derived projections**.
+
+Derived projections must record the algorithm/formula version and be recomputable from durable evidence when practical. Changing a readiness formula must not rewrite or destroy the original learner evidence that produced an older score.
+
 Internal learner levels:
 
 1. Foundation
@@ -508,6 +548,21 @@ The tutor experience must support at least these modes:
 The tutor contract is modality-independent. Text is required; voice/live interaction may be added as a client capability without changing the learning core. The learning engine owns state, selection, and assessment rules; the voice/text client owns presentation.
 
 The platform should never use hints or coaching in strict/mock modes simply because an AI tutor is available.
+
+### 15.1 Tutor grounding and protected-content safety
+
+The tutor should ground teaching and exam-fact claims in the active track's approved content/evidence whenever available.
+
+It must:
+
+- distinguish track teaching content from Exam Intelligence facts
+- avoid inventing official exam rules
+- respect evidence strength and unresolved contradictions
+- not reveal protected answer keys, hidden holdout inventory, or administrative distractor logic
+- preserve the active mode's feedback policy
+- treat untrusted learner/content text as data rather than instructions that override protected-system policy
+
+When an explanation uses an evidence-sensitive or changing claim, the system should be able to surface the relevant source/provenance to the learner or reviewer.
 
 ---
 
@@ -651,6 +706,24 @@ Anonymous/local-first use should remain available where practical. Authenticatio
 
 The product must prohibit storage of unnecessary sensitive personal information in question feedback, events, or learning notes intended for platform analytics.
 
+### 19.2 Sync and multi-device conflict model
+
+The current full-state optimistic replacement API is not the long-term source of truth for rich multi-device learning history.
+
+Future sync should prefer durable append-only or idempotent evidence records for attempts/events, with deterministic reconciliation of derived state.
+
+The sync contract must define:
+
+- stable event/attempt IDs
+- idempotency behaviour
+- ordering/timestamp semantics
+- duplicate detection
+- conflict handling
+- offline queue replay
+- partial-sync failure recovery
+
+Blind last-write-wins must not silently discard valid learning evidence from another device.
+
 ---
 
 ## 20. Content loading and scalability
@@ -689,6 +762,8 @@ Published content releases are immutable or content-addressed once referenced by
 A manifest hash/content hash or equivalent integrity identifier should make it possible to detect mixed or stale content.
 
 Shell, manifest, and content-chunk releases must be compatible atomically. Cache invalidation must prevent a new application shell from interpreting an incompatible old chunk set without an explicit migration/fallback path.
+
+For assessment reproducibility and dispute/debug analysis, an attempt record must contain enough immutable references to reconstruct what the learner actually saw. If an item is rendered from variables, the render seed/variables or an equivalent presentation snapshot must be preserved.
 
 ---
 
@@ -880,6 +955,23 @@ Because the repository may be maintained by one owner for periods of time, gover
 
 Cleanup must be evidence-driven.
 
+Before each Programme A change, run a repository impact map across:
+
+- browser UI/runtime
+- content/data sources
+- schemas
+- learner state/migrations
+- browser/API adapters
+- OpenAPI/server
+- service worker/offline
+- tests/fixtures
+- CI/release workflows
+- Arabic/English
+- mobile/accessibility
+- documentation/handoff
+
+A change is not “local” merely because only one implementation file is edited.
+
 Before deleting a file:
 
 1. identify references
@@ -990,6 +1082,13 @@ Required gate categories:
 - focus visibility
 - touch target and basic semantic checks
 - RTL layout regressions
+
+### Performance/scalability
+- startup does not require loading the full active track bank
+- public chunk loading is bounded and observable
+- cache growth is bounded by policy
+- no release accidentally reintroduces whole-bank precaching
+- performance budgets are documented for the supported client baseline before they become release gates
 
 ---
 
@@ -1135,6 +1234,12 @@ Any future server-backed learner or protected-assessment service must define, be
 - queued offline-event reconciliation and idempotency
 - capacity/resource limits
 - dependency/service failure behaviour
+- corrupted/missing content chunk recovery
+- stale service-worker/manifest recovery
+- learner-state migration failure recovery
+- missing historical content-version handling
+- sync conflict and partial-sync recovery
+- protected assessment-service outage behaviour
 
 These programmes share contracts but should not be implemented as one big-bang rewrite.
 
