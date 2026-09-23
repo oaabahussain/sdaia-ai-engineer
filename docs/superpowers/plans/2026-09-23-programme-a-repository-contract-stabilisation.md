@@ -25,7 +25,8 @@
 - Programme A is the only implementation scope in this plan.
 - No CAT/IRT, production auth, multi-tenant billing, protected-bank backend, or full authoring CMS is introduced here.
 - Every task uses TDD: failing test → minimal implementation → passing test → focused regression run → commit.
-- At execution time, create an isolated workspace with `superpowers:using-git-worktrees`; do not implement on `main` or on the design/spec branch.
+- At execution time, create an isolated workspace with `superpowers:using-git-worktrees`; do not implement on `main` or directly on the design/spec branch.
+- The implementation branch must contain the approved spec, evidence appendix, audit resolution, and this plan. If PR #6 is not merged when execution begins, branch from `design/platform-vnext-spec`; if it has been merged, branch from that merge commit on `main`.
 
 ## Review Focus
 
@@ -95,7 +96,7 @@ The old 121-question content is **moved**, not discarded, because semantic extra
 
 - [ ] **Step 1: Create the isolated implementation worktree and baseline tag**
 
-At execution time, use `superpowers:using-git-worktrees`, create branch `impl/programme-a-contract-stabilisation` from current `main`, then confirm `main` still points at the reviewed baseline before tagging.
+At execution time, use `superpowers:using-git-worktrees`. Create `impl/programme-a-contract-stabilisation` from the commit that contains the approved spec/plan (the `design/platform-vnext-spec` head if PR #6 is still unmerged, otherwise the PR #6 merge commit). Separately verify the production baseline `main` ancestry still contains `362d35c697411d4eddcc4536c843df17161d3374` before creating/reusing the rollback tag.
 
 Run:
 
@@ -139,6 +140,32 @@ Create `tests/fixtures/runtime/current-bank-counts.expected.json`:
   "domains": 7
 }
 ```
+
+Also capture a digest of the **legacy rendered educational payload** (excluding the soon-to-change question ID) so Task 3 can prove stable-ID work did not silently change questions/options/answers for unfinished exams. Generate it from the current bank:
+
+```bash
+node --input-type=module <<'NODE'
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import { expandConceptBank } from './src/logic/questionBank.js';
+import { loadConcepts } from './scripts/load_concepts.js';
+
+const questions = expandConceptBank(loadConcepts(process.cwd()));
+const payload = questions.map(q => ({
+  domain:q.domain, topic:q.topic, question:q.question, question_en:q.question_en,
+  options:q.options, options_en:q.options_en, answer:q.answer,
+  explanation:q.explanation, explanation_en:q.explanation_en, difficulty:q.difficulty
+}));
+const hash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+const path = 'tests/fixtures/runtime/current-bank-counts.expected.json';
+const fixture = JSON.parse(fs.readFileSync(path,'utf8'));
+fixture.legacy_payload_sha256 = hash;
+fs.writeFileSync(path, JSON.stringify(fixture, null, 2) + '\n');
+console.log(hash);
+NODE
+```
+
+This digest is a regression fixture, not a permanent product identifier.
 
 - [ ] **Step 3: Add a temporary baseline test before changing contracts**
 
@@ -252,6 +279,8 @@ Create `tracks/sdaia-ai-engineer/manifest.json`:
   "status": "active",
   "official_status": "unofficial-independent",
   "locales": ["ar", "en"],
+  "core_contract": { "min": 2, "max": 2 },
+  "capabilities": ["bilingual", "foundation-generated-bank", "exam-profile-v1"],
   "content": {
     "concept_files": [
       "data/concepts/data-ml.json",
@@ -306,7 +335,7 @@ Create `data/schema/track-manifest.schema.json` so it requires:
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "track-manifest.schema.json",
   "type": "object",
-  "required": ["schema_version", "id", "version", "status", "official_status", "locales", "content", "exam_profiles", "default_exam_profile"],
+  "required": ["schema_version", "id", "version", "status", "official_status", "locales", "core_contract", "capabilities", "content", "exam_profiles", "default_exam_profile"],
   "properties": {
     "schema_version": { "const": 1 },
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
@@ -314,6 +343,16 @@ Create `data/schema/track-manifest.schema.json` so it requires:
     "status": { "enum": ["draft", "active", "deprecated", "retired"] },
     "official_status": { "enum": ["unofficial-independent", "official", "partner"] },
     "locales": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "core_contract": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "capabilities": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
     "content": {
       "type": "object",
       "required": ["concept_files", "learn", "cases"],
@@ -331,7 +370,36 @@ Create `data/schema/track-manifest.schema.json` so it requires:
 }
 ```
 
-Create `data/schema/exam-profile.schema.json` requiring `question_count >= 1`, weights `>=0`, `section_sizes`, and `evidence_status` from `official-verified | project-reference-unverified | observational`.
+Create `data/schema/exam-profile.schema.json` with the complete active shape:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "exam-profile.schema.json",
+  "type": "object",
+  "required": ["schema_version", "id", "track_id", "version", "evidence_status", "question_count", "section_sizes", "weights"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "track_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "evidence_status": { "enum": ["official-verified", "project-reference-unverified", "observational"] },
+    "question_count": { "type": "integer", "minimum": 1 },
+    "section_sizes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "anyOf": [{ "type": "integer", "minimum": 1 }, { "const": "all" }] }
+    },
+    "weights": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "number", "minimum": 0 }
+    }
+  },
+  "additionalProperties": false
+}
+```
 
 - [ ] **Step 6: Implement the focused Node loader**
 
@@ -362,7 +430,26 @@ export function loadTrack(root, trackId) {
 }
 ```
 
-- [ ] **Step 7: Replace duplicated weight loading in validation**
+- [ ] **Step 7: Validate the new JSON contracts with the already-installed Ajv**
+
+In `scripts/validate.js`, instantiate Ajv Draft 7 validation using the existing `ajv` and `ajv-formats` dependencies. Validate the track manifest and active exam profile before using them:
+
+```js
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+
+const ajv = new Ajv({ allErrors: true, strict: false });
+addFormats(ajv);
+
+function assertSchema(schema, value, label) {
+  const validate = ajv.compile(schema);
+  if (!validate(value)) throw new Error(`${label}: ${ajv.errorsText(validate.errors)}`);
+}
+```
+
+Load `track-manifest.schema.json` and `exam-profile.schema.json`, call `assertSchema`, and separately assert `examProfile.track_id === manifest.id`, `core_contract.min <= 2 <= core_contract.max`, and weights sum to 100.
+
+- [ ] **Step 8: Replace duplicated weight loading in validation**
 
 Update `scripts/validate.js` to call:
 
@@ -375,7 +462,7 @@ const allocation = weightedAllocation(weights, examProfile.question_count);
 
 Do not yet remove the old files in this task.
 
-- [ ] **Step 8: Run contract + existing regression suite**
+- [ ] **Step 9: Run contract + existing regression suite**
 
 Run:
 
@@ -386,7 +473,7 @@ node scripts/validate.js
 
 Expected: PASS and still report 1,120 current foundation questions / 200 profile questions.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add tracks data/schema scripts/load_track.js scripts/validate.js tests/track-contract.test.js
@@ -446,12 +533,12 @@ Expected: FAIL because current IDs are `qN` and concept objects have no stable I
 
 - [ ] **Step 3: Add explicit concept IDs**
 
-Add an `id` field to every concept using the existing domain slug plus concept slug; examples:
+Add an `id` and immutable `order` field to every concept using the existing domain slug plus concept slug; `order` records the current 1–20 position so the legacy rendered payload remains reproducible even if JSON array order changes later. Examples:
 
 ```json
-{"id":"data-ml.accuracy","term":"Accuracy", ...}
-{"id":"data-ml.precision","term":"Precision", ...}
-{"id":"data-ml.recall-sensitivity","term":"Recall / Sensitivity", ...}
+{"id":"data-ml.accuracy","order":1,"term":"Accuracy", ...}
+{"id":"data-ml.precision","order":2,"term":"Precision", ...}
+{"id":"data-ml.recall-sensitivity","order":3,"term":"Recall / Sensitivity", ...}
 ```
 
 Use one deterministic migration script or a one-time edit, then validate:
@@ -483,37 +570,46 @@ const TEMPLATES = [
 ];
 ```
 
+Before generation, canonicalise each domain's concepts by immutable `order`:
+
+```js
+const orderedConcepts = [...concepts].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+```
+
+Use `orderedConcepts` for the concept loop **and for distractor selection**, and seed from `${domain}|${concept.id}|${tpl.id}|20260909`. This preserves the current educational payload while making future JSON-array reorderings harmless.
+
 Change the generator signature to:
 
 ```js
 export function expandConceptBank(conceptsByDomain, { trackId = 'sdaia-ai-engineer' } = {}) {
 ```
 
-and emit:
+and emit only canonical runtime identity:
 
 ```js
 const familyId = `${trackId}.${concept.id}.${tpl.id}`;
 questions.push({
   id: `${familyId}.v1`,
-  legacy_id: `q${qn++}`,
   family_id: familyId,
   track_id: trackId,
   // keep current bilingual question/options/explanation fields unchanged
 });
 ```
 
+Do **not** emit `legacy_id` into runtime questions. Legacy IDs are migration metadata and belong only in the frozen mapping file.
+
 The stable ID must use explicit `concept.id` and `tpl.id`; it must not use list position.
 
 - [ ] **Step 5: Generate and freeze the old→new ID map**
 
-Create `scripts/build_question_id_map.js` that writes exactly:
+Create `scripts/build_question_id_map.js` that walks the manifest concept-file order, sorts each domain by immutable `order`, and pairs the **pre-migration sequential position** with the stable generated ID:
 
 ```js
-const map = Object.fromEntries(
-  expandConceptBank(bundle.concepts, { trackId: bundle.manifest.id })
-    .map(q => [q.legacy_id, q.id])
-);
+const questions = expandConceptBank(bundle.concepts, { trackId: bundle.manifest.id });
+const map = Object.fromEntries(questions.map((q, index) => [`q${index + 1}`, q.id]));
 ```
+
+Run and commit this map while the manifest/domain/concept `order` values still reproduce the shipped ordering. After commit, the map is frozen migration data and must not be regenerated casually.
 
 Write it to `data/migrations/sdaia-generated-v2-question-ids.json` with sorted legacy keys by numeric suffix.
 
@@ -526,12 +622,33 @@ test('legacy generated ID map covers the full shipped bank exactly once', () => 
   const map = JSON.parse(fs.readFileSync(new URL('../data/migrations/sdaia-generated-v2-question-ids.json', import.meta.url), 'utf8'));
   assert.equal(Object.keys(map).length, 1120);
   assert.equal(new Set(Object.values(map)).size, 1120);
-  assert.equal(map.q1, q.find(x => x.legacy_id === 'q1').id);
-  assert.equal(map.q1120, q.find(x => x.legacy_id === 'q1120').id);
+  assert.equal(map.q1, q[0].id);
+  assert.equal(map.q1120, q[1119].id);
 });
 ```
 
-- [ ] **Step 7: Run the stable-ID tests and validation**
+- [ ] **Step 7: Prove the educational payload did not change**
+
+Add a helper in `tests/bank.test.js` that hashes only the old learner-visible fields in generated order:
+
+```js
+import crypto from 'node:crypto';
+const payload = q.map(x => ({
+  domain:x.domain, topic:x.topic, question:x.question, question_en:x.question_en,
+  options:x.options, options_en:x.options_en, answer:x.answer,
+  explanation:x.explanation, explanation_en:x.explanation_en, difficulty:x.difficulty
+}));
+const digest = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+assert.equal(digest, expected.legacy_payload_sha256);
+```
+
+Also strengthen the reorder test to compare `id -> learner-visible payload`, not just the ID set.
+
+- [ ] **Step 8: Define and validate the rendered-question schema**
+
+Create `data/schema/rendered-question.schema.json` requiring `id`, `family_id`, `track_id`, bilingual question/options/explanations, `answer`, `domain`, `topic`, and `difficulty`, with `additionalProperties:false`. In `scripts/validate.js`, validate every generated question against it.
+
+- [ ] **Step 9: Run the stable-ID tests and validation**
 
 Run:
 
@@ -542,7 +659,7 @@ node scripts/validate.js
 
 Expected: PASS, 1,120 stable IDs, one-to-one legacy mapping.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add data/concepts data/migrations data/schema/rendered-question.schema.json src/logic/questionBank.js scripts/build_question_id_map.js tests/bank.test.js tests/track-contract.test.js
@@ -564,6 +681,7 @@ git commit -m "feat: assign stable content and question identifiers"
 - Modify: `src/storage/api.js`
 - Modify: `src/storage/interface.js`
 - Modify: `src/app.js`
+- Modify: `feedback.html`
 - Modify: `tests/storage.browser.test.js`
 - Modify: `server/tests/test_api.py`
 - Modify: `server/app/main.py`
@@ -571,7 +689,7 @@ git commit -m "feat: assign stable content and question identifiers"
 **Interfaces:**
 - Produces:
   - `getOrCreateAnonId() -> string`
-  - `migrateState(raw, { anonId, questionIdMap, trackId, trackVersion }) -> StateV2`
+  - `migrateState(raw, { anonId, questionIdMap, trackId, trackVersion, examProfileId, examProfileVersion }) -> StateV2`
   - storage key `learning-platform.state.v2`
   - identity key `learning-platform.anon-id.v1`
 - Consumes: old keys `sdaia.state.v1`, `sdaia_adaptive_v3`, `sdaia.anon_id.v1`.
@@ -647,6 +765,21 @@ Use the same helper from browser, API, and interface code.
 
 - [ ] **Step 4: Implement pure state migration**
 
+Refactor the storage boundary so adapters load/save raw persisted state while the interface owns bootstrap/migration:
+
+```js
+// src/storage/interface.js
+export async function loadState(context) {
+  const raw = await adapter.loadState();
+  const anonId = getOrCreateAnonId();
+  const state = migrateState(raw, { anonId, ...context });
+  await adapter.saveState(state);
+  return state;
+}
+```
+
+This is what closes the first-run API 404 identity bug: the interface and API adapter both use `getOrCreateAnonId()`.
+
 Create `src/state/migrate.js` with helpers:
 
 ```js
@@ -654,10 +787,14 @@ function remapKeyedObject(value, map) {
   return Object.fromEntries(Object.entries(value || {}).map(([key, item]) => [map[key] || key, item]));
 }
 
-function remapActiveExam(exam, map) {
+function remapActiveExam(exam, map, meta) {
   if (!exam) return null;
   return {
     ...exam,
+    track_id: meta.trackId,
+    track_version: meta.trackVersion,
+    exam_profile_id: meta.examProfileId,
+    exam_profile_version: meta.examProfileVersion,
     questionIds: (exam.questionIds || []).map(id => map[id] || id),
     answers: remapKeyedObject(exam.answers, map),
     confidence: remapKeyedObject(exam.confidence, map),
@@ -666,7 +803,7 @@ function remapActiveExam(exam, map) {
   };
 }
 
-export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion }) {
+export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion, examProfileId, examProfileVersion }) {
   if (raw?.version === 2) return raw;
 
   const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
@@ -685,7 +822,7 @@ export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion
     tracks: {
       [trackId]: {
         track_version: trackVersion,
-        active_exam: remapActiveExam(exam.active, questionIdMap),
+        active_exam: remapActiveExam(exam.active, questionIdMap, { trackId, trackVersion, examProfileId, examProfileVersion }),
         exam_history: Array.isArray(exam.history) ? exam.history : []
       }
     },
@@ -707,7 +844,7 @@ export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion
 - `preferences.theme` = `light|dark`
 - `tracks` object
 - each track state has `track_version`, nullable `active_exam`, and `exam_history`
-- active exam permits stable string IDs and preserves answer/confidence/flag/order objects
+- active exam requires `track_id`, `track_version`, `exam_profile_id`, `exam_profile_version`, stable question IDs, and preserves answer/confidence/flag/order objects
 - `legacy.preserved` is an object.
 
 - [ ] **Step 6: Make browser storage read canonical key first, old keys second**
@@ -721,6 +858,8 @@ const LEGACY_STATE_KEYS = ['sdaia.state.v1', 'sdaia_adaptive_v3'];
 
 On first successful migration, write the canonical key but **do not delete** old keys in Programme A. That leaves a rollback path.
 
+The browser adapter's `loadState()` returns the first available raw JSON object; it does not invent a second anonymous ID. The interface performs migration and persists the canonical state.
+
 - [ ] **Step 7: Fix first-run API identity mismatch**
 
 Write `tests/storage.api.test.js` with a fake localStorage and fake fetch:
@@ -730,7 +869,32 @@ Write `tests/storage.api.test.js` with a fake localStorage and fake fetch:
 
 Refactor `src/storage/api.js` to use `getOrCreateAnonId()` instead of its private `anonId()`.
 
-- [ ] **Step 8: Update the app to use state v2 locations**
+- [ ] **Step 8: Update the app to load migration context and pin every new attempt**
+
+After `BANK=await loadBank()`, load the frozen ID map and call:
+
+```js
+state = await loadState({
+  questionIdMap,
+  trackId: BANK.track.id,
+  trackVersion: BANK.track.version,
+  examProfileId: BANK.exam_profile.id,
+  examProfileVersion: BANK.exam_profile.version
+});
+```
+
+When `createExam()` creates a new attempt, include:
+
+```js
+track_id: BANK.track.id,
+track_version: BANK.track.version,
+exam_profile_id: BANK.exam_profile.id,
+exam_profile_version: BANK.exam_profile.version,
+```
+
+Stable `questionIds` plus persisted `optionOrders` then make the attempt reconstructable for Programme A.
+
+Update the app to use state v2 locations:
 
 Replace direct `state.examV2` access with helpers local to `src/app.js`:
 
@@ -749,13 +913,17 @@ function save() {
 
 History writes become `trackState().exam_history`.
 
-- [ ] **Step 9: Make server validation accept state v2**
+- [ ] **Step 9: Migrate feedback-page preference reads/writes to the neutral state key**
+
+In `feedback.html`, read `learning-platform.state.v2` first and fall back to `sdaia.state.v1`. For a v2 state, read/write `preferences.lang` and `preferences.theme`; for an old state, keep the existing `examV2.lang/theme` fallback. Do not delete the old key.
+
+- [ ] **Step 10: Make server validation accept state v2**
 
 Point the server's active state validator to `state-v2.schema.json`.
 
 Keep the server explicitly documented/tested as dev/test scaffolding; do not add production auth here.
 
-- [ ] **Step 10: Run state, browser-storage, API, and server tests**
+- [ ] **Step 11: Run state, browser-storage, API, and server tests**
 
 ```bash
 node --test tests/state-migration.test.js tests/storage.browser.test.js tests/storage.api.test.js
@@ -764,7 +932,7 @@ PYTHONPATH=server pytest -q server/tests
 
 Expected: all pass, including first-run API 404→save.
 
-- [ ] **Step 11: Commit**
+- [ ] **Step 12: Commit**
 
 ```bash
 git add src/state src/storage src/app.js data/schema/state-v2.schema.json tests/state-migration.test.js tests/storage.api.test.js tests/storage.browser.test.js tests/fixtures/state server
@@ -826,6 +994,30 @@ Run browser contract, start the test server, then run API contract as CI does.
 Expected: browser/API test fails because current API returns `questions` while browser returns `concepts`.
 
 - [ ] **Step 3: Implement browser runtime bundle loading**
+
+Create `data/schema/runtime-bundle.schema.json` first:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-bundle.schema.json",
+  "type": "object",
+  "required": ["contract_version", "track", "exam_profile", "concepts", "learn", "cases"],
+  "properties": {
+    "contract_version": { "const": 2 },
+    "track": { "$ref": "track-manifest.schema.json" },
+    "exam_profile": { "$ref": "exam-profile.schema.json" },
+    "concepts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "array" }
+    },
+    "learn": { "type": "object" },
+    "cases": { "type": "array" }
+  },
+  "additionalProperties": false
+}
+```
 
 Create `src/content/runtimeBundle.js`:
 
@@ -1039,6 +1231,12 @@ test('app imports synchronous service-worker registration helper', () => {
   const app = fs.readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
   assert.match(app, /registerServiceWorker/);
 });
+
+test('non-navigation cache misses do not fall back to index html', () => {
+  const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  assert.match(sw, /event\.request\.mode\s*===\s*['"]navigate['"]/);
+  assert.match(sw, /Response\.error\(\)/);
+});
 ```
 
 - [ ] **Step 2: Run and verify failure**
@@ -1075,6 +1273,8 @@ Delete SW registration from the end of async `init()`.
 
 - [ ] **Step 4: Reduce precache to shell + canonical manifests**
 
+The shell list must include every module needed to bootstrap without a network after a previously successful update, including `src/state/migrate.js`, `src/storage/identity.js`, `src/content/runtimeBundle.js`, and the frozen question-ID migration map. It may include the active manifest/profile because these are configuration, not the question bank.
+
 `sw.js` shell `ASSETS` should include:
 - `./`
 - `index.html`
@@ -1087,6 +1287,27 @@ Delete SW registration from the end of async `init()`.
 Do **not** list concept files, the future whole bank, or all track chunks.
 
 Keep same-origin GET runtime caching so successful network responses for concept/content chunks become available offline after first use.
+
+Do **not** fall back to `index.html` for missing JSON/JS/data requests. The offline fallback is navigation-only:
+
+```js
+event.respondWith(
+  fetch(event.request)
+    .then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+      }
+      return response;
+    })
+    .catch(async () => {
+      const cached = await caches.match(event.request);
+      if (cached) return cached;
+      if (event.request.mode === 'navigate') return caches.match('./index.html');
+      return Response.error();
+    })
+);
+```
 
 - [ ] **Step 5: Remove the unusable inline bank**
 
@@ -1133,7 +1354,7 @@ git commit -m "fix: make offline shell and service worker migration safe"
 ### Task 8: Repair Feedback Submission Without Losing Typed Content
 
 **Files:**
-- Modify: `.github/ISSUE_TEMPLATE/config.yml`
+- Create: `.github/ISSUE_TEMPLATE/public-feedback.md`
 - Modify: `feedback.html`
 - Modify: `scripts/browser_smoke.py`
 - Create: `tests/feedback-contract.test.js`
@@ -1154,8 +1375,9 @@ import fs from 'node:fs';
 const config = fs.readFileSync(new URL('../.github/ISSUE_TEMPLATE/config.yml', import.meta.url), 'utf8');
 const page = fs.readFileSync(new URL('../feedback.html', import.meta.url), 'utf8');
 
-test('feedback page generic prefilled issue path is enabled', () => {
-  assert.match(config, /blank_issues_enabled:\s*true/);
+test('feedback page uses a defined template while blank issues remain disabled', () => {
+  assert.match(config, /blank_issues_enabled:\s*false/);
+  assert.match(page, /template:\s*['"]public-feedback\.md['"]/);
   assert.match(page, /issues\/new\?\$\{p\.toString\(\)\}/);
 });
 ```
@@ -1166,23 +1388,31 @@ test('feedback page generic prefilled issue path is enabled', () => {
 node --test tests/feedback-contract.test.js
 ```
 
-Expected: FAIL because blank issues are currently disabled.
+Expected: FAIL because the public page currently opens the generic issue path without a template.
 
-- [ ] **Step 3: Enable the exact path the public form uses**
+- [ ] **Step 3: Add a dedicated Markdown issue template without enabling blank issues**
 
-Change:
+Keep `.github/ISSUE_TEMPLATE/config.yml` at:
 
 ```yaml
 blank_issues_enabled: false
 ```
 
-to:
+Create `.github/ISSUE_TEMPLATE/public-feedback.md`:
 
-```yaml
-blank_issues_enabled: true
+```markdown
+---
+name: Public feedback submission
+about: Template used by the public feedback page to preserve prefilled title/body content
+title: ''
+labels: ''
+assignees: ''
+---
+
+<!-- This template is normally opened by feedback.html with a prefilled body. Do not include personal, confidential, or sensitive information. -->
 ```
 
-Keep the existing structured `suggestion.yml`, `contribution.yml`, `rating.yml`, and `question-report.yml`; they remain useful for direct GitHub submissions.
+This gives the public page an allowed template path while keeping arbitrary blank issues disabled.
 
 - [ ] **Step 4: Add a visible submission note**
 
@@ -1210,7 +1440,7 @@ Expected: PASS.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add .github/ISSUE_TEMPLATE/config.yml feedback.html tests/feedback-contract.test.js scripts/browser_smoke.py
+git add .github/ISSUE_TEMPLATE/public-feedback.md feedback.html tests/feedback-contract.test.js scripts/browser_smoke.py
 git commit -m "fix: preserve public feedback submissions"
 ```
 
@@ -1690,7 +1920,7 @@ Programme A is complete only when all of these are evidenced, not merely claimed
 8. Old state keys are migration inputs only; canonical writes use the neutral namespace.
 9. Broken inline fallback is removed and service-worker registration is race-safe.
 10. Whole-bank/question-chunk precaching is absent.
-11. Feedback typed content reaches an enabled GitHub issue path.
+11. Feedback typed content reaches the defined `public-feedback.md` GitHub issue template while blank issues remain disabled.
 12. CI/Pages verification is manifest-driven, not tied to 1,120/200/seven files/cache-v8 constants.
 13. Stale active schemas/scripts/dead learner-logic paths are removed after reference verification.
 14. Current public learner behaviour passes browser smoke in Arabic/English, theme, resume, confidence, domain/full exam, navigation, results/review.
