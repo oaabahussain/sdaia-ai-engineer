@@ -503,14 +503,25 @@ git commit -m "feat: add canonical track and exam profile contracts"
 
 - [ ] **Step 1: Write failing stable-ID tests**
 
-Add to `tests/bank.test.js`:
+At the top of `tests/bank.test.js`, stop loading concepts through the soon-to-be-retired `load_concepts.js`; use the canonical loader:
 
 ```js
-test('generated questions use stable namespaced IDs and retain legacy IDs', () => {
+import { loadTrack } from '../scripts/load_track.js';
+const root = new URL('..', import.meta.url).pathname;
+const bundle = loadTrack(root, 'sdaia-ai-engineer');
+const concepts = bundle.concepts;
+const q = expandConceptBank(concepts, { trackId: bundle.manifest.id });
+```
+
+Add:
+
+```js
+test('generated questions use stable namespaced runtime IDs', () => {
   const sample = q[0];
   assert.match(sample.id, /^sdaia-ai-engineer\.[a-z0-9.-]+\.v1$/);
   assert.match(sample.family_id, /^sdaia-ai-engineer\.[a-z0-9.-]+$/);
-  assert.equal(sample.legacy_id, 'q1');
+  assert.equal(sample.track_id, 'sdaia-ai-engineer');
+  assert.equal('legacy_id' in sample, false);
 });
 
 test('stable IDs do not depend on concept array order', () => {
@@ -559,14 +570,14 @@ Change `TEMPLATES` in `src/logic/questionBank.js` from anonymous entries to expl
 
 ```js
 const TEMPLATES = [
-  { id: 'definition.best-description', ar: 'أي وصف يطابق مفهوم «{term}» بشكل أدق؟', en: 'Which description best matches “{term}”?', kind: 'defs' },
-  { id: 'definition.practical-meaning', ar: 'ما المعنى العملي الأقرب لـ «{term}»؟', en: 'What is the closest practical meaning of “{term}”?', kind: 'defs' },
-  { id: 'definition.choose-correct', ar: 'اختر التعريف الصحيح لـ «{term}».', en: 'Choose the correct definition of “{term}”.', kind: 'defs' },
-  { id: 'definition.technical-review', ar: 'في مراجعة تقنية، سُئلت عن «{term}». أي عبارة هي الأدق؟', en: 'In a technical review, you are asked about “{term}”. Which statement is most accurate?', kind: 'defs' },
-  { id: 'reverse.requirement', ar: 'المطلوب هو: {def_ar} ما المفهوم الأنسب؟', en: 'The requirement is: {def_en} Which concept best fits?', kind: 'terms' },
-  { id: 'reverse.describes-case', ar: 'أي مصطلح يصف الحالة التالية؟ {def_ar}', en: 'Which term describes the following? {def_en}', kind: 'terms' },
-  { id: 'reverse.team-choice', ar: 'فريق يريد تطبيق فكرة معناها: {def_ar} ماذا يختار؟', en: 'A team wants to apply the idea meaning: {def_en} What should it choose?', kind: 'terms' },
-  { id: 'reverse.recall-concept', ar: 'إذا كان الهدف هو «{def_ar}»، فأي مفهوم يجب أن تتذكره؟', en: 'If the goal is “{def_en}”, which concept should you recall?', kind: 'terms' }
+  { id: 'definition.best-description', order: 0, ar: 'أي وصف يطابق مفهوم «{term}» بشكل أدق؟', en: 'Which description best matches “{term}”?', kind: 'defs' },
+  { id: 'definition.practical-meaning', order: 1, ar: 'ما المعنى العملي الأقرب لـ «{term}»؟', en: 'What is the closest practical meaning of “{term}”?', kind: 'defs' },
+  { id: 'definition.choose-correct', order: 2, ar: 'اختر التعريف الصحيح لـ «{term}».', en: 'Choose the correct definition of “{term}”.', kind: 'defs' },
+  { id: 'definition.technical-review', order: 3, ar: 'في مراجعة تقنية، سُئلت عن «{term}». أي عبارة هي الأدق؟', en: 'In a technical review, you are asked about “{term}”. Which statement is most accurate?', kind: 'defs' },
+  { id: 'reverse.requirement', order: 4, ar: 'المطلوب هو: {def_ar} ما المفهوم الأنسب؟', en: 'The requirement is: {def_en} Which concept best fits?', kind: 'terms' },
+  { id: 'reverse.describes-case', order: 5, ar: 'أي مصطلح يصف الحالة التالية؟ {def_ar}', en: 'Which term describes the following? {def_en}', kind: 'terms' },
+  { id: 'reverse.team-choice', order: 6, ar: 'فريق يريد تطبيق فكرة معناها: {def_ar} ماذا يختار؟', en: 'A team wants to apply the idea meaning: {def_en} What should it choose?', kind: 'terms' },
+  { id: 'reverse.recall-concept', order: 7, ar: 'إذا كان الهدف هو «{def_ar}»، فأي مفهوم يجب أن تتذكره؟', en: 'If the goal is “{def_en}”, which concept should you recall?', kind: 'terms' }
 ];
 ```
 
@@ -576,7 +587,13 @@ Before generation, canonicalise each domain's concepts by immutable `order`:
 const orderedConcepts = [...concepts].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ```
 
-Use `orderedConcepts` for the concept loop **and for distractor selection**, and seed from `${domain}|${concept.id}|${tpl.id}|20260909`. This preserves the current educational payload while making future JSON-array reorderings harmless.
+Use `orderedConcepts` for the concept loop **and for distractor selection**. To preserve the shipped RNG output exactly, keep the legacy seed semantics but replace the unstable template-array index with the explicit frozen template `order`:
+
+```js
+const rng = mulberry32(hashString(`${domain}|${concept.term}|${tpl.order}|20260909`));
+```
+
+This preserves the current educational payload while making JSON-array reorderings harmless. A future edit that changes concept semantics/term wording must create a new content/item version rather than silently mutating an active v1 item.
 
 Change the generator signature to:
 
@@ -646,7 +663,38 @@ Also strengthen the reorder test to compare `id -> learner-visible payload`, not
 
 - [ ] **Step 8: Define and validate the rendered-question schema**
 
-Create `data/schema/rendered-question.schema.json` requiring `id`, `family_id`, `track_id`, bilingual question/options/explanations, `answer`, `domain`, `topic`, and `difficulty`, with `additionalProperties:false`. In `scripts/validate.js`, validate every generated question against it.
+Create `data/schema/rendered-question.schema.json`:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "rendered-question.schema.json",
+  "type": "object",
+  "required": [
+    "id", "family_id", "track_id", "domain", "topic",
+    "question", "question_en", "options", "options_en",
+    "answer", "explanation", "explanation_en", "difficulty"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*\\.v[0-9]+$" },
+    "family_id": { "type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$" },
+    "track_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "domain": { "type": "string", "minLength": 1 },
+    "topic": { "type": "string", "minLength": 1 },
+    "question": { "type": "string", "minLength": 1 },
+    "question_en": { "type": "string", "minLength": 1 },
+    "options": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string", "minLength": 1 } },
+    "options_en": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string", "minLength": 1 } },
+    "answer": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "explanation": { "type": "string", "minLength": 1 },
+    "explanation_en": { "type": "string", "minLength": 1 },
+    "difficulty": { "enum": ["easy", "medium", "hard"] }
+  },
+  "additionalProperties": false
+}
+```
+
+In `scripts/validate.js`, validate every generated question against it.
 
 - [ ] **Step 9: Run the stable-ID tests and validation**
 
@@ -748,15 +796,27 @@ Create `src/storage/identity.js`:
 export const ANON_KEY = 'learning-platform.anon-id.v1';
 export const LEGACY_ANON_KEY = 'sdaia.anon_id.v1';
 
-export function getOrCreateAnonId(storage = globalThis.localStorage) {
-  const existing = storage?.getItem?.(ANON_KEY) || storage?.getItem?.(LEGACY_ANON_KEY);
-  if (existing) {
-    storage?.setItem?.(ANON_KEY, existing);
-    return existing;
-  }
+let memoryAnonId;
+
+function defaultStorage() {
+  try { return globalThis.localStorage; }
+  catch { return null; }
+}
+
+export function getOrCreateAnonId(storage = defaultStorage()) {
+  try {
+    const existing = storage?.getItem?.(ANON_KEY) || storage?.getItem?.(LEGACY_ANON_KEY);
+    if (existing) {
+      storage?.setItem?.(ANON_KEY, existing);
+      return existing;
+    }
+  } catch {}
+
+  if (memoryAnonId) return memoryAnonId;
   const created = globalThis.crypto?.randomUUID?.();
   if (!created) throw new Error('crypto.randomUUID is required to create an anonymous identifier');
-  storage?.setItem?.(ANON_KEY, created);
+  memoryAnonId = created;
+  try { storage?.setItem?.(ANON_KEY, created); } catch {}
   return created;
 }
 ```
@@ -836,16 +896,91 @@ export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion
 
 - [ ] **Step 5: Define state-v2 schema**
 
-`data/schema/state-v2.schema.json` must require:
-- `version: 2`
-- UUID `anon_id`
-- timestamps
-- `preferences.lang` = `ar|en`
-- `preferences.theme` = `light|dark`
-- `tracks` object
-- each track state has `track_version`, nullable `active_exam`, and `exam_history`
-- active exam requires `track_id`, `track_version`, `exam_profile_id`, `exam_profile_version`, stable question IDs, and preserves answer/confidence/flag/order objects
-- `legacy.preserved` is an object.
+Create `data/schema/state-v2.schema.json`:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "state-v2.schema.json",
+  "type": "object",
+  "required": ["version", "anon_id", "created_at", "updated_at", "preferences", "tracks", "legacy"],
+  "properties": {
+    "version": { "const": 2 },
+    "anon_id": { "type": "string", "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "preferences": {
+      "type": "object",
+      "required": ["lang", "theme"],
+      "properties": {
+        "lang": { "enum": ["ar", "en"] },
+        "theme": { "enum": ["light", "dark"] }
+      },
+      "additionalProperties": false
+    },
+    "tracks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["track_version", "active_exam", "exam_history"],
+        "properties": {
+          "track_version": { "type": "string", "minLength": 1 },
+          "active_exam": {
+            "anyOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "required": [
+                  "id", "mode", "questionIds", "index", "answers", "confidence",
+                  "flags", "optionOrders", "started_at", "submitted",
+                  "track_id", "track_version", "exam_profile_id", "exam_profile_version"
+                ],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "mode": { "enum": ["full", "section"] },
+                  "domain": { "type": ["string", "null"] },
+                  "questionIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+                  "index": { "type": "integer", "minimum": 0 },
+                  "answers": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 3 } },
+                  "confidence": { "type": "object", "additionalProperties": { "enum": ["low", "medium", "high"] } },
+                  "flags": { "type": "object", "additionalProperties": { "type": "boolean" } },
+                  "optionOrders": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true,
+                      "items": { "type": "integer", "minimum": 0, "maximum": 3 }
+                    }
+                  },
+                  "started_at": { "type": "string", "format": "date-time" },
+                  "submitted": { "type": "boolean" },
+                  "submitted_at": { "type": "string", "format": "date-time" },
+                  "track_id": { "type": "string", "minLength": 1 },
+                  "track_version": { "type": "string", "minLength": 1 },
+                  "exam_profile_id": { "type": "string", "minLength": 1 },
+                  "exam_profile_version": { "type": "string", "minLength": 1 }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "exam_history": { "type": "array", "items": { "type": "object" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "legacy": {
+      "type": "object",
+      "required": ["source_version", "preserved"],
+      "properties": {
+        "source_version": { "type": ["integer", "string"] },
+        "preserved": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+```
 
 - [ ] **Step 6: Make browser storage read canonical key first, old keys second**
 
@@ -868,6 +1003,8 @@ Write `tests/storage.api.test.js` with a fake localStorage and fake fetch:
 - first `saveState()` sends the same path/header ID and succeeds.
 
 Refactor `src/storage/api.js` to use `getOrCreateAnonId()` instead of its private `anonId()`.
+
+Add a second test where access to `localStorage` throws; the identity helper must use one stable in-memory UUID for the session rather than creating a different ID on each call.
 
 - [ ] **Step 8: Update the app to load migration context and pin every new attempt**
 
@@ -1354,6 +1491,7 @@ git commit -m "fix: make offline shell and service worker migration safe"
 ### Task 8: Repair Feedback Submission Without Losing Typed Content
 
 **Files:**
+- Read: `.github/ISSUE_TEMPLATE/config.yml`
 - Create: `.github/ISSUE_TEMPLATE/public-feedback.md`
 - Modify: `feedback.html`
 - Modify: `scripts/browser_smoke.py`
@@ -1414,9 +1552,22 @@ assignees: ''
 
 This gives the public page an allowed template path while keeping arbitrary blank issues disabled.
 
-- [ ] **Step 4: Add a visible submission note**
+- [ ] **Step 4: Route the page through the defined template and keep the public-warning copy**
 
-Keep the current public-warning copy and add no promise of private feedback. The form continues to prefill a public issue using `title` and `body`.
+Change the helper in `feedback.html` to:
+
+```js
+function issue(title, body) {
+  const p = new URLSearchParams({ template: 'public-feedback.md', title, body });
+  window.open(
+    `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${p.toString()}`,
+    '_blank',
+    'noopener'
+  );
+}
+```
+
+Keep the current public-warning copy and add no promise of private feedback.
 
 - [ ] **Step 5: Extend browser smoke**
 
@@ -1553,7 +1704,7 @@ node scripts/contract_test.js browser
 
 Expected: PASS and no active runtime reference to the legacy static bank.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add -A
@@ -1611,7 +1762,10 @@ Preserve existing devDependencies unchanged.
 In Pages artifact build, include:
 
 ```bash
-cp -R src data tracks _site/
+cp -R src tracks _site/
+mkdir -p _site/data
+cp -R data/concepts data/migrations _site/data/
+cp data/learn.json data/cases.json _site/data/
 ```
 
 Keep shell files/icons as today.
@@ -1686,8 +1840,11 @@ git commit -m "ci: derive release checks from canonical manifests"
 - Create: `ARCHITECTURE.md`
 - Create: `MIGRATIONS.md`
 - Create: `TESTING.md`
+- Create: `DEPLOYMENT.md`
+- Create: `DATA-MODEL.md`
 - Create: `SECURITY.md`
 - Create: `HANDOFF.md`
+- Create: `CHANGELOG.md`
 - Create: `docs/decisions/0001-canonical-track-runtime-contract.md`
 - Create: `docs/decisions/0002-neutral-storage-namespace.md`
 - Create: `docs/decisions/0003-public-vs-protected-content-boundary.md`
@@ -1724,7 +1881,15 @@ It must retain the independent/unofficial statement.
 - rollback tag `pre-programme-a-2026-09-23`
 - explicit statement that old browser keys are read but not deleted in Programme A.
 
-- [ ] **Step 4: Document testing and release gates**
+- [ ] **Step 4: Document deployment and active data contracts**
+
+`DEPLOYMENT.md` documents the GitHub Pages artifact contents, validation/deploy workflow, rollback tag strategy, service-worker/cache recovery, and optional dev/test API startup. It explicitly says `data/legacy/` is not part of the Pages artifact.
+
+`DATA-MODEL.md` documents the implemented Programme A objects only: TrackManifestV1, ExamProfileV1, RuntimeBundleV2, stable rendered-question identity, the legacy-ID map, and StateV2. Future question-family/learner-engine schemas remain in the architecture spec until their programmes are implemented.
+
+`CHANGELOG.md` starts with an Unreleased Programme A entry and does not claim deployment until the implementation is merged/released.
+
+- [ ] **Step 5: Document testing and release gates**
 
 `TESTING.md` lists exact commands:
 
@@ -1739,7 +1904,7 @@ python3 scripts/db_smoke.py
 
 plus API contract startup/run commands.
 
-- [ ] **Step 5: Document security truthfully**
+- [ ] **Step 6: Document security truthfully**
 
 `SECURITY.md` must say:
 - anonymous UUID is not authentication;
@@ -1749,7 +1914,7 @@ plus API contract startup/run commands.
 - no confidential/leaked exam questions;
 - report secrets/security issues without putting credentials into public issues.
 
-- [ ] **Step 6: Create handoff and ADRs**
+- [ ] **Step 7: Create handoff and ADRs**
 
 `HANDOFF.md` gives a new maintainer:
 - start/run/test/deploy commands
@@ -1762,7 +1927,7 @@ plus API contract startup/run commands.
 
 ADRs record the four decisions listed in the file section.
 
-- [ ] **Step 7: Update contribution rules**
+- [ ] **Step 8: Update contribution rules**
 
 Add:
 - stable IDs are immutable once active;
@@ -1771,7 +1936,7 @@ Add:
 - no new hard-coded track constants in core code;
 - no active legacy path without an explicit disposition.
 
-- [ ] **Step 8: Add repository-governance guidance without blindly locking the owner out**
+- [ ] **Step 9: Add repository-governance guidance without blindly locking the owner out**
 
 Document target policy:
 - CI required before merge;
@@ -1785,7 +1950,7 @@ Do not change GitHub branch protection in this task unless separately approved d
 - [ ] **Step 9: Commit**
 
 ```bash
-git add README.md CONTRIBUTING.md ARCHITECTURE.md MIGRATIONS.md TESTING.md SECURITY.md HANDOFF.md docs/decisions
+git add README.md CONTRIBUTING.md ARCHITECTURE.md MIGRATIONS.md TESTING.md DEPLOYMENT.md DATA-MODEL.md SECURITY.md HANDOFF.md CHANGELOG.md docs/decisions
 git commit -m "docs: document stabilised platform baseline and handoff"
 ```
 
