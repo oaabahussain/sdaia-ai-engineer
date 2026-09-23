@@ -1369,6 +1369,18 @@ EXPECTED_FULL = PROFILE['question_count']
 
 Read expected bank count from `tests/fixtures/runtime/current-bank-counts.expected.json` for Programme A compatibility. Do not embed `1120` or `200` as Python literals in assertions.
 
+Extend the same browser smoke to cover the state-v2 user-visible regression path:
+
+1. start a full exam;
+2. answer question 1, set confidence, flag question 2, navigate to question 2;
+3. reload the page;
+4. assert the resume card appears;
+5. resume and assert current index, prior answer, confidence, flag, and option order are preserved;
+6. submit a short section exam and verify the results/review screen renders;
+7. return home and verify both full and section modes can still start.
+
+This is the UI-level proof for the Review Focus “unfinished current exam” case; the state migration unit test alone is not sufficient.
+
 - [ ] **Step 7: Run exam + browser tests**
 
 ```bash
@@ -1817,7 +1829,10 @@ cp -R src tracks _site/
 mkdir -p _site/data
 cp -R data/concepts data/migrations _site/data/
 cp data/learn.json data/cases.json _site/data/
+test ! -e _site/data/legacy
 ```
+
+Do not publish `data/legacy/` in the Pages artifact even though Git history/repository history remains public.
 
 Keep shell files/icons as today.
 
@@ -1872,7 +1887,7 @@ node scripts/contract_test.js browser
 
 Then run the API contract with local uvicorn as in CI.
 
-Expected: every local equivalent passes.
+Expected: every local equivalent passes. Also build a local `_site` with the same copy commands and assert `_site/data/legacy` does not exist.
 
 - [ ] **Step 7: Commit**
 
