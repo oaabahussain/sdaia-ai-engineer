@@ -448,7 +448,41 @@ IRT/CAT or equivalent techniques may be introduced only after adequate calibrati
 
 ---
 
-## 15. “Why this question?”
+## 15. Learner experience and tutor modes
+
+The product experience should answer two learner questions immediately:
+
+1. **Where am I now?**
+2. **What should I do next?**
+
+The learner-facing home/progress experience should therefore surface, without overwhelming the learner:
+
+- current track/version
+- current learner level
+- readiness
+- strongest and weakest domains/objectives
+- active misconceptions
+- retention/review status
+- recent mock performance
+- the next best learning action
+
+The tutor experience must support at least these modes:
+
+- **Teach me** — explain a concept with examples.
+- **Test me** — ask questions without revealing hints prematurely.
+- **Explain after answer** — preserve assessment integrity until the learner commits.
+- **Strict exam mode** — no hints, coaching, or answer-revealing feedback until the configured review point.
+- **Weak-area focus** — target diagnosed objectives and misconceptions.
+- **Retention review** — revisit due material.
+- **Scenario practice** — prioritise applied/exam-like reasoning.
+
+The tutor contract is modality-independent. Text is required; voice/live interaction may be added as a client capability without changing the learning core. The learning engine owns state, selection, and assessment rules; the voice/text client owns presentation.
+
+The platform should never use hints or coaching in strict/mock modes simply because an AI tutor is available.
+
+---
+
+## 16. “Why this question?”
 
 Adaptive recommendations should be explainable.
 
@@ -460,7 +494,7 @@ The rule engine must be able to produce an explanation for its selection decisio
 
 ---
 
-## 16. Human and agent clients
+## 17. Human and agent clients
 
 The same learning core serves both.
 
@@ -486,7 +520,7 @@ Agent permissions follow least privilege.
 
 ---
 
-## 17. Public and protected content
+## 18. Public and protected content
 
 ### Public learning content
 
@@ -514,7 +548,7 @@ The existing FastAPI skeleton may be evolved for this purpose instead of introdu
 
 ---
 
-## 18. Storage strategy
+## 19. Storage strategy
 
 ### Browser preferences and tiny resume metadata
 
@@ -539,7 +573,7 @@ The application must remain useful when server sync is temporarily unavailable.
 
 ---
 
-## 19. Content loading and scalability
+## 20. Content loading and scalability
 
 Do not load 14,000+ complete items at startup.
 
@@ -561,7 +595,7 @@ A protected assessment pool is not precached.
 
 ---
 
-## 20. Exam profiles
+## 21. Exam profiles
 
 Exam rules are data, not application constants.
 
@@ -588,7 +622,7 @@ A weight must not be labelled official until current primary evidence supports t
 
 ---
 
-## 21. Evidence registry
+## 22. Evidence registry
 
 Sources are stored once and referenced by content.
 
@@ -609,7 +643,48 @@ Content changes caused by a source update should be traceable to affected compet
 
 ---
 
-## 22. Content lifecycle
+## 23. Exam Intelligence subsystem
+
+Changing exam facts must not be scattered through UI text or treated as permanent truth.
+
+Each track may include an **Exam Intelligence** subsystem that records and distinguishes:
+
+- official exam/credential name and current status
+- official domains/competencies
+- official weights when verified
+- registration mechanism
+- cohorts/dates when publicly announced
+- official preparation material
+- official contacts/support routes
+- public changes to the exam format
+- independent test-taker observations
+- observed question style/scenario patterns
+- badge/certificate-holder evidence when relevant and lawfully public
+- source
+- verification date
+- evidence strength
+- contradiction status
+
+Evidence levels should distinguish, at minimum:
+
+- **A — Official / primary**
+- **B — Strong observational evidence from multiple independent sources**
+- **C — Single-source observation**
+- **D — Hypothesis / unverified lead**
+
+A C/D observation must never be promoted to an official fact.
+
+Test-taker experiences are used to identify likely styles, difficulty patterns, and failure modes. They must not be used to copy confidential, leaked, recalled, or copyrighted real exam questions.
+
+Exam Intelligence updates follow:
+
+`Discover → Stage → Verify → Approve → Publish`
+
+This subsystem should allow exam facts to change without forcing a product-code release when the underlying application behaviour is unchanged.
+
+---
+
+## 24. Content lifecycle
 
 Every durable content object uses a lifecycle such as:
 
@@ -621,7 +696,7 @@ Deletion is reserved for invalid/non-production material that has no historical 
 
 ---
 
-## 23. Repository constitution
+## 25. Repository constitution
 
 ### 23.1 Main represents current truth
 
@@ -665,7 +740,7 @@ A qualified developer should be able to clone the repository, understand the arc
 
 ---
 
-## 24. Repository cleanup rules
+## 26. Repository cleanup rules
 
 Cleanup must be evidence-driven.
 
@@ -692,7 +767,7 @@ Historical branches may remain on GitHub until the active repository has a stabl
 
 ---
 
-## 25. Identifier policy
+## 27. Identifier policy
 
 Sequential IDs such as `q1` are not canonical for future content.
 
@@ -706,7 +781,7 @@ A legacy-ID map preserves historical data during migration.
 
 ---
 
-## 26. Compatibility and migrations
+## 28. Compatibility and migrations
 
 Every persisted contract is versioned.
 
@@ -732,7 +807,7 @@ Never erase learner progress silently because a schema changed.
 
 ---
 
-## 27. CI and quality gates
+## 29. CI and quality gates
 
 The CI target should grow beyond syntax checks.
 
@@ -780,7 +855,7 @@ Required gate categories:
 
 ---
 
-## 28. Definition of Done
+## 30. Definition of Done
 
 A change that affects runtime, data, content contracts, or learner behaviour is complete only when applicable items are satisfied:
 
@@ -801,7 +876,7 @@ A change that affects runtime, data, content contracts, or learner behaviour is 
 
 ---
 
-## 29. Transferability and commercial due diligence
+## 31. Transferability and commercial due diligence
 
 The repository must be maintainable as an asset independent of its current owner.
 
@@ -825,7 +900,38 @@ No confidential exam questions or unauthorised copyrighted exam material may be 
 
 ---
 
-## 30. Standards compatibility without premature dependency
+## 32. Content authoring, import, export, and portability
+
+The platform must not require hand-editing application code to add ordinary content.
+
+A documented content-authoring workflow should support:
+
+- create/edit track metadata
+- create competencies/objectives/concepts
+- register evidence
+- author question families and misconceptions
+- generate or author variants
+- bilingual review
+- technical review
+- duplicate detection
+- quality checks
+- approval/activation
+- deprecation/retirement
+
+AI may propose content, variants, translations, tags, and duplicate candidates, but AI-generated content is never auto-published to an active assessment pool without passing the configured quality gates.
+
+The canonical internal model should support future import/export adapters. The initial implementation does not need a full authoring CMS, but content must be serialisable, versioned, and portable enough that:
+
+- a track can be moved between environments
+- a buyer/team can inspect and migrate content without reverse-engineering UI code
+- future QTI-compatible import/export can be added through adapters
+- protected content can be exported only through explicitly authorised administrative workflows
+
+Bulk export of protected assessment content is an administrative capability, not a learner or general agent capability.
+
+---
+
+## 33. Standards compatibility without premature dependency
 
 Internal schemas should be designed so future adapters can map to education standards such as QTI and learning-event standards such as Caliper without requiring those standards as runtime dependencies today.
 
@@ -833,7 +939,7 @@ The goal is compatibility-friendly internal modelling, not premature standards i
 
 ---
 
-## 31. Accessibility and internationalisation
+## 34. Accessibility and internationalisation
 
 Accessibility is a release quality concern, not a later polish stage.
 
@@ -845,7 +951,7 @@ Arabic and English content review must verify equivalent meaning, not word-for-w
 
 ---
 
-## 32. Implementation decomposition
+## 35. Implementation decomposition
 
 This architecture is intentionally decomposed into independently reviewable programmes of work.
 
@@ -879,7 +985,7 @@ This document is the umbrella architecture constitution. **Programme A is the on
 
 ---
 
-## 33. First implementation boundary
+## 36. First implementation boundary
 
 Before destructive cleanup begins, create a recoverable baseline reference (release/tag or equivalent immutable commit reference) for the current production state. Repository cleanup must be performed on a dedicated branch and reviewed before merge; `main` is not used as a scratch workspace.
 
@@ -904,7 +1010,7 @@ Only then should large-scale content production begin.
 
 ---
 
-## 34. Research principles incorporated into this design
+## 37. Research principles incorporated into this design
 
 This design adopts the following evidence-backed patterns:
 
@@ -937,7 +1043,7 @@ Representative source families reviewed during design include:
 
 ---
 
-## 35. Acceptance of this constitution
+## 38. Acceptance of this constitution
 
 After owner approval, this document becomes the architectural baseline for vNext planning.
 
