@@ -57,6 +57,10 @@ Arabic is not a translation afterthought. The content model and UI must support 
 
 A feature is not complete if it leaves duplicate sources of truth, stale scripts, incompatible schemas, dead paths, or undocumented behaviour behind.
 
+### 2.7 Track branding must not imply endorsement
+
+SDAIA content remains clearly presented as independent/unofficial unless an explicit written relationship changes that status. Core platform naming, storage, APIs, schemas, and internal namespaces must not imply that SDAIA owns, endorses, or is the only intended subject of the platform.
+
 ---
 
 ## 3. Current repository baseline
@@ -107,6 +111,12 @@ These are migration inputs, not optional cleanup.
 | IDs | Sequential `q1`, `q2` identifiers are unstable for long-lived multi-track content | Introduce stable namespaced IDs and legacy mapping |
 | Protected content | Public repository/static site exposes any content shipped to the browser | Use server-side delivery for protected assessment pools |
 | Weights provenance | Current `weights.json` values must not be labelled official unless backed by a current primary source | Store source/evidence metadata with exam profile |
+| Browser smoke assumptions | `scripts/browser_smoke.py` asserts 1,120 generated items and a 200-question exam | Read expectations from canonical track/exam profiles or versioned fixtures |
+| Adapter contract assumptions | `scripts/contract_test.js` explicitly accepts browser=1,120 while API>=121 | Replace with one versioned contract and migration fixtures |
+| Pages workflow assumptions | `.github/workflows/pages.yml` hard-codes seven concept filenames, 20 concepts/file, generated-total arithmetic, and service-worker cache `v8` | Drive release validation from canonical manifests rather than duplicated constants |
+| Public documentation assumptions | `README.md` currently advertises 1,120 questions and a 200-question full exam | Update documentation atomically with the canonical profile migration |
+| Platform namespace | Package/API/storage names remain SDAIA-specific, including `sdaia.state.v1` and `sdaia.anon_id.v1` | Introduce a neutral platform namespace with tested migration/alias support for legacy keys |
+| Repository governance | `main` is currently unprotected | Define required checks/review/release governance before enabling restrictive branch rules |
 
 No large-scale question expansion starts until the canonical content/state/API contracts above are defined and migration safety exists.
 
@@ -278,6 +288,25 @@ The system should be able to learn:
 rather than only:
 
 > The learner answered incorrectly.
+
+### 8.4 Coverage matrix
+
+The 14,000+ target is a capacity/coverage target, not a success metric by itself.
+
+Each active track must be able to report bank coverage across at least:
+
+- competency
+- learning objective
+- concept
+- misconception
+- cognitive level
+- intended difficulty
+- scenario type
+- item type
+- Learning / Check / Holdout pool
+- language/review status
+
+A rendered-item count is considered healthy only when required coverage cells meet the track's approved coverage policy. The platform must prevent one easy-to-generate family or domain from inflating the total while leaving important competencies underrepresented.
 
 ---
 
@@ -546,6 +575,36 @@ The client receives only the data required for the current permitted step. Hidde
 
 The existing FastAPI skeleton may be evolved for this purpose instead of introducing a new backend framework without need.
 
+### 18.1 Identity, authentication, authorization, and threat model
+
+The current anonymous UUID is an **identifier**, not authentication and not proof of account ownership.
+
+The architecture distinguishes:
+
+- anonymous/local learner identity
+- authenticated user identity, if introduced
+- authorization for learner resources
+- privileged author/reviewer/administrator roles
+- protected-content access policy
+
+Before protected assessment content is deployed, its threat model must explicitly address:
+
+- broken object-level authorization
+- broken authentication
+- broken function-level authorization
+- excessive object/property exposure
+- unrestricted resource consumption
+- automated scraping of sensitive business flows
+- replay/session abuse
+- answer-key or rationale leakage
+- privileged bulk export
+- cross-user progress access
+- agent capability escalation
+
+Server-side item delivery reduces unnecessary exposure but cannot make a question that is legitimately shown to a learner impossible to capture. Security claims must describe this residual risk rather than promising perfect secrecy.
+
+Protected-bank clients receive only the minimum fields required for the permitted step. Administrative metadata, unused holdout inventory, answer keys, hidden distractor logic, and bulk-export capabilities remain behind explicit authorization.
+
 ---
 
 ## 19. Storage strategy
@@ -571,6 +630,27 @@ When server-backed identity/sync is enabled, client state synchronises through a
 
 The application must remain useful when server sync is temporarily unavailable.
 
+### 19.1 Privacy and learner data governance
+
+Learner data collection follows data-minimization and privacy-by-default principles.
+
+Before a new synced/identified data class is collected, the platform must define:
+
+- why the data is needed
+- whether it is local-only or server-synced
+- sensitivity/classification
+- retention period or retention rule
+- learner export behaviour
+- deletion behaviour
+- telemetry/analytics consent policy where applicable
+- access roles
+- backup implications
+- whether the field is required for learning or merely optional analytics
+
+Anonymous/local-first use should remain available where practical. Authentication, if added, must not silently convert unrelated local data into server-collected telemetry.
+
+The product must prohibit storage of unnecessary sensitive personal information in question feedback, events, or learning notes intended for platform analytics.
+
 ---
 
 ## 20. Content loading and scalability
@@ -592,6 +672,23 @@ content chunk
 The service worker should cache the application shell and requested study packs/chunks on demand.
 
 A protected assessment pool is not precached.
+
+### 20.1 Release integrity and version pinning
+
+Every active learning/check/mock attempt is pinned to the exact versions required to interpret it later, including:
+
+- track version
+- content release/manifest version
+- exam profile version
+- question family/item version
+- rendered option order where relevant
+- scoring/readiness formula version where relevant
+
+Published content releases are immutable or content-addressed once referenced by learner history.
+
+A manifest hash/content hash or equivalent integrity identifier should make it possible to detect mixed or stale content.
+
+Shell, manifest, and content-chunk releases must be compatible atomically. Cache invalidation must prevent a new application shell from interpreting an incompatible old chunk set without an explicit migration/fallback path.
 
 ---
 
@@ -640,6 +737,12 @@ Each source record should capture:
 - notes/limitations
 
 Content changes caused by a source update should be traceable to affected competencies, objectives, families, and rendered items.
+
+Architecture-level evidence used to justify this design is recorded separately in:
+
+`docs/superpowers/specs/2026-09-23-learning-platform-vnext-evidence.md`
+
+That appendix records source URLs/identifiers, verification date, evidence class, limitations, and unresolved gaps. Track-specific evidence should follow the same traceability principle without duplicating the same source metadata across thousands of items.
 
 ---
 
@@ -694,15 +797,26 @@ Retirement preserves historical result interpretation.
 
 Deletion is reserved for invalid/non-production material that has no historical dependency.
 
+Publication history must record enough information for audit and handoff, including:
+
+- author or source process
+- reviewer/approver identity or role
+- change reason
+- evidence-review status
+- publication timestamp
+- retirement/deprecation timestamp where applicable
+
+AI may assist authoring and review but cannot be the sole authority that activates protected or high-stakes assessment content.
+
 ---
 
 ## 25. Repository constitution
 
-### 23.1 Main represents current truth
+### 25.1 Main represents current truth
 
 `main` must not contain active-looking legacy files that contradict the current runtime contract.
 
-### 23.2 Every legacy artifact receives an explicit decision
+### 25.2 Every legacy artifact receives an explicit decision
 
 - KEEP
 - MIGRATE
@@ -710,11 +824,11 @@ Deletion is reserved for invalid/non-production material that has no historical 
 - ARCHIVE
 - DELETE
 
-### 23.3 Git history is the default archive
+### 25.3 Git history is the default archive
 
 Do not create an `archive/` junk drawer merely to avoid deleting obsolete files. Once migration is verified, remove obsolete files from the active tree unless they have an operational reason to remain.
 
-### 23.4 Stable documentation
+### 25.4 Stable documentation
 
 The repository should ultimately maintain:
 
@@ -734,9 +848,31 @@ The repository should ultimately maintain:
 
 Documentation changes ship with the code/data contract they describe.
 
-### 23.5 Zero-tribal-knowledge target
+### 25.5 Zero-tribal-knowledge target
 
 A qualified developer should be able to clone the repository, understand the architecture, run the supported test suite, build/deploy the public application, add a new track through the documented content contract, and understand the migration/security boundaries without needing a private oral explanation.
+
+### 25.6 Neutral platform namespace
+
+Core package names, storage keys, APIs, schemas, events, and internal identifiers should use a neutral platform namespace rather than a certification-specific namespace.
+
+Migration from current SDAIA-specific keys must preserve existing learner state. Legacy aliases/reads may exist during migration, but new writes should converge on the canonical namespace after migration completes.
+
+SDAIA remains a track and product-facing content label, not the identity of the reusable core.
+
+### 25.7 Repository governance
+
+The target repository governance includes:
+
+- required CI checks before merge
+- review expectations proportional to risk
+- release/tag policy for production baselines
+- branch-protection rules when they improve safety without blocking the owner's legitimate workflow
+- CODEOWNERS/review ownership when additional maintainers exist
+- security/dependency-update ownership
+- documented emergency/rollback procedure
+
+Because the repository may be maintained by one owner for periods of time, governance should be staged deliberately rather than enabling restrictive branch rules blindly.
 
 ---
 
@@ -846,6 +982,8 @@ Required gate categories:
 - secret scanning
 - dependency/license inventory
 - documentation contract checks
+- neutral namespace violations in new core code
+- release manifest/profile consistency
 
 ### Accessibility
 - keyboard-critical navigation
@@ -898,6 +1036,8 @@ The repository is currently MIT-licensed and public. Published open-source histo
 
 No confidential exam questions or unauthorised copyrighted exam material may be added.
 
+A release should be able to produce a reproducible dependency/license inventory or SBOM-equivalent record derived from the actual shipped code and dependencies. This requirement does not by itself justify adding a new dependency; the implementation plan should choose the simplest reliable mechanism.
+
 ---
 
 ## 32. Content authoring, import, export, and portability
@@ -928,6 +1068,8 @@ The canonical internal model should support future import/export adapters. The i
 - protected content can be exported only through explicitly authorised administrative workflows
 
 Bulk export of protected assessment content is an administrative capability, not a learner or general agent capability.
+
+Authoring/publishing permissions should be separable by role/capability (for example author, reviewer, approver, administrator) when the platform grows beyond a single trusted maintainer. The architecture must preserve who approved an active content version and why.
 
 ---
 
@@ -973,11 +1115,26 @@ IndexedDB-backed structured state, migrations, optional API sync.
 ### Programme F — Protected assessment service
 Server-side bank/session delivery, least-privilege agent interface, protected content policy.
 
+The current FastAPI + SQLite + process-local rate-limit implementation is treated as development/test scaffolding unless production evidence demonstrates otherwise. A future production deployment must define scale triggers for a shared durable datastore, distributed/session-aware rate limiting, authentication/authorization, backup/restore, and observability without rewriting the learning core.
+
 ### Programme G — Content production
 Migration of useful legacy content followed by controlled expansion toward 14,000+ SDAIA AI Engineer items.
 
 ### Programme H — Transferability
 Documentation, ADRs, licensing/provenance inventory, handoff/runbooks, repository hygiene.
+
+### Cross-programme operational resilience requirement
+
+Any future server-backed learner or protected-assessment service must define, before production use:
+
+- backup and restore policy
+- restore testing
+- service health/metrics/logging sufficient for diagnosis
+- alerting ownership
+- incident response path
+- queued offline-event reconciliation and idempotency
+- capacity/resource limits
+- dependency/service failure behaviour
 
 These programmes share contracts but should not be implemented as one big-bang rewrite.
 
@@ -1005,6 +1162,10 @@ The first milestone is complete when:
 8. stable identifier policy exists in executable schemas/tests
 9. no supported existing learner flow regresses
 10. documentation accurately describes the resulting baseline
+11. current 1,120/200/seven-domain/cache-v8 assumptions are either removed from release checks or explicitly isolated as versioned legacy fixtures
+12. neutral core namespace and legacy storage-key migration policy are executable/testable
+13. current anonymous identity is not represented as authentication
+14. repository governance requirements and production baseline tag/release policy are documented
 
 Only then should large-scale content production begin.
 
@@ -1023,6 +1184,10 @@ This design adopts the following evidence-backed patterns:
 - treat accessibility, provenance, and versioning as core architecture
 - avoid sending protected answer banks wholesale to the browser
 - keep subject configuration out of core code
+
+The traceable source appendix for these claims is:
+
+`docs/superpowers/specs/2026-09-23-learning-platform-vnext-evidence.md`
 
 Representative source families reviewed during design include:
 
