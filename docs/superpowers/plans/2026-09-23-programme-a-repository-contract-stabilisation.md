@@ -556,10 +556,15 @@ Use one deterministic migration script or a one-time edit, then validate:
 
 ```js
 for (const [domain, concepts] of Object.entries(bundle.concepts)) {
+  const orders = new Set();
   for (const concept of concepts) {
     if (!/^[a-z0-9]+(?:[.-][a-z0-9]+)*$/.test(concept.id)) {
       throw new Error(`Invalid concept id ${concept.id} in ${domain}`);
     }
+    if (!Number.isInteger(concept.order) || concept.order < 1 || orders.has(concept.order)) {
+      throw new Error(`Invalid/duplicate concept order ${concept.order} in ${domain}`);
+    }
+    orders.add(concept.order);
   }
 }
 ```
@@ -883,7 +888,16 @@ export function migrateState(raw, { anonId, questionIdMap, trackId, trackVersion
       [trackId]: {
         track_version: trackVersion,
         active_exam: remapActiveExam(exam.active, questionIdMap, { trackId, trackVersion, examProfileId, examProfileVersion }),
-        exam_history: Array.isArray(exam.history) ? exam.history : []
+        exam_history: Array.isArray(exam.history)
+          ? exam.history.map(item => ({
+              ...item,
+              legacy_summary: true,
+              track_id: trackId,
+              track_version: trackVersion,
+              exam_profile_id: examProfileId,
+              exam_profile_version: examProfileVersion
+            }))
+          : []
       }
     },
     legacy: {
@@ -1048,7 +1062,21 @@ function save() {
 }
 ```
 
-History writes become `trackState().exam_history`.
+History writes become `trackState().exam_history`. New submitted history entries must preserve the exact attempt metadata needed for later reconstruction:
+
+```js
+trackState().exam_history.unshift({
+  attempt: {
+    ...structuredClone(activeExam),
+    submitted: true,
+    submitted_at: activeExam.submitted_at
+  },
+  result
+});
+trackState().exam_history = trackState().exam_history.slice(0, 20);
+```
+
+Do not store full rendered question text in state; stable question IDs + pinned track/profile versions + answers + option orders are the Programme A reconstruction contract.
 
 - [ ] **Step 9: Migrate feedback-page preference reads/writes to the neutral state key**
 
@@ -1059,6 +1087,26 @@ In `feedback.html`, read `learning-platform.state.v2` first and fall back to `sd
 Point the server's active state validator to `state-v2.schema.json`.
 
 Keep the server explicitly documented/tested as dev/test scaffolding; do not add production auth here.
+
+Update `server/tests/test_api.py::state()` to construct the canonical v2 payload instead of the old v1 shape:
+
+```python
+return {
+    'version': 2,
+    'anon_id': ANON,
+    'created_at': now,
+    'updated_at': now,
+    'preferences': {'lang': 'ar', 'theme': 'light'},
+    'tracks': {
+        'sdaia-ai-engineer': {
+            'track_version': '2026.09',
+            'active_exam': None,
+            'exam_history': [],
+        }
+    },
+    'legacy': {'source_version': 1, 'preserved': {}},
+}
+```
 
 - [ ] **Step 11: Run state, browser-storage, API, and server tests**
 
@@ -1188,10 +1236,13 @@ Change `GET /v1/bank` to return that canonical public bundle. Because this repos
 - [ ] **Step 5: Correct OpenAPI semantics around the anonymous identifier**
 
 In `api/openapi.yaml`:
-- stop describing `X-Anon-Id` as authentication/security;
-- rename the reusable parameter description to clearly say “client-generated anonymous identifier; not authentication”;
-- remove `security: [{ AnonId: [] }]` from public bank and other endpoints unless/until real authentication exists;
+- remove the `AnonId` security scheme entirely; it is not authentication;
+- keep `X-Anon-Id` only as a normal parameter on progress/feedback/events and describe it as “client-generated anonymous identifier; not authentication”;
+- make public `GET /bank` require **no** anonymous header;
+- remove `security: [{ AnonId: [] }]` from all endpoints;
 - make `/bank` response reference `runtime-bundle.schema.json`.
+
+Update `server/app/main.py::bank()` and `server/tests/test_api.py` so `GET /v1/bank` succeeds without `X-Anon-Id`. Progress remains keyed by the identifier for this dev/test skeleton, but documentation must not present that as secure authorization.
 
 - [ ] **Step 6: Run equivalence tests**
 
@@ -1704,7 +1755,7 @@ node scripts/contract_test.js browser
 
 Expected: PASS and no active runtime reference to the legacy static bank.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -1947,7 +1998,7 @@ Document target policy:
 
 Do not change GitHub branch protection in this task unless separately approved during execution.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add README.md CONTRIBUTING.md ARCHITECTURE.md MIGRATIONS.md TESTING.md DEPLOYMENT.md DATA-MODEL.md SECURITY.md HANDOFF.md CHANGELOG.md docs/decisions
