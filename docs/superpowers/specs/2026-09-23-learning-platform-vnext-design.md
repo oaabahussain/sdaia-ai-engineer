@@ -875,9 +875,13 @@ Documentation, ADRs, licensing/provenance inventory, handoff/runbooks, repositor
 
 These programmes share contracts but should not be implemented as one big-bang rewrite.
 
+This document is the umbrella architecture constitution. **Programme A is the only implementation scope unlocked by approval of this document.** Programmes B–H require their own bounded design/spec review before their implementation plans begin, so the platform can evolve without turning this constitution into an unreviewable mega-plan.
+
 ---
 
 ## 33. First implementation boundary
+
+Before destructive cleanup begins, create a recoverable baseline reference (release/tag or equivalent immutable commit reference) for the current production state. Repository cleanup must be performed on a dedicated branch and reviewed before merge; `main` is not used as a scratch workspace.
 
 The first implementation plan, after this design is approved, must focus on **Programme A: Repository and contract stabilisation**.
 
