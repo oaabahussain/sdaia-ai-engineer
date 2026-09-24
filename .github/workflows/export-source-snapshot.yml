@@ -1,0 +1,21 @@
+name: Export source snapshot
+on:
+  push:
+    branches:
+      - tmp/programme-a-snapshot
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Upload source
+        uses: actions/upload-artifact@v4
+        with:
+          name: programme-a-source
+          path: |
+            .
+            !.git
+          include-hidden-files: true
+          retention-days: 1
