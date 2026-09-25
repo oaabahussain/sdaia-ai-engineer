@@ -18,8 +18,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .programme-a-sync/v3-*.b64 | base64 -d | xz -d > /tmp/programme-a.patch
-          echo "7e2700f499cbc720891718813bbc238a265905574932242e392caf82904b5b49  /tmp/programme-a.patch" | sha256sum -c -
+          parts=(.programme-a-sync/v3-{00..10}.b64)
+          test "${#parts[@]}" -eq 11
+          for f in "${parts[@]}"; do
+            test -s "$f"
+            LC_ALL=C grep -Eq '^[A-Za-z0-9+/=]+$' "$f"
+          done
+          cat "${parts[@]}" | base64 -d | xz -d > /tmp/programme-a.patch
+          echo "7e2700f4176e4c23252493116d9e160a91486d8c3f028f8d11a753210b60c9d4  /tmp/programme-a.patch" | sha256sum -c -
       - name: Apply to real design head and push implementation branch
         shell: bash
         run: |
