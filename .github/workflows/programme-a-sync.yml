@@ -1,0 +1,36 @@
+name: Programme A sync
+on:
+  push:
+    branches: [tmp/programme-a-sync]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Reconstruct verified implementation patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .programme-a-sync/v3-*.b64 | base64 -d | xz -d > /tmp/programme-a.patch
+          echo "7e2700f499cbc720891718813bbc238a265905574932242e392caf82904b5b49  /tmp/programme-a.patch" | sha256sum -c -
+      - name: Apply to real design head and push implementation branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch --detach e269c6be411b849637967c5224c816f6c8af5b02
+          git apply --index /tmp/programme-a.patch
+          git diff --cached --check
+          test -f src/content/runtimeBundle.js
+          test -f tracks/sdaia-ai-engineer/manifest.json
+          test -f tests/runtime-bundle.test.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat: stabilise learning platform runtime contracts"
+          git push origin HEAD:refs/heads/impl/programme-a-contract-stabilisation
