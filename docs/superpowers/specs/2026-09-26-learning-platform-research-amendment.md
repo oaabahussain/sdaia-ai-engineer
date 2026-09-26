@@ -63,3 +63,9 @@ The **14,000+** target remains a future coverage/capacity target, not a current-
 **MUST** build the quality/evaluation pipeline before mass expansion and reject superficial paraphrase multiplication.
 
 The platform must keep **intended difficulty**, **observed difficulty**, **learning value**, and **exam representativeness** as separate concepts rather than collapsing them into one score.
+
+## 6. Psychometric guardrails
+
+There is **no psychometric calibration claim before sufficient real response data exists**. Generated or authored difficulty labels are intentions until empirical learner evidence supports stronger claims.
+
+**MUST** keep versioned calibration outputs separate from durable **raw learner evidence**, and define minimum evidence thresholds before discrimination, distractor, response-time, retention or IRT-style outputs are treated as calibrated.

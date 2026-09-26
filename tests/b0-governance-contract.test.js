@@ -41,3 +41,10 @@ test('question scale stays separate from quality and empirical behavior', () => 
   assert.match(doc, /14,000\+.*future|future.*14,000\+/i);
   for (const phrase of ['intended difficulty','observed difficulty','learning value','exam representativeness']) assert.ok(doc.includes(phrase), phrase);
 });
+
+test('psychometric claims wait for real response data and remain versioned', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /no psychometric calibration claim.*real response data/i);
+  assert.match(doc, /versioned calibration/i);
+  assert.match(doc, /raw learner evidence/i);
+});
