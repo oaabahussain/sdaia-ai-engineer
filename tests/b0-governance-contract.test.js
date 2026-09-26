@@ -48,3 +48,9 @@ test('psychometric claims wait for real response data and remain versioned', () 
   assert.match(doc, /versioned calibration/i);
   assert.match(doc, /raw learner evidence/i);
 });
+
+test('learner analytics answer where, what next, and why with uncertainty', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  for (const q of ['Where am I now?','What should I do next?','Why is that the recommended next action?']) assert.ok(doc.includes(q), q);
+  assert.match(doc, /uncertainty.*weak evidence|weak evidence.*uncertainty/i);
+});

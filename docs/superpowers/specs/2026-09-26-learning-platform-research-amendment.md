@@ -69,3 +69,13 @@ The platform must keep **intended difficulty**, **observed difficulty**, **learn
 There is **no psychometric calibration claim before sufficient real response data exists**. Generated or authored difficulty labels are intentions until empirical learner evidence supports stronger claims.
 
 **MUST** keep versioned calibration outputs separate from durable **raw learner evidence**, and define minimum evidence thresholds before discrimination, distractor, response-time, retention or IRT-style outputs are treated as calibrated.
+
+## 7. Actionable analytics and next-best action
+
+Learner analytics must answer:
+
+1. **Where am I now?**
+2. **What should I do next?**
+3. **Why is that the recommended next action?**
+
+**MUST** make analytics actionable, keep durable evidence separate from derived mastery/readiness projections, and expose **uncertainty when recommendations rest on weak evidence**.
