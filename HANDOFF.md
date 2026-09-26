@@ -19,9 +19,9 @@ Latest product-code checkpoint after Task 10:
 
 Any later commit may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 10 code checkpoint is an ancestor.
 
-**Exact next task after the Task 11 documentation commit: Task 12 — Whole-Branch Verification and Programme A Acceptance Gate.**
+**Exact next task: Task 12 — Whole-Branch Verification and Programme A Acceptance Gate.**
 
-Do not reconstruct Tasks 1–10. Read the current documentation baseline before Task 12.  
+Do not reconstruct Tasks 1–11. Read the current documentation baseline before Task 12.  
 Do not merge PR #7 before the Programme A acceptance gate.  
 Do not begin Task 11 before Task 10 is green.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
@@ -266,6 +266,37 @@ Release-surface audit:
 - no full `data/` copy into Pages;
 - both PR artifact verification and Pages workflow explicitly assert no published `data/legacy/`.
 
+### Task 11 — Documentation and governance baseline
+Final Task 11 checkpoint:
+`c7a52c74d79a8bdfd57222429cee263419c2fa6f`
+
+TDD:
+- `59d83f69b5f74500a4cc294c20a47ea16f95c54f` — RED: eight documentation contracts failed on missing/incomplete current-truth documentation.
+- `8a3693b611a366c60c2185c68f7c58919e015603` — documentation baseline implementation.
+- `c7a52c74d79a8bdfd57222429cee263419c2fa6f` — corrected a negation false-positive in the changelog test; full gate GREEN.
+
+Result:
+- README now separates current 1,120/200-question project-reference facts from the future 14,000+ target;
+- architecture, migration, testing, deployment, data-model and security documents describe implemented Programme A truth only;
+- four ADRs record canonical runtime contract, neutral storage namespace, public/protected content boundary, and legacy-bank disposition;
+- contribution rules protect stable IDs, profile-owned exam rules, evidence status, track-neutral core code and explicit legacy dispositions;
+- governance target requires CI before merge and defers branch protection/CODEOWNERS until the owner/maintainer workflow is confirmed;
+- changelog is explicitly Unreleased and does not claim merge/deployment;
+- handoff includes start/test/deploy concepts, canonical files, legacy disposition, future/non-implemented scope and conceptual new-track steps.
+
+Rollback evidence gap:
+- the immutable baseline SHA `362d35c697411d4eddcc4536c843df17161d3374` is confirmed;
+- planned tag `pre-programme-a-2026-09-23` could not be verified on the GitHub remote with the available connection, and the execution environment cannot reach GitHub directly;
+- documentation therefore treats the SHA as authoritative and does not falsely claim the remote tag exists.
+
+Fresh Task 11 verification:
+- documentation contract: **8/8 PASS**
+- full Node suite: **PASS**
+- canonical validator: **PASS**
+- Pages artifact/live-verifier gate: **PASS**
+- browser smoke: **PASS**
+- Python server/API gate: **PASS**
+
 ## Compatibility invariant
 
 Learner-visible compatibility digest remains:
@@ -276,27 +307,7 @@ No Task 8 question/content/scoring changes were made.
 
 ## Remaining Programme A work
 
-### Task 11 — NEXT
-**Document the New Baseline and Governance**
-
-Still not complete.
-
-Planned outputs include:
-- README current-truth cleanup;
-- ARCHITECTURE.md;
-- MIGRATIONS.md;
-- TESTING.md;
-- DEPLOYMENT.md;
-- DATA-MODEL.md;
-- SECURITY.md;
-- finalised HANDOFF.md;
-- CHANGELOG.md;
-- ADRs;
-- CONTRIBUTING/governance updates.
-
-This early HANDOFF.md must be reconciled/expanded during Task 11, not treated as a substitute for the Task 11 documentation baseline.
-
-### Task 12
+### Task 12 — NEXT
 **Whole-Branch Verification and Programme A Acceptance Gate**
 
 Must include:
@@ -327,11 +338,11 @@ Do not claim Programme A complete before Task 12 is green.
 2. Read this file.
 3. Read the accepted constitution and Programme A plan from `design/platform-vnext-spec`.
 4. Fetch `impl/programme-a-contract-stabilisation` and verify its current HEAD.
-5. Verify the Task 10 checkpoint `6be140e...` is an ancestor of current HEAD.
+5. Verify the Task 11 checkpoint `c7a52c7...` is an ancestor of current HEAD.
 6. Run a brief baseline verification.
-7. Start **Task 11 only** using the accepted constitution and current implementation truth.
+7. Start **Task 12 only** using the accepted constitution, plan, and current implementation truth.
 8. Use `systematic-debugging` on any failure.
-9. Use `verification-before-completion` before declaring Task 11 green.
+9. Use `verification-before-completion` before declaring Programme A accepted.
 10. Keep PR #7 Draft and unmerged until Programme A acceptance is complete.
 
 
