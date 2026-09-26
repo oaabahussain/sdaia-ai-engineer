@@ -55,3 +55,10 @@ Task 26: second RED on run 36263478601 isolated to the community-signal assertio
 Final review finding (Important): HANDOFF referenced the historical Programme A plan by repository path without saying that file is absent from B0/main and remains on `design/platform-vnext-spec`. Direct fetch on B0 returned 404 for that path. Fix RED→GREEN: governance test now requires the historical branch to be named next to the plan reference; handoff explicitly marks the plan as branch-local historical evidence and not a current-main dependency.
 
 Final review fix follow-up: regression test failed only because it required a colon after “Programme A execution plan”; the corrected handoff wording intentionally says “Programme A execution plan remains historical evidence...”. Assertion relaxed to require the plan reference and `design/platform-vnext-spec` within the same local block, preserving the intended behavior without punctuation coupling.
+
+Task 26: complete after fixes — PR quality run 36263748294 GREEN; Node 74/74, validator/application parse/SW/Pages/live verifier/browser smoke all PASS.
+Task 27: complete — PR server/API run 36263748293 GREEN; push server/API run 36263746595 GREEN; Python 16 passed, SQLite/browser/API contracts PASS.
+Final review: self-review (no subagent tool/reviewer resource available).
+Final: fixed historical Programme A plan branch ambiguity — regression test RED→GREEN, full PR quality suite 74/74 plus browser/release gates GREEN and server suite 16/16 GREEN.
+Final: minor (deferred): HANDOFF duplicates the “Do not reconstruct Tasks 1–12” instruction near the top; harmless wording duplication.
+Task 28: final review record prepared; scope audit refreshed to final changed-path list. Final-record HEAD must receive fresh CI before integration.
