@@ -54,3 +54,11 @@ test('learner analytics answer where, what next, and why with uncertainty', () =
   for (const q of ['Where am I now?','What should I do next?','Why is that the recommended next action?']) assert.ok(doc.includes(q), q);
   assert.match(doc, /uncertainty.*weak evidence|weak evidence.*uncertainty/i);
 });
+
+test('AI transformations preserve source control and community reports stay signals', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /preserve.*user-authored|preserve.*source material/i);
+  assert.match(doc, /AI.*disabled|disable.*AI/i);
+  assert.match(doc, /generated.*label|label.*generated/i);
+  assert.match(doc, /community.*signals.*not prevalence|signals.*not prevalence/i);
+});

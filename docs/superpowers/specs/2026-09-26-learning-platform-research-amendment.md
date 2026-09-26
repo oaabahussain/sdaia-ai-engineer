@@ -79,3 +79,11 @@ Learner analytics must answer:
 3. **Why is that the recommended next action?**
 
 **MUST** make analytics actionable, keep durable evidence separate from derived mastery/readiness projections, and expose **uncertainty when recommendations rest on weak evidence**.
+
+## 8. User control over AI transformation
+
+**MUST** preserve source material and user-authored material without silently replacing it with generated facts. Generated or derived content must be labelled when material.
+
+AI assistance should be possible to disable where practical, and deterministic exam/flashcard sources must not be contaminated by unrequested generated facts.
+
+Community reports are **failure and user-demand signals, not prevalence evidence**.
