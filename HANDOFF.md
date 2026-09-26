@@ -11,19 +11,19 @@
 
 ## Authoritative continuation point
 
-Tasks 1–9 are complete and persisted on GitHub.
+Tasks 1–10 are complete and persisted on GitHub.
 
-Latest product-code checkpoint after Task 8:
+Latest product-code checkpoint after Task 10:
 
-`53f1ba9b42d4536c232448a63f55ba4734316fa7`
+`6be140e9e1e80127bb9264e1a3e8a1f7386b20e1`
 
-Any later commit on the implementation branch before Task 9 may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 8 code checkpoint is an ancestor.
+Any later commit may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 10 code checkpoint is an ancestor.
 
-**Exact next task: Task 10 — Make CI and Pages Validation Manifest-Driven.**
+**Exact next task: Task 11 — Document the New Baseline and Governance.**
 
-Do not reconstruct Tasks 1–9.  
+Do not reconstruct Tasks 1–10.  
 Do not merge PR #7 before the Programme A acceptance gate.  
-Do not begin Task 10 before Task 9 is green.  
+Do not begin Task 11 before Task 10 is green.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
 
 ## Governing documents
@@ -208,6 +208,64 @@ Fresh Task 9 verification:
 - generated questions: **1120**
 - weights: **100.0%**
 
+### Task 10 — Manifest-driven CI and Pages validation
+Final Task 10 product-code checkpoint:
+`6be140e9e1e80127bb9264e1a3e8a1f7386b20e1`
+
+TDD / migration sequence:
+- `2b44014c4207e39c6262e3a18a7753ade675eb2b` — RED: six release-contract tests failed on unnamed scripts, full-data publishing, hard-coded live arithmetic, missing live verifier, and pinned SW profile path;
+- `d01a7f6c61a141b398abcdb8e46935d1ea9e2a04` — initial implementation;
+- `8b52f92a4b6a4bb194f65516dde6b648ca2b8bab` — updated the older Task 7 Pages test whose former full-`data/` copy expectation contradicted Task 10 legacy exclusion;
+- `1dcb51d52a3e7fdb35b2423afcb50f5adee4ae6d` — RED requiring the PR gate to assemble the public Pages artifact;
+- `24e497aa807892f5aa59397da9a5768821f7c682` — GREEN artifact assembly verification;
+- `28af47ccedf88757877c07fa090fcc6d8507210c` — RED requiring the live-release verifier to execute against the assembled artifact over HTTP;
+- `6be140e9e1e80127bb9264e1a3e8a1f7386b20e1` — final GREEN.
+
+Result:
+- package scripts now expose `npm test`, `npm run validate`, and `npm run verify:sw` without new dependencies;
+- PR CI uses the named scripts;
+- PR CI builds the same public artifact boundary and proves `_site/data/legacy` does not exist;
+- Pages publishes `src/`, `tracks/`, current concepts/migrations, `learn.json`, and `cases.json` rather than copying all `data/`;
+- `data/legacy/` remains in repository history/tree for migration but is excluded from the public Pages artifact;
+- `scripts/verify_live_release.js` loads the live canonical manifest, resolves the default profile by ID, validates all manifest-declared concept chunks plus learn/cases, and checks the live service-worker contract;
+- PR CI serves the assembled `_site` over local HTTP and executes the same live verifier before merge;
+- Pages post-deploy verification delegates content checks to the manifest-driven verifier;
+- `scripts/verify_sw_assets.js` derives the default profile asset from the cached manifest instead of pinning its filename;
+- `scripts/validate.js` no longer uses a generated-question `>=1000` release assumption; it validates canonical contract integrity instead;
+- server/API tests remain a separate gate and continue asserting RuntimeBundleV2.
+
+Ruling:
+- the plan's sample live verifier selected a path ending in `project-reference-v1.json`. That would preserve a filename-level constant contrary to Task 10's manifest-driven interface. The implementation instead loads `manifest.exam_profiles` and selects the profile whose ID equals `manifest.default_exam_profile`. Cost if wrong: the verifier performs small additional JSON fetches when multiple profiles exist; correctness is more robust to filename/profile changes.
+
+Fresh Task 10 verification:
+- Node tests: **44/44 PASS**
+- `npm run validate`: **PASS**
+- `npm test`: **PASS**
+- `node --check src/app.js`: **PASS**
+- service-worker assets: **PASS (22 shell-only; manifest-derived default profile)**
+- PR Pages artifact assembly: **PASS**
+- public artifact legacy exclusion: **PASS**
+- local HTTP live manifest verification: **PASS**
+  - `sdaia-ai-engineer@2026.09`
+  - default profile `sdaia-ai-engineer.project-reference.v1`
+  - manifest-declared concept chunks: 7
+  - live service-worker contract
+- browser smoke: **PASS**
+- Python server tests: **16/16 PASS**
+- SQLite schema smoke: **PASS**
+- Browser adapter contract: **PASS**
+- API adapter contract: **PASS**
+- active legacy reference contract: **PASS**
+- educational payload compatibility test: **PASS**
+- generated questions: **1120**
+- weights: **100.0%**
+
+Release-surface audit:
+- no duplicated literal dependency on `1120`, `200`, `1000`, seven-domain wording, or `sdaia-ai-pages-v8`;
+- no pinned `project-reference-v1.json` filename in validation/release scripts;
+- no full `data/` copy into Pages;
+- both PR artifact verification and Pages workflow explicitly assert no published `data/legacy/`.
+
 ## Compatibility invariant
 
 Learner-visible compatibility digest remains:
@@ -218,21 +276,7 @@ No Task 8 question/content/scoring changes were made.
 
 ## Remaining Programme A work
 
-### Task 10 — NEXT
-**Make CI and Pages Validation Manifest-Driven**
-
-Key intent:
-- add named package scripts without new dependencies;
-- use canonical manifest/profile in CI/release verification;
-- publish only required current data, explicitly excluding `data/legacy/`;
-- remove duplicated 1,120/200/seven-domain assumptions from release checks;
-- create manifest-driven live-release verification.
-
-Note: `npm run validate` intentionally does **not** exist yet at the Task 8 checkpoint. Current canonical validator remains:
-`node scripts/validate.js`.
-Adding the named script belongs to Task 10.
-
-### Task 11
+### Task 11 — NEXT
 **Document the New Baseline and Governance**
 
 Still not complete.
@@ -283,9 +327,9 @@ Do not claim Programme A complete before Task 12 is green.
 2. Read this file.
 3. Read the accepted constitution and Programme A plan from `design/platform-vnext-spec`.
 4. Fetch `impl/programme-a-contract-stabilisation` and verify its current HEAD.
-5. Verify the Task 9 checkpoint `5c361ef...` is an ancestor of current HEAD.
+5. Verify the Task 10 checkpoint `6be140e...` is an ancestor of current HEAD.
 6. Run a brief baseline verification.
-7. Start **Task 10 only** with TDD.
+7. Start **Task 11 only** using the accepted constitution and current implementation truth.
 8. Use `systematic-debugging` on any failure.
-9. Use `verification-before-completion` before declaring Task 10 green.
+9. Use `verification-before-completion` before declaring Task 11 green.
 10. Keep PR #7 Draft and unmerged until Programme A acceptance is complete.
