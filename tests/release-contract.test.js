@@ -54,3 +54,12 @@ test('service-worker asset verifier derives the default profile path from the ma
   assert.match(swVerifier, /exam_profiles/);
   assert.doesNotMatch(swVerifier, /project-reference-v1\.json/);
 });
+
+
+test('PR gate assembles and verifies the same public Pages artifact boundary', () => {
+  assert.match(ci, /Verify Pages artifact assembly/);
+  assert.match(ci, /cp -R src tracks _site\//);
+  assert.match(ci, /cp -R data\/concepts data\/migrations _site\/data\//);
+  assert.match(ci, /test ! -e _site\/data\/legacy/);
+  assert.match(ci, /node scripts\/verify_sw_assets\.js _site/);
+});
