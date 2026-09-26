@@ -119,5 +119,6 @@ test('B0 evidence ledger preserves provenance, challenge limits, falsifiers and 
   assert.match(doc, /Residual uncertainty/i);
   assert.match(doc, /Strongest falsifiers|counter-evidence/i);
   assert.match(doc, /no independent.*challenge pass/i);
-  assert.match(doc, /signals.*never prevalence|signals.*not prevalence/i);
+  assert.match(doc, /community reports only for failure discovery and user-demand signals/i);
+  assert.match(doc, /Anecdotal; not prevalence evidence/i);
 });
