@@ -1,0 +1,153 @@
+  return questions;
+ }
+diff --git a/src/state/migrate.js b/src/state/migrate.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..7723bbe305beb95d153c710f5895eb3c42597b74
+--- /dev/null
++++ b/src/state/migrate.js
+@@ -0,0 +1,3 @@
++function remapKeyedObject(value,map){return Object.fromEntries(Object.entries(value||{}).map(([k,v])=>[map[k]||k,v]))}
++function remapActiveExam(exam,map,meta){if(!exam)return null;return{...exam,track_id:meta.trackId,track_version:meta.trackVersion,exam_profile_id:meta.examProfileId,exam_profile_version:meta.examProfileVersion,questionIds:(exam.questionIds||[]).map(id=>map[id]||id),answers:remapKeyedObject(exam.answers,map),confidence:remapKeyedObject(exam.confidence,map),flags:remapKeyedObject(exam.flags,map),optionOrders:remapKeyedObject(exam.optionOrders,map)}}
++export function migrateState(raw,{anonId,questionIdMap={},trackId,trackVersion,examProfileId,examProfileVersion}){if(raw?.version===2)return raw;const source=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};const exam=source.examV2||{};const now=new Date().toISOString();return{version:2,anon_id:source.anon_id||anonId,created_at:source.created_at||now,updated_at:source.updated_at||now,preferences:{lang:exam.lang==='en'?'en':'ar',theme:exam.theme==='dark'?'dark':'light'},tracks:{[trackId]:{track_version:trackVersion,active_exam:remapActiveExam(exam.active,questionIdMap,{trackId,trackVersion,examProfileId,examProfileVersion}),exam_history:Array.isArray(exam.history)?exam.history.map(item=>({...item,legacy_summary:true,track_id:trackId,track_version:trackVersion,exam_profile_id:examProfileId,exam_profile_version:examProfileVersion})):[]}},legacy:{source_version:source.version??1,preserved:Object.fromEntries(Object.entries(source).filter(([k])=>!['anon_id','created_at','updated_at','examV2'].includes(k)))}}}
+diff --git a/src/storage/api.js b/src/storage/api.js
+index dc1aaf7b7c529c26c155cf78eb430be41e00c5ad..8f5ee2ece7d6e72b94cfcb3916a800fc1aaab3b9 100644
+--- a/src/storage/api.js
++++ b/src/storage/api.js
+@@ -1,66 +1,8 @@
+-import { API_BASE } from '../config.js';
+-
+-const VERSION = new Map();
+-const ANON_KEY = 'sdaia.anon_id.v1';
+-const base = () => (globalThis.__SDAIA_API_BASE__ || API_BASE).replace(/\/$/, '');
+-
+-function anonId() {
+-  try {
+-    const existing = globalThis.localStorage?.getItem(ANON_KEY);
+-    if (existing) return existing;
+-    const created = globalThis.crypto?.randomUUID?.();
+-    if (!created) throw new Error('crypto.randomUUID is required for API storage');
+-    globalThis.localStorage?.setItem(ANON_KEY, created);
+-    return created;
+-  } catch (error) {
+-    if (!globalThis.__sdaiaAnonId) globalThis.__sdaiaAnonId = globalThis.crypto?.randomUUID?.();
+-    if (!globalThis.__sdaiaAnonId) throw error;
+-    return globalThis.__sdaiaAnonId;
+-  }
+-}
+-
+-async function request(path, options = {}) {
+-  const id = anonId();
+-  const response = await fetch(`${base()}${path}`, {
+-    ...options,
+-    headers: { 'Content-Type': 'application/json', 'X-Anon-Id': id, ...(options.headers || {}) },
+-  });
+-  return { response, id };
+-}
+-
+-export async function loadState() {
+-  const id = anonId();
+-  const { response } = await request(`/progress/${id}`);
+-  if (response.status === 404) return null;
+-  if (!response.ok) throw new Error(`Progress load failed: ${response.status}`);
+-  VERSION.set(id, Number(response.headers.get('etag') || 0));
+-  return response.json();
+-}
+-
+-export async function saveState(state) {
+-  const id = state.anon_id || anonId();
+-  if (id !== anonId()) throw new Error('State anonymous ID does not match adapter ID');
+-  const expected = VERSION.get(id) ?? 0;
+-  const { response } = await request(`/progress/${id}`, { method: 'PUT', headers: { 'If-Match': String(expected) }, body: JSON.stringify(state) });
+-  if (response.status === 409) throw new Error('Progress version conflict');
+-  if (!response.ok) throw new Error(`Progress save failed: ${response.status}`);
+-  VERSION.set(id, Number(response.headers.get('etag') || expected + 1));
+-}
+-
+-export async function loadBank() {
+-  const { response } = await request('/bank');
+-  if (!response.ok) throw new Error(`Bank load failed: ${response.status}`);
+-  return response.json();
+-}
+-
+-export async function submitFeedback(item) {
+-  const { response } = await request('/feedback', { method: 'POST', body: JSON.stringify(item) });
+-  if (!response.ok) throw new Error(`Feedback submit failed: ${response.status}`);
+-  return response.json();
+-}
+-
+-export async function logEvent(evt) {
+-  const item = { ...evt, created_at: evt.created_at || new Date().toISOString(), payload: evt.payload || {} };
+-  const { response } = await request('/events', { method: 'POST', body: JSON.stringify([item]) });
+-  if (!response.ok) throw new Error(`Event submit failed: ${response.status}`);
+-}
++import { API_BASE } from '../config.js';import { getOrCreateAnonId } from './identity.js';
++const VERSION=new Map();const base=()=>(globalThis.__SDAIA_API_BASE__||API_BASE).replace(/\/$/,'');
++async function request(path,options={},includeAnon=true){const id=getOrCreateAnonId();const headers={'Content-Type':'application/json',...(includeAnon?{'X-Anon-Id':id}:{}),...(options.headers||{})};const response=await fetch(`${base()}${path}`,{...options,headers});return{response,id}}
++export async function loadState(){const id=getOrCreateAnonId();const{response}=await request(`/progress/${id}`);if(response.status===404)return null;if(!response.ok)throw new Error(`Progress load failed: ${response.status}`);VERSION.set(id,Number(response.headers.get('etag')||0));return response.json()}
++export async function saveState(state){const id=getOrCreateAnonId();if(state.anon_id!==id)throw new Error('State anonymous ID does not match adapter ID');const expected=VERSION.get(id)??0;const{response}=await request(`/progress/${id}`,{method:'PUT',headers:{'If-Match':String(expected)},body:JSON.stringify(state)});if(response.status===409)throw new Error('Progress version conflict');if(!response.ok)throw new Error(`Progress save failed: ${response.status}`);VERSION.set(id,Number(response.headers.get('etag')||expected+1))}
++export async function loadBank(){const{response}=await request('/bank',{},false);if(!response.ok)throw new Error(`Bank load failed: ${response.status}`);return response.json()}
++export async function submitFeedback(item){const{response}=await request('/feedback',{method:'POST',body:JSON.stringify(item)});if(!response.ok)throw new Error(`Feedback submit failed: ${response.status}`);return response.json()}
++export async function logEvent(evt){const item={...evt,created_at:evt.created_at||new Date().toISOString(),payload:evt.payload||{}};const{response}=await request('/events',{method:'POST',body:JSON.stringify([item])});if(!response.ok)throw new Error(`Event submit failed: ${response.status}`)}
+diff --git a/src/storage/browser.js b/src/storage/browser.js
+index 9a6a7cddd75caee6aa18391d1b82c82d5a64cf5e..948797f3642e8c909c8d89cf9f8c62905e87785f 100644
+--- a/src/storage/browser.js
++++ b/src/storage/browser.js
+@@ -1,122 +1,9 @@
+-import { CONCEPT_FILES } from '../logic/conceptFiles.js';
+-const STATE_KEY = 'sdaia.state.v1';
+-const LEGACY_STATE_KEY = 'sdaia_adaptive_v3';
+-const memory = new Map();
+-
+-function storageAccess() {
+-  try {
+-    const key = '__sdaia_storage_probe__';
+-    globalThis.localStorage.setItem(key, '1');
+-    globalThis.localStorage.removeItem(key);
+-    return globalThis.localStorage;
+-  } catch (error) {
+-    return null;
+-  }
+-}
+-
+-function memoryGet(key) { return memory.has(key) ? memory.get(key) : null; }
+-function memorySet(key, value) { memory.set(key, value); }
+-function memoryDelete(key) { memory.delete(key); }
+-
+-function uuidV4() {
+-  return globalThis.crypto?.randomUUID?.()
+-    ?? '00000000-0000-4000-8000-' + Math.random().toString(16).slice(2, 14).padEnd(12, '0').slice(0, 12);
+-}
+-
+-function bootstrapState(value) {
+-  const state = value && typeof value === 'object' && !Array.isArray(value) ? { ...value } : {};
+-  const createdAt = state.created_at || new Date().toISOString();
+-  state.anon_id = state.anon_id || uuidV4();
+-  state.created_at = createdAt;
+-  state.updated_at = state.updated_at || createdAt;
+-  return state;
+-}
+-
+-function persistBootstrap(storage, state) {
+-  const raw = JSON.stringify(state);
+-  if (storage) storage.setItem(STATE_KEY, raw);
+-  else memorySet(STATE_KEY, raw);
+-}
+-
+-export async function loadState() {
+-  const storage = storageAccess();
+-  const raw = storage
+-    ? (storage.getItem(STATE_KEY) ?? storage.getItem(LEGACY_STATE_KEY))
+-    : (memoryGet(STATE_KEY) ?? memoryGet(LEGACY_STATE_KEY));
+-
+-  if (!raw) {
+-    const state = bootstrapState({});
+-    persistBootstrap(storage, state);
+-    return state;
+-  }
+-
+-  try {
+-    const state = bootstrapState(JSON.parse(raw));
+-    persistBootstrap(storage, state);
+-    return state;
+-  } catch (error) {
+-    console.warn('Ignoring unreadable saved study state and starting clean.', error);
