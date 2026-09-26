@@ -2,8 +2,8 @@ import { registerServiceWorker } from './registerServiceWorker.js';
 import { loadState, saveState, loadBank } from './storage/interface.js';
 import { weightedAllocation, sampleWeightedExam, sampleSectionExam, buildOptionOrders, scoreExam } from './logic/exam.js';
 import { expandConceptBank } from './logic/questionBank.js';
-import { CORE_I18N } from './presentation/coreI18n.js';
-import { loadTrackPresentation } from './presentation/trackPresentation.js';
+import { CORE_I18N, CORE_DEFAULT_LOCALE } from './presentation/coreI18n.js';
+import { loadTrackPresentation, resolvePresentationLocale, getPresentationLocale } from './presentation/trackPresentation.js';
 
 registerServiceWorker();
 
@@ -28,6 +28,7 @@ let PRESENTATION=null;
 function trackState(){return state.tracks[BANK.track.id]}
 
 function t(key,...args){const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];return typeof v==='function'?v(...args):(v??key)}
+function presentationView(){let locale=CORE_I18N[lang]?lang:CORE_DEFAULT_LOCALE;if(PRESENTATION&&BANK?.track){try{locale=resolvePresentationLocale(lang,BANK.track,PRESENTATION)}catch(presentationError){console.warn('Presentation locale fallback',presentationError)}}const view=getPresentationLocale(PRESENTATION,locale);const fallbackName=BANK?.track?.id??'learning-platform';return{locale,view,displayName:view?.display_name??fallbackName,brand:view?.brand??fallbackName}}
 function domainLabel(domain){return lang==='ar'?(DOMAIN_AR[domain]||domain):domain}
 function secureRng(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}return Math.random()}
 function save(){state.preferences.lang=lang;state.preferences.theme=document.documentElement.dataset.theme||'light';trackState().active_exam=activeExam;state.updated_at=new Date().toISOString();void saveState(state)}
