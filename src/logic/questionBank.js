@@ -12,7 +12,8 @@ const TEMPLATES=[
  {id:'reverse.recall-concept',order:7,ar:'إذا كان الهدف هو «{def_ar}»، فأي مفهوم يجب أن تتذكره؟',en:'If the goal is “{def_en}”, which concept should you recall?',kind:'terms'}
 ];
 function fmt(text,c){return text.replaceAll('{term}',c.term).replaceAll('{def_ar}',c.definition_ar).replaceAll('{def_en}',c.definition_en)}
-export function expandConceptBank(conceptsByDomain,{trackId='sdaia-ai-engineer'}={}){
+export function expandConceptBank(conceptsByDomain,{trackId}={}){
+ if(typeof trackId!=='string'||!trackId)throw new Error('trackId is required to expand a question bank');
  const questions=[];
  for(const [domain,rawConcepts] of Object.entries(conceptsByDomain)){
   const concepts=[...rawConcepts].sort((a,b)=>a.order-b.order||a.id.localeCompare(b.id));
