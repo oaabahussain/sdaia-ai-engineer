@@ -1,0 +1,89 @@
++{"$schema":"http://json-schema.org/draft-07/schema#","$id":"rendered-question.schema.json","type":"object","required":["id","family_id","track_id","domain","topic","question","question_en","options","options_en","answer","explanation","explanation_en","difficulty"],"properties":{"id":{"type":"string","pattern":"^[a-z0-9]+(?:[.-][a-z0-9]+)*\\.v[0-9]+$"},"family_id":{"type":"string","pattern":"^[a-z0-9]+(?:[.-][a-z0-9]+)*$"},"track_id":{"type":"string","pattern":"^[a-z0-9]+(?:-[a-z0-9]+)*$"},"domain":{"type":"string","minLength":1},"topic":{"type":"string","minLength":1},"question":{"type":"string","minLength":1},"question_en":{"type":"string","minLength":1},"options":{"type":"array","minItems":4,"maxItems":4,"items":{"type":"string","minLength":1}},"options_en":{"type":"array","minItems":4,"maxItems":4,"items":{"type":"string","minLength":1}},"answer":{"type":"integer","minimum":0,"maximum":3},"explanation":{"type":"string","minLength":1},"explanation_en":{"type":"string","minLength":1},"difficulty":{"enum":["easy","medium","hard"]}},"additionalProperties":false}
+diff --git a/data/schema/runtime-bundle.schema.json b/data/schema/runtime-bundle.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..da97a5b19fed8ce3662367a023e5d5df4fb61478
+--- /dev/null
++++ b/data/schema/runtime-bundle.schema.json
+@@ -0,0 +1,15 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "$id": "runtime-bundle.schema.json",
++  "type": "object",
++  "required": ["contract_version", "track", "exam_profile", "concepts", "learn", "cases"],
++  "properties": {
++    "contract_version": { "const": 2 },
++    "track": { "$ref": "track-manifest.schema.json" },
++    "exam_profile": { "$ref": "exam-profile.schema.json" },
++    "concepts": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "array" } },
++    "learn": { "type": "object" },
++    "cases": { "type": "array" }
++  },
++  "additionalProperties": false
++}
+diff --git a/data/schema/state-v2.schema.json b/data/schema/state-v2.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..27788d281c74565371ecada14a673dcd0a249561
+--- /dev/null
++++ b/data/schema/state-v2.schema.json
+@@ -0,0 +1 @@
++{"$schema":"http://json-schema.org/draft-07/schema#","$id":"state-v2.schema.json","type":"object","required":["version","anon_id","created_at","updated_at","preferences","tracks","legacy"],"properties":{"version":{"const":2},"anon_id":{"type":"string","format":"uuid"},"created_at":{"type":"string","format":"date-time"},"updated_at":{"type":"string","format":"date-time"},"preferences":{"type":"object","required":["lang","theme"],"properties":{"lang":{"enum":["ar","en"]},"theme":{"enum":["light","dark"]}},"additionalProperties":false},"tracks":{"type":"object","additionalProperties":{"type":"object","required":["track_version","active_exam","exam_history"],"properties":{"track_version":{"type":"string","minLength":1},"active_exam":{"anyOf":[{"type":"null"},{"type":"object"}]},"exam_history":{"type":"array","items":{"type":"object"}}},"additionalProperties":false}},"legacy":{"type":"object","required":["source_version","preserved"],"properties":{"source_version":{"type":["integer","string"]},"preserved":{"type":"object"}},"additionalProperties":false}},"additionalProperties":false}
+diff --git a/data/schema/track-manifest.schema.json b/data/schema/track-manifest.schema.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..780e3b2414074330267f0442d99e750990f47ee1
+--- /dev/null
++++ b/data/schema/track-manifest.schema.json
+@@ -0,0 +1 @@
++{"$schema":"http://json-schema.org/draft-07/schema#","$id":"track-manifest.schema.json","type":"object","required":["schema_version","id","version","status","official_status","locales","core_contract","capabilities","content","exam_profiles","default_exam_profile"],"properties":{"schema_version":{"const":1},"id":{"type":"string","pattern":"^[a-z0-9]+(?:-[a-z0-9]+)*$"},"version":{"type":"string","minLength":1},"status":{"enum":["draft","active","deprecated","retired"]},"official_status":{"enum":["unofficial-independent","official","partner"]},"locales":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},"core_contract":{"type":"object","required":["min","max"],"properties":{"min":{"type":"integer","minimum":1},"max":{"type":"integer","minimum":1}},"additionalProperties":false},"capabilities":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},"content":{"type":"object","required":["concept_files","learn","cases"],"properties":{"concept_files":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},"learn":{"type":"string"},"cases":{"type":"string"}},"additionalProperties":false},"exam_profiles":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},"default_exam_profile":{"type":"string","minLength":1}},"additionalProperties":false}
+diff --git a/db/schema.sql b/db/schema.sql
+index aded262674594f8aa87dec3562ca106d9a40c48d..7421c747467d6cbd12084197e8a3aefd2299a4db 100644
+--- a/db/schema.sql
++++ b/db/schema.sql
+@@ -1,16 +1,16 @@
+-CREATE TABLE users (
++CREATE TABLE IF NOT EXISTS users (
+   anon_id TEXT PRIMARY KEY,
+   created_at TEXT NOT NULL
+ );
+ 
+-CREATE TABLE progress (
++CREATE TABLE IF NOT EXISTS progress (
+   anon_id TEXT PRIMARY KEY REFERENCES users(anon_id),
+   state_json TEXT NOT NULL,
+   version INTEGER NOT NULL DEFAULT 1,
+   updated_at TEXT NOT NULL
+ );
+ 
+-CREATE TABLE questions (
++CREATE TABLE IF NOT EXISTS questions (
+   id TEXT NOT NULL,
+   version INTEGER NOT NULL,
+   body_json TEXT NOT NULL,
+@@ -19,7 +19,7 @@ CREATE TABLE questions (
+   PRIMARY KEY (id, version)
+ );
+ 
+-CREATE TABLE feedback (
++CREATE TABLE IF NOT EXISTS feedback (
+   id INTEGER PRIMARY KEY,
+   anon_id TEXT NOT NULL REFERENCES users(anon_id),
+   question_id TEXT NOT NULL,
+@@ -28,7 +28,7 @@ CREATE TABLE feedback (
+   created_at TEXT NOT NULL
+ );
+ 
+-CREATE TABLE events (
++CREATE TABLE IF NOT EXISTS events (
+   id INTEGER PRIMARY KEY,
+   anon_id TEXT NOT NULL REFERENCES users(anon_id),
+   type TEXT NOT NULL,
+diff --git a/feedback.html b/feedback.html
+index 173926a976ae4fdbcc66feedb325a0648af4842f..5ad0add208cc498ca217c814219d8fe8ee4cc290 100644
+--- a/feedback.html
++++ b/feedback.html
+@@ -31,9 +31,9 @@ const TEXT={
+  en:{community:'Community',back:'Practice',eyebrow:'Community & improvement',title:'Help make the experience better.',intro:'Send a suggestion, contribute content or a correction, or rate your experience. Useful feedback helps improve both the question bank and the site.',publicNotice:'Submitting opens a public GitHub Issue and requires a GitHub account. Do not include personal, confidential, or sensitive information.',suggestionTag:'Suggestion',suggestionTitle:'Suggest an improvement',suggestionText:'Propose a feature, exam-experience improvement, interface change, or topic that needs better coverage.',area:'Area',shortTitle:'Short title',details:'Details',sendSuggestion:'Send suggestion',contributionTag:'Contribution',contributionTitle:'Contribute content or a correction',contributionText:'A new question, answer correction, explanation improvement, translation, useful source, or code contribution.',type:'Contribution type',proposed:'Proposed contribution',source:'Source or reference — optional',sendContribution:'Send contribution',guide:'Contribution guide',ratingTag:'Rating',ratingTitle:'Rate your experience',ratingText:'Rate the site from 1 to 5 and tell us what worked well or should improve.',overall:'Overall rating',useful:'Most useful part',comment:'Comment — optional',sendRating:'Send rating',chooseRating:'Choose a star rating first.',viewIssues:'View public submissions',footer:'This is an independent, unofficial project. GitHub submissions are public.'}
+ };
+ let lang='ar',theme='light',rating=0;
+-try{const s=JSON.parse(localStorage.getItem('sdaia.state.v1')||'{}');lang=s?.examV2?.lang==='en'?'en':'ar';theme=s?.examV2?.theme==='dark'?'dark':'light'}catch{}
++try{const raw=localStorage.getItem('learning-platform.state.v2')||localStorage.getItem('sdaia.state.v1')||'{}';const st=JSON.parse(raw);lang=st?.version===2?(st?.preferences?.lang==='en'?'en':'ar'):(st?.examV2?.lang==='en'?'en':'ar');theme=st?.version===2?(st?.preferences?.theme==='dark'?'dark':'light'):(st?.examV2?.theme==='dark'?'dark':'light')}catch{}
+ function apply(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.documentElement.dataset.theme=theme;document.getElementById('langBtn').textContent=lang==='ar'?'EN':'العربية';document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';document.querySelectorAll('[data-i18n]').forEach(el=>{const v=TEXT[lang][el.dataset.i18n];if(v)el.textContent=v})}
