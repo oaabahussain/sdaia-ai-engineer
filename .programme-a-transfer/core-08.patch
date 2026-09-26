@@ -1,0 +1,97 @@
++test('generated questions use stable namespaced runtime IDs',()=>{const s=q[0];assert.match(s.id,/^sdaia-ai-engineer\.[a-z0-9.-]+\.v1$/);assert.match(s.family_id,/^sdaia-ai-engineer\.[a-z0-9.-]+$/);assert.equal(s.track_id,'sdaia-ai-engineer');assert.equal('legacy_id'in s,false)});
++test('stable IDs do not depend on concept array order',()=>{const reversed=Object.fromEntries(Object.entries(concepts).map(([d,l])=>[d,[...l].reverse()]));const normal=new Map(expandConceptBank(concepts,{trackId:'sdaia-ai-engineer'}).map(x=>[x.id,visible(x)]));const rev=new Map(expandConceptBank(reversed,{trackId:'sdaia-ai-engineer'}).map(x=>[x.id,visible(x)]));assert.deepEqual(rev,normal)});
+ test('question IDs and bilingual prompts are unique',()=>{assert.equal(new Set(q.map(x=>x.id)).size,q.length);assert.equal(new Set(q.map(x=>`${x.domain}|${x.question}|${x.question_en}`)).size,q.length)});
+ test('canonical answer positions are balanced',()=>{const c=[0,0,0,0];q.forEach(x=>c[x.answer]++);assert.ok(Math.max(...c)-Math.min(...c)<=Math.ceil(q.length*.08),c.join(','))});
+ test('every domain has 160 questions',()=>{const c={};q.forEach(x=>c[x.domain]=(c[x.domain]||0)+1);Object.values(c).forEach(n=>assert.equal(n,160))});
++test('educational payload stays byte-for-byte compatible',()=>{const digest=crypto.createHash('sha256').update(JSON.stringify(q.map(visible))).digest('hex');assert.equal(digest,expected.legacy_payload_sha256)});
++test('legacy generated ID map covers the full shipped bank exactly once',()=>{const map=JSON.parse(fs.readFileSync(new URL('../data/migrations/sdaia-generated-v2-question-ids.json',import.meta.url),'utf8'));assert.equal(Object.keys(map).length,1120);assert.equal(new Set(Object.values(map)).size,1120);assert.equal(map.q1,q[0].id);assert.equal(map.q1120,q[1119].id)});
+diff --git a/tests/baseline.test.js b/tests/baseline.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..ad99a17ac9bb8dbc0e33ec93d756f3626d18cfc2
+--- /dev/null
++++ b/tests/baseline.test.js
+@@ -0,0 +1,9 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import { expandConceptBank } from '../src/logic/questionBank.js';
++import { loadConcepts } from '../scripts/load_concepts.js';
++const root=new URL('..',import.meta.url).pathname;
++const expected=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-bank-counts.expected.json',import.meta.url),'utf8'));
++const questions=expandConceptBank(loadConcepts(root));
++test('pre-migration runtime baseline is captured',()=>{assert.equal(questions.length,expected.rendered_questions);assert.equal(new Set(questions.map(q=>q.domain)).size,expected.domains)});
+diff --git a/tests/fixtures/runtime/current-bank-counts.expected.json b/tests/fixtures/runtime/current-bank-counts.expected.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..289a3c57e4648d5c61d6046c928b6f5e0e23e9ab
+--- /dev/null
++++ b/tests/fixtures/runtime/current-bank-counts.expected.json
+@@ -0,0 +1,7 @@
++{
++  "concepts": 140,
++  "templates_per_concept": 8,
++  "rendered_questions": 1120,
++  "domains": 7,
++  "legacy_payload_sha256": "5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9"
++}
+diff --git a/tests/fixtures/runtime/current-profile.expected.json b/tests/fixtures/runtime/current-profile.expected.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..37045eeea9cf0d254d621b71792c9f5a2bcb0743
+--- /dev/null
++++ b/tests/fixtures/runtime/current-profile.expected.json
+@@ -0,0 +1,15 @@
++{
++  "track_id": "sdaia-ai-engineer",
++  "question_count": 200,
++  "section_sizes": [25, 50, 100, "all"],
++  "weights": {
++    "MLOps / LLMOps": 18.0,
++    "Data / ML / Evaluation": 17.3,
++    "Core AI / Deep Learning / GenAI": 16.7,
++    "Responsible AI / Security / Governance": 14.7,
++    "AI Software Engineering": 14.0,
++    "Architecture / Infrastructure": 12.6,
++    "Business / Professional Practice": 6.7
++  },
++  "evidence_status": "project-reference-unverified"
++}
+diff --git a/tests/fixtures/state/current-exam-v2.json b/tests/fixtures/state/current-exam-v2.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..90aeff8d09c742eec28dea48794324695e5509c7
+--- /dev/null
++++ b/tests/fixtures/state/current-exam-v2.json
+@@ -0,0 +1,4 @@
++{
++  "anon_id":"123e4567-e89b-42d3-a456-426614174000","created_at":"2026-09-09T00:00:00Z","updated_at":"2026-09-09T00:00:00Z",
++  "examV2":{"lang":"en","theme":"dark","active":{"id":"exam-legacy","mode":"full","domain":null,"questionIds":["q1","q2"],"index":1,"answers":{"q1":0},"confidence":{"q1":"high"},"flags":{"q2":true},"optionOrders":{"q1":[0,1,2,3],"q2":[1,0,2,3]},"started_at":"2026-09-09T00:00:00Z","submitted":false},"history":[]}
++}
+diff --git a/tests/state-migration.test.js b/tests/state-migration.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..c50985d4a26ba3223c16145e78a161b19e83b52c
+--- /dev/null
++++ b/tests/state-migration.test.js
+@@ -0,0 +1,4 @@
++import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import { migrateState } from '../src/state/migrate.js';
++const raw=JSON.parse(fs.readFileSync(new URL('./fixtures/state/current-exam-v2.json',import.meta.url),'utf8'));const map=JSON.parse(fs.readFileSync(new URL('../data/migrations/sdaia-generated-v2-question-ids.json',import.meta.url),'utf8'));const ctx={anonId:raw.anon_id,questionIdMap:map,trackId:'sdaia-ai-engineer',trackVersion:'2026.09',examProfileId:'sdaia-ai-engineer.project-reference.v1',examProfileVersion:'1'};
++test('migrates unfinished current exam without losing keyed state',()=>{const s=migrateState(raw,ctx);assert.equal(s.version,2);assert.deepEqual(s.preferences,{lang:'en',theme:'dark'});const e=s.tracks['sdaia-ai-engineer'].active_exam;assert.deepEqual(e.questionIds,[map.q1,map.q2]);assert.equal(e.answers[map.q1],0);assert.equal(e.confidence[map.q1],'high');assert.equal(e.flags[map.q2],true);assert.deepEqual(e.optionOrders[map.q2],[1,0,2,3]);assert.equal(e.track_id,'sdaia-ai-engineer')});
++test('migration is idempotent',()=>{const once=migrateState(raw,ctx);assert.deepEqual(migrateState(once,ctx),once)});
+diff --git a/tests/storage.api.test.js b/tests/storage.api.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..583a8231bb14c8e1f2777b7354e06269cefd0aea
+--- /dev/null
++++ b/tests/storage.api.test.js
+@@ -0,0 +1,5 @@
++import test from 'node:test';import assert from 'node:assert/strict';
++class FakeLocalStorage{constructor(){this.map=new Map()}getItem(k){return this.map.has(k)?this.map.get(k):null}setItem(k,v){this.map.set(k,String(v))}removeItem(k){this.map.delete(k)}}
++const state=id=>({version:2,anon_id:id,created_at:'2026-09-09T00:00:00Z',updated_at:'2026-09-09T00:00:00Z',preferences:{lang:'ar',theme:'light'},tracks:{'sdaia-ai-engineer':{track_version:'2026.09',active_exam:null,exam_history:[]}},legacy:{source_version:1,preserved:{}}});
++test('first API 404 and first save use one anonymous id',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.__SDAIA_API_BASE__='http://api/v1';const calls=[];globalThis.fetch=async(url,opts={})=>{calls.push({url,opts});if((opts.method||'GET')==='GET')return{status:404,ok:false,headers:new Headers()};return{status:200,ok:true,headers:new Headers({etag:'1'}),json:async()=>({})}};const a=await import(`../src/storage/api.js?x=${Date.now()}`);assert.equal(await a.loadState(),null);const id=globalThis.localStorage.getItem('learning-platform.anon-id.v1');await a.saveState(state(id));assert.ok(calls[0].url.endsWith(`/progress/${id}`));assert.equal(calls[0].opts.headers['X-Anon-Id'],id);assert.equal(calls[1].opts.headers['X-Anon-Id'],id)});
++test('identity is stable when localStorage access throws',async()=>{Object.defineProperty(globalThis,'localStorage',{configurable:true,get(){throw new Error('blocked')}});const {getOrCreateAnonId}=await import(`../src/storage/identity.js?y=${Date.now()}`);assert.equal(getOrCreateAnonId(),getOrCreateAnonId())});
+diff --git a/tests/storage.browser.test.js b/tests/storage.browser.test.js
+index bf83c1b4f4717853cc2096220778fc3e7b3d2bff..70d467f62b6ab54127c05362165cbe6580ebd0dd 100644
+--- a/tests/storage.browser.test.js
++++ b/tests/storage.browser.test.js
+@@ -1,9 +1,4 @@
+-import test from 'node:test';
+-import assert from 'node:assert/strict';
+-class FakeLocalStorage {constructor(){this.map=new Map()}getItem(k){return this.map.has(k)?this.map.get(k):null}setItem(k,v){this.map.set(k,String(v))}removeItem(k){this.map.delete(k)}}
+-const UUID_V4=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+-test('browser adapter saves and loads state with localStorage',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};const a=await import('../src/storage/browser.js');await a.saveState({sample:true});const l=await a.loadState();assert.equal(l.sample,true);assert.match(l.anon_id,UUID_V4)});
