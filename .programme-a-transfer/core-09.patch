@@ -1,0 +1,75 @@
+-test('browser adapter bootstraps a fresh state before app startup',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};const a=await import('../src/storage/browser.js');const l=await a.loadState();assert.match(l.anon_id,UUID_V4);assert.ok(globalThis.localStorage.getItem('sdaia.state.v1'))});
+-test('browser adapter recovers from unreadable saved state',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};globalThis.localStorage.setItem('sdaia.state.v1','{broken-json');const a=await import('../src/storage/browser.js');const l=await a.loadState();assert.match(l.anon_id,UUID_V4);assert.doesNotThrow(()=>JSON.parse(globalThis.localStorage.getItem('sdaia.state.v1')))});
+-test('browser adapter loads concept bank over fetch',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};globalThis.fetch=async url=>({ok:true,json:async()=>url.includes('/concepts/')?{domain:url,concepts:[]}:{url}});const a=await import('../src/storage/browser.js');const bank=await a.loadBank();assert.equal(Object.keys(bank).length,5);assert.equal(Object.keys(bank.concepts).length,7)});
+-test('browser adapter falls back to inline bank when network loading fails',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};globalThis.fetch=async()=>{throw new Error('offline')};const inline={concepts:{sample:[]},sessions:[],learn:{},cases:[],weights:{sample:100}};globalThis.document={getElementById(id){return id==='inline-bank'?{textContent:JSON.stringify(inline)}:null}};const a=await import('../src/storage/browser.js');assert.deepEqual(await a.loadBank(),inline)});
++import test from 'node:test';import assert from 'node:assert/strict';
++class FakeLocalStorage{constructor(){this.map=new Map()}getItem(k){return this.map.has(k)?this.map.get(k):null}setItem(k,v){this.map.set(k,String(v))}removeItem(k){this.map.delete(k)}}
++test('browser adapter saves and loads canonical raw state',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};const a=await import('../src/storage/browser.js');await a.saveState({sample:true});assert.equal((await a.loadState()).sample,true);assert.ok(globalThis.localStorage.getItem('learning-platform.state.v2'))});
++test('browser adapter reads old state as migration input without deleting it',async()=>{globalThis.localStorage=new FakeLocalStorage();globalThis.location={protocol:'https:'};globalThis.localStorage.setItem('sdaia.state.v1',JSON.stringify({old:true}));const a=await import('../src/storage/browser.js');assert.equal((await a.loadState()).old,true);assert.ok(globalThis.localStorage.getItem('sdaia.state.v1'))});
+diff --git a/tests/track-contract.test.js b/tests/track-contract.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..42e3b97132f94070a61860efd080ce399166d168
+--- /dev/null
++++ b/tests/track-contract.test.js
+@@ -0,0 +1,6 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { loadTrack } from '../scripts/load_track.js';
++const root=new URL('..',import.meta.url).pathname;
++test('SDAIA track loads through one canonical manifest',()=>{const b=loadTrack(root,'sdaia-ai-engineer');assert.equal(b.manifest.id,'sdaia-ai-engineer');assert.equal(b.manifest.schema_version,1);assert.equal(b.examProfile.id,'sdaia-ai-engineer.project-reference.v1');assert.equal(b.examProfile.question_count,200);assert.equal(b.examProfile.evidence_status,'project-reference-unverified');assert.equal(Object.values(b.examProfile.weights).reduce((a,x)=>a+x,0),100);assert.equal(Object.values(b.concepts).flat().length,140)});
++test('manifest content references are repository-relative and loadable',()=>{const {manifest}=loadTrack(root,'sdaia-ai-engineer');assert.equal(manifest.content.concept_files.length,7);assert.equal(manifest.default_exam_profile,'sdaia-ai-engineer.project-reference.v1')});
+diff --git a/tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json b/tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..c67ad685200bba5bf79de860061f6e8db7d0d3bc
+--- /dev/null
++++ b/tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json
+@@ -0,0 +1,18 @@
++{
++  "schema_version": 1,
++  "id": "sdaia-ai-engineer.project-reference.v1",
++  "track_id": "sdaia-ai-engineer",
++  "version": "1",
++  "evidence_status": "project-reference-unverified",
++  "question_count": 200,
++  "section_sizes": [25, 50, 100, "all"],
++  "weights": {
++    "MLOps / LLMOps": 18.0,
++    "Data / ML / Evaluation": 17.3,
++    "Core AI / Deep Learning / GenAI": 16.7,
++    "Responsible AI / Security / Governance": 14.7,
++    "AI Software Engineering": 14.0,
++    "Architecture / Infrastructure": 12.6,
++    "Business / Professional Practice": 6.7
++  }
++}
+diff --git a/tracks/sdaia-ai-engineer/manifest.json b/tracks/sdaia-ai-engineer/manifest.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..4a808328c0282a3d8ffd0ea00d59b9fd55cfc0c3
+--- /dev/null
++++ b/tracks/sdaia-ai-engineer/manifest.json
+@@ -0,0 +1,25 @@
++{
++  "schema_version": 1,
++  "id": "sdaia-ai-engineer",
++  "version": "2026.09",
++  "status": "active",
++  "official_status": "unofficial-independent",
++  "locales": ["ar", "en"],
++  "core_contract": { "min": 2, "max": 2 },
++  "capabilities": ["bilingual", "foundation-generated-bank", "exam-profile-v1"],
++  "content": {
++    "concept_files": [
++      "data/concepts/ai-software-engineering.json",
++      "data/concepts/architecture-infrastructure.json",
++      "data/concepts/business-professional-practice.json",
++      "data/concepts/core-ai.json",
++      "data/concepts/data-ml.json",
++      "data/concepts/mlops-llmops.json",
++      "data/concepts/responsible-ai-security-governance.json"
++    ],
++    "learn": "data/learn.json",
++    "cases": "data/cases.json"
++  },
++  "exam_profiles": ["tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json"],
++  "default_exam_profile": "sdaia-ai-engineer.project-reference.v1"
++}
