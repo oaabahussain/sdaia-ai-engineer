@@ -3,6 +3,7 @@ import { loadState, saveState, loadBank } from './storage/interface.js';
 import { weightedAllocation, sampleWeightedExam, sampleSectionExam, buildOptionOrders, scoreExam } from './logic/exam.js';
 import { expandConceptBank } from './logic/questionBank.js';
 import { CORE_I18N } from './presentation/coreI18n.js';
+import { loadTrackPresentation } from './presentation/trackPresentation.js';
 
 registerServiceWorker();
 
@@ -23,6 +24,7 @@ const DOMAIN_AR={
 
 const $=id=>document.getElementById(id);
 let BANK, PROFILE, QUESTIONS=[], WEIGHTS={}, state, lang='ar', activeExam=null;
+let PRESENTATION=null;
 function trackState(){return state.tracks[BANK.track.id]}
 
 function t(key,...args){const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];return typeof v==='function'?v(...args):(v??key)}
@@ -63,5 +65,5 @@ function resetToHome(){showScreen('home');renderHome()}
 $('langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';save();applyLanguage()};$('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');$('homeBtn').onclick=resetToHome;$('startFullBtn').onclick=startFull;$('resumeBtn').onclick=()=>{if(activeExam){showScreen('exam');renderExam()}};$('prevBtn').onclick=()=>move(-1);$('nextBtn').onclick=()=>move(1);$('flagBtn').onclick=toggleFlag;$('submitBtn').onclick=submitExam;$('newExamBtn').onclick=resetToHome;document.querySelectorAll('.confBtn').forEach(b=>b.onclick=()=>setConfidence(b.dataset.confidence));
 window.addEventListener('keydown',e=>{if(!$('exam').classList.contains('active')||!activeExam)return;if(['1','2','3','4'].includes(e.key)){const q=qById(activeExam.questionIds[activeExam.index]);const order=activeExam.optionOrders[q.id]||[0,1,2,3];selectAnswer(order[Number(e.key)-1])}else if(e.key==='ArrowRight')move(lang==='ar'?-1:1);else if(e.key==='ArrowLeft')move(lang==='ar'?1:-1)});
 
-async function init(){try{BANK=await loadBank();PROFILE=BANK.exam_profile;if(!PROFILE)throw new Error('Missing exam profile');QUESTIONS=expandConceptBank(BANK.concepts||{},{trackId:BANK.track.id});WEIGHTS=PROFILE.weights;if(QUESTIONS.length<PROFILE.question_count)throw new Error(t('errorBank'));const mapResponse=await fetch('./data/migrations/sdaia-generated-v2-question-ids.json',{cache:'no-cache'});if(!mapResponse.ok)throw new Error('Failed to load question ID migration map');const questionIdMap=await mapResponse.json();state=await loadState({questionIdMap,trackId:BANK.track.id,trackVersion:BANK.track.version,examProfileId:BANK.exam_profile.id,examProfileVersion:BANK.exam_profile.version});lang=state.preferences.lang==='en'?'en':'ar';activeExam=trackState().active_exam&&!trackState().active_exam.submitted?trackState().active_exam:null;document.documentElement.dataset.theme=state.preferences.theme==='dark'?'dark':'light';$('themeBtn').textContent=document.documentElement.dataset.theme==='dark'?'🌙':'☀️';applyLanguage();renderHome()}catch(error){console.error(error);$('errorBox').textContent=error.message||String(error);$('errorBox').classList.add('show')}}
+async function init(){try{BANK=await loadBank();const fetchJson=async url=>{const response=await fetch(url,{cache:'no-cache'});if(!response.ok)throw new Error(`Failed to load ${url}: ${response.status}`);return response.json()};try{PRESENTATION=await loadTrackPresentation(fetchJson,BANK.track)}catch(presentationError){console.warn('Track presentation unavailable',presentationError);PRESENTATION=null}PROFILE=BANK.exam_profile;if(!PROFILE)throw new Error('Missing exam profile');QUESTIONS=expandConceptBank(BANK.concepts||{},{trackId:BANK.track.id});WEIGHTS=PROFILE.weights;if(QUESTIONS.length<PROFILE.question_count)throw new Error(t('errorBank'));const mapResponse=await fetch('./data/migrations/sdaia-generated-v2-question-ids.json',{cache:'no-cache'});if(!mapResponse.ok)throw new Error('Failed to load question ID migration map');const questionIdMap=await mapResponse.json();state=await loadState({questionIdMap,trackId:BANK.track.id,trackVersion:BANK.track.version,examProfileId:BANK.exam_profile.id,examProfileVersion:BANK.exam_profile.version});lang=state.preferences.lang==='en'?'en':'ar';activeExam=trackState().active_exam&&!trackState().active_exam.submitted?trackState().active_exam:null;document.documentElement.dataset.theme=state.preferences.theme==='dark'?'dark':'light';$('themeBtn').textContent=document.documentElement.dataset.theme==='dark'?'🌙':'☀️';applyLanguage();renderHome()}catch(error){console.error(error);$('errorBox').textContent=error.message||String(error);$('errorBox').classList.add('show')}}
 init();
