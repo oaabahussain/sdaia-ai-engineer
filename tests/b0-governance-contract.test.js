@@ -13,3 +13,11 @@ test('canonical governance files are present on the current branch', () => {
     assert.equal(exists(path), true, path);
   }
 });
+
+test('learning outcomes outrank engagement mechanics without making retrieval dogma', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /learning, retention, transfer, readiness/i);
+  assert.match(doc, /gamification.*secondary|secondary.*gamification/i);
+  assert.match(doc, /MUST NOT.*retrieval/i);
+  assert.match(doc, /universally optimal/i);
+});

@@ -21,3 +21,17 @@ It does **not** claim that the following are implemented by B0 or Programme A:
 
 The accepted 2026-09-23 constitution remains the architectural baseline. This amendment governs later programmes where it adds stricter or newer evidence-backed constraints.
 
+
+## 1. Learning outcomes over engagement
+
+**MUST** optimize primary success metrics for learning, retention, transfer, readiness and calibration. Streaks, XP, badges, session count and time-on-site are secondary engagement signals, not proof of learning.
+
+Gamification is secondary to learning outcomes and may be used only when it supports practice or retention without distorting learner decisions.
+
+## 2. Practice, spacing and feedback
+
+**MUST** keep learning, practice, check and mock modes distinct and provide corrective feedback in learning/practice flows while preserving delayed feedback where assessment validity requires it.
+
+**SHOULD** use spaced/distributed review by default for retention and hide scheduler complexity from ordinary learners.
+
+**MUST NOT** treat one retrieval or spacing policy as universally optimal across every subject or learner context.
