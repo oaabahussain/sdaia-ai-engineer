@@ -97,3 +97,13 @@ test('amendment preserves the strongest research falsifiers', () => {
   assert.match(doc, /AI generation.*not inherently low quality|not inherently low quality.*AI generation/i);
   assert.match(doc, /analytics sophistication.*not evidence of learning impact/i);
 });
+
+test('current handoff reflects Programme A merged deployed post-merge state', () => {
+  const doc = read('../HANDOFF.md');
+  assert.match(doc, /Programme A.*merged/i);
+  assert.match(doc, /deployed/i);
+  assert.match(doc, /post-merge verified/i);
+  assert.doesNotMatch(doc, /Draft PR:\s*#7.*open, Draft, not merged/i);
+  assert.doesNotMatch(doc, /Programme A next action:\s*owner review\/merge decision/i);
+  assert.match(doc, /B1 — Track Presentation Contract design/);
+});
