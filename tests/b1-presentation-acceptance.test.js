@@ -55,3 +55,17 @@ test('app presentation view falls back to a core locale and track id', () => {
   assert.match(app, /Presentation locale fallback/);
   assert.match(app, /BANK\?\.track\?\.id/);
 });
+
+test('main page brand and hero are sourced from track presentation', () => {
+  const app = read('../src/app.js');
+  const html = read('../index.html');
+  assert.doesNotMatch(app, /SDAIA AI Engineer/);
+  assert.doesNotMatch(app, /تدرّب مثل الاختبار/);
+  assert.doesNotMatch(app, /Practice like an exam/);
+  assert.doesNotMatch(html, /SDAIA AI Engineer/);
+  assert.doesNotMatch(html, /تدرّب مثل الاختبار/);
+  assert.doesNotMatch(html, /Practice like an exam/);
+  for (const id of ['brandText','heroEyebrow','heroTitle','heroText','statusNotice']) assert.match(html,new RegExp('id=["\\']'+id+'["\\']'));
+  assert.match(app,/function applyTrackPresentation\(\)/);
+  assert.match(app,/document\.title/);
+});
