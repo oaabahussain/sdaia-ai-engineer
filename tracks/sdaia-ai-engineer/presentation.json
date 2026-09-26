@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "track_id": "sdaia-ai-engineer",
+  "track_version": "2026.09",
+  "default_locale": "ar",
+  "locales": {
+    "ar": {
+      "display_name": "SDAIA AI Engineer",
+      "brand": "SDAIA AI Engineer · بنك الاختبارات",
+      "hero": {
+        "eyebrow": "بنك اختبارات ثنائي اللغة",
+        "title": "تدرّب مثل الاختبار، بدون نمط محفوظ للإجابات.",
+        "description": "أكثر من ألف سؤال بالعربي والإنجليزي، اختبار كامل موزون، واختبارات مستقلة لكل مجال."
+      },
+      "domain_labels": {
+        "MLOps / LLMOps": "عمليات تعلم الآلة والنماذج اللغوية",
+        "Data / ML / Evaluation": "البيانات وتعلم الآلة والتقييم",
+        "Core AI / Deep Learning / GenAI": "أساسيات الذكاء الاصطناعي والتعلم العميق والذكاء التوليدي",
+        "Responsible AI / Security / Governance": "الذكاء المسؤول والأمن والحوكمة",
+        "AI Software Engineering": "هندسة برمجيات الذكاء الاصطناعي",
+        "Architecture / Infrastructure": "المعمارية والبنية التحتية",
+        "Business / Professional Practice": "الأعمال والممارسة المهنية"
+      }
+    },
+    "en": {
+      "display_name": "SDAIA AI Engineer",
+      "brand": "SDAIA AI Engineer · Exam Bank",
+      "hero": {
+        "eyebrow": "Bilingual exam bank",
+        "title": "Practice like an exam, without a predictable answer pattern.",
+        "description": "More than one thousand Arabic/English questions, a weighted full exam, and standalone domain exams."
+      },
+      "domain_labels": {
+        "MLOps / LLMOps": "MLOps / LLMOps",
+        "Data / ML / Evaluation": "Data / ML / Evaluation",
+        "Core AI / Deep Learning / GenAI": "Core AI / Deep Learning / GenAI",
+        "Responsible AI / Security / Governance": "Responsible AI / Security / Governance",
+        "AI Software Engineering": "AI Software Engineering",
+        "Architecture / Infrastructure": "Architecture / Infrastructure",
+        "Business / Professional Practice": "Business / Professional Practice"
+      }
+    }
+  }
+}
