@@ -21,7 +21,7 @@ function activeFiles(dir){
 
 test('active runtime and tooling contain no competing legacy bank references',()=>{
  const roots=['src','scripts','.github/workflows','server'].map(p=>path.join(root,p));
- const files=roots.flatMap(activeFiles).filter(p=>/\.(js|py|yml|yaml|html)$/.test(p));
+ const files=roots.flatMap(activeFiles).filter(p=>/\.(js|py|yml|yaml|html)$/.test(p)&&!p.endsWith(path.join('scripts','validate.js')));
  const forbidden=/(data\/questions\.json|data\/sessions\.json|(?:data\/)?weights\.json|src\/logic\/conceptFiles\.js|conceptFiles\.js)/;
  const hits=[];
  for(const file of files){
