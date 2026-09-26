@@ -112,3 +112,13 @@ test('presentation locale resolver uses only core-manifest-presentation intersec
   const noCommonPresentation={...presentation,default_locale:'fr',locales:{fr:frLocale}};
   assert.throws(()=>resolvePresentationLocale('fr',noCommonManifest,noCommonPresentation),/common locale/i);
 });
+
+test('presentation accessors return locale data and safe domain fallbacks', async () => {
+  const { getPresentationLocale, getDomainLabel } = await import('../src/presentation/trackPresentation.js');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  assert.equal(getPresentationLocale(presentation,'ar'), presentation.locales.ar);
+  assert.equal(getPresentationLocale(presentation,'fr'), null);
+  assert.equal(getDomainLabel(presentation,'ar','MLOps / LLMOps'),'عمليات تعلم الآلة والنماذج اللغوية');
+  assert.equal(getDomainLabel(presentation,'ar','Unknown Domain'),'Unknown Domain');
+  assert.equal(getDomainLabel(null,'ar','Unknown Domain'),'Unknown Domain');
+});
