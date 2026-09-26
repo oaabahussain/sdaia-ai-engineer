@@ -25,3 +25,15 @@ test('HTML shells are neutral while bootstrap track selection remains explicit',
   assert.doesNotMatch(read('../feedback.html'), /SDAIA AI Engineer/);
   assert.match(read('../src/config.js'), /ACTIVE_TRACK_ID\s*=\s*['"]sdaia-ai-engineer['"]/);
 });
+
+test('app imports namespaced generic core translations', async () => {
+  const core = await import('../src/presentation/coreI18n.js');
+  assert.deepEqual(core.CORE_LOCALES, ['ar','en']);
+  assert.equal(core.CORE_DEFAULT_LOCALE, 'ar');
+  assert.equal(core.CORE_I18N.ar.app.home, 'الرئيسية');
+  assert.equal(core.CORE_I18N.en.app.home, 'Home');
+  assert.equal(core.CORE_I18N.en.feedback.community, 'Community');
+  const app = read('../src/app.js');
+  assert.match(app, /from ['"]\.\/presentation\/coreI18n\.js['"]/);
+  assert.doesNotMatch(app, /const I18N\s*=/);
+});
