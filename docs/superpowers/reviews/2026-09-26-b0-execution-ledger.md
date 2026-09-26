@@ -44,3 +44,5 @@ Task 22: complete — evidence provenance contract GREEN; Deep/date/residual-unc
 Task 23: complete — baseline compare shows documentation/governance/tests-only diff; no runtime/product paths changed.
 Task 24: complete — stale Programme A current-state contradictions removed from handoff; remaining Draft/unmerged mentions classified historical/conditional and retained.
 Task 25: complete — 14,000+/official SDAIA/AI tutor/adaptive/psychometric scan found no current/future or evidence-status violation.
+
+Task 26/27 Ruling: this harness has no full local checkout/runtime workspace for executing the repository-wide npm/Python/browser gates. Use a Draft PR as the remote verification environment before Task 28, then update that same PR after final review. This changes only the order of Tasks 27/29, not B0 scope or acceptance criteria — cost if wrong: PR metadata exists earlier than planned, but no merge occurs before full verification.
