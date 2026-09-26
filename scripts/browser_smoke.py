@@ -126,7 +126,25 @@ def main():
         assert find(session,'#contributionForm')
         assert find(session,'#ratingForm')
         assert len(finds(session,'#stars .star'))==5
-        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS offline_cached_reload=PASS feedback=PASS')
+        execute(session,"window.__opened=[]; window.open=(url,target,features)=>{window.__opened.push({url,target,features}); return null;};")
+        execute(session,"document.getElementById('suggestionTitleInput').value='Offline feedback title';document.getElementById('suggestionDetails').value='Suggestion body keeps typed text';document.getElementById('suggestionForm').requestSubmit();")
+        suggestion_url=execute(session,"return window.__opened.at(-1)?.url||''")
+        assert suggestion_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
+        assert 'template=public-feedback.md' in suggestion_url
+        assert 'Offline+feedback+title' in suggestion_url
+        assert 'Suggestion+body+keeps+typed+text' in suggestion_url
+        execute(session,"document.getElementById('contributionDetails').value='Contribution body survives';document.getElementById('contributionSource').value='https://example.com/reference';document.getElementById('contributionForm').requestSubmit();")
+        contribution_url=execute(session,"return window.__opened.at(-1)?.url||''")
+        assert contribution_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
+        assert 'template=public-feedback.md' in contribution_url
+        assert 'Contribution+body+survives' in contribution_url
+        assert 'https%3A%2F%2Fexample.com%2Freference' in contribution_url
+        execute(session,"document.querySelector('.star[data-rating=\"5\"]').click();document.getElementById('ratingComment').value='Rating comment survives';document.getElementById('ratingForm').requestSubmit();")
+        rating_url=execute(session,"return window.__opened.at(-1)?.url||''")
+        assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
+        assert 'template=public-feedback.md' in rating_url
+        assert 'Rating+comment+survives' in rating_url
+        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS offline_cached_reload=PASS feedback_urls=PASS')
     finally:
         if session:
             try:req('DELETE',f'/session/{session}')
