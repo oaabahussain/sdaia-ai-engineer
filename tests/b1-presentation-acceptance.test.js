@@ -37,3 +37,12 @@ test('app imports namespaced generic core translations', async () => {
   assert.match(app, /from ['"]\.\/presentation\/coreI18n\.js['"]/);
   assert.doesNotMatch(app, /const I18N\s*=/);
 });
+
+test('app presentation load is best-effort after canonical bank load', () => {
+  const app = read('../src/app.js');
+  assert.match(app, /loadTrackPresentation/);
+  assert.match(app, /let PRESENTATION\s*=\s*null/);
+  assert.match(app, /BANK=await loadBank\(\)[\s\S]*?try\{PRESENTATION=await loadTrackPresentation/);
+  assert.match(app, /catch\(presentationError\)\{console\.warn/);
+  assert.match(app, /PRESENTATION=null/);
+});
