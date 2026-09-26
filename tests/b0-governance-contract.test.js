@@ -89,3 +89,11 @@ test('research amendment records the major platform anti-patterns', () => {
   const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
   for (const phrase of ['AI chatbot added because competitors have one','engagement metrics used as readiness metrics','dashboards that only visualize','mass question generation before eval infrastructure','accessibility/offline/mobile deferred as polish','hidden source/evidence uncertainty']) assert.ok(doc.includes(phrase), phrase);
 });
+
+test('amendment preserves the strongest research falsifiers', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /retrieval.*not universally|not universally.*retrieval/i);
+  assert.match(doc, /gamification.*not inherently harmful|not inherently harmful.*gamification/i);
+  assert.match(doc, /AI generation.*not inherently low quality|not inherently low quality.*AI generation/i);
+  assert.match(doc, /analytics sophistication.*not evidence of learning impact/i);
+});

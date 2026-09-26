@@ -136,3 +136,10 @@ Future programmes must reject these anti-patterns:
 - **accessibility/offline/mobile deferred as polish**;
 - content quantity used as a proxy for coverage;
 - **hidden source/evidence uncertainty**.
+
+## 14. Counter-evidence and guardrails against overreach
+
+- **Retrieval is not universally dominant:** some domain-specific meta-analytic estimates are modest or uncertain, so retrieval/spacing policies must remain evidence-informed rather than dogmatic.
+- **Gamification is not inherently harmful:** some learners benefit from repetition/streak structure; engagement mechanics may remain optional but must stay subordinate to learning outcomes.
+- **AI generation is not inherently low quality:** iterative generation, critique and psychometric field evaluation can produce strong items; the policy is quality-gated generation rather than a human-only rule.
+- **Analytics sophistication is not evidence of learning impact:** predictive accuracy or dashboard complexity alone does not establish pedagogical benefit.
