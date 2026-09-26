@@ -65,6 +65,7 @@ The plan fixes these interfaces for all implementing tasks:
 export const CORE_LOCALES = ['ar', 'en'];
 export const CORE_DEFAULT_LOCALE = 'ar';
 export const CORE_I18N = { ar: {...}, en: {...} };
+// Each locale exposes statusNotice(officialStatus, evidenceStatus) -> string.
 
 // src/presentation/trackPresentation.js
 export async function loadTrackPresentation(fetchJson, manifest);
@@ -76,10 +77,11 @@ export function getDomainLabel(presentation, locale, domainKey);
 Behavior:
 
 - `loadTrackPresentation(fetchJson, manifest)` fetches `./tracks/${manifest.id}/presentation.json`, then rejects track/version mismatch.
+- Browser callers pass a local static JSON helper with exact behavior: `async url => { const r = await fetch(url,{cache:'no-cache'}); if(!r.ok) throw new Error(...); return r.json(); }`. B1 does not route presentation through the API bank endpoint.
 - `resolvePresentationLocale(...)` returns preferred locale when it is in core + manifest + presentation sets; otherwise presentation `default_locale`; otherwise `CORE_DEFAULT_LOCALE` when valid; otherwise the first common locale. It throws only when no common locale exists.
 - `getPresentationLocale(presentation, locale)` returns the locale object or `null`.
 - `getDomainLabel(...)` returns localized label or `domainKey`.
-- Application code catches presentation loading failures and continues with track ID/domain-key fallbacks. CI never accepts a missing/invalid active-track presentation.
+- Application code catches presentation loading failures **and locale-resolution failures** and continues with track ID/domain-key fallbacks plus a valid `CORE_I18N` locale. CI never accepts a missing/invalid active-track presentation.
 
 ## Review Focus
 
@@ -229,7 +231,7 @@ Behavior:
 - [ ] **Step 1: Add RED assertion that generic app UI strings are imported from `./presentation/coreI18n.js`.**
 - [ ] **Step 2: Create module exporting exactly `CORE_LOCALES=['ar','en']`, `CORE_DEFAULT_LOCALE='ar'`, and generic current UI translations.**
 - [ ] **Step 3: Move only generic strings out of `src/app.js`; leave track brand/hero temporarily until later tasks.**
-- [ ] **Step 4: Run Node tests and parse `src/app.js`; expected GREEN except planned B1 leakage REDs.**
+- [ ] **Step 4: Run the targeted core-i18n/import tests plus `node --check src/app.js`; do not claim the full suite GREEN while the intentionally RED B1 acceptance contract still covers later tasks.**
 - [ ] **Step 5: Commit `refactor: extract generic core translations`.**
 
 ### Task 10: Add Presentation Loader
@@ -302,7 +304,7 @@ Behavior:
 - Produces: app-level `PRESENTATION` value that may be `null`; exam bank initialization remains independent.
 
 - [ ] **Step 1: Add RED source/behavior test requiring a presentation-load `try/catch` separated from canonical bank failure handling.**
-- [ ] **Step 2: In `init()`, load the bank first, then attempt presentation load using `BANK.track`; on failure `console.warn` and continue with `PRESENTATION=null`.**
+- [ ] **Step 2: In `init()`, load the bank first, define the local static `fetchJson(url)` helper (`fetch(url,{cache:'no-cache'})` + non-OK error), then attempt `loadTrackPresentation(fetchJson,BANK.track)`; on failure `console.warn` and continue with `PRESENTATION=null`.**
 - [ ] **Step 3: Ensure bank/profile failures still reach the existing error box.**
 - [ ] **Step 4: Run app parse + targeted tests.**
 - [ ] **Step 5: Commit `feat: make presentation loading non-blocking`.**
@@ -320,7 +322,7 @@ Behavior:
   - generic controls remain from `CORE_I18N`.
 
 - [ ] **Step 1: Add RED acceptance assertion that app references fallback track ID when presentation is unavailable.**
-- [ ] **Step 2: Add minimal helper in app for current presentation locale/view using Task 13 accessors.**
+- [ ] **Step 2: Add minimal helper in app for current presentation locale/view using Task 13 accessors; catch locale-resolution errors and fall back to a valid core locale plus `BANK.track.id`/domain keys.**
 - [ ] **Step 3: Verify no presentation failure can block `renderHome()` or exam start.**
 - [ ] **Step 4: Commit `feat: add resilient presentation fallback`.**
 
@@ -371,7 +373,7 @@ Behavior:
   - `PROFILE.evidence_status`.
 
 - [ ] **Step 1: Add RED test proving `presentation.json` contains no `official`, `unofficial`, or evidence-status override field.**
-- [ ] **Step 2: Add generic Arabic/English status-warning builders to core I18N.**
+- [ ] **Step 2: Add `CORE_I18N[locale].statusNotice(officialStatus,evidenceStatus) -> string` for Arabic and English.**
 - [ ] **Step 3: Replace the current hard-coded unofficial/project-reference sentence with output derived from manifest/profile status.**
 - [ ] **Step 4: Assert `project-reference-unverified` never renders as official.**
 - [ ] **Step 5: Commit `feat: derive evidence warnings from canonical status`.**
@@ -404,7 +406,7 @@ Behavior:
 - Uses current `ACTIVE_TRACK_ID` only for B1 bootstrap; loads manifest then presentation for display identity.
 
 - [ ] **Step 1: Add RED leakage assertion that `feedback.html` and `src/feedback.js` contain no `SDAIA AI Engineer` literal.**
-- [ ] **Step 2: Load current manifest and presentation using `ACTIVE_TRACK_ID`; resolve locale from current StateV2 preference.**
+- [ ] **Step 2: Load current manifest and presentation using `ACTIVE_TRACK_ID` with the same local static `fetchJson(url)` helper contract; resolve locale from current StateV2 preference, and fall back to core locale/track ID if presentation or locale resolution fails.**
 - [ ] **Step 3: Set feedback document title/brand from presentation with track-ID fallback.**
 - [ ] **Step 4: Preserve public-warning and form labels from generic translations.**
 - [ ] **Step 5: Verify feedback contracts GREEN.**
