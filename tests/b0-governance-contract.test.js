@@ -21,3 +21,11 @@ test('learning outcomes outrank engagement mechanics without making retrieval do
   assert.match(doc, /MUST NOT.*retrieval/i);
   assert.match(doc, /universally optimal/i);
 });
+
+test('AI tutor rules require grounded, optional, scaffolded help', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /canonical content|canonical track/i);
+  assert.match(doc, /deterministic.*manual|manual.*deterministic/i);
+  assert.match(doc, /abstain|abstention/i);
+  assert.match(doc, /scaffold|hint/i);
+});

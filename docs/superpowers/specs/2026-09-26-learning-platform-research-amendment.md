@@ -35,3 +35,13 @@ Gamification is secondary to learning outcomes and may be used only when it supp
 **SHOULD** use spaced/distributed review by default for retention and hide scheduler complexity from ordinary learners.
 
 **MUST NOT** treat one retrieval or spacing policy as universally optimal across every subject or learner context.
+
+## 3. AI tutor behavior
+
+**MUST** ground course-specific tutor behavior in canonical track content and evidence. A general-model answer is not authoritative track truth.
+
+**MUST** preserve a deterministic/manual learning path when AI is disabled, unavailable, or inappropriate; AI assistance is optional rather than the only path.
+
+**MUST** distinguish sourced track facts from general-model knowledge and allow abstention or escalation when evidence is missing or contradictory.
+
+Tutoring should prefer hints, questions and scaffolded support before direct answer dumping when the learning objective permits it.
