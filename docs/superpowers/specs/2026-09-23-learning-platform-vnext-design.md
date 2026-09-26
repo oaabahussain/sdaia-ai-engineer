@@ -1,9 +1,11 @@
 # Learning Platform vNext — Architecture and Repository Constitution
 
 **Date:** 2026-09-23  
-**Status:** Proposed design for owner review  
+**Status:** Accepted architecture constitution; authoritative for Programme A implementation  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Scope:** Architecture, learning model, content model, repository cleanup, migration, scalability, security, transferability, and future multi-track expansion.
+
+**Implementation tracking:** Current execution state is recorded in `HANDOFF.md` on `impl/programme-a-contract-stabilisation`; implementation rulings do not silently modify this constitution.
 
 ---
 
