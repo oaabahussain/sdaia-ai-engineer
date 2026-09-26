@@ -34,3 +34,16 @@ test('TrackPresentationV1 rejects missing hero fields and arbitrary contract fie
   };
   assert.equal(validate(extra), false);
 });
+
+test('current SDAIA presentation validates and matches track identity', () => {
+  const schema = readJson('../data/schema/track-presentation.schema.json');
+  const validate = new Ajv({allErrors:true,strict:false}).compile(schema);
+  const doc = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  assert.equal(validate(doc), true, JSON.stringify(validate.errors));
+  assert.equal(doc.track_id, 'sdaia-ai-engineer');
+  assert.equal(doc.track_version, '2026.09');
+  assert.equal(doc.default_locale, 'ar');
+  assert.deepEqual(Object.keys(doc.locales).sort(), ['ar','en']);
+  assert.equal(Object.keys(doc.locales.ar.domain_labels).length, 7);
+  assert.equal(Object.keys(doc.locales.en.domain_labels).length, 7);
+});
