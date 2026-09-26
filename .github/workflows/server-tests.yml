@@ -23,6 +23,8 @@ jobs:
           set -euo pipefail
           pip install -r server/requirements.txt
           npm ci --ignore-scripts
+      - name: Verify canonical track has no active legacy references
+        run: node --test tests/track-contract.test.js
       - name: Run server tests
         env:
           DB_URL: sqlite:///./server-ci.db
