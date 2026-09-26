@@ -26,3 +26,8 @@ test('release verification does not pin the retired v8 cache name', () => {
   const pages = read('../.github/workflows/pages.yml');
   assert.doesNotMatch(pages, /sdaia-ai-pages-v8/);
 });
+
+test('pages artifact copies canonical track configuration used by the shell', () => {
+  const pages = read('../.github/workflows/pages.yml');
+  assert.match(pages, /cp -R src data tracks _site\//);
+});
