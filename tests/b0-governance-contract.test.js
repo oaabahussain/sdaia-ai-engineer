@@ -106,6 +106,9 @@ test('current handoff reflects Programme A merged deployed post-merge state', ()
   assert.doesNotMatch(doc, /Draft PR:\s*#7.*open, Draft, not merged/i);
   assert.doesNotMatch(doc, /Programme A next action:\s*owner review\/merge decision/i);
   assert.match(doc, /B1 — Track Presentation Contract design/);
+  assert.doesNotMatch(doc, /Programme A.*Unreleased \/ unmerged/i);
+  assert.doesNotMatch(doc, /Start \*\*Task 12 only\*\*/i);
+  assert.doesNotMatch(doc, /Keep PR #7 Draft and unmerged/i);
 });
 
 test('B0 evidence ledger preserves provenance, challenge limits, falsifiers and date', () => {
