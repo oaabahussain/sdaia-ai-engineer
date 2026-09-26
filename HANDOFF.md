@@ -19,9 +19,9 @@ Latest product-code checkpoint after Task 10:
 
 Any later commit may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 10 code checkpoint is an ancestor.
 
-**Exact next task: Task 12 — Whole-Branch Verification and Programme A Acceptance Gate.**
+**Programme A next action:** owner review/merge decision for PR #7. Do not merge automatically. Any Programme B work requires its own bounded design/spec review.
 
-Do not reconstruct Tasks 1–11. Read the current documentation baseline before Task 12.  
+Do not reconstruct Tasks 1–12. Use the final review record and this handoff as the continuation source.  
 Do not merge PR #7 before the Programme A acceptance gate.  
 Do not begin Task 11 before Task 10 is green.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
@@ -297,6 +297,45 @@ Fresh Task 11 verification:
 - browser smoke: **PASS**
 - Python server/API gate: **PASS**
 
+### Task 12 — Whole-branch verification and Programme A acceptance
+Verified implementation head before the final review-record commit:
+`471491d9d851a9406ad92c2dc3072a876ce68b04`
+
+Final acceptance evidence:
+- `npm run validate`: PASS
+- Node suite: **57/57 PASS**
+- `node --check src/app.js`: PASS
+- service-worker shell verifier: **PASS (22 assets)**
+- Pages artifact assembly and local HTTP live-release verifier: PASS
+- browser smoke: PASS, including offline cached reload and feedback URLs
+- Python server tests: **16/16 PASS**
+- SQLite schema/apply/query smoke: PASS
+- Browser adapter contract: PASS
+- API adapter contract: PASS
+- active legacy reference contract: PASS
+- learner-visible educational payload compatibility: PASS
+- baseline compare: **49 commits ahead, 0 behind** from `362d35c697411d4eddcc4536c843df17161d3374`.
+
+Task 12 review findings fixed with RED→GREEN coverage:
+1. feedback page could write preferences back into legacy `sdaia.state.v1`; it now reads legacy only as fallback and writes only an existing canonical StateV2 record;
+2. app/runtime bundle/question-bank core retained implicit current-track defaults; current bootstrap selection is isolated in config and core functions now consume explicit/loaded track identity;
+3. app bank-capacity validation used a hard-coded `1000` threshold; it now checks the loaded profile's required question count;
+4. adapter/compatibility tests repeated current 1,120/200 totals instead of versioned fixtures;
+5. browser smoke pinned the current exam-profile filename instead of resolving `manifest.default_exam_profile`;
+6. server track selection is now configurable by `TRACK_ID` rather than a function-level current-track default.
+
+Review method:
+- **self-review (no subagent/reviewer dispatch capability was available in this environment)**;
+- no independent approval is claimed;
+- no Critical/Important findings remain open after the fix pass.
+
+Task 12 rulings:
+- The planned rollback tag `pre-programme-a-2026-09-23` is not verifiable on the GitHub remote with the available connector, and direct GitHub access from the execution container is unavailable. The immutable baseline SHA `362d35c697411d4eddcc4536c843df17161d3374` was therefore used for the whole-branch compare. Cost if wrong: rollback discovery is less convenient until the tag is explicitly created/confirmed; the immutable commit itself is confirmed.
+- Current SDAIA-specific branding and Arabic domain-label presentation remain in the current single-track UI. Full extraction of track presentation/localization into track packages belongs to Programme B's track/content engine. Cost if wrong: adding a second track before Programme B would still require UI presentation work, although Programme A runtime/exam/state/release contracts are now track/config driven.
+
+Final review record:
+`docs/superpowers/reviews/2026-09-23-programme-a-final-review.md`
+
 ## Compatibility invariant
 
 Learner-visible compatibility digest remains:
@@ -305,22 +344,16 @@ Learner-visible compatibility digest remains:
 
 No Task 8 question/content/scoring changes were made.
 
-## Remaining Programme A work
+## Programme A acceptance status
 
-### Task 12 — NEXT
-**Whole-Branch Verification and Programme A Acceptance Gate**
+Programme A is complete on the implementation branch and remains **Unreleased / unmerged**.
 
-Must include:
-- complete fresh local/CI-equivalent verification;
-- stale legacy-contract scans;
-- hard-coded profile-constant audit;
-- schema/manifest integrity;
-- full baseline diff review;
-- Superpowers code review;
-- final re-run after accepted fixes;
-- final verification record.
+Before merge:
+- review PR #7;
+- optionally obtain an independent human/agent code review because the final in-session review was self-review only;
+- explicitly create/confirm the planned rollback tag if tag-based recovery is desired.
 
-Do not claim Programme A complete before Task 12 is green.
+After merge, do not begin Programme B–H implicitly. Each requires its own bounded design/spec review under the architecture constitution.
 
 ## Current known evidence/security boundaries
 
