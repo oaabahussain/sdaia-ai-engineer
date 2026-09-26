@@ -45,11 +45,27 @@ def make_validator(name):
 
 
 VALIDATORS = {
-    'state': make_validator('state.schema.json'),
+    'state': make_validator('state-v2.schema.json'),
     'feedback': make_validator('feedback.schema.json'),
     'events': make_validator('events.schema.json'),
 }
 
+
+def load_runtime_bundle(track_id='sdaia-ai-engineer'):
+    manifest = json.loads((ROOT / 'tracks' / track_id / 'manifest.json').read_text(encoding='utf-8'))
+    profiles = [json.loads((ROOT / ref).read_text(encoding='utf-8')) for ref in manifest['exam_profiles']]
+    exam_profile = next((p for p in profiles if p['id'] == manifest['default_exam_profile']), None)
+    if exam_profile is None:
+        raise RuntimeError(f"Missing default exam profile {manifest['default_exam_profile']}")
+    concept_docs = [json.loads((ROOT / ref).read_text(encoding='utf-8')) for ref in manifest['content']['concept_files']]
+    return {
+        'contract_version': 2,
+        'track': manifest,
+        'exam_profile': exam_profile,
+        'concepts': {doc['domain']: doc['concepts'] for doc in concept_docs},
+        'learn': json.loads((ROOT / manifest['content']['learn']).read_text(encoding='utf-8')),
+        'cases': json.loads((ROOT / manifest['content']['cases']).read_text(encoding='utf-8')),
+    }
 
 def error(code, message, status):
     return JSONResponse({'error': {'code': code, 'message': message}}, status_code=status)
@@ -117,16 +133,8 @@ def create_app(db_url=None):
         return {'status': 'ok'}
 
     @app.get('/v1/bank')
-    def bank(x_anon_id: str = Header(..., alias='X-Anon-Id')):
-        invalid = require_anon(x_anon_id)
-        if invalid: return invalid
-        return {
-            'questions': json.loads((DATA_DIR / 'questions.json').read_text(encoding='utf-8')),
-            'sessions': json.loads((DATA_DIR / 'sessions.json').read_text(encoding='utf-8')),
-            'learn': json.loads((DATA_DIR / 'learn.json').read_text(encoding='utf-8')),
-            'cases': json.loads((DATA_DIR / 'cases.json').read_text(encoding='utf-8')),
-            'weights': json.loads((DATA_DIR / 'weights.json').read_text(encoding='utf-8')),
-        }
+    def bank():
+        return load_runtime_bundle()
 
     @app.get('/v1/progress/{anon_id}')
     def get_progress(anon_id: str, response: Response, x_anon_id: str = Header(..., alias='X-Anon-Id')):
