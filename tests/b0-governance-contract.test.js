@@ -84,3 +84,8 @@ test('evidence discipline preserves source classes and current SDAIA uncertainty
   const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
   for (const phrase of ['official/primary evidence','independent research','implementation evidence','community signals','project-reference-unverified','dated evidence ledger']) assert.ok(doc.includes(phrase), phrase);
 });
+
+test('research amendment records the major platform anti-patterns', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  for (const phrase of ['AI chatbot added because competitors have one','engagement metrics used as readiness metrics','dashboards that only visualize','mass question generation before eval infrastructure','accessibility/offline/mobile deferred as polish','hidden source/evidence uncertainty']) assert.ok(doc.includes(phrase), phrase);
+});

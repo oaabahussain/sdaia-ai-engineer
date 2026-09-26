@@ -119,3 +119,20 @@ Use **progressive disclosure** for advanced analytics/settings so the learner is
 Multiple URLs with one provenance root do not become independent confirmation. Current SDAIA exam rules/weights remain **project-reference-unverified** until current primary evidence supports promotion.
 
 Maintain a **dated evidence ledger** so future research refreshes are incremental and contradictions remain visible.
+
+## 13. Explicit anti-patterns
+
+Future programmes must reject these anti-patterns:
+- **AI chatbot added because competitors have one**;
+- AI-generated content activated without quality gates;
+- **engagement metrics used as readiness metrics**;
+- mastery inferred from repeated exposed items;
+- **dashboards that only visualize** without a next action;
+- scheduler parameters exposed as required learner decisions;
+- silent rewriting of user/source content by AI;
+- redesigns that increase navigation cost without measured benefit;
+- **mass question generation before eval infrastructure**;
+- psychometric terminology used before calibration;
+- **accessibility/offline/mobile deferred as polish**;
+- content quantity used as a proxy for coverage;
+- **hidden source/evidence uncertainty**.
