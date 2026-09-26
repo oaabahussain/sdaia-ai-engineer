@@ -199,3 +199,19 @@ No new primary evidence was obtained during Programme A, so they must not be rep
 ## Final conclusion
 
 The Programme A acceptance criteria are satisfied on the reviewed implementation head, with the explicit limitations/rulings above. Large-scale content production and Programmes B–H remain locked behind their own bounded design/spec reviews.
+
+
+## Post-merge addendum — 2026-09-26
+
+Programme A was subsequently merged into `main` with merge commit:
+
+`1808442442cf7e75ba59a298df93e17fd84244f0`
+
+This addendum does not rewrite the pre-merge acceptance evidence above; it records the later release state.
+
+Post-merge GitHub Actions on that exact merge SHA:
+
+- `Server and adapter contract tests` — run `36250047147` — **SUCCESS**
+- `Validate and deploy GitHub Pages` — run `36250047151` — **SUCCESS**
+
+The Pages workflow completed build/deploy/live verification, and the server/API workflow completed successfully. Programme A is therefore merged, deployed and post-merge verified on `main`.

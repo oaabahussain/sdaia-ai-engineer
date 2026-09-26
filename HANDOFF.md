@@ -4,37 +4,43 @@
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Implementation branch:** `impl/programme-a-contract-stabilisation`  
 **Base:** `main@362d35c697411d4eddcc4536c843df17161d3374`  
-**Draft PR:** #7 — open, Draft, not merged  
+**Programme A status:** merged to `main`, deployed, and post-merge verified.  
+**Programme A merge SHA:** `1808442442cf7e75ba59a298df93e17fd84244f0`  
 **Architecture constitution:** `design/platform-vnext-spec` — accepted/authoritative status recorded at `533c89c13d403164d7f8a68a0cd00f59d4f91f88`
 
-> This file is the durable Programme A continuity record. Task 11 establishes the documentation/governance baseline; Task 12 remains the final acceptance gate until its verification record is committed.
+> Programme A Tasks 1–12 are complete. Historical Task 1–12 evidence remains below; B0 now synchronizes governance/research truth on top of the accepted implementation.
 
 ## Authoritative continuation point
 
-Tasks 1–10 are complete and persisted on GitHub. Task 11 documentation is being established on this branch; Task 12 is the remaining acceptance gate.
+Programme A Tasks 1–12 are complete, merged, deployed, and post-merge verified.
 
-Latest product-code checkpoint after Task 10:
+Verified Programme A implementation checkpoint:
 
-`6be140e9e1e80127bb9264e1a3e8a1f7386b20e1`
+`471491d9d851a9406ad92c2dc3072a876ce68b04`
 
-Any later commit may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 10 code checkpoint is an ancestor.
+Programme A merge commit on `main`:
 
-**Programme A next action:** owner review/merge decision for PR #7. Do not merge automatically. Any Programme B work requires its own bounded design/spec review.
+`1808442442cf7e75ba59a298df93e17fd84244f0`
+
+Any future session should resolve the current `main` SHA, read the final review, and treat later governance changes separately from the accepted implementation checkpoint.
+
+**Current governance action:** finish B0 governance/research sync. **After B0 merge, exact next design task:** B1 — Track Presentation Contract design. Any Programme B implementation still requires its own bounded design/spec review.
 
 Do not reconstruct Tasks 1–12. Use the final review record and this handoff as the continuation source.  
-Do not merge PR #7 before the Programme A acceptance gate.  
-Do not begin Task 11 before Task 10 is green.  
+Programme A acceptance/merge is complete. Do not reconstruct Tasks 1–12.  
+Do not begin Programme B runtime implementation from this B0 branch.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
 
 ## Governing documents
 
 1. Architecture constitution:
    `docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md`
-   on `design/platform-vnext-spec`.
-2. Programme A execution plan:
-   `docs/superpowers/plans/2026-09-23-programme-a-repository-contract-stabilisation.md`
-   on `design/platform-vnext-spec`.
-3. This `HANDOFF.md` is the durable execution checkpoint on the implementation branch.
+   available directly on the B0 branch and intended for `main`.
+2. Programme A execution plan remains historical evidence on branch `design/platform-vnext-spec` at:
+   `docs/superpowers/plans/2026-09-23-programme-a-repository-contract-stabilisation.md`.
+   It is not a current-`main` governance dependency.
+3. `docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md` is the dated research amendment for future programmes.
+4. This `HANDOFF.md` is the durable current continuation record.
 
 If plan text conflicts with the constitution, the constitution wins. Deviations must be recorded as explicit rulings.
 
@@ -346,14 +352,13 @@ No Task 8 question/content/scoring changes were made.
 
 ## Programme A acceptance status
 
-Programme A is complete on the implementation branch and remains **Unreleased / unmerged**.
+Programme A is complete, merged to `main`, deployed, and post-merge verified.
 
-Before merge:
-- review PR #7;
-- optionally obtain an independent human/agent code review because the final in-session review was self-review only;
-- explicitly create/confirm the planned rollback tag if tag-based recovery is desired.
+Historical final review limitation remains: the in-session whole-branch review was self-review only; no independent approval is claimed.
 
-After merge, do not begin Programme B–H implicitly. Each requires its own bounded design/spec review under the architecture constitution.
+The planned rollback tag may still be created/confirmed later if tag-based recovery is desired; the immutable baseline SHA remains the confirmed recovery reference.
+
+After B0 merge, do not begin Programme B–H implicitly. Each requires its own bounded design/spec review under the architecture constitution. The exact next design task is **B1 — Track Presentation Contract design**.
 
 ## Current known evidence/security boundaries
 
@@ -369,14 +374,14 @@ After merge, do not begin Programme B–H implicitly. Each requires its own boun
 
 1. Invoke Superpowers first.
 2. Read this file.
-3. Read the accepted constitution and Programme A plan from `design/platform-vnext-spec`.
-4. Fetch `impl/programme-a-contract-stabilisation` and verify its current HEAD.
-5. Verify the Task 11 checkpoint `c7a52c7...` is an ancestor of current HEAD.
-6. Run a brief baseline verification.
-7. Start **Task 12 only** using the accepted constitution, plan, and current implementation truth.
+3. Read the constitution, original evidence appendix, 2026-09-26 research amendment, and B0 evidence ledger directly from the repository.
+4. Resolve the current `main` SHA before making claims about repository state.
+5. Treat `1808442442cf7e75ba59a298df93e17fd84244f0` as the Programme A merge commit and `471491d9d851a9406ad92c2dc3072a876ce68b04` as the accepted implementation checkpoint.
+6. Read `docs/superpowers/reviews/2026-09-23-programme-a-final-review.md` including its post-merge addendum.
+7. Finish/verify B0 if it has not merged; after B0 merge, start **B1 — Track Presentation Contract design** only.
 8. Use `systematic-debugging` on any failure.
-9. Use `verification-before-completion` before declaring Programme A accepted.
-10. Keep PR #7 Draft and unmerged until Programme A acceptance is complete.
+9. Use `verification-before-completion` before any new completion claim.
+10. Do not silently start B2–B7 or any later Programme B–H implementation from this handoff.
 
 
 ## Maintainer quick start
