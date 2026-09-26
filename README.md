@@ -42,6 +42,16 @@ See:
 - [TESTING.md](TESTING.md)
 - [HANDOFF.md](HANDOFF.md)
 
+## Governance & evidence
+
+- [Architecture constitution](docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md)
+- [Original vNext evidence appendix](docs/superpowers/specs/2026-09-23-learning-platform-vnext-evidence.md)
+- [2026-09-26 research amendment](docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md)
+- [2026-09-26 research evidence ledger](docs/superpowers/specs/2026-09-26-b0-governance-research-sync-evidence.md)
+
+Current SDAIA exam-rule metadata remains `project-reference-unverified`. The 14,000+ target and later AI/adaptive/psychometric programmes remain future work.
+
+
 ## Project structure
 
 ```text
