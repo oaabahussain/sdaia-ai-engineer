@@ -4,7 +4,13 @@ import json, os, shutil, subprocess, sys, time, urllib.request, urllib.error
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE='http://127.0.0.1:4173'
 DRIVER='http://127.0.0.1:9515'
-with open(os.path.join(ROOT,'tracks','sdaia-ai-engineer','exam-profiles','project-reference-v1.json'),encoding='utf-8') as f: PROFILE=json.load(f)
+TRACK_ID='sdaia-ai-engineer'
+with open(os.path.join(ROOT,'tracks',TRACK_ID,'manifest.json'),encoding='utf-8') as f: MANIFEST=json.load(f)
+PROFILES=[]
+for profile_path in MANIFEST['exam_profiles']:
+    with open(os.path.join(ROOT,profile_path),encoding='utf-8') as f: PROFILES.append(json.load(f))
+PROFILE=next((p for p in PROFILES if p['id']==MANIFEST['default_exam_profile']),None)
+if PROFILE is None: raise RuntimeError(f"Missing default exam profile {MANIFEST['default_exam_profile']}")
 with open(os.path.join(ROOT,'tests','fixtures','runtime','current-bank-counts.expected.json'),encoding='utf-8') as f: BANK_FIXTURE=json.load(f)
 EXPECTED_FULL=PROFILE['question_count']
 EXPECTED_BANK=BANK_FIXTURE['rendered_questions']
