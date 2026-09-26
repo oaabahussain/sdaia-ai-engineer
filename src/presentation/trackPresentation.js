@@ -17,3 +17,11 @@ export function resolvePresentationLocale(preferredLocale, manifest, presentatio
   if (common.includes(CORE_DEFAULT_LOCALE)) return CORE_DEFAULT_LOCALE;
   return common[0];
 }
+
+export function getPresentationLocale(presentation, locale) {
+  return presentation?.locales?.[locale] ?? null;
+}
+
+export function getDomainLabel(presentation, locale, domainKey) {
+  return presentation?.locales?.[locale]?.domain_labels?.[domainKey] ?? domainKey;
+}
