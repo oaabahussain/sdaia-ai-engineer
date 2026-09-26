@@ -81,3 +81,13 @@ test('presentation contract requires every exam domain label in every locale', a
   const missingEn = structuredClone(presentation); delete missingEn.locales.en.domain_labels[domain];
   assert.throws(() => validatePresentationContract(manifest, profile, missingEn), /domain label/i);
 });
+
+test('runtime presentation loader fetches the canonical track path', async () => {
+  const { loadTrackPresentation } = await import('../src/presentation/trackPresentation.js');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  const calls=[];
+  const result=await loadTrackPresentation(async path=>{calls.push(path);return presentation},manifest);
+  assert.deepEqual(calls,[`./tracks/${manifest.id}/presentation.json`]);
+  assert.equal(result,presentation);
+});
