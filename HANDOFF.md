@@ -7,11 +7,11 @@
 **Draft PR:** #7 — open, Draft, not merged  
 **Architecture constitution:** `design/platform-vnext-spec` — accepted/authoritative status recorded at `533c89c13d403164d7f8a68a0cd00f59d4f91f88`
 
-> This file is an early durable continuity record requested during Programme A execution. It does **not** mean Task 11 (the complete documentation/governance baseline) is complete.
+> This file is the durable Programme A continuity record. Task 11 establishes the documentation/governance baseline; Task 12 remains the final acceptance gate until its verification record is committed.
 
 ## Authoritative continuation point
 
-Tasks 1–10 are complete and persisted on GitHub.
+Tasks 1–10 are complete and persisted on GitHub. Task 11 documentation is being established on this branch; Task 12 is the remaining acceptance gate.
 
 Latest product-code checkpoint after Task 10:
 
@@ -19,9 +19,9 @@ Latest product-code checkpoint after Task 10:
 
 Any later commit may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 10 code checkpoint is an ancestor.
 
-**Exact next task: Task 11 — Document the New Baseline and Governance.**
+**Exact next task after the Task 11 documentation commit: Task 12 — Whole-Branch Verification and Programme A Acceptance Gate.**
 
-Do not reconstruct Tasks 1–10.  
+Do not reconstruct Tasks 1–10. Read the current documentation baseline before Task 12.  
 Do not merge PR #7 before the Programme A acceptance gate.  
 Do not begin Task 11 before Task 10 is green.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
@@ -333,3 +333,68 @@ Do not claim Programme A complete before Task 12 is green.
 8. Use `systematic-debugging` on any failure.
 9. Use `verification-before-completion` before declaring Task 11 green.
 10. Keep PR #7 Draft and unmerged until Programme A acceptance is complete.
+
+
+## Maintainer quick start
+
+Run the public site over HTTP:
+
+```bash
+python3 -m http.server 8080
+```
+
+Core gate:
+
+```bash
+npm ci --ignore-scripts
+npm run validate
+npm test
+node --check src/app.js
+python3 scripts/browser_smoke.py
+PYTHONPATH=server pytest -q server/tests
+python3 scripts/db_smoke.py
+node scripts/contract_test.js browser
+```
+
+API adapter verification is documented in `TESTING.md`.
+
+Canonical files:
+- `tracks/sdaia-ai-engineer/manifest.json`
+- its manifest-declared exam profiles/content
+- `data/schema/runtime-bundle.schema.json`
+- `data/schema/state-v2.schema.json`
+- `data/migrations/sdaia-generated-v2-question-ids.json`
+
+Legacy:
+- `data/legacy/static-bank-v1/` is migration input only and must not become an active runtime source.
+
+Not yet implemented:
+- 14,000+ expansion;
+- production mastery/readiness learner engine;
+- protected assessment delivery;
+- authentication/authorization;
+- full multi-track authoring/registry programmes.
+
+### Conceptually adding a new track
+
+Programme A establishes the contract pattern, not the full Programme B tooling. A future new track should:
+1. receive a unique versioned track ID;
+2. add a manifest under `tracks/<track-id>/manifest.json`;
+3. point that manifest at versioned public content and one or more exam profiles;
+4. use stable namespaced content/question identities;
+5. supply evidence status for exam-rule claims;
+6. pass manifest/schema/runtime/release tests without adding subject constants to core code.
+
+### Recovery baseline
+
+Confirmed baseline SHA:
+`362d35c697411d4eddcc4536c843df17161d3374`
+
+Planned rollback tag:
+`pre-programme-a-2026-09-23`
+
+The remote tag could not be verified through the available GitHub connection on 2026-09-26. Treat the SHA as authoritative until the tag is explicitly confirmed.
+
+### Evidence gap
+
+The current default profile remains `project-reference-unverified`. Do not call the current SDAIA weights/exam rules official unless current primary evidence is obtained and recorded.
