@@ -57,3 +57,15 @@ test('presentation contract rejects track and version mismatch', async () => {
   assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,track_id:'wrong-track'}), /track mismatch/i);
   assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,track_version:'wrong'}), /version mismatch/i);
 });
+
+test('presentation contract requires exact manifest locale coverage and valid default', async () => {
+  const { validatePresentationContract } = await import('../scripts/validate.js');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const profile = readJson('../tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  const missingEn = structuredClone(presentation); delete missingEn.locales.en;
+  assert.throws(() => validatePresentationContract(manifest, profile, missingEn), /locale/i);
+  const extraFr = structuredClone(presentation); extraFr.locales.fr=structuredClone(extraFr.locales.en);
+  assert.throws(() => validatePresentationContract(manifest, profile, extraFr), /locale/i);
+  assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,default_locale:'fr'}), /default locale/i);
+});
