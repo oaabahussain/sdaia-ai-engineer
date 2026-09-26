@@ -45,3 +45,13 @@ Gamification is secondary to learning outcomes and may be used only when it supp
 **MUST** distinguish sourced track facts from general-model knowledge and allow abstention or escalation when evidence is missing or contradictory.
 
 Tutoring should prefer hints, questions and scaffolded support before direct answer dumping when the learning objective permits it.
+
+## 4. AI-generated content quality
+
+**MUST NOT** auto-activate generated questions, explanations, translations or tags from a single generation step.
+
+The canonical future content pipeline is:
+
+`Generate → Critique → Validate → Deduplicate → Evidence → Bilingual check → Review → Activate → Measure → Recalibrate/Retire`
+
+Each stage must preserve appropriate source/evidence, generator/reviewer and version metadata. Post-publication item evidence must support recalibration or retirement.

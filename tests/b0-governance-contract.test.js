@@ -29,3 +29,9 @@ test('AI tutor rules require grounded, optional, scaffolded help', () => {
   assert.match(doc, /abstain|abstention/i);
   assert.match(doc, /scaffold|hint/i);
 });
+
+test('AI content activation requires the staged quality pipeline', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.ok(doc.includes('Generate → Critique → Validate → Deduplicate → Evidence → Bilingual check → Review → Activate → Measure → Recalibrate/Retire'));
+  assert.match(doc, /never.*single generation step|must not.*single generation step/i);
+});
