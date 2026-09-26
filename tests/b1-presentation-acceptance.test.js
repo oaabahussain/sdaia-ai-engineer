@@ -46,3 +46,12 @@ test('app presentation load is best-effort after canonical bank load', () => {
   assert.match(app, /catch\(presentationError\)\{console\.warn/);
   assert.match(app, /PRESENTATION=null/);
 });
+
+test('app presentation view falls back to a core locale and track id', () => {
+  const app = read('../src/app.js');
+  assert.match(app, /resolvePresentationLocale/);
+  assert.match(app, /getPresentationLocale/);
+  assert.match(app, /function presentationView\(\)/);
+  assert.match(app, /Presentation locale fallback/);
+  assert.match(app, /BANK\?\.track\?\.id/);
+});
