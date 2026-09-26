@@ -23,5 +23,21 @@ jobs:
         run: node --check src/app.js
       - name: Verify service worker shell assets
         run: npm run verify:sw
+      - name: Verify Pages artifact assembly
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir _site
+          cp index.html feedback.html manifest.webmanifest sw.js icon.svg icon-180.png icon-192.png icon-512.png _site/
+          cp -R src tracks _site/
+          mkdir -p _site/data
+          cp -R data/concepts data/migrations _site/data/
+          cp data/learn.json data/cases.json _site/data/
+          test ! -e _site/data/legacy
+          touch _site/.nojekyll
+          node --check _site/src/app.js
+          node scripts/verify_html.js _site/index.html
+          node scripts/verify_sw_assets.js _site
       - name: Browser smoke test
         run: python3 scripts/browser_smoke.py
