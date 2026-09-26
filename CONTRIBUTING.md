@@ -1,58 +1,65 @@
 # Contributing
 
-Contributions that improve the accuracy, clarity, accessibility, translations, or usability of the practice site are welcome.
+Contributions that improve accuracy, clarity, accessibility, translations, usability, architecture, or tests are welcome.
 
-## Ways to contribute
+## Content quality
 
-You can help by:
+For learning-content changes:
 
-- Reporting an incorrect or ambiguous question.
-- Suggesting a new topic or missing concept.
-- Improving Arabic or English wording.
-- Adding a useful question pattern or explanation.
-- Improving accessibility, mobile behavior, performance, or tests.
-- Fixing bugs or improving the interface.
+1. Test one clear objective or decision.
+2. Use one defensible best answer and plausible distractors.
+3. Keep Arabic and English equivalent in meaning.
+4. Add concise teaching explanations.
+5. Supply reliable sources when a claim depends on a standard, product, policy, exam rule, or changing fact.
+6. Record/update the relevant **evidence status**; do not upgrade a claim from project-reference/unverified to official without primary evidence.
+7. Do not copy confidential, leaked, copyrighted real-exam material.
 
-Use the public feedback page for non-code contributions:
+## Contract rules
 
-**https://oaabahussain.github.io/sdaia-ai-engineer/feedback.html**
+- **Stable IDs are immutable once active.** Do not recycle or renumber an active question/family identity.
+- **Exam rules live in exam profiles, not code.** Question counts, section sizes, weights, and evidence status belong in `ExamProfileV1`.
+- Do not add new **hard-coded track constants** to core runtime/release logic when the manifest/profile can supply them.
+- Do not create an active **legacy path without an explicit disposition** and migration/retirement plan.
+- The canonical track manifest owns track content references; do not create a second competing question-bank source.
+- State/storage changes must preserve migration behaviour for unfinished learner state.
 
-## Question and content quality
+## Code workflow
 
-For question-bank changes:
-
-1. Keep the question focused on one clear learning objective.
-2. Use one defensible best answer.
-3. Make distractors plausible but clearly incorrect.
-4. Avoid answer-position clues or wording patterns.
-5. Keep Arabic and English versions equivalent in meaning.
-6. Add a concise explanation that teaches why the answer is correct.
-7. Include a reliable source when the claim depends on a standard, specification, product behavior, or changing fact.
-8. Do not copy copyrighted exam questions or confidential exam material.
-
-## Code changes
-
-Create a branch, make the smallest coherent change, then run:
+Make the smallest coherent change, then run:
 
 ```bash
 npm ci --ignore-scripts
-node scripts/validate.js
-node --test tests/*.test.js
+npm run validate
+npm test
+node --check src/app.js
 python3 scripts/browser_smoke.py
+PYTHONPATH=server pytest -q server/tests
+python3 scripts/db_smoke.py
+node scripts/contract_test.js browser
 ```
 
-Open a pull request against `main`. CI must pass before merge.
+See [TESTING.md](TESTING.md) for the API adapter contract.
 
 ## Pull request checklist
 
-- The change has a clear user benefit.
-- Existing exam behavior is preserved unless the PR intentionally changes it.
-- Arabic and English UI remain consistent.
-- Light and dark themes remain usable.
-- Mobile layout remains usable.
-- New public pages are included in the Pages artifact and service-worker cache when appropriate.
-- Tests cover behavior that could regress.
+- User-visible behaviour is intentional and covered.
+- Canonical manifest/profile/state contracts remain valid.
+- Arabic/English and RTL/LTR remain usable.
+- Mobile/light/dark behaviour is not regressed.
+- Service-worker/offline behaviour is covered when relevant.
+- Public Pages artifact does not accidentally include `data/legacy/`.
+- Evidence status is updated for factual/exam-rule changes.
+- No active legacy source was added silently.
+
+## Repository governance target
+
+- **CI is required before merge.**
+- Risky migrations should receive review before integration.
+- Production baselines should be identified by immutable commit SHA and, when available, annotated tags.
+- Enable **branch protection when the owner's workflow is confirmed**; do not lock the owner out before confirming the intended merge/recovery path.
+- Add **CODEOWNERS when multiple maintainers exist** and ownership boundaries are agreed.
+- Programme A does not itself change repository branch-protection settings.
 
 ## Privacy and safety
 
-Do not submit personal information, API keys, credentials, private exam material, confidential documents, or proprietary content in issues or pull requests.
+Do not submit personal information, API keys, credentials, secrets, private exam material, confidential documents, or proprietary content in public issues or pull requests.

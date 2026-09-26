@@ -1,0 +1,4 @@
+{
+  "anon_id":"123e4567-e89b-42d3-a456-426614174000","created_at":"2026-09-09T00:00:00Z","updated_at":"2026-09-09T00:00:00Z",
+  "examV2":{"lang":"en","theme":"dark","active":{"id":"exam-legacy","mode":"full","domain":null,"questionIds":["q1","q2"],"index":1,"answers":{"q1":0},"confidence":{"q1":"high"},"flags":{"q2":true},"optionOrders":{"q1":[0,1,2,3],"q2":[1,0,2,3]},"started_at":"2026-09-09T00:00:00Z","submitted":false},"history":[]}
+}

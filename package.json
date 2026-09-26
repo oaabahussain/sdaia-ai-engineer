@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "validate": "node scripts/validate.js",
+    "verify:sw": "node scripts/verify_sw_assets.js ."
   },
   "devDependencies": {
     "ajv": "^8.17.1",

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "sdaia-ai-engineer",
+  "version": "2026.09",
+  "status": "active",
+  "official_status": "unofficial-independent",
+  "locales": ["ar", "en"],
+  "core_contract": { "min": 2, "max": 2 },
+  "capabilities": ["bilingual", "foundation-generated-bank", "exam-profile-v1"],
+  "content": {
+    "concept_files": [
+      "data/concepts/ai-software-engineering.json",
+      "data/concepts/architecture-infrastructure.json",
+      "data/concepts/business-professional-practice.json",
+      "data/concepts/core-ai.json",
+      "data/concepts/data-ml.json",
+      "data/concepts/mlops-llmops.json",
+      "data/concepts/responsible-ai-security-governance.json"
+    ],
+    "learn": "data/learn.json",
+    "cases": "data/cases.json"
+  },
+  "exam_profiles": ["tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json"],
+  "default_exam_profile": "sdaia-ai-engineer.project-reference.v1"
+}

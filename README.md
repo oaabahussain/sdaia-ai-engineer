@@ -1,52 +1,68 @@
 # SDAIA AI Engineer Practice
 
-A bilingual, community-oriented practice site for AI Engineer exam preparation.
+A bilingual, independent practice site and the current first track of a reusable learning-and-assessment platform.
 
-> **Unofficial project:** This repository and website are independent study resources and are not affiliated with, endorsed by, or certified by SDAIA. Exam questions and explanations are training content.
+> **Unofficial project:** This repository and website are independent study resources and are not affiliated with, endorsed by, or certified by SDAIA. Training questions and explanations are not official exam questions.
 
 ## Live site
 
 **https://oaabahussain.github.io/sdaia-ai-engineer/**
 
-## What the site includes
+## Current implementation
+
+The canonical track manifest is `tracks/sdaia-ai-engineer/manifest.json`; exam behaviour comes from its default `ExamProfileV1`.
+
+Current implementation facts:
 
 - Arabic and English interface with RTL/LTR support.
-- 1,120 bilingual practice-question instances across seven AI engineering domains.
-- A 200-question weighted full exam.
-- Standalone domain exams with 25, 50, 100, or all available questions.
-- Randomized question order and randomized answer-option order on every attempt.
-- Balanced displayed correct-answer positions in the 200-question exam.
-- Optional confidence selection; it never blocks answering, navigation, or submission.
-- Resume support, question flags, direct question navigation, results by domain, and answer review.
-- Light and dark themes.
-- Local progress storage in the browser.
+- **1,120** generated bilingual foundation practice items from 140 concepts across seven domains.
+- A **200-question project-reference** full exam, with 25/50/100/all section modes.
+- Current weights and exam rules are marked `project-reference-unverified`; they must not be described as official SDAIA rules without current primary evidence.
+- Stable namespaced question IDs plus a legacy `q1..q1120` migration map.
+- StateV2 with browser storage, resume, flags, confidence, option-order persistence, results, and review.
+- Browser and optional API adapters expose the same public `RuntimeBundleV2`.
+- Service-worker offline recovery with shell-only precache and on-demand public content caching.
+- Public GitHub feedback flows that preserve typed suggestion/contribution/rating content.
 
-## Community
+The architecture constitution targets **14,000+ high-quality training items in future content programmes**. That expansion has **not** been implemented in Programme A and the current runtime remains 1,120 foundation items.
 
-The project welcomes useful feedback and contributions.
+## Architecture
 
-- **Suggestions, contributions, and ratings:** https://oaabahussain.github.io/sdaia-ai-engineer/feedback.html
-- **Question problem:** use the report action available from the project issue templates.
-- **Code or content contribution:** see [CONTRIBUTING.md](CONTRIBUTING.md).
+Core rule:
 
-GitHub submissions are public. Do not include personal, confidential, or sensitive information.
+> **The track is data; the learning platform is code.**
+
+See:
+
+- [ARCHITECTURE.md](ARCHITECTURE.md)
+- [DATA-MODEL.md](DATA-MODEL.md)
+- [MIGRATIONS.md](MIGRATIONS.md)
+- [SECURITY.md](SECURITY.md)
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [TESTING.md](TESTING.md)
+- [HANDOFF.md](HANDOFF.md)
 
 ## Project structure
 
 ```text
 .
-├── index.html                 # Main practice interface
-├── feedback.html              # Suggestions, contributions, and rating page
-├── src/                       # Application, exam logic, and storage adapters
-├── data/                      # Domain concepts, study data, and schemas
-├── tests/                     # Automated application tests
-├── scripts/                   # Validation and browser smoke tests
-├── server/                    # Optional/test API implementation
-├── api/                       # API contract
-└── .github/                   # CI, Pages deployment, and community templates
+├── index.html
+├── feedback.html
+├── src/                       # Browser core, runtime, state and adapters
+├── tracks/                    # Canonical track manifests and exam profiles
+├── data/
+│   ├── concepts/              # Current public concept sources
+│   ├── migrations/            # Stable-ID migration maps
+│   ├── legacy/                # Retained migration input; not active runtime
+│   └── schema/                # Active contracts
+├── tests/
+├── scripts/
+├── server/                    # Local/test FastAPI + SQLite scaffold
+├── api/                       # OpenAPI contract
+└── .github/                   # CI, Pages and community templates
 ```
 
-The public GitHub Pages site currently uses browser storage. The optional API code is not required to use the website.
+The public GitHub Pages site uses browser storage. The FastAPI server is optional development/test scaffolding and is not required to use the site.
 
 ## Run locally
 
@@ -54,20 +70,30 @@ The public GitHub Pages site currently uses browser storage. The optional API co
 python3 -m http.server 8080
 ```
 
-Then open `http://localhost:8080/`.
+Open `http://localhost:8080/`. Do not open `index.html` through `file:`; canonical track content is loaded over HTTP.
 
-Run validation and tests:
+## Validate and test
 
 ```bash
 npm ci --ignore-scripts
-node scripts/validate.js
-node --test tests/*.test.js
+npm run validate
+npm test
+node --check src/app.js
 python3 scripts/browser_smoke.py
+PYTHONPATH=server pytest -q server/tests
+python3 scripts/db_smoke.py
+node scripts/contract_test.js browser
 ```
 
-## Content quality
+See [TESTING.md](TESTING.md) for the API contract command and full release-equivalent gate.
 
-Changes to questions, concepts, translations, answer choices, domain weights, or scoring logic should include evidence where appropriate and must pass the automated validation suite before merge.
+## Community
+
+- Suggestions, contributions, and ratings: https://oaabahussain.github.io/sdaia-ai-engineer/feedback.html
+- Question reports: use the project issue templates.
+- Code/content changes: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+GitHub submissions are public. Do not include personal, confidential, sensitive, proprietary, or credential material.
 
 ## License
 

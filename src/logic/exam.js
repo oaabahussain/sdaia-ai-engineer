@@ -20,7 +20,8 @@ export function weightedAllocation(weights, total) {
   return Object.fromEntries(base.sort((a,b)=>entries.findIndex(([d])=>d===a.domain)-entries.findIndex(([d])=>d===b.domain)).map(item => [item.domain, item.count]));
 }
 
-export function sampleWeightedExam(questions, weights, total = 200, rng = Math.random) {
+export function sampleWeightedExam(questions, weights, total, rng = Math.random) {
+  if (!Number.isInteger(total) || total < 1) throw new Error('Exam total must be a positive integer');
   const allocation = weightedAllocation(weights, total);
   const picked = [];
   for (const [domain, count] of Object.entries(allocation)) {
@@ -40,7 +41,7 @@ export function sampleSectionExam(questions, domain, count, rng = Math.random) {
 
 export function buildOptionOrders(questions, rng = Math.random) {
   // Balance the displayed correct answer positions, then randomize their sequence.
-  // For a 200-question exam this guarantees exactly 50 A / 50 B / 50 C / 50 D.
+  // Spread displayed correct-answer positions as evenly as possible for any exam size.
   const targetPositions = shuffle(questions.map((_, i) => i % 4), rng);
   return Object.fromEntries(questions.map((q, index) => {
     const target = targetPositions[index];

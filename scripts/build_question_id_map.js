@@ -1,0 +1,2 @@
+import fs from 'node:fs';import { loadTrack } from './load_track.js';import { expandConceptBank } from '../src/logic/questionBank.js';
+const root=process.cwd();const bundle=loadTrack(root,'sdaia-ai-engineer');const q=expandConceptBank(bundle.concepts,{trackId:bundle.manifest.id});const map=Object.fromEntries(q.map((x,i)=>[`q${i+1}`,x.id]));fs.mkdirSync('data/migrations',{recursive:true});fs.writeFileSync('data/migrations/sdaia-generated-v2-question-ids.json',JSON.stringify(map,null,2)+'\n');console.log(Object.keys(map).length);
