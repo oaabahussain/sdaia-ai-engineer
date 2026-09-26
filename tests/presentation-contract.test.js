@@ -91,3 +91,11 @@ test('runtime presentation loader fetches the canonical track path', async () =>
   assert.deepEqual(calls,[`./tracks/${manifest.id}/presentation.json`]);
   assert.equal(result,presentation);
 });
+
+test('runtime presentation loader rejects incompatible track identity and version', async () => {
+  const { loadTrackPresentation } = await import('../src/presentation/trackPresentation.js');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  await assert.rejects(() => loadTrackPresentation(async()=>({...presentation,track_id:'wrong-track'}),manifest), /track mismatch/i);
+  await assert.rejects(() => loadTrackPresentation(async()=>({...presentation,track_version:'wrong'}),manifest), /version mismatch/i);
+});
