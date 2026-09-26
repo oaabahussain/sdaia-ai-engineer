@@ -99,3 +99,16 @@ test('runtime presentation loader rejects incompatible track identity and versio
   await assert.rejects(() => loadTrackPresentation(async()=>({...presentation,track_id:'wrong-track'}),manifest), /track mismatch/i);
   await assert.rejects(() => loadTrackPresentation(async()=>({...presentation,track_version:'wrong'}),manifest), /version mismatch/i);
 });
+
+test('presentation locale resolver uses only core-manifest-presentation intersection', async () => {
+  const { resolvePresentationLocale } = await import('../src/presentation/trackPresentation.js');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  assert.equal(resolvePresentationLocale('en',manifest,presentation),'en');
+  assert.equal(resolvePresentationLocale('fr',manifest,presentation),'ar');
+  assert.equal(resolvePresentationLocale('fr',manifest,{...presentation,default_locale:'en'}),'en');
+  const noCommonManifest={...manifest,locales:['fr']};
+  const frLocale=structuredClone(presentation.locales.en);
+  const noCommonPresentation={...presentation,default_locale:'fr',locales:{fr:frLocale}};
+  assert.throws(()=>resolvePresentationLocale('fr',noCommonManifest,noCommonPresentation),/common locale/i);
+});
