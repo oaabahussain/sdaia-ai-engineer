@@ -40,3 +40,7 @@ Task 19: complete — handoff RED→GREEN against stale Draft/unmerged state; cu
 Task 20: complete — historical final review preserved; post-merge addendum records merge SHA and successful Pages/server workflow runs.
 Task 21: complete — README now links constitution, original evidence appendix, research amendment and B0 evidence ledger without changing runtime claims.
 Task 22: complete — evidence provenance contract GREEN; Deep/date/residual-uncertainty/falsifier/no-independent-challenge/community-signal boundaries pinned.
+
+Task 23: complete — baseline compare shows documentation/governance/tests-only diff; no runtime/product paths changed.
+Task 24: complete — stale Programme A current-state contradictions removed from handoff; remaining Draft/unmerged mentions classified historical/conditional and retained.
+Task 25: complete — 14,000+/official SDAIA/AI tutor/adaptive/psychometric scan found no current/future or evidence-status violation.
