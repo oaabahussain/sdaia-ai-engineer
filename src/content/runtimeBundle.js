@@ -1,4 +1,5 @@
-export async function loadRuntimeBundle(fetchJson,trackId='sdaia-ai-engineer'){
+export async function loadRuntimeBundle(fetchJson,trackId){
+ if(typeof trackId!=='string'||!trackId)throw new Error('trackId is required to load a runtime bundle');
  const manifest=await fetchJson(`./tracks/${trackId}/manifest.json`);
  const examProfiles=await Promise.all(manifest.exam_profiles.map(fetchJson));
  const examProfile=examProfiles.find(x=>x.id===manifest.default_exam_profile);
