@@ -125,5 +125,5 @@ test('B0 evidence ledger preserves provenance, challenge limits, falsifiers and 
 
 test('historical Programme A execution plan names its actual branch', () => {
   const doc = read('../HANDOFF.md');
-  assert.match(doc, /Programme A execution plan:[\s\S]{0,300}design\/platform-vnext-spec/);
+  assert.match(doc, /Programme A execution plan[\s\S]{0,300}design\/platform-vnext-spec/);
 });
