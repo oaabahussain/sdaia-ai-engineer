@@ -1,0 +1,144 @@
+-    if (storage) {
+-      storage.removeItem(STATE_KEY);
+-      storage.removeItem(LEGACY_STATE_KEY);
+-    } else {
+-      memoryDelete(STATE_KEY);
+-      memoryDelete(LEGACY_STATE_KEY);
+-    }
+-    const state = bootstrapState({});
+-    persistBootstrap(storage, state);
+-    return state;
+-  }
+-}
+-
+-export async function saveState(state) {
+-  const raw = JSON.stringify(state);
+-  const storage = storageAccess();
+-  if (storage) storage.setItem(STATE_KEY, raw);
+-  else memorySet(STATE_KEY, raw);
+-}
+-
+-function inlineBank() {
+-  const node = globalThis.document?.getElementById?.('inline-bank');
+-  if (!node?.textContent) throw new Error('Inline bank fallback is unavailable');
+-  return JSON.parse(node.textContent);
+-}
+-
+-export async function loadBank() {
+-  const protocol = globalThis.location?.protocol ?? 'file:';
+-  if (protocol === 'file:') return inlineBank();
+-
+-  try {
+-    const loadJson = async (url) => {
+-      const response = await fetch(url, { cache: 'no-cache' });
+-      if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
+-      return response.json();
+-    };
+-    const [conceptDocs, sessions, learn, cases, weights] = await Promise.all([
+-      Promise.all(CONCEPT_FILES.map(loadJson)),
+-      loadJson('./data/sessions.json'),
+-      loadJson('./data/learn.json'),
+-      loadJson('./data/cases.json'),
+-      loadJson('./data/weights.json'),
+-    ]);
+-    const concepts = Object.fromEntries(conceptDocs.map(doc => [doc.domain, doc.concepts]));
+-    return { concepts, sessions, learn, cases, weights };
+-  } catch (error) {
+-    console.warn('Network study bank unavailable; using the validated inline bank.', error);
+-    return inlineBank();
+-  }
+-}
+-
+-export async function submitFeedback(item) {
+-  const questionId = String(item?.question_id ?? 'unknown');
+-  const issueType = String(item?.issue_type ?? 'other');
+-  const params = new URLSearchParams({
+-    template: 'question-report.yml',
+-    title: `Question report: ${questionId} [${issueType}]`,
+-    question_id: questionId,
+-    issue_type: issueType,
+-  });
+-  return { ok: true, ref: `https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}` };
+-}
+-
+-export async function logEvent(_evt) {}
++const STATE_KEY='learning-platform.state.v2';const LEGACY_STATE_KEYS=['sdaia.state.v1','sdaia_adaptive_v3'];const memory=new Map();
++function storageAccess(){try{const k='__lp_storage_probe__';globalThis.localStorage.setItem(k,'1');globalThis.localStorage.removeItem(k);return globalThis.localStorage}catch{return null}}
++function readRaw(storage,key){return storage?storage.getItem(key):(memory.has(key)?memory.get(key):null)}function writeRaw(storage,key,value){if(storage)storage.setItem(key,value);else memory.set(key,value)}
++export async function loadState(){const storage=storageAccess();for(const key of [STATE_KEY,...LEGACY_STATE_KEYS]){const raw=readRaw(storage,key);if(!raw)continue;try{return JSON.parse(raw)}catch{continue}}return null}
++export async function saveState(state){writeRaw(storageAccess(),STATE_KEY,JSON.stringify(state))}
++function inlineBank(){const node=globalThis.document?.getElementById?.('inline-bank');if(!node?.textContent)throw new Error('Inline bank fallback is unavailable');return JSON.parse(node.textContent)}
++export async function loadBank(){const protocol=globalThis.location?.protocol??'file:';if(protocol==='file:')return inlineBank();try{const {loadRuntimeBundle}=await import('../content/runtimeBundle.js');const loadJson=async url=>{const r=await fetch(url,{cache:'no-cache'});if(!r.ok)throw new Error(`Failed to load ${url}: ${r.status}`);return r.json()};return await loadRuntimeBundle(loadJson)}catch(error){console.warn('Network study bank unavailable; using the validated inline bank.',error);return inlineBank()}}
++export async function submitFeedback(item){const questionId=String(item?.question_id??'unknown');const issueType=String(item?.issue_type??'other');const params=new URLSearchParams({template:'question-report.yml',title:`Question report: ${questionId} [${issueType}]`,question_id:questionId,issue_type:issueType});return{ok:true,ref:`https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${params.toString()}`}}
++export async function logEvent(_evt){}
+diff --git a/src/storage/identity.js b/src/storage/identity.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..77985f85d9fc3e5b8a8aa497d9abe6cd69736d38
+--- /dev/null
++++ b/src/storage/identity.js
+@@ -0,0 +1,8 @@
++export const ANON_KEY='learning-platform.anon-id.v1';
++export const LEGACY_ANON_KEY='sdaia.anon_id.v1';
++let memoryAnonId;
++function defaultStorage(){try{return globalThis.localStorage}catch{return null}}
++export function getOrCreateAnonId(storage=defaultStorage()){
++ try{const existing=storage?.getItem?.(ANON_KEY)||storage?.getItem?.(LEGACY_ANON_KEY);if(existing){storage?.setItem?.(ANON_KEY,existing);return existing}}catch{}
++ if(memoryAnonId)return memoryAnonId;const created=globalThis.crypto?.randomUUID?.();if(!created)throw new Error('crypto.randomUUID is required to create an anonymous identifier');memoryAnonId=created;try{storage?.setItem?.(ANON_KEY,created)}catch{}return created;
++}
+diff --git a/src/storage/interface.js b/src/storage/interface.js
+index cfe44bda0e8a2f75cb843bc9386f36fa3933839d..c17e57688b3511702d540a6fda88617f85ba6867 100644
+--- a/src/storage/interface.js
++++ b/src/storage/interface.js
+@@ -1,30 +1,4 @@
+-import { STORAGE } from '../config.js';
+-
+-const adapter = STORAGE === 'api'
+-  ? await import('./api.js')
+-  : await import('./browser.js');
+-
+-function uuidV4() {
+-  return globalThis.crypto?.randomUUID?.()
+-    ?? '00000000-0000-4000-8000-' + Math.random().toString(16).slice(2, 14).padEnd(12, '0').slice(0, 12);
+-}
+-
+-function bootstrapState(value) {
+-  const state = value && typeof value === 'object' && !Array.isArray(value) ? { ...value } : {};
+-  const createdAt = state.created_at || new Date().toISOString();
+-  state.anon_id = state.anon_id || uuidV4();
+-  state.created_at = createdAt;
+-  state.updated_at = state.updated_at || createdAt;
+-  return state;
+-}
+-
+-/** @returns {Promise<State>} */
+-export async function loadState() { return bootstrapState(await adapter.loadState()); }
+-/** @param {State} state @returns {Promise<void>} */
+-export function saveState(state) { return adapter.saveState(state); }
+-/** @returns {Promise<Bank>} */
+-export function loadBank() { return adapter.loadBank(); }
+-/** @param {Feedback} item @returns {Promise<{ok:boolean, ref?:string}>} */
+-export function submitFeedback(item) { return adapter.submitFeedback(item); }
+-/** @param {Event} evt @returns {Promise<void>} */
+-export function logEvent(evt) { return adapter.logEvent(evt); }
++import { STORAGE } from '../config.js';import { getOrCreateAnonId } from './identity.js';import { migrateState } from '../state/migrate.js';
++const adapter=STORAGE==='api'?await import('./api.js'):await import('./browser.js');
++export async function loadState(context){const raw=await adapter.loadState();const state=migrateState(raw,{anonId:getOrCreateAnonId(),...context});await adapter.saveState(state);return state}
++export function saveState(state){return adapter.saveState(state)}export function loadBank(){return adapter.loadBank()}export function submitFeedback(item){return adapter.submitFeedback(item)}export function logEvent(evt){return adapter.logEvent(evt)}
+diff --git a/tests/bank.test.js b/tests/bank.test.js
+index 55fc7001911382205288a35cd8c2fd3f3ba42ed8..9838312e8071020e5735b1722817af7d68b56732 100644
+--- a/tests/bank.test.js
++++ b/tests/bank.test.js
+@@ -1,10 +1,17 @@
+ import test from 'node:test';
+ import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import crypto from 'node:crypto';
+ import { expandConceptBank } from '../src/logic/questionBank.js';
+-import { loadConcepts } from '../scripts/load_concepts.js';
+-const concepts=loadConcepts(new URL('..',import.meta.url).pathname);
+-const q=expandConceptBank(concepts);
++import { loadTrack } from '../scripts/load_track.js';
++const root=new URL('..',import.meta.url).pathname;const bundle=loadTrack(root,'sdaia-ai-engineer');const concepts=bundle.concepts;const q=expandConceptBank(concepts,{trackId:bundle.manifest.id});
++const expected=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-bank-counts.expected.json',import.meta.url),'utf8'));
++const visible=x=>({domain:x.domain,topic:x.topic,question:x.question,question_en:x.question_en,options:x.options,options_en:x.options_en,answer:x.answer,explanation:x.explanation,explanation_en:x.explanation_en,difficulty:x.difficulty});
+ test('generated bank has 1120 bilingual questions',()=>{assert.equal(q.length,1120);assert.ok(q.every(x=>x.question&&x.question_en&&x.options.length===4&&x.options_en.length===4))});
