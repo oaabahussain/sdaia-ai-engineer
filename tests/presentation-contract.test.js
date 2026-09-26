@@ -69,3 +69,15 @@ test('presentation contract requires exact manifest locale coverage and valid de
   assert.throws(() => validatePresentationContract(manifest, profile, extraFr), /locale/i);
   assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,default_locale:'fr'}), /default locale/i);
 });
+
+test('presentation contract requires every exam domain label in every locale', async () => {
+  const { validatePresentationContract } = await import('../scripts/validate.js');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const profile = readJson('../tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  const domain = Object.keys(profile.weights)[0];
+  const missingAr = structuredClone(presentation); delete missingAr.locales.ar.domain_labels[domain];
+  assert.throws(() => validatePresentationContract(manifest, profile, missingAr), /domain label/i);
+  const missingEn = structuredClone(presentation); delete missingEn.locales.en.domain_labels[domain];
+  assert.throws(() => validatePresentationContract(manifest, profile, missingEn), /domain label/i);
+});
