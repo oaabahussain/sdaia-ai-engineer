@@ -1,7 +1,7 @@
 # B1 — Track Presentation Contract Design
 
 **Date:** 2026-09-26  
-**Status:** Draft for owner review  
+**Status:** Approved design — implementation planning authorized  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Base:** `main@0efae25ba71ca26030bd2471a26cb273bc574826`  
 **Programme:** B1 — Track Presentation Contract  
