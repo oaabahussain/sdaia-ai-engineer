@@ -63,3 +63,9 @@ test('PR gate assembles and verifies the same public Pages artifact boundary', (
   assert.match(ci, /test ! -e _site\/data\/legacy/);
   assert.match(ci, /node scripts\/verify_sw_assets\.js _site/);
 });
+
+
+test('PR gate executes live-release verification against the assembled artifact over HTTP', () => {
+  assert.match(ci, /python3 -m http\.server 4174/);
+  assert.match(ci, /node scripts\/verify_live_release\.js http:\/\/127\.0\.0\.1:4174/);
+});
