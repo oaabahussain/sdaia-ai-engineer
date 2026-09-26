@@ -73,3 +73,9 @@ test('reliability offline mobile and accessibility are release quality', () => {
   assert.match(doc, /release-quality.*reliability.*offline.*mobile.*accessibility/i);
   assert.match(doc, /WCAG 2\.2/);
 });
+
+test('personalization avoids content overload', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /smallest.*next learning action/i);
+  assert.match(doc, /progressive disclosure/i);
+});

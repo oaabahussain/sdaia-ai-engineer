@@ -105,3 +105,9 @@ Minimum measures/checks:
 **MUST** treat **release-quality reliability, offline, mobile and accessibility** as core product constraints rather than later polish.
 
 Use **WCAG 2.2** as the current web-accessibility baseline where applicable, preserve tested offline recovery guarantees unless explicitly replaced, and avoid performance-heavy additions that materially degrade low-bandwidth/mobile learning without demonstrated benefit.
+
+## 11. Content overload
+
+**SHOULD** prefer the **smallest useful next learning action** that addresses the learner need instead of presenting a large undifferentiated catalog as personalization.
+
+Use **progressive disclosure** for advanced analytics/settings so the learner is not required to understand internal algorithm complexity to continue learning.
