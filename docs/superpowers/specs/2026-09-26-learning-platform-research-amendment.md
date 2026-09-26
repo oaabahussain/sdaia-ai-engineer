@@ -55,3 +55,11 @@ The canonical future content pipeline is:
 `Generate → Critique → Validate → Deduplicate → Evidence → Bilingual check → Review → Activate → Measure → Recalibrate/Retire`
 
 Each stage must preserve appropriate source/evidence, generator/reviewer and version metadata. Post-publication item evidence must support recalibration or retirement.
+
+## 5. Question quality vs quantity
+
+The **14,000+** target remains a future coverage/capacity target, not a current-runtime fact and not a quality metric.
+
+**MUST** build the quality/evaluation pipeline before mass expansion and reject superficial paraphrase multiplication.
+
+The platform must keep **intended difficulty**, **observed difficulty**, **learning value**, and **exam representativeness** as separate concepts rather than collapsing them into one score.

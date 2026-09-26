@@ -35,3 +35,9 @@ test('AI content activation requires the staged quality pipeline', () => {
   assert.ok(doc.includes('Generate → Critique → Validate → Deduplicate → Evidence → Bilingual check → Review → Activate → Measure → Recalibrate/Retire'));
   assert.match(doc, /never.*single generation step|must not.*single generation step/i);
 });
+
+test('question scale stays separate from quality and empirical behavior', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /14,000\+.*future|future.*14,000\+/i);
+  for (const phrase of ['intended difficulty','observed difficulty','learning value','exam representativeness']) assert.ok(doc.includes(phrase), phrase);
+});
