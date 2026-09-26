@@ -67,3 +67,9 @@ test('material redesigns measure learner-path friction', () => {
   const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
   for (const metric of ['time-to-start-learning','actions-to-resume','actions-to-weak-topic','actions-to-exam','mobile/RTL','recovery after refresh/offline interruption']) assert.ok(doc.includes(metric), metric);
 });
+
+test('reliability offline mobile and accessibility are release quality', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  assert.match(doc, /release-quality.*reliability.*offline.*mobile.*accessibility/i);
+  assert.match(doc, /WCAG 2\.2/);
+});

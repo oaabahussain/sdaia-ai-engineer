@@ -99,3 +99,9 @@ Minimum measures/checks:
 - `actions-to-exam`;
 - task completion on `mobile/RTL`;
 - `recovery after refresh/offline interruption`.
+
+## 10. Reliability, offline and accessibility
+
+**MUST** treat **release-quality reliability, offline, mobile and accessibility** as core product constraints rather than later polish.
+
+Use **WCAG 2.2** as the current web-accessibility baseline where applicable, preserve tested offline recovery guarantees unless explicitly replaced, and avoid performance-heavy additions that materially degrade low-bandwidth/mobile learning without demonstrated benefit.
