@@ -4,6 +4,10 @@ import json, os, shutil, subprocess, sys, time, urllib.request, urllib.error
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE='http://127.0.0.1:4173'
 DRIVER='http://127.0.0.1:9515'
+with open(os.path.join(ROOT,'tracks','sdaia-ai-engineer','exam-profiles','project-reference-v1.json'),encoding='utf-8') as f: PROFILE=json.load(f)
+with open(os.path.join(ROOT,'tests','fixtures','runtime','current-bank-counts.expected.json'),encoding='utf-8') as f: BANK_FIXTURE=json.load(f)
+EXPECTED_FULL=PROFILE['question_count']
+EXPECTED_BANK=BANK_FIXTURE['rendered_questions']
 
 def req(method,path,payload=None,timeout=30):
     data=None if payload is None else json.dumps(payload).encode()
@@ -69,7 +73,7 @@ def main():
         session=value['sessionId'] if isinstance(value,dict) and 'sessionId' in value else None
         if not session: raise RuntimeError(f'no webdriver session id: {value}')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
-        wait_until(lambda:text(session,find(session,'#bankCount'))=='1120',label='1120 bank count')
+        wait_until(lambda:text(session,find(session,'#bankCount'))==str(EXPECTED_BANK),label='profile bank count')
         assert 'سؤال' in text(session,find(session,'body'))
         click(session,find(session,'#langBtn'))
         wait_until(lambda:'Practice like an exam' in text(session,find(session,'#home')),label='English UI')
@@ -79,20 +83,43 @@ def main():
         assert before!=after, (before,after)
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
-        wait_until(lambda:'1 of 200' in text(session,find(session,'#questionCounter')),label='200-question exam')
+        wait_until(lambda:f'1 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='profile-sized full exam')
         opts=finds(session,'#options .option'); assert len(opts)==4
-        click(session,opts[0])
+        first_option_text=text(session,opts[0]); click(session,opts[0])
+        click(session,find(session,'.confBtn[data-confidence="high"]'))
         next_ok=execute(session,"const b=document.getElementById('nextBtn'); if(!b||b.disabled) return false; b.click(); return true;")
         assert next_ok is True
-        wait_until(lambda:'2 of 200' in text(session,find(session,'#questionCounter')),label='next without confidence')
-        assert len(finds(session,'#palette .qjump'))==200
+        click(session,find(session,'#flagBtn'))
+        q2_order=[text(session,e) for e in finds(session,'#options .option')]
+        wait_until(lambda:f'2 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='next without confidence')
+        assert len(finds(session,'#palette .qjump'))==EXPECTED_FULL
+        req('POST',f'/session/{session}/refresh',{})
+        wait_until(lambda:execute(session,"return document.getElementById('resumeBox').classList.contains('show')"),label='resume card after reload')
+        click(session,find(session,'#resumeBtn'))
+        wait_until(lambda:f'2 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='resume current index')
+        assert [text(session,e) for e in finds(session,'#options .option')]==q2_order
+        assert 'Remove flag' in text(session,find(session,'#flagBtn'))
+        click(session,find(session,'#prevBtn'))
+        wait_until(lambda:f'1 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='previous answered question')
+        assert len(finds(session,'#options .option.selected'))==1
+        assert text(session,find(session,'#options .option.selected')).endswith(first_option_text.split('\n',1)[-1])
+        assert execute(session,"return document.querySelector('.confBtn[data-confidence=\"high\"]').classList.contains('on')")
+        click(session,find(session,'#homeBtn'))
+        wait_until(lambda:len(finds(session,'.startSection'))>0,label='section actions')
+        execute(session,"const s=document.querySelector('.sectionCount'); const preferred=[...s.options].find(o=>o.value!=='all'); s.value=preferred.value; document.querySelector('.startSection').click();")
+        wait_until(lambda:'Domain exam' in text(session,find(session,'#examModeLabel')),label='section exam started')
+        click(session,find(session,'#submitBtn'))
+        req('POST',f'/session/{session}/alert/accept',{})
+        wait_until(lambda:len(finds(session,'#reviewList .reviewItem'))>0,label='results review rendered')
+        click(session,find(session,'#newExamBtn'))
+        wait_until(lambda:len(finds(session,'.startSection'))>0 and len(finds(session,'#startFullBtn'))==1,label='exam modes available after results')
         req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html?smoke=1'})
         wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='three feedback cards')
         assert find(session,'#suggestionForm')
         assert find(session,'#contributionForm')
         assert find(session,'#ratingForm')
         assert len(finds(session,'#stars .star'))==5
-        print('BROWSER_SMOKE: PASS bank=1120 bilingual=PASS theme=PASS full_exam=200 confidence_optional=PASS feedback=PASS')
+        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS feedback=PASS')
     finally:
         if session:
             try:req('DELETE',f'/session/{session}')
