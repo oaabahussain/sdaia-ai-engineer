@@ -35,3 +35,8 @@ Task 15: complete — targeted TDD RED→GREEN; content-overload/progressive-dis
 Task 16: complete — targeted TDD RED→GREEN; evidence-family discipline and project-reference-unverified guardrail committed.
 Task 17: complete — targeted TDD RED→GREEN; explicit anti-patterns committed.
 Task 18: complete — targeted TDD RED→GREEN; strongest falsifiers/counter-evidence committed.
+
+Task 19: complete — handoff RED→GREEN against stale Draft/unmerged state; current continuation now records Programme A merged/deployed/post-merge verified and B1 design after B0.
+Task 20: complete — historical final review preserved; post-merge addendum records merge SHA and successful Pages/server workflow runs.
+Task 21: complete — README now links constitution, original evidence appendix, research amendment and B0 evidence ledger without changing runtime claims.
+Task 22: complete — evidence provenance contract GREEN; Deep/date/residual-uncertainty/falsifier/no-independent-challenge/community-signal boundaries pinned.
