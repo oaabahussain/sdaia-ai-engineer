@@ -65,7 +65,7 @@ test('main page brand and hero are sourced from track presentation', () => {
   assert.doesNotMatch(html, /SDAIA AI Engineer/);
   assert.doesNotMatch(html, /تدرّب مثل الاختبار/);
   assert.doesNotMatch(html, /Practice like an exam/);
-  for (const id of ['brandText','heroEyebrow','heroTitle','heroText','statusNotice']) assert.match(html,new RegExp('id=["\\']'+id+'["\\']'));
+  for (const id of ['brandText','heroEyebrow','heroTitle','heroText','statusNotice']) assert.ok(html.includes(`id="${id}"`) || html.includes(`id='${id}'`), id);
   assert.match(app,/function applyTrackPresentation\(\)/);
   assert.match(app,/document\.title/);
 });
