@@ -1,0 +1,66 @@
+-function persist(){try{const s=JSON.parse(localStorage.getItem('sdaia.state.v1')||'{}');s.examV2=s.examV2||{};s.examV2.lang=lang;s.examV2.theme=theme;localStorage.setItem('sdaia.state.v1',JSON.stringify(s))}catch{}}
++function persist(){try{const key=localStorage.getItem('learning-platform.state.v2')?'learning-platform.state.v2':'sdaia.state.v1';const st=JSON.parse(localStorage.getItem(key)||'{}');if(st?.version===2){st.preferences=st.preferences||{};st.preferences.lang=lang;st.preferences.theme=theme}else{st.examV2=st.examV2||{};st.examV2.lang=lang;st.examV2.theme=theme}localStorage.setItem(key,JSON.stringify(st))}catch{}}
+ function issue(title,body){const p=new URLSearchParams({title,body});window.open(`https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?${p.toString()}`,'_blank','noopener')}
+ document.getElementById('langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';persist();apply()};document.getElementById('themeBtn').onclick=()=>{theme=theme==='dark'?'light':'dark';persist();apply()};
+ document.getElementById('suggestionForm').onsubmit=e=>{e.preventDefault();const area=document.getElementById('suggestionArea').value,title=document.getElementById('suggestionTitleInput').value.trim(),details=document.getElementById('suggestionDetails').value.trim();issue(`[Suggestion] ${title}`,`## Area\n${area}\n\n## Suggestion\n${details}\n\n---\nSubmitted from the public feedback page.`)};
+diff --git a/scripts/build_question_id_map.js b/scripts/build_question_id_map.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..2b232901d6b32e984e6354b6612ea4ca3f1394e8
+--- /dev/null
++++ b/scripts/build_question_id_map.js
+@@ -0,0 +1,2 @@
++import fs from 'node:fs';import { loadTrack } from './load_track.js';import { expandConceptBank } from '../src/logic/questionBank.js';
++const root=process.cwd();const bundle=loadTrack(root,'sdaia-ai-engineer');const q=expandConceptBank(bundle.concepts,{trackId:bundle.manifest.id});const map=Object.fromEntries(q.map((x,i)=>[`q${i+1}`,x.id]));fs.mkdirSync('data/migrations',{recursive:true});fs.writeFileSync('data/migrations/sdaia-generated-v2-question-ids.json',JSON.stringify(map,null,2)+'\n');console.log(Object.keys(map).length);
+diff --git a/scripts/contract_test.js b/scripts/contract_test.js
+index 703d56f3f43f19c918f0f966f27a92c3b4a2ca4c..64817340cb351197b26648b4e4a0cf1fdf996a29 100644
+--- a/scripts/contract_test.js
++++ b/scripts/contract_test.js
+@@ -1,8 +1,6 @@
+-import assert from 'node:assert/strict';
+-import crypto from 'node:crypto';
+-import { expandConceptBank } from '../src/logic/questionBank.js';
++import assert from 'node:assert/strict';import crypto from 'node:crypto';import { expandConceptBank } from '../src/logic/questionBank.js';
+ const adapterName=process.argv[2];if(!['browser','api'].includes(adapterName))throw new Error('Usage: node scripts/contract_test.js browser|api');
+ class FakeLocalStorage{constructor(){this.map=new Map()}getItem(k){return this.map.has(k)?this.map.get(k):null}setItem(k,v){this.map.set(k,String(v))}removeItem(k){this.map.delete(k)}}
+-globalThis.localStorage=new FakeLocalStorage();const id=crypto.randomUUID();globalThis.localStorage.setItem('sdaia.anon_id.v1',id);globalThis.location={protocol:'https:'};const now=new Date().toISOString();const state={version:1,anon_id:id,created_at:now,updated_at:now,onboarded:false,profile:{minutes:20,examDate:''},answer_map:{},attempts:{},confidence:{},mastered:{},review_map:{},errors:{},bookmark_map:{},notes:{},sessions:{},activity:{},diagnostic:{done:false,answers:{}},theme:'auto',focus:false};let adapter;
++globalThis.localStorage=new FakeLocalStorage();const id=crypto.randomUUID();globalThis.localStorage.setItem('learning-platform.anon-id.v1',id);globalThis.location={protocol:'https:'};const now=new Date().toISOString();const state={version:2,anon_id:id,created_at:now,updated_at:now,preferences:{lang:'ar',theme:'light'},tracks:{'sdaia-ai-engineer':{track_version:'2026.09',active_exam:null,exam_history:[]}},legacy:{source_version:1,preserved:{}}};let adapter;
+ if(adapterName==='browser'){const fs=await import('node:fs/promises');globalThis.fetch=async url=>({ok:true,status:200,json:async()=>JSON.parse(await fs.readFile(new URL(`../${url.replace('./','')}`,import.meta.url),'utf8'))});adapter=await import('../src/storage/browser.js')}else{globalThis.__SDAIA_API_BASE__=process.env.SDAIA_API_BASE||'http://127.0.0.1:8000/v1';adapter=await import('../src/storage/api.js')}
+-await adapter.saveState(state);const loaded=await adapter.loadState();assert.equal(loaded.anon_id,id);const bank=await adapter.loadBank();if(adapterName==='browser'){assert.equal(expandConceptBank(bank.concepts).length,1120)}else{assert.ok(bank.questions.length>=121)}const feedback=await adapter.submitFeedback({question_id:'q1',issue_type:'other',details:'contract test'});assert.equal(feedback.ok,true);console.log(`${adapterName} adapter contract: PASS`);
++await adapter.saveState(state);const loaded=await adapter.loadState();assert.equal(loaded.anon_id,id);const bank=await adapter.loadBank();assert.equal(bank.contract_version,2);assert.equal(bank.track.id,'sdaia-ai-engineer');assert.equal(bank.exam_profile.id,bank.track.default_exam_profile);assert.equal(expandConceptBank(bank.concepts,{trackId:bank.track.id}).length,1120);assert.deepEqual([...Object.keys(bank.exam_profile.weights)].sort(),[...Object.keys(bank.concepts)].sort());const feedback=await adapter.submitFeedback({question_id:'q1',issue_type:'other',details:'contract test'});assert.equal(feedback.ok,true);console.log(`${adapterName} adapter contract: PASS`);
+diff --git a/scripts/load_track.js b/scripts/load_track.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..fcd41c10e894b776b379c3a603ff3d52ecb03dfe
+--- /dev/null
++++ b/scripts/load_track.js
+@@ -0,0 +1,12 @@
++import fs from 'node:fs';
++import path from 'node:path';
++const readJson=file=>JSON.parse(fs.readFileSync(file,'utf8'));
++export function loadTrack(root,trackId){
++ const manifest=readJson(path.join(root,'tracks',trackId,'manifest.json'));
++ const profiles=manifest.exam_profiles.map(p=>readJson(path.join(root,p)));
++ const examProfile=profiles.find(p=>p.id===manifest.default_exam_profile);
++ if(!examProfile)throw new Error(`Missing default exam profile ${manifest.default_exam_profile}`);
++ const conceptDocs=manifest.content.concept_files.map(p=>readJson(path.join(root,p)));
++ const concepts=Object.fromEntries(conceptDocs.map(doc=>[doc.domain,doc.concepts]));
++ return{manifest,examProfile,concepts,learn:readJson(path.join(root,manifest.content.learn)),cases:readJson(path.join(root,manifest.content.cases))};
++}
+diff --git a/scripts/validate.js b/scripts/validate.js
+index 7ef1b2632c53c58652163809a20e1977916cd78f..cb589607b86a6d57df77276084dcf53f4d876a8e 100644
+--- a/scripts/validate.js
++++ b/scripts/validate.js
+@@ -1,14 +1,4 @@
+-import fs from 'node:fs';
+-import path from 'node:path';
+-import process from 'node:process';
+-import { expandConceptBank } from '../src/logic/questionBank.js';
+-import { weightedAllocation } from '../src/logic/exam.js';
+-import { loadConcepts } from './load_concepts.js';
+-const root=process.cwd();const read=name=>JSON.parse(fs.readFileSync(path.join(root,name),'utf8'));
+-const concepts=loadConcepts(root),weights=read('data/weights.json');
+-const questions=expandConceptBank(concepts);
+-if(questions.length<1000)throw new Error(`Expected >=1000 generated questions, found ${questions.length}`);
+-const ids=new Set(),prompts=new Set(),answerCounts=[0,0,0,0],domainCounts=Object.fromEntries(Object.keys(weights).map(d=>[d,0]));
+-for(const q of questions){if(ids.has(q.id))throw new Error(`Duplicate id ${q.id}`);ids.add(q.id);const k=`${q.domain}|${q.question}|${q.question_en}`;if(prompts.has(k))throw new Error(`Duplicate prompt ${q.id}`);prompts.add(k);if(!(q.domain in domainCounts))throw new Error(`Unknown domain ${q.domain}`);if(!q.question||!q.question_en||q.options.length!==4||q.options_en.length!==4||q.answer<0||q.answer>3)throw new Error(`Invalid bilingual question ${q.id}`);domainCounts[q.domain]++;answerCounts[q.answer]++}
+-const sum=Object.values(weights).reduce((s,n)=>s+Number(n),0);if(Math.abs(sum-100)>1e-9)throw new Error(`Weights sum ${sum}`);for(const [d,n] of Object.entries(domainCounts))if(n<100)throw new Error(`${d} only ${n}`);if(Math.max(...answerCounts)-Math.min(...answerCounts)>Math.ceil(questions.length*.08))throw new Error(`Answer imbalance ${answerCounts}`);const allocation=weightedAllocation(weights,200);if(Object.values(allocation).reduce((s,n)=>s+n,0)!==200)throw new Error('Allocation !=200');
+-console.log(`generated questions: PASS (${questions.length})`);console.log(`domains: PASS ${JSON.stringify(domainCounts)}`);console.log(`answer positions: PASS ${answerCounts.join('/')}`);console.log(`weights: PASS (${sum.toFixed(1)})`);console.log(`weighted 200: PASS ${JSON.stringify(allocation)}`);
