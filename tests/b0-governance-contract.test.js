@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const exists = path => fs.existsSync(new URL(path, import.meta.url));
+const read = path => fs.readFileSync(new URL(path, import.meta.url), 'utf8');
 
 test('canonical governance files are present on the current branch', () => {
   for (const path of [
