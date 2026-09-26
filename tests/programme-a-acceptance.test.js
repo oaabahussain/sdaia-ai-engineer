@@ -18,6 +18,9 @@ test('browser core derives active track state from loaded/configured contracts',
   assert.doesNotMatch(runtime, /trackId\s*=\s*['"]sdaia-ai-engineer['"]/);
   assert.match(browser, /ACTIVE_TRACK_ID/);
   assert.match(browser, /loadRuntimeBundle\(loadJson,ACTIVE_TRACK_ID\)/);
+  const questionBank = read('../src/logic/questionBank.js');
+  assert.doesNotMatch(questionBank, /trackId\s*=\s*['"]/);
+  assert.match(questionBank, /trackId is required/);
 });
 
 test('server default track is configuration rather than a function default', () => {
