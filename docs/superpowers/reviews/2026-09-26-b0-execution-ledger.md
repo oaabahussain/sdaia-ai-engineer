@@ -13,3 +13,5 @@ Pre-flight shared interfaces:
 - Tasks 23–25 produce audit evidence consumed by Task 28 final review: no interface conflict.
 
 Task 1: started from `main@1808442442cf7e75ba59a298df93e17fd84244f0`.
+
+Task 1: complete — baseline SHA re-read from GitHub and matched `1808442442cf7e75ba59a298df93e17fd84244f0`; baseline file present and verified.
