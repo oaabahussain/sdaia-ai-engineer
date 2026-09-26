@@ -1,16 +1,16 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   anon_id TEXT PRIMARY KEY,
   created_at TEXT NOT NULL
 );
 
-CREATE TABLE progress (
+CREATE TABLE IF NOT EXISTS progress (
   anon_id TEXT PRIMARY KEY REFERENCES users(anon_id),
   state_json TEXT NOT NULL,
   version INTEGER NOT NULL DEFAULT 1,
   updated_at TEXT NOT NULL
 );
 
-CREATE TABLE questions (
+CREATE TABLE IF NOT EXISTS questions (
   id TEXT NOT NULL,
   version INTEGER NOT NULL,
   body_json TEXT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE questions (
   PRIMARY KEY (id, version)
 );
 
-CREATE TABLE feedback (
+CREATE TABLE IF NOT EXISTS feedback (
   id INTEGER PRIMARY KEY,
   anon_id TEXT NOT NULL REFERENCES users(anon_id),
   question_id TEXT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE feedback (
   created_at TEXT NOT NULL
 );
 
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY,
   anon_id TEXT NOT NULL REFERENCES users(anon_id),
   type TEXT NOT NULL,
