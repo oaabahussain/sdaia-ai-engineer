@@ -36,9 +36,9 @@ Do not use the old corrupted Base64/XZ transfer mechanism.
 1. Architecture constitution:
    `docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md`
    available directly on the B0 branch and intended for `main`.
-2. Programme A execution plan:
-   `docs/superpowers/plans/2026-09-23-programme-a-repository-contract-stabilisation.md`
-   remains historical Programme A planning evidence.
+2. Programme A execution plan remains historical evidence on branch `design/platform-vnext-spec` at:
+   `docs/superpowers/plans/2026-09-23-programme-a-repository-contract-stabilisation.md`.
+   It is not a current-`main` governance dependency.
 3. `docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md` is the dated research amendment for future programmes.
 4. This `HANDOFF.md` is the durable current continuation record.
 
