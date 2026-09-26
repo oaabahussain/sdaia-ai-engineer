@@ -107,3 +107,13 @@ test('current handoff reflects Programme A merged deployed post-merge state', ()
   assert.doesNotMatch(doc, /Programme A next action:\s*owner review\/merge decision/i);
   assert.match(doc, /B1 — Track Presentation Contract design/);
 });
+
+test('B0 evidence ledger preserves provenance, challenge limits, falsifiers and date', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-b0-governance-research-sync-evidence.md');
+  assert.match(doc, /2026-09-26/);
+  assert.match(doc, /Deep evidence audit/);
+  assert.match(doc, /Residual uncertainty/i);
+  assert.match(doc, /Strongest falsifiers|counter-evidence/i);
+  assert.match(doc, /no independent.*challenge pass/i);
+  assert.match(doc, /signals.*never prevalence|signals.*not prevalence/i);
+});
