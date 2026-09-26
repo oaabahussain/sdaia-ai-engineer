@@ -79,3 +79,8 @@ test('personalization avoids content overload', () => {
   assert.match(doc, /smallest.*next learning action/i);
   assert.match(doc, /progressive disclosure/i);
 });
+
+test('evidence discipline preserves source classes and current SDAIA uncertainty', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  for (const phrase of ['official/primary evidence','independent research','implementation evidence','community signals','project-reference-unverified','dated evidence ledger']) assert.ok(doc.includes(phrase), phrase);
+});

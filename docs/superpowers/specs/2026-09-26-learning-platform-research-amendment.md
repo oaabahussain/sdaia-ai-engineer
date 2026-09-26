@@ -111,3 +111,11 @@ Use **WCAG 2.2** as the current web-accessibility baseline where applicable, pre
 **SHOULD** prefer the **smallest useful next learning action** that addresses the learner need instead of presenting a large undifferentiated catalog as personalization.
 
 Use **progressive disclosure** for advanced analytics/settings so the learner is not required to understand internal algorithm complexity to continue learning.
+
+## 12. Evidence discipline
+
+**MUST** distinguish **official/primary evidence**, **independent research**, **implementation evidence**, and **community signals**.
+
+Multiple URLs with one provenance root do not become independent confirmation. Current SDAIA exam rules/weights remain **project-reference-unverified** until current primary evidence supports promotion.
+
+Maintain a **dated evidence ledger** so future research refreshes are incremental and contradictions remain visible.
