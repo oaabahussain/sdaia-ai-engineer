@@ -107,6 +107,8 @@ def main():
         click(session,find(session,'#homeBtn'))
         wait_until(lambda:len(finds(session,'.startSection'))>0,label='section actions')
         execute(session,"const s=document.querySelector('.sectionCount'); const preferred=[...s.options].find(o=>o.value!=='all'); s.value=preferred.value; document.querySelector('.startSection').click();")
+        section_debug=execute(session,"return {home:document.getElementById('home').className,exam:document.getElementById('exam').className,label:document.getElementById('examModeLabel').textContent,error:document.getElementById('errorBox').textContent,select:document.querySelector('.sectionCount')?.value,buttons:document.querySelectorAll('.startSection').length};")
+        print('SECTION_DEBUG',json.dumps(section_debug,ensure_ascii=False))
         wait_until(lambda:'Domain exam' in text(session,find(session,'#examModeLabel')),label='section exam started')
         click(session,find(session,'#submitBtn'))
         req('POST',f'/session/{session}/alert/accept',{})
