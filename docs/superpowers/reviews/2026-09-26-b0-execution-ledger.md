@@ -15,3 +15,8 @@ Pre-flight shared interfaces:
 Task 1: started from `main@1808442442cf7e75ba59a298df93e17fd84244f0`.
 
 Task 1: complete — baseline SHA re-read from GitHub and matched `1808442442cf7e75ba59a298df93e17fd84244f0`; baseline file present and verified.
+
+Task 2: complete — governance presence contract written first; RED observed because canonical constitution/evidence/amendment were absent.
+Task 3: complete — accepted constitution imported; presence contract remained RED because later canonical files were still absent.
+Task 4: complete — evidence appendix imported with provenance note; contract remained RED only for missing research amendment.
+Task 5: complete — research amendment shell created; targeted governance presence test GREEN 1/1.
