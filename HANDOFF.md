@@ -11,7 +11,7 @@
 
 ## Authoritative continuation point
 
-Tasks 1–8 are complete and persisted on GitHub.
+Tasks 1–9 are complete and persisted on GitHub.
 
 Latest product-code checkpoint after Task 8:
 
@@ -19,9 +19,9 @@ Latest product-code checkpoint after Task 8:
 
 Any later commit on the implementation branch before Task 9 may be documentation-only (including this handoff). A new session should always resolve the current branch HEAD from GitHub, then verify that the Task 8 code checkpoint is an ancestor.
 
-**Exact next task: Task 9 — Quarantine Legacy Content and Remove Active Dead Paths.**
+**Exact next task: Task 10 — Make CI and Pages Validation Manifest-Driven.**
 
-Do not reconstruct Tasks 1–8.  
+Do not reconstruct Tasks 1–9.  
 Do not merge PR #7 before the Programme A acceptance gate.  
 Do not begin Task 10 before Task 9 is green.  
 Do not use the old corrupted Base64/XZ transfer mechanism.
@@ -167,6 +167,47 @@ Fresh Task 8 verification:
 - weights: **100.0%**
 - learner-visible educational payload compatibility test: **PASS**
 
+### Task 9 — Quarantine legacy content and remove active dead paths
+Final Task 9 checkpoint:
+`5c361efbf10f960075d8363f21ea2fcdb9aa6b0d`
+
+RED:
+- `2a6a710132f8850ad7410eac4f33688b29311340`
+- contract scan failed on the still-active `scripts/verify_release.py → weights.json` dependency.
+
+GREEN result:
+- former `data/questions.json` moved byte-for-byte to `data/legacy/static-bank-v1/questions.json`;
+- former `data/sessions.json` moved byte-for-byte to `data/legacy/static-bank-v1/sessions.json`;
+- legacy disposition README marks the 121-item bank as `MIGRATE_PENDING` and `NOT ACTIVE`;
+- active `data/weights.json` removed after manifest/profile consumers were already canonical;
+- obsolete question/session/bank schemas removed;
+- unreferenced State V1 schema removed by explicit ruling because StateV2 is canonical and migration code does not consume the old schema;
+- stale `scripts/verify_release.py` removed;
+- hard-coded concept-file helper and loader removed; baseline regression now uses the canonical track loader;
+- disconnected mastery/readiness/review/mission modules and their legacy/equivalence tests removed;
+- validator rejects reappearance of retired active paths and requires the preserved legacy migration inputs;
+- CI/server workflow includes an explicit no-active-legacy contract check.
+
+Debugging note:
+- the first GREEN attempt exposed a false-positive in the contract test: `scripts/validate.js` mentioned retired paths only as negative guards. The test was corrected to distinguish a guard from an active consumer before product code was touched.
+
+Ruling:
+- `data/schema/state.schema.json` (State V1) was not explicitly listed in the Task 9 file list, but it was an unreferenced active-looking schema competing with `state-v2.schema.json`. It was removed to satisfy the constitution's no-ambiguity rule. Cost if wrong: an undocumented external consumer of that repository path would need Git history; no in-repo consumer exists.
+
+Fresh Task 9 verification:
+- Node tests: **36/36 PASS**
+- canonical validator: **PASS**
+- browser smoke: **PASS**
+- service-worker shell assets: **PASS (22)**
+- Python server tests: **16/16 PASS**
+- SQLite schema smoke: **PASS**
+- Browser adapter contract: **PASS**
+- API adapter contract: **PASS**
+- active legacy reference contract: **PASS**
+- educational payload compatibility test: **PASS**
+- generated questions: **1120**
+- weights: **100.0%**
+
 ## Compatibility invariant
 
 Learner-visible compatibility digest remains:
@@ -177,21 +218,7 @@ No Task 8 question/content/scoring changes were made.
 
 ## Remaining Programme A work
 
-### Task 9 — NEXT
-**Quarantine Legacy Content and Remove Active Dead Paths**
-
-Key intent:
-- move the unique 121-question legacy bank/sessions under explicit legacy migration input;
-- remove active competing `data/weights.json`;
-- remove obsolete active schemas/release preflight;
-- remove disconnected mastery/readiness/review/mission runtime paths after reference scans;
-- remove hard-coded concept-file helper after manifest loading is confirmed everywhere;
-- preserve unique authored legacy content for later semantic migration;
-- prove there are no active runtime references to the legacy bank.
-
-TDD is mandatory. Run reference scans before each deletion/move. Do not treat Git history as permission for unexplained content loss.
-
-### Task 10
+### Task 10 — NEXT
 **Make CI and Pages Validation Manifest-Driven**
 
 Key intent:
@@ -256,9 +283,9 @@ Do not claim Programme A complete before Task 12 is green.
 2. Read this file.
 3. Read the accepted constitution and Programme A plan from `design/platform-vnext-spec`.
 4. Fetch `impl/programme-a-contract-stabilisation` and verify its current HEAD.
-5. Verify the Task 8 code checkpoint `53f1ba9...` is an ancestor of current HEAD.
+5. Verify the Task 9 checkpoint `5c361ef...` is an ancestor of current HEAD.
 6. Run a brief baseline verification.
-7. Start **Task 9 only** with TDD.
+7. Start **Task 10 only** with TDD.
 8. Use `systematic-debugging` on any failure.
-9. Use `verification-before-completion` before declaring Task 9 green.
+9. Use `verification-before-completion` before declaring Task 10 green.
 10. Keep PR #7 Draft and unmerged until Programme A acceptance is complete.
