@@ -47,3 +47,13 @@ test('current SDAIA presentation validates and matches track identity', () => {
   assert.equal(Object.keys(doc.locales.ar.domain_labels).length, 7);
   assert.equal(Object.keys(doc.locales.en.domain_labels).length, 7);
 });
+
+test('presentation contract rejects track and version mismatch', async () => {
+  const { validatePresentationContract } = await import('../scripts/validate.js');
+  assert.equal(typeof validatePresentationContract, 'function');
+  const manifest = readJson('../tracks/sdaia-ai-engineer/manifest.json');
+  const profile = readJson('../tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json');
+  const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
+  assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,track_id:'wrong-track'}), /track mismatch/i);
+  assert.throws(() => validatePresentationContract(manifest, profile, {...presentation,track_version:'wrong'}), /version mismatch/i);
+});
