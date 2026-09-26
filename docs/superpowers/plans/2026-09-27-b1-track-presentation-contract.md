@@ -64,8 +64,11 @@ The plan fixes these interfaces for all implementing tasks:
 // src/presentation/coreI18n.js
 export const CORE_LOCALES = ['ar', 'en'];
 export const CORE_DEFAULT_LOCALE = 'ar';
-export const CORE_I18N = { ar: {...}, en: {...} };
-// Each locale exposes statusNotice(officialStatus, evidenceStatus) -> string.
+export const CORE_I18N = {
+  ar: { app: {...}, feedback: {...} },
+  en: { app: {...}, feedback: {...} }
+};
+// CORE_I18N[locale].app.statusNotice(officialStatus, evidenceStatus) -> string.
 
 // src/presentation/trackPresentation.js
 export async function loadTrackPresentation(fetchJson, manifest);
@@ -135,7 +138,7 @@ Behavior:
 - [ ] **Step 1: Write a failing AJV test for a minimal valid TrackPresentationV1 document.**
 - [ ] **Step 2: Write failing tests rejecting missing hero fields and arbitrary top-level/locale fields.**
 - [ ] **Step 3: Run targeted test; expected RED because schema is missing.**
-- [ ] **Step 4: Create the draft-07 schema with `schema_version: const 1` and `additionalProperties:false` at contract-owned levels.**
+- [ ] **Step 4: Create the draft-07 schema: top-level/locale/hero objects use `additionalProperties:false`; `locales` accepts locale-keyed objects; `domain_labels` is an object with `minProperties:1` and `additionalProperties:{type:'string',minLength:1}` because current domain keys are data.**
 - [ ] **Step 5: Re-run targeted test; expected GREEN.**
 - [ ] **Step 6: Commit `feat: add track presentation v1 schema`.**
 
@@ -226,10 +229,10 @@ Behavior:
 - Test: `tests/b1-presentation-acceptance.test.js`
 
 **Interfaces:**
-- Produces: `CORE_LOCALES`, `CORE_DEFAULT_LOCALE`, `CORE_I18N`.
+- Produces: `CORE_LOCALES`, `CORE_DEFAULT_LOCALE`, `CORE_I18N[locale].app`, and `CORE_I18N[locale].feedback` namespaces so page-specific generic keys such as `footer` cannot collide.
 
 - [ ] **Step 1: Add RED assertion that generic app UI strings are imported from `./presentation/coreI18n.js`.**
-- [ ] **Step 2: Create module exporting exactly `CORE_LOCALES=['ar','en']`, `CORE_DEFAULT_LOCALE='ar'`, and generic current UI translations.**
+- [ ] **Step 2: Create module exporting exactly `CORE_LOCALES=['ar','en']`, `CORE_DEFAULT_LOCALE='ar'`, and `CORE_I18N={ar:{app:{...},feedback:{...}},en:{app:{...},feedback:{...}}}`; preserve current generic wording while renaming only internal keys as needed to avoid collisions.**
 - [ ] **Step 3: Move only generic strings out of `src/app.js`; leave track brand/hero temporarily until later tasks.**
 - [ ] **Step 4: Run the targeted core-i18n/import tests plus `node --check src/app.js`; do not claim the full suite GREEN while the intentionally RED B1 acceptance contract still covers later tasks.**
 - [ ] **Step 5: Commit `refactor: extract generic core translations`.**
@@ -338,7 +341,7 @@ Behavior:
 - Produces: dynamic document title, brand, hero eyebrow/title/description.
 
 - [ ] **Step 1: Add RED leakage assertions for current SDAIA brand/hero literals in `src/app.js` and `index.html`.**
-- [ ] **Step 2: Replace track-specific HTML fallbacks with neutral shell placeholders only.**
+- [ ] **Step 2: Replace track-specific HTML fallbacks with neutral shell placeholders and add exact presentation targets: `#brandText`, `#heroEyebrow`, `#heroTitle`, `#heroText`, and `#statusNotice`.**
 - [ ] **Step 3: Apply track display/brand/hero after presentation locale resolution.**
 - [ ] **Step 4: Set `document.title` from track display name plus generic practice label; fallback to track ID.**
 - [ ] **Step 5: Verify leakage assertions GREEN.**
@@ -373,7 +376,7 @@ Behavior:
   - `PROFILE.evidence_status`.
 
 - [ ] **Step 1: Add RED test proving `presentation.json` contains no `official`, `unofficial`, or evidence-status override field.**
-- [ ] **Step 2: Add `CORE_I18N[locale].statusNotice(officialStatus,evidenceStatus) -> string` for Arabic and English.**
+- [ ] **Step 2: Add `CORE_I18N[locale].app.statusNotice(officialStatus,evidenceStatus) -> string` for Arabic and English.**
 - [ ] **Step 3: Replace the current hard-coded unofficial/project-reference sentence with output derived from manifest/profile status.**
 - [ ] **Step 4: Assert `project-reference-unverified` never renders as official.**
 - [ ] **Step 5: Commit `feat: derive evidence warnings from canonical status`.**
@@ -391,7 +394,7 @@ Behavior:
 
 - [ ] **Step 1: Add RED assertion that `feedback.html` loads `./src/feedback.js` as a module and no longer embeds the main feedback behavior script.**
 - [ ] **Step 2: Move existing language/theme/form/rating/issue behavior byte-for-behavior into `src/feedback.js`.**
-- [ ] **Step 3: Import generic feedback translations from `coreI18n.js`; do not change issue template/URL/body semantics.**
+- [ ] **Step 3: Import generic feedback translations from `CORE_I18N[locale].feedback`; do not change issue template/URL/body semantics.**
 - [ ] **Step 4: Run feedback contract tests.**
 - [ ] **Step 5: Commit `refactor: extract feedback page module`.**
 
@@ -405,7 +408,7 @@ Behavior:
 **Interfaces:**
 - Uses current `ACTIVE_TRACK_ID` only for B1 bootstrap; loads manifest then presentation for display identity.
 
-- [ ] **Step 1: Add RED leakage assertion that `feedback.html` and `src/feedback.js` contain no `SDAIA AI Engineer` literal.**
+- [ ] **Step 1: Add RED leakage assertion that `feedback.html` and `src/feedback.js` contain no `SDAIA AI Engineer` literal, and require a neutral `#feedbackBrand` presentation target in the HTML shell.**
 - [ ] **Step 2: Load current manifest and presentation using `ACTIVE_TRACK_ID` with the same local static `fetchJson(url)` helper contract; resolve locale from current StateV2 preference, and fall back to core locale/track ID if presentation or locale resolution fails.**
 - [ ] **Step 3: Set feedback document title/brand from presentation with track-ID fallback.**
 - [ ] **Step 4: Preserve public-warning and form labels from generic translations.**
