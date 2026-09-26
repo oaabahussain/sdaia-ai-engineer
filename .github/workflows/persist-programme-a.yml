@@ -1,0 +1,81 @@
+name: Persist Programme A Tasks 1-5
+on:
+  push:
+    branches:
+      - tmp/programme-a-persist
+permissions:
+  contents: write
+jobs:
+  build-implementation-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Rebuild verified implementation commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/programme-a
+          : > /tmp/programme-a/core.patch
+          for i in 00 01 02 03 04 05 06 07 08 09; do
+            cat ".programme-a-transfer/core-${i}.patch" >> /tmp/programme-a/core.patch
+          done
+          actual="$(sha256sum /tmp/programme-a/core.patch | awk '{print $1}')"
+          expected="56d5dbf16fb03f0c689d0522fc5766e240d8fa1138b8a8f0ac8ebdf2f2deb51a"
+          test "$actual" = "$expected"
+
+          git checkout -B tmp/programme-a-built 362d35c697411d4eddcc4536c843df17161d3374
+          git apply --check /tmp/programme-a/core.patch
+          git apply /tmp/programme-a/core.patch
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, re
+          for p in sorted(Path('data/concepts').glob('*.json')):
+              doc = json.loads(p.read_text(encoding='utf-8'))
+              prefix = p.stem
+              for idx, concept in enumerate(doc['concepts'], 1):
+                  slug = '-'.join(re.findall(r'[a-z0-9]+', concept['term'].lower()))
+                  concept['id'] = f'{prefix}.{slug}'
+                  concept['order'] = idx
+              p.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          node scripts/build_question_id_map.js
+
+          git add tests/baseline.test.js \
+            tests/fixtures/runtime/current-bank-counts.expected.json \
+            tests/fixtures/runtime/current-profile.expected.json
+          git commit -m "test: capture programme A production baseline"
+
+          git add data/schema/exam-profile.schema.json \
+            data/schema/track-manifest.schema.json \
+            scripts/load_track.js scripts/validate.js tests/track-contract.test.js \
+            tracks/sdaia-ai-engineer/manifest.json \
+            tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json
+          git commit -m "feat: add canonical track and exam profile contracts"
+
+          git add data/concepts/*.json \
+            data/migrations/sdaia-generated-v2-question-ids.json \
+            data/schema/rendered-question.schema.json \
+            scripts/build_question_id_map.js src/logic/questionBank.js tests/bank.test.js
+          git commit -m "feat: assign stable content and question identifiers"
+
+          git add db/schema.sql feedback.html data/schema/state-v2.schema.json \
+            src/app.js src/state/migrate.js \
+            src/storage/api.js src/storage/browser.js src/storage/identity.js src/storage/interface.js \
+            tests/fixtures/state/current-exam-v2.json tests/state-migration.test.js \
+            tests/storage.api.test.js tests/storage.browser.test.js
+          git commit -m "feat: add state v2 and neutral anonymous identity"
+
+          git add MIGRATIONS.md api/openapi.yaml data/schema/runtime-bundle.schema.json \
+            scripts/contract_test.js server/app/main.py server/tests/test_api.py \
+            src/content/runtimeBundle.js
+          git commit -m "fix: unify browser and API runtime bundle contracts"
+
+          test -z "$(git status --porcelain)"
+          git diff --check 362d35c697411d4eddcc4536c843df17161d3374..HEAD
+          git push origin HEAD:refs/heads/tmp/programme-a-built --force
