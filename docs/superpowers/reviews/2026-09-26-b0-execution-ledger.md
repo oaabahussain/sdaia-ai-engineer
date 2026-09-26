@@ -20,3 +20,18 @@ Task 2: complete — governance presence contract written first; RED observed be
 Task 3: complete — accepted constitution imported; presence contract remained RED because later canonical files were still absent.
 Task 4: complete — evidence appendix imported with provenance note; contract remained RED only for missing research amendment.
 Task 5: complete — research amendment shell created; targeted governance presence test GREEN 1/1.
+
+Task 6: Ruling: initial retrieval guardrail regex was order-sensitive and rejected semantically correct text — split it into independent MUST-NOT/retrieval and universally-optimal assertions — cost if wrong: test could miss a wording regression, mitigated by both assertions and the explicit counter-evidence section.
+Task 6: complete — targeted TDD RED→GREEN; learning outcomes/spacing/retrieval/gamification rules committed.
+Task 7: complete — targeted TDD RED→GREEN; grounded/optional/scaffolded AI tutor rules committed.
+Task 8: complete — targeted TDD RED→GREEN; staged AI content activation pipeline committed.
+Task 9: complete — targeted TDD RED→GREEN; 14,000+ future/quality separation committed.
+Task 10: complete — targeted TDD RED→GREEN; psychometric real-data/versioning guardrails committed.
+Task 11: complete — targeted TDD RED→GREEN; actionable analytics/uncertainty rules committed.
+Task 12: complete — targeted TDD RED→GREEN; learner source control/community-signal rules committed.
+Task 13: complete — targeted TDD RED→GREEN; learner-path friction metrics committed.
+Task 14: complete — targeted TDD RED→GREEN; reliability/offline/mobile/WCAG 2.2 rules committed.
+Task 15: complete — targeted TDD RED→GREEN; content-overload/progressive-disclosure rules committed.
+Task 16: complete — targeted TDD RED→GREEN; evidence-family discipline and project-reference-unverified guardrail committed.
+Task 17: complete — targeted TDD RED→GREEN; explicit anti-patterns committed.
+Task 18: complete — targeted TDD RED→GREEN; strongest falsifiers/counter-evidence committed.
