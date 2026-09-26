@@ -49,3 +49,5 @@ Task 26/27 Ruling: this harness has no full local checkout/runtime workspace for
 
 Task 26: RED observed in PR quality gate run 36263412814 — 15 governance tests failed with `ReferenceError: read is not defined`; file-presence test passed. Root cause: the new test suite defined `exists()` but omitted the `read()` helper used by all semantic assertions.
 Task 26: fix — add the single missing UTF-8 `read()` helper; no production/governance content changed.
+
+Task 26: second RED on run 36263478601 isolated to the community-signal assertion. Root cause: one order-sensitive regex tried to encode two separate evidence statements. The ledger already states both semantics independently. Fix: split the assertion into (1) community reports are for discovery/user-demand signals and (2) anecdotal reports are not prevalence evidence. No evidence claim changed.
