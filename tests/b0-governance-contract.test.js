@@ -62,3 +62,8 @@ test('AI transformations preserve source control and community reports stay sign
   assert.match(doc, /generated.*label|label.*generated/i);
   assert.match(doc, /community.*signals.*not prevalence|signals.*not prevalence/i);
 });
+
+test('material redesigns measure learner-path friction', () => {
+  const doc = read('../docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md');
+  for (const metric of ['time-to-start-learning','actions-to-resume','actions-to-weak-topic','actions-to-exam','mobile/RTL','recovery after refresh/offline interruption']) assert.ok(doc.includes(metric), metric);
+});

@@ -87,3 +87,15 @@ Learner analytics must answer:
 AI assistance should be possible to disable where practical, and deterministic exam/flashcard sources must not be contaminated by unrequested generated facts.
 
 Community reports are **failure and user-demand signals, not prevalence evidence**.
+
+## 9. UX friction and redesign
+
+Material learner-facing redesigns **MUST** measure learning-path friction rather than treating visual cleanliness as sufficient evidence of improvement.
+
+Minimum measures/checks:
+- `time-to-start-learning`;
+- `actions-to-resume`;
+- `actions-to-weak-topic`;
+- `actions-to-exam`;
+- task completion on `mobile/RTL`;
+- `recovery after refresh/offline interruption`.
