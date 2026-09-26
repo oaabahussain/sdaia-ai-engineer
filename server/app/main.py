@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
 DATA_DIR = ROOT / 'data'
 RATE = defaultdict(deque)
+DEFAULT_TRACK_ID = os.getenv('TRACK_ID', 'sdaia-ai-engineer')
 
 
 def load_schema(name):
@@ -51,7 +52,8 @@ VALIDATORS = {
 }
 
 
-def load_runtime_bundle(track_id='sdaia-ai-engineer'):
+def load_runtime_bundle(track_id=None):
+    track_id = track_id or DEFAULT_TRACK_ID
     manifest = json.loads((ROOT / 'tracks' / track_id / 'manifest.json').read_text(encoding='utf-8'))
     profiles = [json.loads((ROOT / ref).read_text(encoding='utf-8')) for ref in manifest['exam_profiles']]
     exam_profile = next((p for p in profiles if p['id'] == manifest['default_exam_profile']), None)
