@@ -80,7 +80,7 @@ jobs:
           echo "live generated bilingual questions: PASS (${question_total})"
           curl --fail --silent --show-error --location --output live-sw.js "${PAGE_URL}sw.js?verify=${GITHUB_SHA}"
           grep -n "const CACHE" live-sw.js
-          if grep -q "sdaia-ai-pages-v8" live-sw.js; then echo 'Retired service worker cache name found'; exit 1; fi
           if grep -q "./data/concepts/" live-sw.js; then echo 'Concept chunks must not be pre-cached'; exit 1; fi
+          grep -q "event.request.mode === 'navigate'" live-sw.js
           grep -q "Response.error()" live-sw.js
           echo 'live service worker contract: PASS'
