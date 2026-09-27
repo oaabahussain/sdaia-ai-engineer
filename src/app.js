@@ -3,7 +3,7 @@ import { loadState, saveState, loadBank } from './storage/interface.js';
 import { weightedAllocation, sampleWeightedExam, sampleSectionExam, buildOptionOrders, scoreExam } from './logic/exam.js';
 import { expandConceptBank } from './logic/questionBank.js';
 import { CORE_I18N, CORE_DEFAULT_LOCALE } from './presentation/coreI18n.js';
-import { loadTrackPresentation, resolvePresentationLocale, getPresentationLocale } from './presentation/trackPresentation.js';
+import { loadTrackPresentation, resolvePresentationLocale, getPresentationLocale, getDomainLabel } from './presentation/trackPresentation.js';
 
 registerServiceWorker();
 
@@ -12,15 +12,6 @@ const TRACK_I18N = {
  en:{unofficial:'An independent, unofficial preparation tool. Domain weights follow the project reference, and the question bank is training content for practice.'}
 };
 
-const DOMAIN_AR={
- 'MLOps / LLMOps':'عمليات تعلم الآلة والنماذج اللغوية',
- 'Data / ML / Evaluation':'البيانات وتعلم الآلة والتقييم',
- 'Core AI / Deep Learning / GenAI':'أساسيات الذكاء الاصطناعي والتعلم العميق والذكاء التوليدي',
- 'Responsible AI / Security / Governance':'الذكاء المسؤول والأمن والحوكمة',
- 'AI Software Engineering':'هندسة برمجيات الذكاء الاصطناعي',
- 'Architecture / Infrastructure':'المعمارية والبنية التحتية',
- 'Business / Professional Practice':'الأعمال والممارسة المهنية',
-};
 
 const $=id=>document.getElementById(id);
 let BANK, PROFILE, QUESTIONS=[], WEIGHTS={}, state, lang='ar', activeExam=null;
@@ -30,7 +21,7 @@ function trackState(){return state.tracks[BANK.track.id]}
 function t(key,...args){const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];return typeof v==='function'?v(...args):(v??key)}
 function presentationView(){let locale=CORE_I18N[lang]?lang:CORE_DEFAULT_LOCALE;if(PRESENTATION&&BANK?.track){try{locale=resolvePresentationLocale(lang,BANK.track,PRESENTATION)}catch(presentationError){console.warn('Presentation locale fallback',presentationError)}}const view=getPresentationLocale(PRESENTATION,locale);const fallbackName=BANK?.track?.id??'learning-platform';return{locale,view,displayName:view?.display_name??fallbackName,brand:view?.brand??fallbackName,hero:view?.hero??null}}
 function applyTrackPresentation(){const p=presentationView();$('brandText').textContent=p.brand;$('heroEyebrow').textContent=p.hero?.eyebrow??'';$('heroTitle').textContent=p.hero?.title??p.displayName;$('heroText').textContent=p.hero?.description??'';document.title=`${p.displayName} · ${t('practiceLabel')}`}
-function domainLabel(domain){return lang==='ar'?(DOMAIN_AR[domain]||domain):domain}
+function domainLabel(domain){const p=presentationView();return getDomainLabel(PRESENTATION,p.locale,domain)}
 function secureRng(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}return Math.random()}
 function save(){state.preferences.lang=lang;state.preferences.theme=document.documentElement.dataset.theme||'light';trackState().active_exam=activeExam;state.updated_at=new Date().toISOString();void saveState(state)}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');scrollTo({top:0,behavior:'smooth'})}
