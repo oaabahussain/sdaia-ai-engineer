@@ -36,19 +36,19 @@ Community evidence is used for discovery and failure signals, not prevalence cla
 
 | # | Decision point | Prior project state | Current systems/standards to compare | Initial reuse direction | Status |
 |---:|---|---|---|---|---|
-| 1 | Expansion unit / coverage planning | QuestionFamilyV2 + CoverageGapV1; raw-count requests invalid | assessment blueprints, competency/coverage systems, CASE alignment patterns | preserve internal coverage engine; borrow standards/alignment semantics, not vendor data model | REFRESH_REQUIRED |
-| 2 | Batch/tranche sizing | resumable partial batches exist | modern content/data batch orchestration and adaptive quality-yield policies | build thin policy above K1 runner; do not build a new workflow engine without need | REFRESH_REQUIRED |
-| 3 | Provider routing/evaluation | provider ports + frozen-set evaluation foundation | OpenAI evals/datasets, Anthropic agent evals, Braintrust, Langfuse, Phoenix | reuse evaluation/trace tooling where useful; keep canonical provider policy internal | RESEARCHING |
-| 4 | Evidence/source policy | STRICT/GROUNDED/EXPANSIVE; GROUNDED default | NIST AI RMF, retrieval/evidence systems, source-governance patterns | keep policy internal; reuse retrieval/eval infrastructure only | REFRESH_REQUIRED |
-| 5 | Human review scaling | AI/high-risk/quarantined require human; deterministic may sample | Label Studio/Argilla-style review, AI review queues, active sampling | adapt mature review tooling if needed; keep risk policy internal | REFRESH_REQUIRED |
-| 6 | Semantic/cross-lingual dedup | exact + optional embedding cosine; uncertainty -> REVIEW_REQUIRED | pgvector, Qdrant hybrid search, multilingual embeddings, clustering/dedup systems | no dedicated vector DB by default; benchmark Postgres/adapter first; hybrid lexical+semantic | RESEARCHING |
+| 1 | Expansion unit / coverage planning | QuestionFamilyV2 + CoverageGapV1; raw-count requests invalid | assessment blueprints, competency/coverage systems, CASE alignment patterns | QuestionFamily + objective/misconception CoverageGap remains canonical; CASE is an interoperability/alignment adapter, not internal truth | DECISION_READY |
+| 2 | Batch/tranche sizing | resumable partial batches exist | modern content/data batch orchestration and adaptive quality-yield policies | retain K1 LocalRunner and add tranche policy first; workflow-engine adoption requires demonstrated scale/recovery need | PARTIAL |
+| 3 | Provider routing/evaluation | provider ports + frozen-set evaluation foundation | OpenAI evals/datasets, Anthropic agent evals, Braintrust, Langfuse, Phoenix | frozen/versioned eval sets + production-failure cases + end-to-end evals; external eval tools are adapters, provider promotion policy stays internal | DECISION_READY |
+| 4 | Evidence/source policy | STRICT/GROUNDED/EXPANSIVE; GROUNDED default | NIST AI RMF/GAI profile, retrieval/evidence systems, source-governance patterns | keep versioned source policy/provenance internal; external retrieval/eval systems cannot become authority | PARTIAL |
+| 5 | Human review scaling | AI/high-risk/quarantined require human; deterministic may sample | Label Studio-style agent/human evaluation, review queues, active sampling | review UI/tooling may be reused; risk tiers, sampling and approval authority remain internal | PARTIAL |
+| 6 | Semantic/cross-lingual dedup | exact + optional embedding cosine; uncertainty -> REVIEW_REQUIRED | pgvector, vector/hybrid systems, multilingual embeddings | lexical + structural + multilingual semantic layers; benchmark pgvector/exact search first; thresholds must be calibrated on labeled bank pairs | DECISION_READY (architecture) |
 | 7 | Intended vs observed difficulty | strict separation already constitutional | psychometrics/IRT research and standards | K2 keeps intended only; observed/calibrated remains later | DECISION_READY |
-| 8 | CANARY -> ACTIVE evidence | CANARY boundary exists; activation evidence currently minimal | progressive delivery, feature flags, experiments, release health systems | define education-specific ActivationEvidence; reuse release/experiment tooling | RESEARCHING |
-| 9 | Release cadence | immutable releases/rollback exist | PostHog/Statsig/GrowthBook progressive rollout patterns | controlled tranches + flags/experiments where learner-facing exposure changes | RESEARCHING |
-| 10 | Rollback/quarantine | release rollback + family/item lifecycle available | feature flags, release rollback, content moderation/quarantine workflows | reuse kill-switch/flag mechanism; keep immutable release semantics internal | REFRESH_REQUIRED |
-| 11 | Bilingual authoring/equivalence | Arabic/English first-class; semantic equivalence gate | multilingual evaluation, translation-QA, cross-lingual embeddings | use external model/eval providers behind ports; canonical reasoning/evidence remains internal | REFRESH_REQUIRED |
-| 12 | Quality sampling / critics / humans | multidimensional QualityReport + conservative review | model graders, agent evals, human calibration, active sampling | combine deterministic gates + calibrated model graders + human gold subset | RESEARCHING |
-| 13 | Measurement, observability & improvement loop | LearnerEventV1 + actionable-analytics constitution; no full closed loop yet | PostHog, Statsig, Amplitude, Snowplow Event Studio, OpenTelemetry, Grafana Faro, Sentry, Langfuse/Phoenix | do not build commodity analytics/replay/experimentation/tracing; build education event semantics + improvement policy | RESEARCHING |
+| 8 | CANARY -> ACTIVE evidence | CANARY boundary exists; activation evidence currently minimal | progressive delivery, feature flags, experiments, release health systems | internal ActivationEvidence contract + optional standards-based feature-flag adapter; promotion requires observed evidence, not a string flag | DECISION_READY |
+| 9 | Release cadence | immutable releases/rollback exist | Statsig/PostHog/GrowthBook progressive rollout patterns | controlled tranches; feature gates for exposure control and experiments only when causal comparison is needed | DECISION_READY |
+| 10 | Rollback/quarantine | release rollback + family/item lifecycle available | OpenFeature/vendor flags, progressive release systems | immutable content rollback remains canonical; feature flags may provide emergency exposure kill-switch, never replace release history | DECISION_READY |
+| 11 | Bilingual authoring/equivalence | Arabic/English first-class; semantic equivalence gate | QTI internationalization, multilingual embeddings/evaluation | one canonical family/reasoning/evidence lineage with AR/EN item variants; cross-lingual models assist but do not prove equivalence alone | PARTIAL |
+| 12 | Quality sampling / critics / humans | multidimensional QualityReport + conservative review | Anthropic/Phoenix/Langfuse eval patterns, human evaluation tools | deterministic checks + rubric/model graders + human-labeled gold subset; production failures continuously feed eval sets | DECISION_READY |
+| 13 | Measurement, observability & improvement loop | LearnerEventV1 + actionable-analytics constitution; no full closed loop yet | PostHog, Statsig, Snowplow Event Studio, OpenTelemetry, Caliper, OpenFeature, AI eval platforms | versioned internal education events + adapters for analytics/replay/experiments/telemetry; future scouts are evidence/hypothesis generators, not autonomous production authority | DECISION_READY (architecture) |
 
 ## 4. Point 13 — current 2026 evidence snapshot
 
@@ -245,3 +245,147 @@ If these answers are missing, the design point remains open.
 3. Run a counter-evidence/failure pass before declaring DECISION_READY.
 4. Preserve evidence in dated research artifacts rather than chat only.
 5. Do not research K3-K9 deeply enough to delay K2, but keep the queue explicit so future programmes never start from zero.
+
+
+## 10. K2 Research Pass 1 — 2026-09-28
+
+This pass refreshed all thirteen K2 decision areas at architecture level. It does **not** choose every vendor, numeric threshold or sampling percentage; those remain policy/configuration decisions that require project-specific calibration.
+
+### 10.1 Coverage and interoperability
+
+- CASE 1.1 standardizes exchange of competencies, standards and learning outcomes across systems. This supports preserving our stable internal objective/competency identities while using CASE only as an adapter/alignment format.
+- QTI 3 standardizes assessment-item/test exchange and supports accessibility, bidirectional text, language variants and CAT-related interoperability. Internal JSON remains canonical.
+- Caliper provides a standardized learning-activity vocabulary. K3 should map canonical LearnerEvent records to/from Caliper where useful rather than making Caliper the source of truth.
+
+Primary references:
+- https://www.1edtech.org/standards/case
+- https://www.1edtech.org/standards/qti/index
+- https://www.1edtech.org/standards/qti/accessibility
+- https://www.1edtech.org/standards/caliper
+
+### 10.2 Provider/model evaluation
+
+Current agent-evaluation practice reinforces the K1 boundary:
+- end-to-end agent/application evals are more useful than judging a single prompt/model response in isolation;
+- real production failures should feed frozen/versioned evaluation datasets;
+- deterministic checks, rubric/model graders and human judgments are complementary rather than interchangeable;
+- a newer model/provider is not promoted solely because it is newer.
+
+Candidate reusable tooling includes Langfuse, Phoenix, Braintrust and vendor eval platforms, but K2 must keep the evaluation policy and provider activation decision vendor-neutral.
+
+Primary references:
+- https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents
+- https://langfuse.com/docs/evaluation/experiments/datasets
+- https://arize.com/docs/phoenix/evaluation/llm-evals/evaluator-traces
+
+### 10.3 Evidence and AI risk
+
+NIST AI 600-1 remains a useful cross-sector reference for incorporating trustworthiness/risk considerations into generative-AI design, development, use and evaluation. It supports evidence, monitoring and lifecycle governance but does not define our approved SDAIA source classes; that classification remains a project-specific evidence-policy task.
+
+Reference:
+- https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
+
+### 10.4 Human review
+
+Modern human-evaluation tools increasingly support agent traces, intermediate decisions and multimodal outputs, reinforcing that reviewers need context rather than a final-output-only screen. K2 can reuse review UI/tooling later, but reviewer authority, risk class, sampling policy and approval lineage remain platform contracts.
+
+Reference:
+- https://labelstud.io/blog/new-evaluation-engine/
+
+### 10.5 Deduplication and bilingual semantics
+
+Findings:
+- pgvector supports exact nearest-neighbor search plus HNSW/IVFFlat approximate indexes. Approximate indexes trade recall/resources/speed, and 2026 changelogs show real HNSW/IVFFlat operational fixes; therefore adding ANN infrastructure is not a free win.
+- multilingual embeddings can compare semantically similar text across languages, including Arabic↔English.
+- embedding similarity is a signal, not a duplicate truth predicate.
+
+K2 direction:
+1. normalized exact fingerprint;
+2. structural family/objective/reasoning comparison;
+3. lexical near-match;
+4. AR↔AR / EN↔EN semantic match;
+5. AR↔EN cross-lingual match;
+6. REVIEW_REQUIRED gray zone.
+
+Do not hard-code a universal cosine threshold. Build a labeled duplicate/non-duplicate calibration set from our own bank.
+
+References:
+- https://github.com/pgvector/pgvector
+- https://www.sbert.net/examples/sentence_transformer/training/multilingual/README.html
+- https://docs.cohere.com/docs/semantic-search-with-cohere
+
+### 10.6 Canary, release, experiment and rollback
+
+Modern systems distinguish **exposure control** from **causal experimentation**:
+- feature gates/flags control progressive exposure and emergency disabling;
+- experiments compare variants and quantify effects;
+- multi-stage rollouts need special analysis handling, especially after rollback.
+
+OpenFeature provides a vendor-neutral flag-evaluation API and remote-evaluation protocol direction. Therefore K2 should not invent a vendor-locked feature-flag API.
+
+K2 direction:
+- immutable ContentRelease remains the source of truth;
+- ActivationEvidence controls CANARY→ACTIVE;
+- feature flag adapter can control who is exposed;
+- experiment is used only when we are testing a hypothesis, not merely deploying;
+- rollback selects prior compatible immutable release; kill-switches may stop exposure but do not rewrite release history.
+
+References:
+- https://docs.statsig.com/guides/featureflags-or-experiments
+- https://docs.statsig.com/feature-flags/conditions
+- https://openfeature.dev/docs/reference/intro/
+- https://openfeature.dev/specification/sections/flag-evaluation/
+
+### 10.7 Analytics/event governance and improvement loop
+
+Current event-data systems have moved from loose event names toward versioned tracking contracts:
+- Snowplow Tracking Plans/Event Specifications define event meaning, ownership, schema and triggering rules;
+- validation can compare live incoming events against the exact declared specification version;
+- multiple event-spec versions may coexist during rolling deployments.
+
+This maps strongly to our stable/versioned-contract philosophy.
+
+K2 direction:
+- versioned event definitions are canonical;
+- events include owner/purpose/privacy classification;
+- schema validation occurs before treating analytics as trusted;
+- raw event data is distinct from derived funnels/mastery/readiness;
+- product analytics tooling is an adapter, not the canonical learner model.
+
+References:
+- https://docs.snowplow.io/docs/event-studio/tracking-plans/
+- https://docs.snowplow.io/docs/event-studio/tracking-plans/event-specification-validation/
+- https://www.1edtech.org/standards/caliper
+
+### 10.8 Observability and product-intelligence tooling
+
+PostHog's current stack demonstrates that product analytics, replay, feature flags, experiments, AI observability and automated scouts can already be bought/reused instead of rebuilt. Its Replay Vision experience also provides a useful guardrail: broad AI scanning can generate plausible but low-value summaries; narrow scanners tied to specific questions are more useful.
+
+OpenTelemetry remains the preferred portability seam for backend/system telemetry, but its JavaScript documentation still marks browser client instrumentation as experimental while traces/metrics are stable and logs are development.
+
+K2 direction:
+- do not rebuild generic funnels, replay, flags, experiment engines or trace viewers;
+- instrument our education-specific events/contracts and export them;
+- start scouts narrow (e.g. mobile-friction, Arabic-equivalence, mock-abandonment, review-discovery);
+- scouts produce evidence-backed findings/hypotheses for human review, not autonomous product changes.
+
+References:
+- https://posthog.com/docs/product-analytics
+- https://posthog.com/replay-vision
+- https://posthog.com/blog/a-scanner-that-watches-everything-sees-nothing
+- https://opentelemetry.io/docs/languages/js/
+
+## 11. Open decisions after Pass 1
+
+The following are intentionally **not** treated as solved:
+
+1. exact tranche/batch sizing rule — requires observed factory yield/review throughput;
+2. approved source-class list for each SDAIA content category — requires source-by-source evidence review;
+3. human-review percentages by risk tier — requires pilot error/yield evidence;
+4. dedup similarity thresholds — requires labeled bank calibration;
+5. bilingual equivalence rubric/judge combination — requires an Arabic/English gold set;
+6. exact CANARY duration/sample/exposure thresholds — requires deployment/usage evidence;
+7. initial analytics vendor commitment — PostHog is a strong current candidate, but adapter-first architecture prevents lock-in;
+8. exact privacy/consent/retention rules — must be designed against deployment jurisdiction, collected fields and product account model.
+
+These remain open because guessing them now would contradict the evidence-first rule.
