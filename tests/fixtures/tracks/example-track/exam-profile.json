@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "example-track.default.v1",
+  "track_id": "example-track",
+  "version": "1",
+  "evidence_status": "fixture",
+  "question_count": 1,
+  "section_sizes": [
+    1,
+    "all"
+  ],
+  "weights": {
+    "Example": 100
+  }
+}
