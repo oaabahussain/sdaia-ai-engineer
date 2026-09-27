@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from datetime import datetime, timezone
 
 def _path(db_url):
     if not db_url.startswith('sqlite:///'):
@@ -66,7 +67,49 @@ def list_audit(db_url, run_id):
     return [json.loads(row['record_json']) for row in rows]
 
 
+
+_LEARNER_ALLOWED={'schema_version','event_id','learner_id','track_id','content_release_id','form_id','question_family_id','item_version_id','objective_id','domain_id','mode','locale','shown_at','answered_at','answer','correct','confidence','latency_ms','hint_used','explanation_opened','attempt_number','device'}
+_LEARNER_REQUIRED={'event_id','learner_id','track_id','content_release_id','form_id','question_family_id','item_version_id','objective_id','domain_id','mode','locale','shown_at','answered_at','answer','correct','latency_ms','hint_used','explanation_opened','attempt_number'}
+def _utc_iso(value):
+    if not isinstance(value,str):
+        raise ValueError('Invalid learner event timestamp')
+    try:
+        dt=datetime.fromisoformat(value.replace('Z','+00:00'))
+    except ValueError as exc:
+        raise ValueError('Invalid learner event timestamp') from exc
+    if dt.tzinfo is None:
+        raise ValueError('Learner event timestamp must include timezone')
+    return dt.astimezone(timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z')
+
+def _validate_learner_event(event):
+    if not isinstance(event,dict):
+        raise ValueError('Learner event must be an object')
+    unknown=set(event)-_LEARNER_ALLOWED
+    if unknown:
+        raise ValueError('Unknown or derived learner event field: '+','.join(sorted(unknown)))
+    normalized=dict(event)
+    normalized.setdefault('schema_version',1)
+    if normalized['schema_version'] != 1:
+        raise ValueError('LearnerEvent schema_version must be 1')
+    missing=[k for k in _LEARNER_REQUIRED if k not in normalized or normalized[k] is None or normalized[k]=='']
+    if missing:
+        raise ValueError('Learner event missing required fields: '+','.join(sorted(missing)))
+    if normalized['mode'] not in {'learn','practice','check','section','mock'}:
+        raise ValueError('Invalid learner event mode')
+    if normalized['locale'] not in {'ar','en'}:
+        raise ValueError('Invalid learner event locale')
+    normalized['shown_at']=_utc_iso(normalized['shown_at'])
+    normalized['answered_at']=_utc_iso(normalized['answered_at'])
+    if normalized['answered_at'] < normalized['shown_at']:
+        raise ValueError('Learner event timestamp order is invalid')
+    if not isinstance(normalized['latency_ms'],(int,float)) or normalized['latency_ms'] < 0:
+        raise ValueError('Invalid learner event latency')
+    if not isinstance(normalized['attempt_number'],int) or normalized['attempt_number'] < 1:
+        raise ValueError('Invalid learner event attempt')
+    return normalized
+
 def append_learner_event(db_url, event):
+    event=_validate_learner_event(event)
     with _connect(db_url) as db:
         db.execute(
             'INSERT INTO learner_events (event_id,learner_id,track_id,item_version_id,shown_at,event_json) VALUES (?,?,?,?,?,?)',
