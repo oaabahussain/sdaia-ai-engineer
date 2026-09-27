@@ -1,5 +1,7 @@
 export function validateTrackRegistry(registry){
  if(!registry||registry.schema_version!==1||!Array.isArray(registry.tracks)||registry.tracks.length<1)throw new Error('Invalid track registry');
+ const topKeys=Object.keys(registry).sort().join(',');if(topKeys!=='default_track_id,schema_version,tracks')throw new Error('Invalid track registry fields');
+ if(registry.tracks.some(entry=>!entry||Object.keys(entry).sort().join(',')!=='id'))throw new Error('Invalid track registry entry fields');
  const ids=registry.tracks.map(x=>x?.id);
  if(ids.some(id=>typeof id!=='string'||!id))throw new Error('Invalid track id');
  if(new Set(ids).size!==ids.length)throw new Error('Duplicate track id');
