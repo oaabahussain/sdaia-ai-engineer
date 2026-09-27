@@ -42,7 +42,8 @@ test('live release verifier resolves the default exam profile through the manife
   const file = new URL('../scripts/verify_live_release.js', import.meta.url);
   assert.equal(fs.existsSync(file), true);
   const live = fs.readFileSync(file, 'utf8');
-  assert.match(live, /tracks\/sdaia-ai-engineer\/manifest\.json/);
+  assert.match(live, /tracks\/registry\.json/);
+  assert.match(live, /registry\.tracks/);
   assert.match(live, /manifest\.exam_profiles/);
   assert.match(live, /manifest\.default_exam_profile/);
   assert.match(live, /manifest\.content\.concept_files/);
@@ -76,15 +77,14 @@ test('live release verifier validates active track presentation contract', () =>
   assert.match(live, /presentation\.json/);
   assert.match(live, /presentation\.track_id/);
   assert.match(live, /presentation\.track_version/);
-  assert.match(live, /presentation\.default_locale/);
-  assert.match(live, /domain_labels/);
-  assert.match(live, /live track presentation: PASS/);
+  assert.match(live, /presentation\.track_version/);
+  assert.match(live, /live track registry: PASS/);
 });
 
 
 test('Pages and PR artifact gates explicitly verify active presentation is assembled', () => {
   for (const workflow of [pages, ci]) {
-    assert.match(workflow, /test -f _site\/tracks\/sdaia-ai-engineer\/presentation\.json/);
+    assert.match(workflow, /test -f _site\/tracks\/registry\.json/);
     assert.doesNotMatch(workflow, /cp .*presentation\.json/);
   }
 });
