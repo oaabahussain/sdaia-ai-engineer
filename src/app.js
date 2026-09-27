@@ -8,8 +8,8 @@ import { loadTrackPresentation, resolvePresentationLocale, getPresentationLocale
 registerServiceWorker();
 
 const TRACK_I18N = {
- ar:{brand:'SDAIA AI Engineer · بنك الاختبارات',eyebrow:'بنك اختبارات ثنائي اللغة',heroTitle:'تدرّب مثل الاختبار، بدون نمط محفوظ للإجابات.',heroText:'أكثر من ألف سؤال بالعربي والإنجليزي، اختبار كامل موزون، واختبارات مستقلة لكل مجال.',unofficial:'أداة تحضيرية مستقلة وغير رسمية. أوزان المجالات مبنية على مرجع المشروع، وبنك الأسئلة محتوى تدريبي للممارسة.'},
- en:{brand:'SDAIA AI Engineer · Exam Bank',eyebrow:'Bilingual exam bank',heroTitle:'Practice like an exam, without a predictable answer pattern.',heroText:'More than one thousand Arabic/English questions, a weighted full exam, and standalone domain exams.',unofficial:'An independent, unofficial preparation tool. Domain weights follow the project reference, and the question bank is training content for practice.'}
+ ar:{unofficial:'أداة تحضيرية مستقلة وغير رسمية. أوزان المجالات مبنية على مرجع المشروع، وبنك الأسئلة محتوى تدريبي للممارسة.'},
+ en:{unofficial:'An independent, unofficial preparation tool. Domain weights follow the project reference, and the question bank is training content for practice.'}
 };
 
 const DOMAIN_AR={
@@ -28,7 +28,8 @@ let PRESENTATION=null;
 function trackState(){return state.tracks[BANK.track.id]}
 
 function t(key,...args){const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];return typeof v==='function'?v(...args):(v??key)}
-function presentationView(){let locale=CORE_I18N[lang]?lang:CORE_DEFAULT_LOCALE;if(PRESENTATION&&BANK?.track){try{locale=resolvePresentationLocale(lang,BANK.track,PRESENTATION)}catch(presentationError){console.warn('Presentation locale fallback',presentationError)}}const view=getPresentationLocale(PRESENTATION,locale);const fallbackName=BANK?.track?.id??'learning-platform';return{locale,view,displayName:view?.display_name??fallbackName,brand:view?.brand??fallbackName}}
+function presentationView(){let locale=CORE_I18N[lang]?lang:CORE_DEFAULT_LOCALE;if(PRESENTATION&&BANK?.track){try{locale=resolvePresentationLocale(lang,BANK.track,PRESENTATION)}catch(presentationError){console.warn('Presentation locale fallback',presentationError)}}const view=getPresentationLocale(PRESENTATION,locale);const fallbackName=BANK?.track?.id??'learning-platform';return{locale,view,displayName:view?.display_name??fallbackName,brand:view?.brand??fallbackName,hero:view?.hero??null}}
+function applyTrackPresentation(){const p=presentationView();$('brandText').textContent=p.brand;$('heroEyebrow').textContent=p.hero?.eyebrow??'';$('heroTitle').textContent=p.hero?.title??p.displayName;$('heroText').textContent=p.hero?.description??'';document.title=p.displayName}
 function domainLabel(domain){return lang==='ar'?(DOMAIN_AR[domain]||domain):domain}
 function secureRng(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}return Math.random()}
 function save(){state.preferences.lang=lang;state.preferences.theme=document.documentElement.dataset.theme||'light';trackState().active_exam=activeExam;state.updated_at=new Date().toISOString();void saveState(state)}
@@ -38,7 +39,7 @@ function localizedQuestion(q){return lang==='ar'?q.question:q.question_en}
 function localizedOptions(q){return lang==='ar'?q.options:q.options_en}
 function localizedExplanation(q){return lang==='ar'?q.explanation:q.explanation_en}
 
-function applyLanguage(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';$('langBtn').textContent=lang==='ar'?'EN':'العربية';document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];if(v&&typeof v!=='function')el.textContent=t(key)});renderHome();if($('exam').classList.contains('active'))renderExam();if($('results').classList.contains('active'))renderResults(lastResult)}
+function applyLanguage(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';$('langBtn').textContent=lang==='ar'?'EN':'العربية';document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;const v=CORE_I18N[lang]?.app?.[key]??TRACK_I18N[lang]?.[key];if(v&&typeof v!=='function')el.textContent=t(key)});applyTrackPresentation();renderHome();if($('exam').classList.contains('active'))renderExam();if($('results').classList.contains('active'))renderResults(lastResult)}
 function applyTheme(theme){document.documentElement.dataset.theme=theme;$('themeBtn').textContent=theme==='dark'?'🌙':'☀️';save()}
 
 function renderAllocation(){const allocation=weightedAllocation(WEIGHTS,PROFILE.question_count);$('allocation').innerHTML=Object.entries(allocation).map(([d,n])=>`<div class="allocRow"><div><b>${domainLabel(d)}</b><div class="bar"><i style="width:${WEIGHTS[d]}%"></i></div></div><span>${n} · ${WEIGHTS[d]}%</span></div>`).join('')}
