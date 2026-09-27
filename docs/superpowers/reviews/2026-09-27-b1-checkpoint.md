@@ -2,45 +2,27 @@
 
 **Date:** 2026-09-27
 **Branch:** `design/b1-track-presentation-contract`
-**Checkpoint:** B4 — Tasks 16–18 complete
-**Product HEAD before checkpoint record:** `8d5c1f51d380716e62067246a33d0475bdc259c5`
+**Checkpoint:** C2 — Tasks 1–22 complete; Task 23 next
+**Product HEAD before checkpoint record:** `efd2681c601d3a6a7f39baca8033c6962f865753`
 
 ## Completed parent tasks
 
-Tasks 1–18.
+Tasks 1–22.
 
-## Latest micro-tasks
+## Latest evidence
 
-- Main HTML shell neutralized with `#brandText`, `#heroEyebrow`, `#heroTitle`, `#heroText`, `#statusNotice`.
-- Main brand/hero/document title sourced from TrackPresentationV1.
-- Generic localized `practiceLabel` added to core i18n.
-- `DOMAIN_AR` removed; domain labels now resolve through `getDomainLabel` with raw-key fallback.
-- Track-specific `TRACK_I18N` removed.
-- Evidence/unofficial notice now derives only from manifest/profile canonical status.
+- PR run 115: feedback extraction, presentation identity, submission semantics, public warning and state fallback all pass; PWA Adaptive assertion RED as intended.
+- PR run 116: validator, Node suite, app parse, SW verifier and Pages artifact steps pass. Browser smoke reaches offline feedback and fails because `src/feedback.js` is not yet cached.
+- Server/adapter workflow for the same product head passes.
 
-## RED→GREEN evidence
+## Ruling / debugging record
 
-- Task 16 RED: PR quality gate run 102 failed main-shell presentation assertions; generic-title RED was additionally observed in run 102.
-- Task 16 GREEN: run 107 passes main brand/hero and document-title assertions.
-- Task 17 RED: run 103 still failed on `DOMAIN_AR`; run 107 passes `core app no longer owns SDAIA presentation literals`.
-- Task 18 RED: run 105 failed `status notice is canonical...`; run 107 passes it.
-
-## Current known failure
-
-PR quality gate run 107 still fails the broad HTML-shell assertion because `feedback.html` intentionally remains SDAIA-specific. That is the planned RED boundary for Tasks 19–20, not a Tasks 16–18 regression.
+The offline feedback failure is assigned to planned Task 23: new feedback/presentation modules are network dependencies but the service-worker shell still has the pre-B1 asset list. Fix the shell contract, not feedback behavior.
 
 ## Next exact task
 
-Task 19 — write/confirm RED requiring `feedback.html` to load `./src/feedback.js` as an ES module and move feedback behavior to that module while reusing `CORE_I18N`.
-
-## Files changed in this checkpoint
-
-- `tests/b1-presentation-acceptance.test.js`
-- `src/presentation/coreI18n.js`
-- `src/app.js`
-- `index.html`
-- execution ledger + this checkpoint
+Task 23 RED/GREEN: require and cache `./src/presentation/coreI18n.js`, `./src/presentation/trackPresentation.js`, `./src/feedback.js`, and `./tracks/sdaia-ai-engineer/presentation.json`; extend the verifier to require each manifest's presentation path; do not cache concept chunks.
 
 ## Resume safety
 
-Safe to resume from Task 19. Do not redo Tasks 1–18. Nothing has been merged; `main` remains at the B0 baseline for this branch comparison.
+Safe to resume from Task 23. Do not redo Tasks 1–22. Nothing merged.
