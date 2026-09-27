@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
 DATA_DIR = ROOT / 'data'
 RATE = defaultdict(deque)
-DEFAULT_TRACK_ID = os.getenv('TRACK_ID', 'sdaia-ai-engineer')
+
 
 
 def load_schema(name):
@@ -52,8 +52,17 @@ VALIDATORS = {
 }
 
 
+def load_track_registry():
+    return json.loads((ROOT / 'tracks' / 'registry.json').read_text(encoding='utf-8'))
+
+
+def default_track_id():
+    registry = load_track_registry()
+    return registry['default_track_id']
+
+
 def load_runtime_bundle(track_id=None):
-    track_id = track_id or DEFAULT_TRACK_ID
+    track_id = track_id or default_track_id()
     manifest = json.loads((ROOT / 'tracks' / track_id / 'manifest.json').read_text(encoding='utf-8'))
     profiles = [json.loads((ROOT / ref).read_text(encoding='utf-8')) for ref in manifest['exam_profiles']]
     exam_profile = next((p for p in profiles if p['id'] == manifest['default_exam_profile']), None)
@@ -135,8 +144,15 @@ def create_app(db_url=None):
         return {'status': 'ok'}
 
     @app.get('/v1/bank')
-    def bank():
-        return load_runtime_bundle()
+    def bank(track_id: str | None = None):
+        selected = track_id or default_track_id()
+        registered = {item['id'] for item in load_track_registry()['tracks']}
+        if selected not in registered:
+            return error('invalid_track', 'Track is not registered', 404)
+        try:
+            return load_runtime_bundle(selected)
+        except (FileNotFoundError, RuntimeError, KeyError, json.JSONDecodeError):
+            return error('invalid_track', 'Track package is invalid', 404)
 
     @app.get('/v1/progress/{anon_id}')
     def get_progress(anon_id: str, response: Response, x_anon_id: str = Header(..., alias='X-Anon-Id')):

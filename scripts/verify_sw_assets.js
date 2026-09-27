@@ -11,10 +11,11 @@ if (assets.some(asset => asset.includes('/data/concepts/'))) {
   throw new Error('Concept-bank chunks must not be pre-cached');
 }
 
-const manifestAssets = assets.filter(asset => /^\.\/tracks\/[^/]+\/manifest\.json$/.test(asset));
-if (!manifestAssets.length) throw new Error('No canonical track manifest is pre-cached');
-
+for (const required of ['./tracks/registry.json','./src/tracks/registry.js','./src/tracks/selection.js']) if (!assets.includes(required)) throw new Error(`Registry bootstrap asset is not pre-cached: ${required}`);
+const registry=JSON.parse(fs.readFileSync(path.join(root,'tracks/registry.json'),'utf8'));
+const manifestAssets=registry.tracks.map(entry=>`./tracks/${entry.id}/manifest.json`);
 for (const manifestAsset of manifestAssets) {
+  if(!assets.includes(manifestAsset)) throw new Error(`Registry track manifest is not pre-cached: ${manifestAsset}`);
   const manifestPath = manifestAsset.replace(/^\.\//, '');
   const manifest = JSON.parse(fs.readFileSync(path.join(root, manifestPath), 'utf8'));
   const presentationAsset = `./tracks/${manifest.id}/presentation.json`;

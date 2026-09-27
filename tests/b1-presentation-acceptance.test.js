@@ -20,10 +20,11 @@ test('core app no longer owns SDAIA presentation literals', () => {
   assert.doesNotMatch(app, /SDAIA AI Engineer/);
 });
 
-test('HTML shells are neutral while bootstrap track selection remains explicit', () => {
+test('HTML shells are neutral while bootstrap track selection is registry driven', () => {
   assert.doesNotMatch(read('../index.html'), /SDAIA AI Engineer/);
   assert.doesNotMatch(read('../feedback.html'), /SDAIA AI Engineer/);
-  assert.match(read('../src/config.js'), /ACTIVE_TRACK_ID\s*=\s*['"]sdaia-ai-engineer['"]/);
+  assert.doesNotMatch(read('../src/config.js'), /ACTIVE_TRACK_ID/);
+  assert.match(read('../src/app.js'), /loadTrackRegistry/);
 });
 
 test('app imports namespaced generic core translations', async () => {
@@ -42,7 +43,7 @@ test('app presentation load is best-effort after canonical bank load', () => {
   const app = read('../src/app.js');
   assert.match(app, /loadTrackPresentation/);
   assert.match(app, /let PRESENTATION\s*=\s*null/);
-  assert.match(app, /BANK=await loadBank\(\)[\s\S]*?try\{PRESENTATION=await loadTrackPresentation/);
+  assert.match(app, /BANK=await loadBank\(selectedTrackId\)[\s\S]*?try\{PRESENTATION=await loadTrackPresentation/);
   assert.match(app, /catch\(presentationError\)\{console\.warn/);
   assert.match(app, /PRESENTATION=null/);
 });
@@ -120,7 +121,7 @@ test('runtime core has no migrated track presentation leakage', () => {
     for (const literal of forbidden) assert.equal(source.includes(literal), false, `${file}: ${literal}`);
   }
   const config = read('../src/config.js');
-  assert.match(config, /ACTIVE_TRACK_ID\s*=\s*['"]sdaia-ai-engineer['"]/);
+  assert.doesNotMatch(config, /ACTIVE_TRACK_ID/);
   assert.doesNotMatch(config, /SDAIA AI Engineer/);
   const presentation = read('../tracks/sdaia-ai-engineer/presentation.json');
   for (const literal of forbidden) assert.equal(presentation.includes(literal), true, literal);

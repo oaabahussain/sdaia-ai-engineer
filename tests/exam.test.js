@@ -3,13 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { expandConceptBank } from '../src/logic/questionBank.js';
 import { weightedAllocation, sampleWeightedExam, sampleSectionExam, buildOptionOrders, scoreExam } from '../src/logic/exam.js';
-import { loadTrack } from '../scripts/load_track.js';
-import { ACTIVE_TRACK_ID } from '../src/config.js';
+import { loadTrack, loadTrackRegistry } from '../scripts/load_track.js';
 
 const root=new URL('..',import.meta.url).pathname;
 const expectedProfile=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-profile.expected.json',import.meta.url),'utf8'));
-const { examProfile, concepts }=loadTrack(root,ACTIVE_TRACK_ID);
-const questions=expandConceptBank(concepts,{trackId:ACTIVE_TRACK_ID});
+const { examProfile, concepts }=loadTrack(root,loadTrackRegistry(root).default_track_id);
+const questions=expandConceptBank(concepts,{trackId:loadTrackRegistry(root).default_track_id});
 const total=examProfile.question_count;
 const weights=examProfile.weights;
 

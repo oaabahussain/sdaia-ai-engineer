@@ -35,7 +35,7 @@ jobs:
           cp -R data/concepts data/migrations _site/data/
           cp data/learn.json data/cases.json _site/data/
           test ! -e _site/data/legacy
-          test -f _site/tracks/sdaia-ai-engineer/presentation.json
+          test -f _site/tracks/registry.json
           touch _site/.nojekyll
           node --check _site/src/app.js
           node scripts/verify_html.js _site/index.html

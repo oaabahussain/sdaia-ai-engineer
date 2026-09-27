@@ -1,6 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const readJson=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+export function loadTrackRegistry(root){return readJson(path.join(root,'tracks','registry.json'))}
+export function validateTrackRegistry(registry){
+ if(!registry||registry.schema_version!==1||!Array.isArray(registry.tracks)||!registry.tracks.length)throw new Error('Invalid track registry');
+ const ids=registry.tracks.map(x=>x.id);if(new Set(ids).size!==ids.length)throw new Error('Duplicate track id');
+ if(!ids.includes(registry.default_track_id))throw new Error('Registry default track is not registered');
+ return true;
+}
 export function loadTrack(root,trackId){
  const manifest=readJson(path.join(root,'tracks',trackId,'manifest.json'));
  const presentation=readJson(path.join(root,'tracks',trackId,'presentation.json'));

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "default_track_id": "sdaia-ai-engineer",
+  "tracks": [
+    {
+      "id": "sdaia-ai-engineer"
+    }
+  ]
+}
