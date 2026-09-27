@@ -5,11 +5,12 @@ import fs from 'node:fs';
 const config = fs.readFileSync(new URL('../.github/ISSUE_TEMPLATE/config.yml', import.meta.url), 'utf8');
 const page = fs.readFileSync(new URL('../feedback.html', import.meta.url), 'utf8');
 const feedbackModuleUrl = new URL('../src/feedback.js', import.meta.url);
+const feedbackModule = fs.readFileSync(feedbackModuleUrl, 'utf8');
 
 test('feedback page uses a defined template while blank issues remain disabled', () => {
   assert.match(config, /blank_issues_enabled:\s*false/);
-  assert.match(page, /template:\s*['"]public-feedback\.md['"]/);
-  assert.match(page, /issues\/new\?\$\{p\.toString\(\)\}/);
+  assert.match(feedbackModule, /template:\s*['"]public-feedback\.md['"]/);
+  assert.match(feedbackModule, /issues\/new\?\$\{p\.toString\(\)\}/);
 });
 
 test('feedback page keeps the public submission warning', () => {
@@ -29,9 +30,8 @@ test('feedback behavior is extracted to the shared ES module', () => {
   assert.match(page, /<script\s+type=['"]module['"]\s+src=['"]\.\/src\/feedback\.js['"]><\/script>/);
   assert.doesNotMatch(page, /const TEXT\s*=/);
   assert.doesNotMatch(page, /function issue\(/);
-  const module = fs.readFileSync(feedbackModuleUrl, 'utf8');
-  assert.match(module, /CORE_I18N/);
-  assert.match(module, /public-feedback\.md/);
-  assert.match(module, /learning-platform\.state\.v2/);
-  assert.match(module, /sdaia\.state\.v1/);
+  assert.match(feedbackModule, /CORE_I18N/);
+  assert.match(feedbackModule, /public-feedback\.md/);
+  assert.match(feedbackModule, /learning-platform\.state\.v2/);
+  assert.match(feedbackModule, /sdaia\.state\.v1/);
 });
