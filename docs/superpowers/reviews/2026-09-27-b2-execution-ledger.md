@@ -20,3 +20,9 @@ Pre-flight: no interface conflict found against the approved B2 spec.
 
 Task 1: complete — baseline and coupling inventory recorded. Baseline product evidence is inherited only as starting evidence, not B2 completion evidence.
 Next exact task: Task 2 — add B2 acceptance contract in RED.
+
+Task 2: complete — RED proven by PR #10 quality-gate run 130 (36298495143): four B2 acceptance tests failed for the intended missing registry/runtime boundaries; server/adapter run 413 remained green.
+Task 3: partial GREEN — TrackRegistryV1 schema contract tests 106–107 pass in quality-gate run 132; schema is closed at top-level and entry level. Ruling: the broader Task 2 acceptance RED existed before the schema commit, but the strict arbitrary-field assertion was introduced with the schema rather than observed independently RED; do not count Task 3 fully TDD-complete until a regression RED is demonstrated or the task is reworked. Cost if wrong: reduced proof that the strictness test detects regression, not a known product defect.
+Task 4: GREEN evidence — canonical production registry test 108 passes in quality-gate run 132; production registry remains one SDAIA entry. Task 4 is not checkpoint-complete until Task 3's TDD evidence is repaired.
+Current CI expected RED: acceptance tests still fail because `src/tracks/registry.js`, removal of `ACTIVE_TRACK_ID`, explicit adapter `loadBank(trackId)`, and registry-driven release/SW work belong to later tasks.
+Next exact task: repair Task 3 TDD evidence, then continue Task 5.
