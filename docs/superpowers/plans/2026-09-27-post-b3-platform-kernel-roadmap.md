@@ -101,6 +101,9 @@ The K2 architectural design must explicitly decide:
 10. **Rollback/quarantine:** batch and family-level recovery rules.
 11. **Bilingual authoring:** generate together vs source-first translation/equivalence workflow.
 12. **Quality sampling:** deterministic full checks + model critics + human sampling boundaries.
+13. **Measurement, observability & improvement loop:** versioned event semantics, system/factory/product/learning signals, funnels/friction, experiment evidence, anomaly/alert policy, privacy boundaries and a future human-reviewed improvement-agent interface. Commodity analytics/replay/experimentation/tracing should be evaluated for reuse rather than rebuilt.
+
+Each K2 design point must pass the dated research-refresh process in `docs/superpowers/reviews/2026-09-28-k2-plus-research-refresh-register.md` before it is treated as decision-ready.
 
 No K2 product implementation begins until those decisions are approved in a written K2 design/spec and implementation plan.
 
