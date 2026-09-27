@@ -13,9 +13,11 @@ test('feedback page uses a defined template while blank issues remain disabled',
   assert.match(feedbackModule, /issues\/new\?\$\{p\.toString\(\)\}/);
 });
 
-test('feedback page keeps the public submission warning', () => {
-  assert.match(page, /public GitHub Issue/);
-  assert.match(page, /personal, confidential, or sensitive information/);
+test('feedback page keeps the public submission warning', async () => {
+  const core = await import('../src/presentation/coreI18n.js');
+  assert.match(core.CORE_I18N.en.feedback.publicNotice, /public GitHub Issue/);
+  assert.match(core.CORE_I18N.en.feedback.publicNotice, /personal, confidential, or sensitive information/);
+  assert.match(page, /data-i18n=['"]publicNotice['"]/);
 });
 
 test('public feedback template is a named markdown issue template', () => {
@@ -45,4 +47,19 @@ test('feedback identity is sourced from active track presentation', () => {
   assert.match(feedbackModule, /loadTrackPresentation/);
   assert.match(feedbackModule, /resolvePresentationLocale/);
   assert.match(feedbackModule, /document\.title/);
+});
+
+
+test('feedback submission semantics remain pinned after extraction', () => {
+  assert.match(feedbackModule, /template:'public-feedback\.md'/);
+  assert.match(feedbackModule, /\[Suggestion\] \$\{title\}/);
+  assert.match(feedbackModule, /## Area\\n\$\{area\}\\n\\n## Suggestion/);
+  assert.match(feedbackModule, /\[Contribution\] \$\{type\}/);
+  assert.match(feedbackModule, /## Proposed contribution/);
+  assert.match(feedbackModule, /## Source or reference/);
+  assert.match(feedbackModule, /\[Rating\] \$\{rating\}\/5/);
+  assert.match(feedbackModule, /## Most useful part/);
+  assert.match(feedbackModule, /Submitted from the public feedback page\./);
+  assert.match(feedbackModule, /const key='learning-platform\.state\.v2'/);
+  assert.doesNotMatch(feedbackModule, /const key='sdaia\.state\.v1'/);
 });
