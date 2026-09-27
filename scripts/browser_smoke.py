@@ -4,7 +4,8 @@ import json, os, shutil, subprocess, sys, time, urllib.request, urllib.error
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE='http://127.0.0.1:4173'
 DRIVER='http://127.0.0.1:9515'
-TRACK_ID='sdaia-ai-engineer'
+with open(os.path.join(ROOT,'tracks','registry.json'),encoding='utf-8') as f: REGISTRY=json.load(f)
+TRACK_ID=REGISTRY['default_track_id']
 with open(os.path.join(ROOT,'tracks',TRACK_ID,'manifest.json'),encoding='utf-8') as f: MANIFEST=json.load(f)
 with open(os.path.join(ROOT,'tracks',TRACK_ID,'presentation.json'),encoding='utf-8') as f: PRESENTATION=json.load(f)
 PROFILES=[]
@@ -80,6 +81,8 @@ def main():
         session=value['sessionId'] if isinstance(value,dict) and 'sessionId' in value else None
         if not session: raise RuntimeError(f'no webdriver session id: {value}')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
+        execute(session,"localStorage.setItem('learning-platform.track-id.v1','stale-fixture-track')")
+        req('POST',f'/session/{session}/refresh',{})
         wait_until(lambda:text(session,find(session,'#bankCount'))==str(EXPECTED_BANK),label='profile bank count')
         assert 'سؤال' in text(session,find(session,'body'))
         first_domain=next(iter(PROFILE['weights']))
