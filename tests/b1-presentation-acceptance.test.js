@@ -69,3 +69,12 @@ test('main page brand and hero are sourced from track presentation', () => {
   assert.match(app,/function applyTrackPresentation\(\)/);
   assert.match(app,/document\.title/);
 });
+
+
+test('document title uses generic practice copy', async () => {
+  const core = await import('../src/presentation/coreI18n.js');
+  assert.equal(core.CORE_I18N.ar.app.practiceLabel, 'تدريب');
+  assert.equal(core.CORE_I18N.en.app.practiceLabel, 'Practice');
+  const app = read('../src/app.js');
+  assert.match(app, /document\.title\s*=\s*\x60\$\{p\.displayName\}\s*·\s*\$\{t\(['\"]practiceLabel['\"]\)\}\x60/);
+});
