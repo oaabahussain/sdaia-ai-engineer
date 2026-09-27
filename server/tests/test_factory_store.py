@@ -1,4 +1,5 @@
 import json
+import sqlite3
 from app.main import init_db
 from app.factory_store import create_run, get_run, update_run, record_stage_output, append_audit, list_audit
 
@@ -27,3 +28,17 @@ def test_sqlite_factory_store_preserves_shared_fixture(tmp_path):
     got=get_run(db_url, fixture['run_id'])
     for key,value in fixture.items():
         assert got[key] == value
+
+
+def test_learner_events_are_append_only_and_queryable(tmp_path):
+    from app.factory_store import append_learner_event, list_learner_events
+    db_url=f"sqlite:///{tmp_path / 'learner.db'}"
+    init_db(db_url)
+    a={'event_id':'e1','learner_id':'l1','track_id':'t1','item_version_id':'i1','shown_at':'2026-09-27T00:00:00Z'}
+    b={'event_id':'e2','learner_id':'l1','track_id':'t2','item_version_id':'i2','shown_at':'2026-09-27T00:01:00Z'}
+    append_learner_event(db_url,a)
+    append_learner_event(db_url,b)
+    assert [x['event_id'] for x in list_learner_events(db_url,track_id='t1')] == ['e1']
+    assert [x['event_id'] for x in list_learner_events(db_url,item_version_id='i2')] == ['e2']
+    with pytest.raises(sqlite3.IntegrityError):
+        append_learner_event(db_url,a)
