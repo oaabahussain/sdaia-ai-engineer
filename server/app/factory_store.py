@@ -1,0 +1,66 @@
+import json
+import sqlite3
+
+def _path(db_url):
+    if not db_url.startswith('sqlite:///'):
+        raise RuntimeError('Factory store supports sqlite:/// DB_URL values only')
+    return db_url[len('sqlite:///'):] or './dev.db'
+
+def _connect(db_url):
+    db=sqlite3.connect(_path(db_url))
+    db.row_factory=sqlite3.Row
+    db.execute('PRAGMA foreign_keys = ON')
+    return db
+
+def _row(row):
+    if row is None:
+        return None
+    return {
+        'run_id':row['run_id'],'target_id':row['target_id'],'stage':row['stage'],'status':row['status'],
+        'attempt':row['attempt'],'input_hash':row['input_hash'],'output_ref':row['output_ref'],
+        'request':json.loads(row['request_json']),'started_at':row['started_at'],'completed_at':row['completed_at'],
+        'retry':json.loads(row['retry_json']),
+    }
+
+def create_run(db_url, record):
+    with _connect(db_url) as db:
+        db.execute('INSERT INTO factory_runs (run_id,target_id,stage,status,attempt,input_hash,output_ref,request_json,started_at,completed_at,retry_json) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+            (record['run_id'],record['target_id'],record['stage'],record['status'],record['attempt'],record['input_hash'],record.get('output_ref'),json.dumps(record.get('request',{}),ensure_ascii=False),record['started_at'],record.get('completed_at'),json.dumps(record.get('retry',{}),ensure_ascii=False)))
+    return record
+
+def get_run(db_url, run_id):
+    with _connect(db_url) as db:
+        return _row(db.execute('SELECT * FROM factory_runs WHERE run_id=?',(run_id,)).fetchone())
+
+def update_run(db_url, run_id, status, attempt=None, retry=None, stage=None, completed_at=None, output_ref=None):
+    current=get_run(db_url,run_id)
+    if current is None:
+        raise KeyError('Factory run not found')
+    current['status']=status
+    if attempt is not None: current['attempt']=attempt
+    if retry is not None: current['retry']=retry
+    if stage is not None: current['stage']=stage
+    if completed_at is not None: current['completed_at']=completed_at
+    if output_ref is not None: current['output_ref']=output_ref
+    with _connect(db_url) as db:
+        db.execute('UPDATE factory_runs SET stage=?,status=?,attempt=?,output_ref=?,completed_at=?,retry_json=? WHERE run_id=?',
+            (current['stage'],current['status'],current['attempt'],current['output_ref'],current['completed_at'],json.dumps(current['retry'],ensure_ascii=False),run_id))
+    return current
+
+def record_stage_output(db_url, run_id, stage, output, output_hash, completed_at):
+    with _connect(db_url) as db:
+        db.execute('INSERT INTO factory_stage_outputs (run_id,stage,output_json,output_hash,completed_at) VALUES (?,?,?,?,?)',
+            (run_id,stage,json.dumps(output,ensure_ascii=False),output_hash,completed_at))
+        db.execute('UPDATE factory_runs SET stage=? WHERE run_id=?',(stage,run_id))
+    return output
+
+def append_audit(db_url, record):
+    with _connect(db_url) as db:
+        db.execute('INSERT INTO factory_audit (run_id,target_id,record_json,created_at) VALUES (?,?,?,?)',
+            (record['run_id'],record['target_id'],json.dumps(record,ensure_ascii=False),record['created_at']))
+    return record
+
+def list_audit(db_url, run_id):
+    with _connect(db_url) as db:
+        rows=db.execute('SELECT record_json FROM factory_audit WHERE run_id=? ORDER BY id',(run_id,)).fetchall()
+    return [json.loads(row['record_json']) for row in rows]
