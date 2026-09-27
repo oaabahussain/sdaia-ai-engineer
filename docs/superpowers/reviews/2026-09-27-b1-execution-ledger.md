@@ -52,3 +52,13 @@ Task 17: complete — pre-existing RED `DOMAIN_AR` assertion became GREEN after 
 Task 18: complete — RED canonical-status assertion failed before implementation, then GREEN after `CORE_I18N.*.app.statusNotice` was added and app rendering was driven only by `BANK.track.official_status` + `PROFILE.evidence_status`; hard-coded status notice removed from HTML.
 Checkpoint evidence: PR quality gate run 107 reaches Node tests; all Task 16–18 scoped assertions pass. Remaining Node failure is the intentionally future `feedback.html` SDAIA literal assertion for Tasks 19–20, not a B4 regression.
 Next exact task: Task 19 RED — require external `src/feedback.js` module and preserve existing feedback semantics during extraction.
+
+
+## Checkpoint C1/C2 — Tasks 19–22
+
+Task 19: complete — feedback behavior extracted to `src/feedback.js`; generic labels now reuse `CORE_I18N.*.feedback`. Existing tests that intentionally inspected inline behavior were updated to follow the behavior into the module after systematic-debugging identified stale test location assumptions.
+Task 20: complete — feedback shell neutralized and identity/title resolve from active track manifest + presentation with track-ID fallback. PR run 113 passes the feedback identity assertion.
+Task 21: complete — feedback template, encoded suggestion/contribution/rating semantics, public warning, StateV2 writes and legacy read fallback are pinned and pass in PR run 115.
+Task 22: complete — unsupported `Adaptive` description had a verified RED in PR run 115; description corrected without changing PWA name/short_name. Node suite passes in PR run 116.
+Systematic-debugging finding: PR run 116 browser smoke fails only after offline navigation to feedback because newly extracted `src/feedback.js` is not yet pre-cached; this is the planned Task 23 offline-shell gap. Cost if diagnosis wrong: Task 23 cache change would not restore offline feedback and browser smoke will remain red, forcing a new root-cause pass.
+Next exact task: Task 23 — pin and cache presentation/feedback shell assets.
