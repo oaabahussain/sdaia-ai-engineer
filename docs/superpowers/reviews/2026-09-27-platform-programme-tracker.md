@@ -81,14 +81,14 @@ K1 kernel/governance:
 
 Current stage:
 
-`DESIGN_GATE`
+`SPEC_REVIEW_GATE`
 
 Status:
 
 - K2 implementation: NOT STARTED
-- K2 written spec: NOT CREATED
-- K2 implementation plan: NOT CREATED
-- K2 branch: NONE
+- K2 written spec: CREATED — `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md` — awaiting explicit user approval
+- K2 implementation plan: NOT CREATED — blocked until written-spec approval
+- K2 design/research branch: `docs/k2-research-refresh-register`
 
 Purpose:
 
