@@ -2,7 +2,9 @@
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Current verified main:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
+**K1 product merge baseline:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
+**Post-K1 documentation main observed before this audit:** `134313a49514e02209954002c9af8de0a704535b`  
+**Session rule:** always resolve live `main` first; documentation-only merges may advance it without changing the product baseline.  
 **Current gate:** `K2_DESIGN_GATE`
 
 ## Completed foundation
@@ -24,8 +26,13 @@ Post-merge verification:
 - GitHub Pages #23: SUCCESS
 - Pages deploy + live release verification: SUCCESS
 
-Durable evidence:
-`docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
+Durable K1 evidence:
+- `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
+- `docs/superpowers/reviews/2026-09-27-k1-reverification.md`
+
+Comprehensive continuation:
+- `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`
+- `docs/superpowers/OPERATING_PLAYBOOK.md`
 
 ## Current verified architecture
 
@@ -166,12 +173,14 @@ A new chat must:
 
 1. read this HANDOFF;
 2. resolve live `main` SHA;
-3. read the programme tracker;
-4. read K1 post-merge verification;
-5. inspect current main architecture and K1 factory artifacts;
-6. if K2 design/spec/plan artifacts later exist, read them directly;
-7. inspect branch/main diff before any mutation;
-8. resume the earliest incomplete K2 gate only.
+3. read `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`;
+4. read `docs/superpowers/OPERATING_PLAYBOOK.md`;
+5. read the programme tracker;
+6. read K1 post-merge verification + fresh reverification;
+7. inspect current main architecture and K1 factory artifacts;
+8. if K2 design/spec/plan artifacts later exist, read them directly;
+9. inspect branch/main diff before any mutation;
+10. resume the earliest incomplete K2 gate only.
 
 Do not reconstruct Programme A/B0/B1/B2/B3/K1 from conversation memory.
 
