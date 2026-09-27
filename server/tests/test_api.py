@@ -49,6 +49,15 @@ def test_bank(client):
 
 
 
+def test_bank_explicit_track_and_unknown_are_bounded(client):
+    response = client.get('/v1/bank?track_id=sdaia-ai-engineer')
+    assert response.status_code == 200
+    assert response.json()['track']['id'] == 'sdaia-ai-engineer'
+    missing = client.get('/v1/bank?track_id=missing-track')
+    assert missing.status_code == 404
+    assert missing.json()['error']['code'] == 'invalid_track'
+
+
 def test_progress_missing(client):
     assert client.get(f'/v1/progress/{ANON}', headers=headers()).status_code == 404
 
