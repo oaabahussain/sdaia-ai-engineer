@@ -88,3 +88,6 @@ test('Pages and PR artifact gates explicitly verify active presentation is assem
     assert.doesNotMatch(workflow, /cp .*presentation\.json/);
   }
 });
+
+
+test('synthetic track fixtures are excluded from release artifact inputs',()=>{for(const workflow of [pages,ci]){assert.doesNotMatch(workflow,/tests\/fixtures/)}const registry=JSON.parse(read('../tracks/registry.json'));assert.deepEqual(registry.tracks,[{id:'sdaia-ai-engineer'}]);});
