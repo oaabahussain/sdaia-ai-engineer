@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "learner_id",
+    "track_id",
+    "content_release_id",
+    "form_id",
+    "question_family_id",
+    "item_version_id",
+    "objective_id",
+    "domain_id",
+    "mode",
+    "locale",
+    "shown_at",
+    "answered_at",
+    "answer",
+    "correct",
+    "confidence",
+    "latency_ms",
+    "hint_used",
+    "explanation_opened",
+    "attempt_number"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "learner_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "content_release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "form_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question_family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objective_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "learn",
+        "practice",
+        "check",
+        "section",
+        "mock"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "ar",
+        "en"
+      ]
+    },
+    "shown_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "answered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "answer": {
+      "type": [
+        "integer",
+        "string",
+        "null"
+      ]
+    },
+    "correct": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        null
+      ]
+    },
+    "latency_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "hint_used": {
+      "type": "boolean"
+    },
+    "explanation_opened": {
+      "type": "boolean"
+    },
+    "attempt_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "device": {
+      "type": "object"
+    }
+  }
+}
