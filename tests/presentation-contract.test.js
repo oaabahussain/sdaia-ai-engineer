@@ -118,7 +118,7 @@ test('presentation accessors return locale data and safe domain fallbacks', asyn
   const presentation = readJson('../tracks/sdaia-ai-engineer/presentation.json');
   assert.equal(getPresentationLocale(presentation,'ar'), presentation.locales.ar);
   assert.equal(getPresentationLocale(presentation,'fr'), null);
-  assert.equal(getDomainLabel(presentation,'ar','MLOps / LLMOps'),'عمليات تعلم الآلة والنماذج اللغوية');
+  assert.equal(getDomainLabel(presentation,'ar','mlops-llmops'),'عمليات تعلم الآلة والنماذج اللغوية');
   assert.equal(getDomainLabel(presentation,'ar','Unknown Domain'),'Unknown Domain');
   assert.equal(getDomainLabel(null,'ar','Unknown Domain'),'Unknown Domain');
 });
