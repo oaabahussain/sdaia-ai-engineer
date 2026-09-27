@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "source_type",
+    "title",
+    "trust_class",
+    "status",
+    "version",
+    "locator"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "document",
+        "web",
+        "dataset",
+        "standard",
+        "human"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trust_class": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "provisional",
+        "untrusted"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "retired",
+        "quarantined"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "locator": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "retired"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "trust_class": {
+            "not": {
+              "const": "approved"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
