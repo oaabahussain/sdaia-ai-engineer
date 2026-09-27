@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "track_id": "sdaia-ai-engineer",
+  "legacy_to_domain_id": {
+    "MLOps / LLMOps": "mlops-llmops",
+    "Data / ML / Evaluation": "data-ml",
+    "Core AI / Deep Learning / GenAI": "core-ai",
+    "Responsible AI / Security / Governance": "responsible-ai-security-governance",
+    "AI Software Engineering": "ai-software-engineering",
+    "Architecture / Infrastructure": "architecture-infrastructure",
+    "Business / Professional Practice": "business-professional-practice"
+  }
+}
