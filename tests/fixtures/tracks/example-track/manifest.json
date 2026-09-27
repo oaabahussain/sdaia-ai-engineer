@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "example-track",
+  "version": "1",
+  "status": "active",
+  "official_status": "unofficial-independent",
+  "locales": [
+    "en"
+  ],
+  "core_contract": {
+    "min": 2,
+    "max": 2
+  },
+  "capabilities": [
+    "exam-profile-v1"
+  ],
+  "content": {
+    "concept_files": [
+      "tests/fixtures/tracks/example-track/concepts.json"
+    ],
+    "learn": "tests/fixtures/tracks/example-track/learn.json",
+    "cases": "tests/fixtures/tracks/example-track/cases.json"
+  },
+  "exam_profiles": [
+    "tests/fixtures/tracks/example-track/exam-profile.json"
+  ],
+  "default_exam_profile": "example-track.default.v1"
+}
