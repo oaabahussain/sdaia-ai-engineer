@@ -46,3 +46,13 @@ test('runtime registry resolver is generic and deterministic', async () => {
   let seen=[]; const loaded=await mod.loadTrackRegistry(async p=>{seen.push(p);return fixture});
   assert.deepEqual(loaded,fixture);assert.deepEqual(seen,['./tracks/registry.json']);
 });
+
+
+test('track selection uses only the neutral preference key and tolerates storage failure', async () => {
+  const mod=await import('../src/tracks/selection.js');
+  assert.equal(mod.TRACK_SELECTION_KEY,'learning-platform.track-id.v1');
+  const calls=[];const storage={getItem:k=>{calls.push(['get',k]);return 'x'},setItem:(k,v)=>calls.push(['set',k,v])};
+  assert.equal(mod.readSavedTrackId(storage),'x');mod.saveTrackId('y',storage);
+  assert.deepEqual(calls,[['get','learning-platform.track-id.v1'],['set','learning-platform.track-id.v1','y']]);
+  assert.equal(mod.readSavedTrackId({getItem(){throw new Error('blocked')}}),null);
+});
