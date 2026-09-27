@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "objective_id",
+    "track_id",
+    "domain_id",
+    "concept_ids",
+    "version",
+    "status",
+    "origin"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "objective_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*\\.v[0-9]+$"
+    },
+    "track_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "domain_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "concept_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "provisional",
+        "active",
+        "retired"
+      ]
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "migration-derived",
+        "authoritative",
+        "imported"
+      ]
+    }
+  }
+}
