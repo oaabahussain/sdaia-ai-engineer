@@ -43,7 +43,9 @@ test('feedback identity is sourced from active track presentation', () => {
   assert.doesNotMatch(page, /SDAIA AI Engineer/);
   assert.doesNotMatch(feedbackModule, /SDAIA AI Engineer/);
   assert.match(page, /id=['"]feedbackBrand['"]/);
-  assert.match(feedbackModule, /ACTIVE_TRACK_ID/);
+  assert.doesNotMatch(feedbackModule, /ACTIVE_TRACK_ID/);
+  assert.match(feedbackModule, /loadTrackRegistry/);
+  assert.match(feedbackModule, /resolveActiveTrackId/);
   assert.match(feedbackModule, /loadTrackPresentation/);
   assert.match(feedbackModule, /resolvePresentationLocale/);
   assert.match(feedbackModule, /document\.title/);
