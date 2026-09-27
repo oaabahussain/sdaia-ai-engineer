@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv';
+const load=n=>JSON.parse(fs.readFileSync(new URL('../data/schema/'+n,import.meta.url),'utf8'));const compile=n=>new Ajv({strict:false,allErrors:true,formats:{'date-time':true}}).compile(load(n));
+const valid={schema_version:1,run_id:'run:1',target_id:'item:1',stage:'generate',status:'running',attempt:1,input_hash:'a'.repeat(64),output_ref:null,started_at:'2026-09-27T00:00:00Z',completed_at:null,retry:{eligible:true}};test('FactoryRunV1 captures resumable state',()=>{const v=compile('factory-run-v1.schema.json');assert.equal(v(valid),true,JSON.stringify(v.errors));assert.equal(v({...valid,status:'mystery'}),false)});
