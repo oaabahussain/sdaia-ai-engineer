@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv';
+const load=n=>JSON.parse(fs.readFileSync(new URL('../data/schema/'+n,import.meta.url),'utf8'));const compile=n=>new Ajv({strict:false,allErrors:true,formats:{'date-time':true}}).compile(load(n));
+const valid={schema_version:1,result_id:'pr:1',run_id:'run:1',provider:'deterministic',model:null,model_version:null,policy_version:'k1.source.default.v1',latency_ms:0,output:{candidate:true},provenance_ref:'prov:1',created_at:'2026-09-27T00:00:00Z'};test('ProviderResultV1 is untrusted envelope',()=>{const v=compile('provider-result-v1.schema.json');assert.equal(v(valid),true,JSON.stringify(v.errors));assert.equal(v({...valid,trusted:true}),false)});
