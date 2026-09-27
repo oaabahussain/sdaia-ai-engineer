@@ -42,7 +42,8 @@ def test_health(client):
 
 def test_bank(client):
     payload = client.get('/v1/bank').json()
-    assert payload['contract_version'] == 2
+    assert payload['contract_version'] == 3
+    assert payload['domains']['schema_version'] == 2
     assert payload['track']['id'] == 'sdaia-ai-engineer'
     assert payload['exam_profile']['id'] == payload['track']['default_exam_profile']
     assert sum(len(items) for items in payload['concepts'].values()) == 140
