@@ -22,7 +22,8 @@ export const CORE_I18N = {
       confirmSubmit:'هل تريد تسليم الاختبار الآن؟ يمكنك ترك أسئلة بلا إجابة.',
       scoreText:(c,t)=>`${c} إجابة صحيحة من ${t}`,yourAnswer:'إجابتك',correctAnswer:'الإجابة الصحيحة',notAnswered:'لم تتم الإجابة',
       resumeText:(i,t)=>`السؤال ${i} من ${t}`,
-      errorBank:'تعذر تحميل بنك الأسئلة الكامل. حدّث الصفحة وتأكد من الاتصال بالإنترنت.'
+      errorBank:'تعذر تحميل بنك الأسئلة الكامل. حدّث الصفحة وتأكد من الاتصال بالإنترنت.',
+      statusNotice:(officialStatus,evidenceStatus)=>officialStatus==='unofficial-independent'||evidenceStatus==='project-reference-unverified'?'أداة تحضيرية مستقلة وغير رسمية. أوزان المجالات مبنية على مرجع المشروع، وبنك الأسئلة محتوى تدريبي للممارسة.':''
     },
     feedback: {
       community:'المشاركة',back:'الاختبار',eyebrow:'المجتمع والتطوير',title:'ساعدنا نخلي التجربة أفضل.',
@@ -60,7 +61,8 @@ export const CORE_I18N = {
       confirmSubmit:'Submit the exam now? You may leave questions unanswered.',
       scoreText:(c,t)=>`${c} correct out of ${t}`,yourAnswer:'Your answer',correctAnswer:'Correct answer',notAnswered:'Not answered',
       resumeText:(i,t)=>`Question ${i} of ${t}`,
-      errorBank:'The full question bank could not be loaded. Refresh the page and check your connection.'
+      errorBank:'The full question bank could not be loaded. Refresh the page and check your connection.',
+      statusNotice:(officialStatus,evidenceStatus)=>officialStatus==='unofficial-independent'||evidenceStatus==='project-reference-unverified'?'An independent, unofficial preparation tool. Domain weights follow the project reference, and the question bank is training content for practice.':''
     },
     feedback: {
       community:'Community',back:'Practice',eyebrow:'Community & improvement',title:'Help make the experience better.',
