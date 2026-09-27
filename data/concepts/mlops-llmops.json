@@ -1,5 +1,4 @@
 {
-  "domain": "MLOps / LLMOps",
   "concepts": [
     {
       "term": "Experiment Tracking",
@@ -141,5 +140,6 @@
       "id": "mlops-llmops.observability",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "mlops-llmops"
 }
