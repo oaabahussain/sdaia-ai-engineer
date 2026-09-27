@@ -2,36 +2,24 @@
 
 **Date:** 2026-09-27
 **Branch:** `design/b1-track-presentation-contract`
-**Checkpoint:** D2 — Tasks 1–28 complete; Task 29 next
-**Product HEAD before checkpoint record:** `0698ce055d13d062fc69000c9d8606defcdfefbe`
+**Checkpoint:** E1 — Tasks 1–29 complete; Task 30 integration next
 
-## Completed parent tasks
+## Completed
 
-Tasks 1–28.
+Tasks 1–29. Whole-branch final review is recorded in `docs/superpowers/reviews/2026-09-27-b1-final-review.md`; HANDOFF now points to B1.
 
-## Fresh verification
+## Acceptance evidence
 
-PR quality gate run 126: SUCCESS.
-- canonical validator: PASS
-- Node tests: PASS
-- app parse: PASS
-- service-worker verifier: PASS
-- Pages artifact assembly + live verifier: PASS
-- browser smoke: PASS, including bilingual presentation, RTL/LTR, offline cached reload, feedback URLs and presentation
+Implementation head `0698ce055d13d062fc69000c9d8606defcdfefbe`: PR quality gate run 126 SUCCESS; server/adapter run 394 SUCCESS. Node 101/101, Python 16/16, SW 26 assets, Pages/live presentation, browser bilingual/RTL-LTR/offline/feedback presentation, SQLite and adapters all pass.
 
-Server and adapter contract workflow run 394: SUCCESS.
+## Review
 
-## Latest RED→GREEN
-
-- Task 23 RED run 118 → GREEN by run 120.
-- Task 24 RED run 120 → GREEN before Task 25 RED.
-- Task 25 RED run 122 → GREEN in run 126.
-- Tasks 26–28 are acceptance/test extensions over the completed implementation; final run 126 is green.
+Final review: self-review (no subagent tool). No Critical or Important findings remain open.
 
 ## Next exact task
 
-Task 29 — whole-branch verification/review against base `0efae25ba71ca26030bd2471a26cb273bc574826`; verify compatibility boundaries, scan leakage/adaptive claims, create final review, update HANDOFF. Critical/Important review findings require one TDD fix pass.
+Task 30 — use `finishing-a-development-branch`; verify current branch/PR head and fresh CI after documentation commits, then follow the skill's integration gate. If merged, verify new main, CI, Pages/deployment/live release, and re-read B1 artifacts from main. Stop before B2 implementation.
 
 ## Resume safety
 
-Safe to resume from Task 29. Do not redo Tasks 1–28. Nothing merged yet.
+Safe to resume from Task 30 only. Do not redo Tasks 1–29. Nothing has been merged at this checkpoint.
