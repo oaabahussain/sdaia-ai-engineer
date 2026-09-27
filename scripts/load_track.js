@@ -15,6 +15,7 @@ export function loadTrack(root,trackId){
  const examProfile=profiles.find(p=>p.id===manifest.default_exam_profile);
  if(!examProfile)throw new Error(`Missing default exam profile ${manifest.default_exam_profile}`);
  const conceptDocs=manifest.content.concept_files.map(p=>readJson(path.join(root,p)));
- const concepts=Object.fromEntries(conceptDocs.map(doc=>[doc.domain,doc.concepts]));
- return{manifest,presentation,examProfile,concepts,learn:readJson(path.join(root,manifest.content.learn)),cases:readJson(path.join(root,manifest.content.cases))};
+ const domains=manifest.capabilities?.includes('content-model-v2')?readJson(path.join(root,'tracks',trackId,'domains.json')):null;
+ const concepts=Object.fromEntries(conceptDocs.map(doc=>[domains?doc.domain_id:doc.domain,doc.concepts]));
+ return{manifest,presentation,examProfile,...(domains?{domains}:{}),concepts,learn:readJson(path.join(root,manifest.content.learn)),cases:readJson(path.join(root,manifest.content.cases))};
 }
