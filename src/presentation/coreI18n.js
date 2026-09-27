@@ -4,7 +4,7 @@ export const CORE_DEFAULT_LOCALE = 'ar';
 export const CORE_I18N = {
   ar: {
     app: {
-      home:'الرئيسية',feedback:'شارك رأيك',questions:'سؤال',domains:'مجالات',fullExam:'الاختبار الكامل',randomized:'خيارات عشوائية',
+      home:'الرئيسية',practiceLabel:'تدريب',feedback:'شارك رأيك',questions:'سؤال',domains:'مجالات',fullExam:'الاختبار الكامل',randomized:'خيارات عشوائية',
       resumeAvailable:'لديك اختبار غير مكتمل',resume:'استأنف',rules:'قواعد الاختبار',rulesTitle:'مصمم لكسر الأنماط',
       rule1:'ترتيب الأسئلة يتغير مع كل محاولة.',rule2:'ترتيب A/B/C/D يتغير لكل سؤال مع كل محاولة.',
       rule3:'الثقة اختيارية ولا تمنع الانتقال أو التسليم.',rule4:'يمكنك تغيير اللغة أثناء الاختبار بدون فقد الإجابة.',
@@ -42,7 +42,7 @@ export const CORE_I18N = {
   },
   en: {
     app: {
-      home:'Home',feedback:'Feedback',questions:'Questions',domains:'Domains',fullExam:'Full exam',randomized:'Random options',
+      home:'Home',practiceLabel:'Practice',feedback:'Feedback',questions:'Questions',domains:'Domains',fullExam:'Full exam',randomized:'Random options',
       resumeAvailable:'You have an unfinished exam',resume:'Resume',rules:'Exam rules',rulesTitle:'Designed to break patterns',
       rule1:'Question order changes on every attempt.',rule2:'A/B/C/D order changes for every question on every attempt.',
       rule3:'Confidence is optional and never blocks navigation or submission.',rule4:'You can switch language during the exam without losing your answer.',
