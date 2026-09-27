@@ -10,7 +10,10 @@ const ASSETS = [
   './icon-512.png',
   './src/registerServiceWorker.js',
   './src/app.js',
+  './src/feedback.js',
   './src/config.js',
+  './src/presentation/coreI18n.js',
+  './src/presentation/trackPresentation.js',
   './src/logic/exam.js',
   './src/logic/questionBank.js',
   './src/storage/interface.js',
@@ -21,6 +24,7 @@ const ASSETS = [
   './src/content/runtimeBundle.js',
   './data/migrations/sdaia-generated-v2-question-ids.json',
   './tracks/sdaia-ai-engineer/manifest.json',
+  './tracks/sdaia-ai-engineer/presentation.json',
   './tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json'
 ];
 

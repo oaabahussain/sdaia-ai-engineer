@@ -1,7 +1,7 @@
 {
   "name": "SDAIA AI Engineer Study Space",
   "short_name": "SDAIA AI",
-  "description": "Adaptive mobile-first study space for SDAIA AI Engineer Badge preparation.",
+  "description": "Mobile-first bilingual practice and exam space for SDAIA AI Engineer Badge preparation.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

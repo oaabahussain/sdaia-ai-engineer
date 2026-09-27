@@ -1,3 +1,24 @@
+# B1 — Current Durable Handoff
+
+**Date:** 2026-09-27  
+**Repository:** `oaabahussain/sdaia-ai-engineer`  
+**Branch:** `design/b1-track-presentation-contract`  
+**Base:** `main@0efae25ba71ca26030bd2471a26cb273bc574826`  
+**Status:** B1 implementation Tasks 1–29 accepted on branch; integration/post-merge verification remains.  
+
+Authoritative recovery records:
+- `docs/superpowers/reviews/2026-09-27-b1-checkpoint.md`
+- `docs/superpowers/reviews/2026-09-27-b1-execution-ledger.md`
+- `docs/superpowers/reviews/2026-09-27-b1-final-review.md`
+- `docs/superpowers/plans/2026-09-27-b1-track-presentation-contract.md`
+- `docs/superpowers/specs/2026-09-26-b1-track-presentation-contract-design.md`
+
+Fresh implementation acceptance: PR quality gate run 126 SUCCESS (101/101 Node, validator, app parse, SW 26 assets, Pages/live presentation, browser bilingual/offline/feedback presentation) and server/adapter run 394 SUCCESS (16 Python tests, SQLite, browser/API adapters). Final review is self-review only because no reviewer/subagent dispatch tool is available.
+
+**Next exact action:** invoke `finishing-a-development-branch`, verify current PR head and fresh CI after review/handoff commits, then integrate only according to that skill's gate. After successful merge/deploy/post-merge verification, stop at **B2 — Track Registry design**. Do not implement B2 automatically.
+
+---
+
 # Programme A — Durable Handoff
 
 **Date:** 2026-09-26  

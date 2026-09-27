@@ -69,3 +69,22 @@ test('PR gate executes live-release verification against the assembled artifact 
   assert.match(ci, /python3 -m http\.server 4174/);
   assert.match(ci, /node scripts\/verify_live_release\.js http:\/\/127\.0\.0\.1:4174/);
 });
+
+
+test('live release verifier validates active track presentation contract', () => {
+  const live = read('../scripts/verify_live_release.js');
+  assert.match(live, /presentation\.json/);
+  assert.match(live, /presentation\.track_id/);
+  assert.match(live, /presentation\.track_version/);
+  assert.match(live, /presentation\.default_locale/);
+  assert.match(live, /domain_labels/);
+  assert.match(live, /live track presentation: PASS/);
+});
+
+
+test('Pages and PR artifact gates explicitly verify active presentation is assembled', () => {
+  for (const workflow of [pages, ci]) {
+    assert.match(workflow, /test -f _site\/tracks\/sdaia-ai-engineer\/presentation\.json/);
+    assert.doesNotMatch(workflow, /cp .*presentation\.json/);
+  }
+});

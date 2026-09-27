@@ -17,6 +17,8 @@ if (!manifestAssets.length) throw new Error('No canonical track manifest is pre-
 for (const manifestAsset of manifestAssets) {
   const manifestPath = manifestAsset.replace(/^\.\//, '');
   const manifest = JSON.parse(fs.readFileSync(path.join(root, manifestPath), 'utf8'));
+  const presentationAsset = `./tracks/${manifest.id}/presentation.json`;
+  if (!assets.includes(presentationAsset)) throw new Error(`Track presentation is not pre-cached: ${presentationAsset}`);
   const profiles = manifest.exam_profiles.map(ref => ({
     ref,
     value: JSON.parse(fs.readFileSync(path.join(root, ref.replace(/^\.\//, '')), 'utf8')),

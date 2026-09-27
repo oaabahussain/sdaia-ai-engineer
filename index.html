@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
-<title>SDAIA AI Engineer Practice</title>
+<title>Learning Platform</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#667085;--line:#e4e7ec;--accent:#5b5ce2;--accent2:#7c3aed;--good:#087f5b;--bad:#c92a2a;--warn:#b7791f;--shadow:0 14px 40px rgba(16,24,40,.08);--radius:18px}
@@ -15,13 +15,13 @@
 </style>
 </head>
 <body>
-<header class="topbar"><div class="topin"><div class="brand" data-i18n="brand">SDAIA AI Engineer · بنك الاختبارات</div><div class="controls"><a class="btn small" href="./feedback.html" data-i18n="feedback">شارك رأيك</a><button class="btn small" id="langBtn" aria-label="Language">EN</button><button class="btn small" id="themeBtn" aria-label="Theme">☀️</button><button class="btn small" id="homeBtn" data-i18n="home">الرئيسية</button></div></div></header>
+<header class="topbar"><div class="topin"><div class="brand" id="brandText">Learning Platform</div><div class="controls"><a class="btn small" href="./feedback.html" data-i18n="feedback">شارك رأيك</a><button class="btn small" id="langBtn" aria-label="Language">EN</button><button class="btn small" id="themeBtn" aria-label="Theme">☀️</button><button class="btn small" id="homeBtn" data-i18n="home">الرئيسية</button></div></div></header>
 <main class="app">
 <div id="errorBox" class="errorBox" role="alert"></div>
 <section id="home" class="screen active">
   <div class="hero"><div class="heroGrid">
-    <div class="card"><div class="eyebrow" data-i18n="eyebrow">بنك اختبارات ثنائي اللغة</div><h1 data-i18n="heroTitle">تدرّب مثل الاختبار، بدون نمط محفوظ للإجابات.</h1><p class="muted" data-i18n="heroText">أكثر من ألف سؤال بالعربي والإنجليزي، اختبار كامل موزون، واختبارات مستقلة لكل مجال.</p><div class="stats"><div class="stat"><b id="bankCount">—</b><small data-i18n="questions">سؤال</small></div><div class="stat"><b id="domainCount">—</b><small data-i18n="domains">مجالات</small></div><div class="stat"><b id="fullExamCount">—</b><small data-i18n="fullExam">الاختبار الكامل</small></div><div class="stat"><b>A–D</b><small data-i18n="randomized">خيارات عشوائية</small></div></div><div id="resumeBox" class="resumeBox"><div><b data-i18n="resumeAvailable">لديك اختبار غير مكتمل</b><div class="muted" id="resumeMeta"></div></div><button class="btn primary" id="resumeBtn" data-i18n="resume">استأنف</button></div></div>
-    <div class="card"><div class="eyebrow" data-i18n="rules">قواعد الاختبار</div><h2 data-i18n="rulesTitle">مصمم لكسر الأنماط</h2><ul><li data-i18n="rule1">ترتيب الأسئلة يتغير مع كل محاولة.</li><li data-i18n="rule2">ترتيب A/B/C/D يتغير لكل سؤال مع كل محاولة.</li><li data-i18n="rule3">الثقة اختيارية ولا تمنع الانتقال أو التسليم.</li><li data-i18n="rule4">يمكنك تغيير اللغة أثناء الاختبار بدون فقد الإجابة.</li></ul><div class="notice" data-i18n="unofficial">أداة تحضيرية مستقلة وغير رسمية. أوزان المجالات مبنية على مرجع المشروع، وبنك الأسئلة محتوى تدريبي للممارسة.</div></div>
+    <div class="card"><div class="eyebrow" id="heroEyebrow"></div><h1 id="heroTitle">Learning Platform</h1><p class="muted" id="heroText"></p><div class="stats"><div class="stat"><b id="bankCount">—</b><small data-i18n="questions">سؤال</small></div><div class="stat"><b id="domainCount">—</b><small data-i18n="domains">مجالات</small></div><div class="stat"><b id="fullExamCount">—</b><small data-i18n="fullExam">الاختبار الكامل</small></div><div class="stat"><b>A–D</b><small data-i18n="randomized">خيارات عشوائية</small></div></div><div id="resumeBox" class="resumeBox"><div><b data-i18n="resumeAvailable">لديك اختبار غير مكتمل</b><div class="muted" id="resumeMeta"></div></div><button class="btn primary" id="resumeBtn" data-i18n="resume">استأنف</button></div></div>
+    <div class="card"><div class="eyebrow" data-i18n="rules">قواعد الاختبار</div><h2 data-i18n="rulesTitle">مصمم لكسر الأنماط</h2><ul><li data-i18n="rule1">ترتيب الأسئلة يتغير مع كل محاولة.</li><li data-i18n="rule2">ترتيب A/B/C/D يتغير لكل سؤال مع كل محاولة.</li><li data-i18n="rule3">الثقة اختيارية ولا تمنع الانتقال أو التسليم.</li><li data-i18n="rule4">يمكنك تغيير اللغة أثناء الاختبار بدون فقد الإجابة.</li></ul><div class="notice" id="statusNotice"></div></div>
   </div></div>
   <div class="sectionTitle"><div><div class="eyebrow" data-i18n="mode">وضع الاختبار</div><h2 data-i18n="chooseExam">اختر طريقة الاختبار</h2></div></div>
   <div class="modeGrid"><div class="card fullExam"><h2 id="fullExamTitle">الاختبار الكامل</h2><p class="muted" id="fullExamDesc">يتم تحميل إعدادات الاختبار…</p><div id="allocation" class="allocation"></div><button class="btn primary" id="startFullBtn">ابدأ الاختبار</button></div><div class="card"><h2 data-i18n="sectionExam">اختبار مجال واحد</h2><p class="muted" data-i18n="sectionDesc">اختر أي مجال واختبر نفسك فيه وحده.</p><div id="domainSummary"></div></div></div>
