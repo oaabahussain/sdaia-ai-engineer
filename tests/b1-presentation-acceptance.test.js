@@ -78,3 +78,22 @@ test('document title uses generic practice copy', async () => {
   const app = read('../src/app.js');
   assert.match(app, /document\.title\s*=\s*\x60\$\{p\.displayName\}\s*·\s*\$\{t\(['\"]practiceLabel['\"]\)\}\x60/);
 });
+
+
+test('status notice is canonical and presentation cannot override evidence truth', async () => {
+  const presentation = JSON.parse(read('../tracks/sdaia-ai-engineer/presentation.json'));
+  assert.equal(Object.hasOwn(presentation, 'official_status'), false);
+  assert.equal(Object.hasOwn(presentation, 'evidence_status'), false);
+  for (const locale of Object.values(presentation.locales)) {
+    assert.equal(Object.hasOwn(locale, 'official_status'), false);
+    assert.equal(Object.hasOwn(locale, 'evidence_status'), false);
+  }
+  const core = await import('../src/presentation/coreI18n.js');
+  assert.equal(typeof core.CORE_I18N.ar.app.statusNotice, 'function');
+  assert.equal(typeof core.CORE_I18N.en.app.statusNotice, 'function');
+  const app = read('../src/app.js');
+  assert.match(app, /statusNotice/);
+  assert.match(app, /BANK\.track\.official_status/);
+  assert.match(app, /PROFILE\.evidence_status/);
+  assert.doesNotMatch(app, /const TRACK_I18N\s*=/);
+});
