@@ -2,13 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadTrack } from '../scripts/load_track.js';
-import { ACTIVE_TRACK_ID } from '../src/config.js';
+import { loadTrack, loadTrackRegistry } from '../scripts/load_track.js';
 const root=new URL('..',import.meta.url).pathname;
 const expectedProfile=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-profile.expected.json',import.meta.url),'utf8'));
 const expectedBank=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-bank-counts.expected.json',import.meta.url),'utf8'));
-test('current track loads through one canonical manifest',()=>{const b=loadTrack(root,ACTIVE_TRACK_ID);assert.equal(b.manifest.id,ACTIVE_TRACK_ID);assert.equal(b.manifest.schema_version,1);assert.equal(b.presentation.track_id,b.manifest.id);assert.equal(b.examProfile.id,b.manifest.default_exam_profile);assert.equal(b.examProfile.question_count,expectedProfile.question_count);assert.equal(b.examProfile.evidence_status,expectedProfile.evidence_status);assert.deepEqual(b.examProfile.weights,expectedProfile.weights);assert.equal(Object.values(b.concepts).flat().length,expectedBank.concepts)});
-test('manifest content references are repository-relative and loadable',()=>{const {manifest}=loadTrack(root,ACTIVE_TRACK_ID);assert.equal(manifest.content.concept_files.length,expectedBank.domains);assert.ok(manifest.exam_profiles.length>0)});
+test('current track loads through one canonical manifest',()=>{const b=loadTrack(root,loadTrackRegistry(root).default_track_id);assert.equal(b.manifest.id,loadTrackRegistry(root).default_track_id);assert.equal(b.manifest.schema_version,1);assert.equal(b.presentation.track_id,b.manifest.id);assert.equal(b.examProfile.id,b.manifest.default_exam_profile);assert.equal(b.examProfile.question_count,expectedProfile.question_count);assert.equal(b.examProfile.evidence_status,expectedProfile.evidence_status);assert.deepEqual(b.examProfile.weights,expectedProfile.weights);assert.equal(Object.values(b.concepts).flat().length,expectedBank.concepts)});
+test('manifest content references are repository-relative and loadable',()=>{const {manifest}=loadTrack(root,loadTrackRegistry(root).default_track_id);assert.equal(manifest.content.concept_files.length,expectedBank.domains);assert.ok(manifest.exam_profiles.length>0)});
 
 function activeFiles(dir){
  if(!fs.existsSync(dir))return[];
