@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "policy_id": "k1.source.default.v1",
+  "version": 1,
+  "mode": "GROUNDED",
+  "requires_evidence_for_added_claims": true,
+  "allow_external_facts": false
+}
