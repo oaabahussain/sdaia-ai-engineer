@@ -31,3 +31,25 @@ Task 3: complete — repaired TDD evidence with regression RED→GREEN. Run 134:
 Task 4: complete — canonical production registry test 108 is GREEN; registry is schema_version 1, default `sdaia-ai-engineer`, one production entry.
 Checkpoint A2 status: Tasks 3–4 complete. Expected branch CI remains RED only on later B2 acceptance boundaries.
 Next exact task: Task 5 — tooling registry loader.
+
+Task 5: implemented — tooling loadTrackRegistry(root) added; RED observed in run 138 as missing export before implementation.
+Task 6: implemented — semantic registry validation rejects empty/default-absent/duplicate IDs and canonical validator consumes registry.
+Task 7: implemented — validateRegistryContract iterates registry entries and validates manifest/presentation identity.
+Task 8: implemented — synthetic example-track fixture package + two-track registry fixture under tests/fixtures only.
+Task 9: implemented — runtime registry loader/validator/resolver; requested → saved → default precedence.
+Task 10: implemented — neutral selection key learning-platform.track-id.v1, outside StateV2.
+Task 11: implemented — ACTIVE_TRACK_ID removed; Programme A acceptance updated for registry bootstrap.
+Task 12: implemented — browser/interface loadBank(trackId).
+Task 13: implemented — API loadBank(trackId) and /v1/bank?track_id= selection.
+Task 14: implemented — server default derives from tracks/registry.json; TRACK_ID fallback removed.
+Task 15: implemented — app loads registry, resolves/saves selected ID, then loads explicit bank.
+Task 17: implemented — feedback shares registry + selection modules.
+Task 18: implemented — browser smoke derives TRACK_ID from registry and seeds stale saved ID to prove fallback.
+Task 19: implemented — SW caches registry bootstrap modules/data.
+Task 20: implemented — SW verifier derives manifest requirements from production registry.
+Task 22: implemented — live verifier iterates registry entries and reports registry summary.
+Task 23: implemented — CI/Pages hard-coded SDAIA presentation assertion replaced by registry assertion.
+Task 25: implemented — leakage regression scans runtime/release surfaces for ACTIVE_TRACK_ID and pinned manifest path.
+Debugging ruling: server/adapter run 468 failed because scripts/contract_test.js still imported removed ACTIVE_TRACK_ID. Root cause was a stale test consumer, not runtime code. Fixed at source by deriving default ID through tooling loadTrackRegistry and passing it explicitly to loadBank(trackId).
+Current verification: fresh quality-gate run 160 and server/adapter run 480 are in progress on c7c5ad6. Do not mark Tasks 5–25 complete until these runs finish and remaining Task 16/21/24 assertions are closed.
+Next exact task: inspect run 160/480 results; systematic-debug any failure; close Tasks 16,21,24; then Task 26 full acceptance.
