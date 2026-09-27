@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import Ajv from 'ajv';
+import { loadTrackRegistry } from '../scripts/load_track.js';
 
 const schema = JSON.parse(fs.readFileSync(new URL('../data/schema/track-registry.schema.json', import.meta.url), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(new URL('../tracks/registry.json', import.meta.url), 'utf8'));
@@ -20,4 +21,10 @@ test('production registry is the single current SDAIA track', () => {
   assert.equal(registry.schema_version, 1);
   assert.equal(registry.default_track_id, 'sdaia-ai-engineer');
   assert.deepEqual(registry.tracks, [{id:'sdaia-ai-engineer'}]);
+});
+
+
+test('tooling loads the canonical track registry', () => {
+  const root = new URL('..', import.meta.url).pathname;
+  assert.deepEqual(loadTrackRegistry(root), registry);
 });
