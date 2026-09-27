@@ -31,6 +31,7 @@ Durable K1 evidence:
 - `docs/superpowers/reviews/2026-09-27-k1-reverification.md`
 
 Comprehensive continuation:
+- `docs/superpowers/reviews/2026-09-27-comprehensive-handoff-v2.md` — final full recovery artifact including constitution-update protocol and fresh post-audit main verification.
 - `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`
 - `docs/superpowers/OPERATING_PLAYBOOK.md`
 
