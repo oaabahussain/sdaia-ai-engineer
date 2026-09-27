@@ -43,3 +43,14 @@ Checkpoint D:
 - Quality run 272 SUCCESS; Server/Adapter run 785 SUCCESS.
 
 Next exact task: Checkpoint E — governed quality pipeline.
+
+Checkpoint E:
+- E RED proven in quality run 280: governed pipeline/stage modules absent.
+- Implemented fixed ordered pipeline: generate → critique → validate → deduplicate → evidence → distractor → bilingual → accessibility → review → activate.
+- Exact/semantic dedup uncertainty becomes REVIEW_REQUIRED; no mandatory vector DB.
+- Evidence and bilingual provider ABSTAIN becomes REVIEW_REQUIRED rather than guessed PASS.
+- Accessibility/fairness gate rejects missing visual alt metadata and preserves fairness uncertainty.
+- Review stage enforces risk-based human approval; activation stage yields CANARY only, never ACTIVE.
+- Quality run 290 SUCCESS; Server/Adapter run 825 SUCCESS.
+
+Next exact task: Checkpoint F — Coverage Engine.
