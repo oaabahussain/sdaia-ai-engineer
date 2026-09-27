@@ -56,3 +56,6 @@ test('track selection uses only the neutral preference key and tolerates storage
   assert.deepEqual(calls,[['get','learning-platform.track-id.v1'],['set','learning-platform.track-id.v1','y']]);
   assert.equal(mod.readSavedTrackId({getItem(){throw new Error('blocked')}}),null);
 });
+
+
+test('synthetic two-track fixture exercises generic resolver without entering production', async()=>{const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/track-registry-two-tracks.json',import.meta.url),'utf8'));assert.equal(validate(fixture),true,JSON.stringify(validate.errors));const {resolveActiveTrackId}=await import('../src/tracks/registry.js');assert.equal(resolveActiveTrackId({registry:fixture,requestedTrackId:'example-track'}),'example-track');assert.deepEqual(registry.tracks,[{id:'sdaia-ai-engineer'}]);for(const p of ['../.github/workflows/ci.yml','../.github/workflows/pages.yml'])assert.doesNotMatch(fs.readFileSync(new URL(p,import.meta.url),'utf8'),/tests\/fixtures/)});
