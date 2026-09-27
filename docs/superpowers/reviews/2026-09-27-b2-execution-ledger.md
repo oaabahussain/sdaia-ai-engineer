@@ -26,3 +26,8 @@ Task 3: partial GREEN — TrackRegistryV1 schema contract tests 106–107 pass i
 Task 4: GREEN evidence — canonical production registry test 108 passes in quality-gate run 132; production registry remains one SDAIA entry. Task 4 is not checkpoint-complete until Task 3's TDD evidence is repaired.
 Current CI expected RED: acceptance tests still fail because `src/tracks/registry.js`, removal of `ACTIVE_TRACK_ID`, explicit adapter `loadBank(trackId)`, and registry-driven release/SW work belong to later tasks.
 Next exact task: repair Task 3 TDD evidence, then continue Task 5.
+
+Task 3: complete — repaired TDD evidence with regression RED→GREEN. Run 134: test 107 failed expected false/actual true after strictness was intentionally disabled; commit 997a0fc restored closed objects; run 135 test 107 GREEN. The earlier partial-evidence ruling is superseded by this explicit regression proof.
+Task 4: complete — canonical production registry test 108 is GREEN; registry is schema_version 1, default `sdaia-ai-engineer`, one production entry.
+Checkpoint A2 status: Tasks 3–4 complete. Expected branch CI remains RED only on later B2 acceptance boundaries.
+Next exact task: Task 5 — tooling registry loader.
