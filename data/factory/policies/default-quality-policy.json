@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "policy_id": "k1.quality.default.v1",
+  "version": 1,
+  "required": {
+    "correctness": "PASS",
+    "evidence_grounding": "PASS",
+    "ambiguity": "PASS",
+    "bilingual_equivalence": "PASS",
+    "accessibility": "PASS"
+  },
+  "abstain_requires_review": true
+}
