@@ -37,16 +37,16 @@ Community evidence is used for discovery and failure signals, not prevalence cla
 | # | Decision point | Prior project state | Current systems/standards to compare | Initial reuse direction | Status |
 |---:|---|---|---|---|---|
 | 1 | Expansion unit / coverage planning | QuestionFamilyV2 + CoverageGapV1; raw-count requests invalid | assessment blueprints, competency/coverage systems, CASE alignment patterns | QuestionFamily + objective/misconception CoverageGap remains canonical; CASE is an interoperability/alignment adapter, not internal truth | DECISION_READY |
-| 2 | Batch/tranche sizing | resumable partial batches exist | modern content/data batch orchestration and adaptive quality-yield policies | retain K1 LocalRunner and add tranche policy first; workflow-engine adoption requires demonstrated scale/recovery need | PARTIAL |
+| 2 | Batch/tranche sizing | resumable partial batches exist | modern content/data batch orchestration and adaptive quality-yield policies | use adaptive tranches governed by observed yield/review capacity/failure rates; exact sizes are calibration policy, not architecture | DECISION_READY (architecture) |
 | 3 | Provider routing/evaluation | provider ports + frozen-set evaluation foundation | OpenAI evals/datasets, Anthropic agent evals, Braintrust, Langfuse, Phoenix | frozen/versioned eval sets + production-failure cases + end-to-end evals; external eval tools are adapters, provider promotion policy stays internal | DECISION_READY |
-| 4 | Evidence/source policy | STRICT/GROUNDED/EXPANSIVE; GROUNDED default | NIST AI RMF/GAI profile, retrieval/evidence systems, source-governance patterns | keep versioned source policy/provenance internal; external retrieval/eval systems cannot become authority | PARTIAL |
-| 5 | Human review scaling | AI/high-risk/quarantined require human; deterministic may sample | Label Studio-style agent/human evaluation, review queues, active sampling | review UI/tooling may be reused; risk tiers, sampling and approval authority remain internal | PARTIAL |
+| 4 | Evidence/source policy | STRICT/GROUNDED/EXPANSIVE; GROUNDED default | NIST AI RMF/GAI profile, retrieval/evidence systems, source-governance patterns | keep versioned source policy/provenance internal; approved source classes are track policy data and require explicit registry evidence | DECISION_READY (architecture) |
+| 5 | Human review scaling | AI/high-risk/quarantined require human; deterministic may sample | human/AI evaluation studies, review queues, active sampling | risk-based review with mandatory review for critical/new/uncertain classes and evidence-driven sampling for mature low-risk classes; percentages are calibration policy | DECISION_READY (architecture) |
 | 6 | Semantic/cross-lingual dedup | exact + optional embedding cosine; uncertainty -> REVIEW_REQUIRED | pgvector, vector/hybrid systems, multilingual embeddings | lexical + structural + multilingual semantic layers; benchmark pgvector/exact search first; thresholds must be calibrated on labeled bank pairs | DECISION_READY (architecture) |
 | 7 | Intended vs observed difficulty | strict separation already constitutional | psychometrics/IRT research and standards | K2 keeps intended only; observed/calibrated remains later | DECISION_READY |
 | 8 | CANARY -> ACTIVE evidence | CANARY boundary exists; activation evidence currently minimal | progressive delivery, feature flags, experiments, release health systems | internal ActivationEvidence contract + optional standards-based feature-flag adapter; promotion requires observed evidence, not a string flag | DECISION_READY |
 | 9 | Release cadence | immutable releases/rollback exist | Statsig/PostHog/GrowthBook progressive rollout patterns | controlled tranches; feature gates for exposure control and experiments only when causal comparison is needed | DECISION_READY |
 | 10 | Rollback/quarantine | release rollback + family/item lifecycle available | OpenFeature/vendor flags, progressive release systems | immutable content rollback remains canonical; feature flags may provide emergency exposure kill-switch, never replace release history | DECISION_READY |
-| 11 | Bilingual authoring/equivalence | Arabic/English first-class; semantic equivalence gate | QTI internationalization, multilingual embeddings/evaluation | one canonical family/reasoning/evidence lineage with AR/EN item variants; cross-lingual models assist but do not prove equivalence alone | PARTIAL |
+| 11 | Bilingual authoring/equivalence | Arabic/English first-class; semantic equivalence gate | QTI internationalization, MQM, multilingual embeddings/evaluation | canonical reasoning/evidence + AR/EN variants; MQM-style analytic rubric + automated semantic signals + human gold-set calibration; no single metric is authority | DECISION_READY (architecture) |
 | 12 | Quality sampling / critics / humans | multidimensional QualityReport + conservative review | Anthropic/Phoenix/Langfuse eval patterns, human evaluation tools | deterministic checks + rubric/model graders + human-labeled gold subset; production failures continuously feed eval sets | DECISION_READY |
 | 13 | Measurement, observability & improvement loop | LearnerEventV1 + actionable-analytics constitution; no full closed loop yet | PostHog, Statsig, Snowplow Event Studio, OpenTelemetry, Caliper, OpenFeature, AI eval platforms | versioned internal education events + adapters for analytics/replay/experiments/telemetry; future scouts are evidence/hypothesis generators, not autonomous production authority | DECISION_READY (architecture) |
 
@@ -389,3 +389,174 @@ The following are intentionally **not** treated as solved:
 8. exact privacy/consent/retention rules — must be designed against deployment jurisdiction, collected fields and product account model.
 
 These remain open because guessing them now would contradict the evidence-first rule.
+
+
+## 12. K2 Research Pass 2 — Close Architecture, Defer Calibration
+
+Pass 2 focused on the remaining PARTIAL items. The key distinction is now explicit:
+
+- **Architecture decisions** must be fixed before K2 spec approval.
+- **Calibration parameters** must be versioned policies learned from pilot/runtime evidence and must not be guessed during architecture.
+
+### 12.1 Adaptive tranche sizing — architecture closed
+
+There is no defensible universal batch size for generated assessment content. Published QA studies show materially different usable/reject rates across contexts, while canary guidance likewise ties representative sample size/duration to workload diversity, traffic and the metrics being evaluated.
+
+K2 therefore uses **adaptive tranches**, not one fixed global batch size.
+
+Tranche policy inputs:
+- requested coverage deficit;
+- recent candidate pass/yield rate;
+- human-review queue capacity and latency;
+- duplicate/evidence/bilingual failure rates;
+- provider/model maturity;
+- domain/risk class;
+- previous canary outcomes;
+- cost/latency budget.
+
+Calibration outputs:
+- next tranche requested_count;
+- required review sample/coverage;
+- pause/continue/expand/contract decision.
+
+Exact numeric tranche sizes are versioned configuration learned from pilots. They are not constitutional constants.
+
+Evidence:
+- AI-item QA studies show substantial screening/revision needs and domain/context variance.
+- Google SRE canary guidance explicitly states sample size/duration must be representative and can be tuned from historical canary failure data rather than arbitrary fixed values.
+
+References:
+- https://pmc.ncbi.nlm.nih.gov/articles/PMC11854382/
+- https://link.springer.com/article/10.1186/s12909-025-06796-6
+- https://sre.google/workbook/canarying-releases/
+
+### 12.2 Evidence/source policy — architecture closed
+
+The existing STRICT/GROUNDED/EXPANSIVE policy family remains valid.
+
+Architecture decision:
+- source authority remains an internal, versioned registry;
+- every EvidenceSource records source class, status, version/date, provenance locator and limitations;
+- track policy decides which source classes may support which claim classes;
+- retrieval engines, search providers and LLMs may locate/transform evidence but cannot upgrade source authority;
+- contradictory or missing evidence produces ABSTAIN/REVIEW_REQUIRED rather than synthetic certainty.
+
+NIST's GAI profile and AI RMF support lifecycle risk management, documentation, TEVV and production monitoring, but they do not define SDAIA-specific source authority. Therefore the exact approved-source list belongs to track configuration/research evidence, not reusable core architecture.
+
+References:
+- https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
+- https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+
+### 12.3 Human review scaling — architecture closed, percentages deferred
+
+Current evidence is mixed in the useful way:
+- iterative AI generation/critique can produce items with field performance comparable to expert-created items in studied contexts;
+- other current studies still report factual errors, misalignment, weak distractors, easier/lower-order items and substantial rejection or amendment rates.
+
+Therefore:
+- new provider/model/domain/high-risk/ambiguous/evidence-sensitive/quarantined content requires human review;
+- mature low-risk classes may move to sampled human review only after observed error/yield evidence supports it;
+- sampling rate rises automatically when failure/anomaly/drift rates worsen;
+- automated graders cannot impersonate a human approval;
+- production failures become new gold/eval cases.
+
+Exact percentages are **ReviewCalibrationPolicy** data, not hard-coded architecture.
+
+References:
+- https://ojs.aaai.org/index.php/AAAI/article/view/41205
+- https://pmc.ncbi.nlm.nih.gov/articles/PMC11854382/
+- https://link.springer.com/article/10.1186/s12909-025-06796-6
+- https://onlinelibrary.wiley.com/doi/10.1111/ijsa.70021
+
+### 12.4 Arabic/English equivalence — architecture closed, rubric calibrated later
+
+The bilingual gate should use multiple evidence types:
+1. canonical learning intent/reasoning/evidence equivalence;
+2. structured analytic language-quality rubric;
+3. automated semantic/translation metrics as supporting signals;
+4. human-labeled bilingual gold set for calibration and drift detection.
+
+MQM provides a reusable analytic error typology covering terminology, accuracy, linguistic conventions, style, locale conventions, audience appropriateness and design/markup. It is a better foundation than inventing a proprietary translation score.
+
+Arabic-English research also supports combining automated metrics (e.g. COMET/ChrF/BLEU/TER where appropriate) with human analytic evaluation rather than treating one automatic metric as truth.
+
+K2 should define a **BilingualEquivalenceReport** whose critical semantic dimensions cannot be overridden by one aggregate language score.
+
+References:
+- https://www.themqm.org/mqm-pillars/typology/
+- https://www.themqm.org/
+- https://doi.org/10.3390/info16060440
+- https://www.tandfonline.com/doi/full/10.1080/0907676X.2025.2464120
+
+### 12.5 CANARY parameters — architecture closed, exposure parameters deferred
+
+CANARY policy is not a fixed duration or fixed percentage.
+
+Promotion evidence must be representative for the risks being tested. Required evidence can include:
+- release/runtime compatibility;
+- critical quality dimensions;
+- error/latency regressions;
+- content/review anomalies;
+- learner/product guardrails when enough traffic exists;
+- no unresolved blocker/critical alert.
+
+The exact exposure size/duration depends on traffic, diversity and metric latency, consistent with Google SRE and current progressive-rollout systems.
+
+A canary can pause/hold/rollback when guardrails fail or when evidence volume is insufficient.
+
+References:
+- https://sre.google/workbook/canarying-releases/
+- https://docs.datadoghq.com/feature_flags/use_cases/progressive_rollouts/
+
+### 12.6 Privacy/data minimization — Saudi deployment baseline identified
+
+If the platform processes personal data relating to individuals in Saudi Arabia outside a purely personal/family-use exemption, the Saudi PDPL is a material design constraint.
+
+Current official guidance requires, among other things:
+- purpose limitation;
+- collecting only the minimum personal data needed;
+- privacy-policy transparency before collection;
+- documenting consent where consent is the legal basis and separate consent per purpose where applicable;
+- storage limitation / destruction when data is no longer necessary unless another legal basis requires retention;
+- records of processing activities;
+- safeguards for confidentiality, integrity and availability.
+
+Architecture consequence:
+- analytics events must carry purpose/privacy classification;
+- optional product analytics is separate from core learning evidence;
+- anonymous/local-first paths remain supported where practical;
+- retention is policy-driven per data class, not one global forever-retention rule;
+- replay/telemetry tools must be configured to avoid unnecessary personal/sensitive capture;
+- cross-border processing/export requires separate legal/configuration review before deployment.
+
+Exact consent text, retention periods and cross-border configuration remain deployment/legal-policy work rather than K2 hard-coded constants.
+
+References:
+- https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/b7cfae89-828e-4994-b167-adaa00e37188/1
+- https://dgp.sdaia.gov.sa/wps/portal/pdp/knowledgecenter/details/PDPL2
+- https://dgp.sdaia.gov.sa/wps/portal/pdp/knowledgecenter/details/MinimumPersonalDataDeterminationGuideline
+
+## 13. Calibration Policy Boundary
+
+The following values MUST be versioned policy/configuration and may not be silently embedded in business logic:
+
+- tranche requested_count/min/max;
+- provider promotion thresholds;
+- human review sampling rates;
+- semantic duplicate thresholds and gray zones;
+- bilingual automatic-metric thresholds;
+- canary exposure size/duration/minimum evidence;
+- alert/anomaly thresholds;
+- analytics retention periods;
+- experimentation guardrails.
+
+Each policy records:
+- policy_id/version;
+- rationale/evidence basis;
+- applicable track/domain/provider/risk class;
+- effective_from;
+- observed metrics used for calibration;
+- owner/approver;
+- rollback/reconsideration trigger.
+
+This allows K2 architecture to be stable while operating values improve from real evidence.
