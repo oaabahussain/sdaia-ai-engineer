@@ -35,3 +35,37 @@ CREATE TABLE IF NOT EXISTS events (
   payload_json TEXT,
   created_at TEXT NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS factory_runs (
+  run_id TEXT PRIMARY KEY,
+  target_id TEXT NOT NULL,
+  stage TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pending','running','partial','failed','completed','cancelled')),
+  attempt INTEGER NOT NULL CHECK (attempt >= 1),
+  input_hash TEXT NOT NULL,
+  output_ref TEXT,
+  request_json TEXT NOT NULL,
+  started_at TEXT NOT NULL,
+  completed_at TEXT,
+  retry_json TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS factory_stage_outputs (
+  run_id TEXT NOT NULL REFERENCES factory_runs(run_id),
+  stage TEXT NOT NULL,
+  output_json TEXT NOT NULL,
+  output_hash TEXT NOT NULL,
+  completed_at TEXT NOT NULL,
+  PRIMARY KEY (run_id, stage)
+);
+
+CREATE TABLE IF NOT EXISTS factory_audit (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  run_id TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  record_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_factory_audit_run ON factory_audit(run_id, id);
