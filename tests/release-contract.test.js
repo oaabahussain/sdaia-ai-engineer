@@ -80,3 +80,11 @@ test('live release verifier validates active track presentation contract', () =>
   assert.match(live, /domain_labels/);
   assert.match(live, /live track presentation: PASS/);
 });
+
+
+test('Pages and PR artifact gates explicitly verify active presentation is assembled', () => {
+  for (const workflow of [pages, ci]) {
+    assert.match(workflow, /test -f _site\/tracks\/sdaia-ai-engineer\/presentation\.json/);
+    assert.doesNotMatch(workflow, /cp .*presentation\.json/);
+  }
+});
