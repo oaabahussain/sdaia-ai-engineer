@@ -1,5 +1,4 @@
 {
-  "domain": "Core AI / Deep Learning / GenAI",
   "concepts": [
     {
       "term": "Activation Function",
@@ -141,5 +140,6 @@
       "id": "core-ai.tool-calling",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "core-ai"
 }
