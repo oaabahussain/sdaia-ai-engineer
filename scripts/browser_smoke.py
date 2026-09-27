@@ -133,12 +133,18 @@ def main():
         wait_until(lambda:execute(session,"return !!navigator.serviceWorker && !!navigator.serviceWorker.controller"),timeout=20,label='service worker controller')
         req('POST',f'/session/{session}/refresh',{})
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),label='controlled online reload')
+        assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
         server.terminate()
         server.wait(timeout=5)
         req('POST',f'/session/{session}/refresh',{})
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),timeout=20,label='offline cached home reload')
+        assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
+        assert text(session,find(session,'.domainCard h3'))==PRESENTATION['locales']['en']['domain_labels'][first_domain]
         req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html'})
         wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='three feedback cards')
+        wait_until(lambda:text(session,find(session,'#feedbackBrand'))==PRESENTATION['locales']['en']['brand'],label='feedback presentation brand')
+        assert execute(session,"return document.title")==PRESENTATION['locales']['en']['display_name']+' · Community'
+        assert text(session,find(session,'[data-i18n="suggestionTitle"]'))=='Suggest an improvement'
         assert find(session,'#suggestionForm')
         assert find(session,'#contributionForm')
         assert find(session,'#ratingForm')
@@ -161,7 +167,7 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
-        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS offline_cached_reload=PASS feedback_urls=PASS')
+        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
             try:req('DELETE',f'/session/{session}')
