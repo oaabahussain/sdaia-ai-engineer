@@ -54,8 +54,8 @@ test('compatibility tests consume versioned fixtures instead of repeating curren
 });
 
 test('feedback reads legacy preferences only as fallback and never writes the legacy state key', () => {
-  const page = read('../feedback.html');
-  assert.match(page, /sdaia\.state\.v1/);
-  assert.doesNotMatch(page, /const key=.*sdaia\.state\.v1/);
-  assert.doesNotMatch(page, /Full 200-question exam/);
+  const feedback = read('../src/feedback.js');
+  assert.match(feedback, /sdaia\.state\.v1/);
+  assert.doesNotMatch(feedback, /const key=.*sdaia\.state\.v1/);
+  assert.doesNotMatch(feedback, /Full 200-question exam/);
 });
