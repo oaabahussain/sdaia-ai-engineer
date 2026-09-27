@@ -69,3 +69,16 @@ CREATE TABLE IF NOT EXISTS factory_audit (
 );
 
 CREATE INDEX IF NOT EXISTS idx_factory_audit_run ON factory_audit(run_id, id);
+
+
+CREATE TABLE IF NOT EXISTS learner_events (
+  event_id TEXT PRIMARY KEY,
+  learner_id TEXT NOT NULL,
+  track_id TEXT NOT NULL,
+  item_version_id TEXT NOT NULL,
+  shown_at TEXT NOT NULL,
+  event_json TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_learner_events_track_time ON learner_events(track_id, shown_at);
+CREATE INDEX IF NOT EXISTS idx_learner_events_item_time ON learner_events(item_version_id, shown_at);
