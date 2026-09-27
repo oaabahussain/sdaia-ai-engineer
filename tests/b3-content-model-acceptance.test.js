@@ -6,4 +6,4 @@ test('B3 contract files exist',()=>{for(const p of ['data/schema/domain-catalog-
 test('canonical domain catalog exposes seven stable ids',()=>{const d=json('tracks/sdaia-ai-engineer/domains.json');assert.equal(d.schema_version,2);assert.deepEqual(d.domains.map(x=>x.id),IDS)});
 test('canonical profile uses stable domain ids',()=>{const p=json('tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json');assert.equal(p.schema_version,2);assert.deepEqual(Object.keys(p.weights),IDS)});
 test('canonical concepts use domain_id',()=>{for(const id of IDS){const c=json('data/concepts/'+id+'.json');assert.equal(c.domain_id,id);assert.equal('domain' in c,false)}});
-test('runtime contract source targets version 3',()=>{assert.match(read('src/content/runtimeBundle.js'),/contract_version:v2\\?3:2/)});
+test('runtime contract source targets version 3',()=>{const src=read('src/content/runtimeBundle.js');assert.ok(src.includes('contract_version:v2?3:2'))});
