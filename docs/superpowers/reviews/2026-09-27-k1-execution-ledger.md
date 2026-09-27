@@ -62,3 +62,13 @@ Checkpoint F:
 - CoverageGap converts to provider-neutral factory request carrying source/quality/review policies.
 - Quality run 298 SUCCESS; Server/Adapter run 841 SUCCESS.
 Next exact task: Checkpoint G — releases/canary/rollback/snapshots/migration delta.
+
+Checkpoint G:
+- G RED proven in quality run 303: release constructor/lifecycle/rollback/snapshot/delta functions absent.
+- Content releases now sort/dedupe item IDs and hash immutable release content.
+- Release lifecycle requires DRAFT→DEV→REVIEW→CANARY→ACTIVE; activation requires evidence.
+- Rollback selects prior immutable release and emits rollback event without mutating manifests.
+- AssessmentFormSnapshot deep-freezes delivered release/items/options/profile/scoring.
+- Content release delta exposes added/removed item/objective catch-up candidates without marking unseen content learned.
+- Quality run 306 SUCCESS; Server/Adapter run 857 SUCCESS.
+Next exact task: Checkpoint H — raw learner evidence + interoperability seams.
