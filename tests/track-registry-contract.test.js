@@ -59,3 +59,5 @@ test('track selection uses only the neutral preference key and tolerates storage
 
 
 test('synthetic two-track fixture exercises generic resolver without entering production', async()=>{const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/track-registry-two-tracks.json',import.meta.url),'utf8'));assert.equal(validate(fixture),true,JSON.stringify(validate.errors));const {resolveActiveTrackId}=await import('../src/tracks/registry.js');assert.equal(resolveActiveTrackId({registry:fixture,requestedTrackId:'example-track'}),'example-track');assert.deepEqual(registry.tracks,[{id:'sdaia-ai-engineer'}]);for(const p of ['../.github/workflows/ci.yml','../.github/workflows/pages.yml'])assert.doesNotMatch(fs.readFileSync(new URL(p,import.meta.url),'utf8'),/tests\/fixtures/)});
+
+test('runtime registry validator rejects undeclared fields',async()=>{const {validateTrackRegistry}=await import('../src/tracks/registry.js');assert.throws(()=>validateTrackRegistry({...registry,extra:true}),/registry/i);assert.throws(()=>validateTrackRegistry({...registry,tracks:[{id:'sdaia-ai-engineer',extra:true}]}),/registry/i)});
