@@ -6,5 +6,5 @@ import { loadTrack } from '../scripts/load_track.js';
 const root=new URL('..',import.meta.url).pathname;
 const expected=JSON.parse(fs.readFileSync(new URL('./fixtures/runtime/current-bank-counts.expected.json',import.meta.url),'utf8'));
 const bundle=loadTrack(root,'sdaia-ai-engineer');
-const questions=expandConceptBank(bundle.concepts,{trackId:bundle.manifest.id});
-test('pre-migration runtime baseline is preserved through the canonical track loader',()=>{assert.equal(questions.length,expected.rendered_questions);assert.equal(new Set(questions.map(q=>q.domain)).size,expected.domains)});
+const questions=expandConceptBank(bundle.concepts,{trackId:bundle.manifest.id,domainCatalog:bundle.domains});
+test('pre-migration runtime baseline is preserved through the canonical track loader',()=>{assert.equal(questions.length,expected.rendered_questions);assert.equal(new Set(questions.map(q=>q.domain_id)).size,expected.domains)});
