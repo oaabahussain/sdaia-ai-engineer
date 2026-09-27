@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,6 +28,25 @@ jobs:
           name: k1-factory-generated
           path: /tmp/k1-factory
           if-no-files-found: error
+      - name: Persist generated K1 artifacts once
+        if: github.event_name == 'pull_request' && github.head_ref == 'impl/k1-content-factory-governance-core'
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+          rm -rf data/factory/migrations data/factory/knowledge data/factory/sources data/factory/releases
+          node scripts/platform-kernel/import_current_bank.js data/factory
+          git add data/factory
+          if git diff --cached --quiet; then
+            echo "K1 factory artifacts already canonical"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "data: persist K1 current-bank lineage"
+          git push origin "HEAD:$BRANCH"
       - name: Parse application module
         run: node --check src/app.js
       - name: Verify service worker shell assets
