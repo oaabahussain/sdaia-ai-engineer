@@ -19,6 +19,15 @@ jobs:
         run: npm run validate
       - name: Run Node tests
         run: npm test
+      - name: Generate governed current-bank migration artifact
+        run: |
+          rm -rf /tmp/k1-factory
+          node scripts/platform-kernel/import_current_bank.js /tmp/k1-factory
+      - uses: actions/upload-artifact@v4
+        with:
+          name: k1-factory-generated
+          path: /tmp/k1-factory
+          if-no-files-found: error
       - name: Parse application module
         run: node --check src/app.js
       - name: Verify service worker shell assets
