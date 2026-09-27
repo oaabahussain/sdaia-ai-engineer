@@ -35,3 +35,14 @@ test('registry validation rejects a missing default and duplicate ids', async ()
   assert.throws(() => validateTrackRegistry({schema_version:1, default_track_id:'missing', tracks:[{id:'a'}]}), /default/i);
   assert.throws(() => validateTrackRegistry({schema_version:1, default_track_id:'a', tracks:[{id:'a'},{id:'a'}]}), /duplicate/i);
 });
+
+
+test('runtime registry resolver is generic and deterministic', async () => {
+  const mod = await import('../src/tracks/registry.js');
+  const fixture={schema_version:1,default_track_id:'a',tracks:[{id:'a'},{id:'b'}]};
+  assert.equal(mod.resolveActiveTrackId({registry:fixture,requestedTrackId:'b',savedTrackId:'a'}),'b');
+  assert.equal(mod.resolveActiveTrackId({registry:fixture,requestedTrackId:'missing',savedTrackId:'b'}),'b');
+  assert.equal(mod.resolveActiveTrackId({registry:fixture,requestedTrackId:'missing',savedTrackId:'missing'}),'a');
+  let seen=[]; const loaded=await mod.loadTrackRegistry(async p=>{seen.push(p);return fixture});
+  assert.deepEqual(loaded,fixture);assert.deepEqual(seen,['./tracks/registry.json']);
+});
