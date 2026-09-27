@@ -355,6 +355,8 @@ Rollback means selecting an earlier compatible release, not rewriting content in
 
 ## 11. Factory state machine
 
+Governance interpretation: the Research Amendment's canonical pipeline is the **minimum required ordered sequence**. This spec may insert stricter gates such as distractor quality, accessibility/fairness and CANARY, but it may not remove or reverse amendment-required stages without an explicit governance amendment.
+
 A content candidate moves through an enforced state machine.
 
 Canonical pipeline:
