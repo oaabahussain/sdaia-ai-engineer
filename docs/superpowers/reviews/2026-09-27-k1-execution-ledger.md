@@ -87,3 +87,25 @@ Ruling: H failure #880 was a test setup defect, not a persistence defect; fixed 
 F/G/H are complete.
 Next exact task: Checkpoint I — migrate current 1,120 items into governed lineage.
 Nothing merged.
+
+Checkpoint I:
+- Current 1,120 rendered questions imported into governed lineage as 1,120 QuestionFamilyV2 + 1,120 ItemVersionV1 records.
+- 140 provisional migration-derived LearningObjectiveV1 records created.
+- Historical content has structured migration provenance and zero synthetic QualityReport PASS records.
+- Approved-source registry starts empty rather than inventing evidence provenance.
+- Bootstrap release status is REVIEW and origin is migrated-grandfathered.
+- Legacy learner-visible payload digest remains 5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9.
+- CI briefly generated canonical artifacts, then returned to read-only verification. `npm run verify:factory-import` is now the permanent drift gate.
+
+Checkpoint J:
+- Final K1 acceptance contract re-enabled unconditionally.
+- Validator now validates K1 policies, 140 objectives, source registry, 1,120 family/item records, 1,120 migration provenance records and bootstrap release.
+- Final review: self-review (no subagent tool).
+- Final: fixed direct ACTIVE release construction — RED Quality #334 → GREEN Quality #338/#340.
+- Final: fixed unvalidated learner-event persistence boundaries — RED Quality #334 + Server #913 → GREEN Quality #338 + Server #921/#925.
+- Final: fixed executable CLI runner wiring — RED Quality #339 → GREEN Quality #340.
+- Final: minor (deferred): migration-derived current-bank families use provisional cognitive_level=understand because historical content lacks authoritative per-item cognitive taxonomy; future refinement must version, not rewrite.
+- Reviewed head 31850572: Node 206/206 PASS; Python 20/20 PASS; 1120 bank PASS; 140 objectives PASS; browser/offline/Pages/SQLite/browser/API adapters PASS.
+
+Next exact task: exact-head CI on final review/checkpoint commit, then finishing-a-development-branch and merge if green.
+Nothing merged.
