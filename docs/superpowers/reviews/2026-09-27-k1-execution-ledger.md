@@ -54,3 +54,11 @@ Checkpoint E:
 - Quality run 290 SUCCESS; Server/Adapter run 825 SUCCESS.
 
 Next exact task: Checkpoint F — Coverage Engine.
+
+Checkpoint F:
+- F RED proven in quality run 295: coverage matrix/gap/request modules absent.
+- Implemented multidimensional normalized coverage cells and deterministic target-minus-inventory gap detection.
+- Count-only request such as {requested_count:14000} remains invalid.
+- CoverageGap converts to provider-neutral factory request carrying source/quality/review policies.
+- Quality run 298 SUCCESS; Server/Adapter run 841 SUCCESS.
+Next exact task: Checkpoint G — releases/canary/rollback/snapshots/migration delta.
