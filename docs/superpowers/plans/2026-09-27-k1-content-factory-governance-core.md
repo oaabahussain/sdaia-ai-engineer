@@ -42,10 +42,16 @@
 ## Canonical schemas
 Create under `data/schema/`:
 
+- `learning-objective-v1.schema.json`
+- `evidence-source-v1.schema.json`
 - `question-family-v2.schema.json`
 - `item-version-v1.schema.json`
 - `quality-report-v1.schema.json`
 - `provenance-record-v1.schema.json`
+- `review-decision-v1.schema.json`
+- `source-policy-v1.schema.json`
+- `quality-policy-v1.schema.json`
+- `review-policy-v1.schema.json`
 - `factory-run-v1.schema.json`
 - `provider-result-v1.schema.json`
 - `provider-evaluation-v1.schema.json`
@@ -83,6 +89,8 @@ Create under `scripts/platform-kernel/`:
 - `adapters/fileContentStore.js`
 - `adapters/jsonlAuditStore.js`
 - `adapters/fileJobStore.js`
+- `adapters/fileReviewStore.js`
+- `adapters/jsonlLearnerEventStore.js`
 - `cli.js`
 - `import_current_bank.js`
 - `verify_current_import.js`
@@ -97,6 +105,8 @@ Modify/create:
 ## Canonical internal artifacts
 Create under `data/factory/` only after contracts are green:
 
+- `knowledge/objectives.json`
+- `sources/approved-sources.json`
 - `policies/default-source-policy.json`
 - `policies/default-quality-policy.json`
 - `policies/default-review-policy.json`
@@ -189,6 +199,38 @@ These factory artifacts remain repository-internal during K1 and must not be add
 
 # Checkpoint A1 — Core Contracts
 
+### Task 5A: LearningObjectiveV1 schema
+
+**Files:**
+- Create: `data/schema/learning-objective-v1.schema.json`
+- Create: `tests/learning-objective-v1.test.js`
+
+**Interfaces:**
+- Produces stable track-scoped objective records used by QuestionFamilyV2, CoverageGapV1 and LearnerEventV1.
+
+- [ ] RED requires objective_id/track_id/domain_id/concept_ids/version/status/origin.
+- [ ] Assert objective IDs follow stable namespaced identifier rules.
+- [ ] Assert `status` supports `provisional` and `active`; migration-derived objectives begin `provisional`.
+- [ ] Implement strict schema.
+- [ ] Verify GREEN.
+- [ ] Commit `feat: add LearningObjectiveV1 contract`.
+
+### Task 5B: EvidenceSourceV1 schema
+
+**Files:**
+- Create: `data/schema/evidence-source-v1.schema.json`
+- Create: `tests/evidence-source-v1.test.js`
+
+**Interfaces:**
+- Produces approved source metadata referenced by STRICT/GROUNDED policies.
+
+- [ ] RED requires source_id/source_type/title/trust_class/status/version/provenance locator.
+- [ ] Assert unsupported/retired source cannot be represented as approved.
+- [ ] Assert secrets/raw credentials are forbidden fields.
+- [ ] Implement strict schema.
+- [ ] Verify GREEN.
+- [ ] Commit `feat: add EvidenceSourceV1 contract`.
+
 ### Task 6: QuestionFamilyV2 schema
 
 **Files:**
@@ -252,6 +294,22 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - [ ] Implement schema.
 - [ ] Verify GREEN.
 - [ ] Commit `feat: add provenance record contract`.
+
+### Task 9A: ReviewDecisionV1 schema
+
+**Files:**
+- Create: `data/schema/review-decision-v1.schema.json`
+- Create: `tests/review-decision-v1.test.js`
+
+**Interfaces:**
+- Produces immutable reviewer decision records consumed by ReviewPort/stage.
+
+- [ ] RED requires decision_id/target/reviewer_type/decision/reason/policy_version/timestamp.
+- [ ] Assert decision enum = APPROVE/REJECT/NEEDS_REVISION/ABSTAIN.
+- [ ] Assert automated review cannot impersonate human reviewer_type.
+- [ ] Implement strict schema.
+- [ ] Verify GREEN.
+- [ ] Commit `feat: add ReviewDecisionV1 contract`.
 
 ### Task 10: FactoryRunV1 schema
 
@@ -372,7 +430,7 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - Produces `FACTORY_STATES`, `FACTORY_EVENTS`.
 
 - [ ] RED expected state/event constants are absent.
-- [ ] Define DRAFT/GENERATED/CRITIQUED/VALIDATED/DEDUPED/EVIDENCE_CHECKED/DISTRACTOR_CHECKED/BILINGUAL_CHECKED/ACCESSIBILITY_CHECKED/REVIEW_PENDING/APPROVED/CANARY/ACTIVE/DEPRECATED/RETIRED/QUARANTINED.
+- [ ] Define DRAFT/GENERATED/CRITIQUED/VALIDATED/DEDUPED/EVIDENCE_CHECKED/DISTRACTOR_CHECKED/BILINGUAL_CHECKED/ACCESSIBILITY_CHECKED/REVIEW_PENDING/APPROVED/CANARY/ACTIVE/OBSERVING/REVISION_REQUIRED/RECALIBRATION_PENDING/DEPRECATED/RETIRED/QUARANTINED.
 - [ ] Verify constants test GREEN.
 - [ ] Commit `feat: define factory lifecycle states`.
 
@@ -401,10 +459,26 @@ These factory artifacts remain repository-internal during K1 and must not be add
 
 - [ ] RED `GENERATED → ACTIVE` must throw/reject.
 - [ ] RED RETIRED cannot reactivate without explicit revision path.
+- [ ] RED ACTIVE observation may move only to OBSERVING, REVISION_REQUIRED, RECALIBRATION_PENDING, DEPRECATED/RETIRED/QUARANTINED through explicit events; no calibrated claim is created by this state alone.
 - [ ] RED QUARANTINED requires review path.
 - [ ] Implement bounded invalid-transition error.
 - [ ] Verify GREEN.
 - [ ] Commit `test: prevent lifecycle shortcuts`.
+
+### Task 19A: SourcePolicyV1 schema
+
+**Files:**
+- Create: `data/schema/source-policy-v1.schema.json`
+- Create: `tests/source-policy-contract.test.js`
+
+**Interfaces:**
+- Produces versioned STRICT/GROUNDED/EXPANSIVE policy documents.
+
+- [ ] RED unknown source mode fails.
+- [ ] Pin default K1 source mode to `GROUNDED`.
+- [ ] Require policy_id/version/mode/evidence requirements.
+- [ ] Implement schema and validate `data/factory/policies/default-source-policy.json`.
+- [ ] Commit `feat: version source policy contract`.
 
 ### Task 20: SourcePolicy
 
@@ -423,6 +497,20 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - [ ] Verify GREEN.
 - [ ] Commit `feat: enforce source policies`.
 
+### Task 20A: QualityPolicyV1 schema
+
+**Files:**
+- Create: `data/schema/quality-policy-v1.schema.json`
+- Create: `tests/quality-policy-contract.test.js`
+
+**Interfaces:**
+- Produces versioned mandatory dimension/gate thresholds.
+
+- [ ] RED policy omitting a critical dimension fails.
+- [ ] Pin K1 default: correctness/evidence/ambiguity/bilingual/accessibility must PASS; ABSTAIN requires review; aggregate score cannot override.
+- [ ] Implement schema and validate default-quality-policy.
+- [ ] Commit `feat: version quality policy contract`.
+
 ### Task 21: QualityPolicy
 
 **Files:**
@@ -439,6 +527,20 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - [ ] Implement evaluator.
 - [ ] Verify GREEN.
 - [ ] Commit `feat: enforce quality policy`.
+
+### Task 21A: ReviewPolicyV1 schema
+
+**Files:**
+- Create: `data/schema/review-policy-v1.schema.json`
+- Create: `tests/review-policy-contract.test.js`
+
+**Interfaces:**
+- Produces versioned risk/sampling/human-review rules.
+
+- [ ] RED policy missing high-risk rule fails.
+- [ ] Pin conservative K1 default: all new AI/provider-generated production candidates require human approval; deterministic migrated content is grandfathered only through migration release; sampling relaxation is not default.
+- [ ] Implement schema and validate default-review-policy.
+- [ ] Commit `feat: version review policy contract`.
 
 ### Task 22: ReviewPolicy
 
@@ -572,10 +674,10 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - Create: `tests/factory-store-ports.test.js`
 
 **Interfaces:**
-- Produces assertions for `ContentStorePort`, `JobStorePort`, `EventStorePort`, `ReviewPort`.
+- Produces assertions for `RunnerPort`, `ContentStorePort`, `JobStorePort`, `EventStorePort`, `ReviewPort`.
 
-- [ ] RED incomplete store object fails.
-- [ ] Define minimal methods and return semantics.
+- [ ] RED incomplete runner/store/review object fails.
+- [ ] Define minimal methods and return semantics for every required C-ready port.
 - [ ] Verify in-memory test double passes.
 - [ ] Commit `feat: define factory persistence ports`.
 
@@ -623,6 +725,21 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - [ ] Implement atomic job document updates.
 - [ ] Verify completed stage output hash is retained.
 - [ ] Commit `feat: add local job store`.
+
+### Task 33A: FileReviewStore
+
+**Files:**
+- Create: `scripts/platform-kernel/adapters/fileReviewStore.js`
+- Create: `tests/file-review-store.test.js`
+
+**Interfaces:**
+- Produces local ReviewPort implementation: appendDecision/getLatestDecision/listDecisions.
+
+- [ ] RED append immutable ReviewDecisionV1 then read latest.
+- [ ] RED existing decision cannot be overwritten.
+- [ ] Implement atomic append-only review decision storage.
+- [ ] Verify human vs automated reviewer_type remains preserved.
+- [ ] Commit `feat: add local review store`.
 
 ### Task 34: LocalRunner basic execution
 
@@ -1010,9 +1127,15 @@ These factory artifacts remain repository-internal during K1 and must not be add
 ### Task 63: Append-only learner event storage boundary
 
 **Files:**
-- Modify: EventStore port + JSONL/SQLite adapters/tests.
+- Create: `scripts/platform-kernel/adapters/jsonlLearnerEventStore.js`
+- Modify: `db/schema.sql`
+- Modify: `server/app/factory_store.py`
+- Modify: EventStore port/tests.
+- Test: `tests/learner-event-store.test.js`, `server/tests/test_factory_store.py`.
 
 - [ ] RED event append succeeds and update/delete is absent.
+- [ ] Add SQLite `learner_events` table with immutable event_id and indexes for track/item/time queries.
+- [ ] Implement JSONL and SQLite append/read semantics.
 - [ ] Verify learner events can be read by time/track/item without rewriting records.
 - [ ] Commit `feat: persist append-only learner evidence`.
 
@@ -1055,6 +1178,8 @@ These factory artifacts remain repository-internal during K1 and must not be add
 
 - [ ] RED importer output count must equal 1,120 item versions and current family count.
 - [ ] Assert current IDs/text/options/answers/difficulty/domain IDs preserved.
+- [ ] For current content without explicit objectives, deterministically derive one provisional LearningObjectiveV1 per current concept using `<track>.objective.<concept-id>.v1`; record `origin=migration-derived` and never claim external/official objective provenance.
+- [ ] Set current missing misconception references to an explicit empty list rather than inventing misconceptions.
 - [ ] Implement pure import mapping before persistence.
 - [ ] Commit `feat: import current bank into governed lineage`.
 
@@ -1081,6 +1206,19 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - [ ] Assert IDs/family IDs unique.
 - [ ] Commit `data: persist K1 current-bank lineage`.
 
+### Task 68A: Persist migration-derived objectives and source registry
+
+**Files:**
+- Create generated: `data/factory/knowledge/objectives.json`
+- Create: `data/factory/sources/approved-sources.json`
+- Test: current-bank import/evidence-source tests.
+
+- [ ] Persist deterministic provisional objectives generated from current concept IDs.
+- [ ] Verify every imported family objective_id resolves exactly once.
+- [ ] Create an initially explicit approved-source registry; where current historical evidence is unavailable, record source status honestly rather than inventing approval.
+- [ ] Assert STRICT/GROUNDED cannot treat unknown historical source as approved.
+- [ ] Commit `data: persist K1 knowledge and source migration baseline`.
+
 ### Task 69: Bootstrap content release manifest
 
 **Files:**
@@ -1088,7 +1226,8 @@ These factory artifacts remain repository-internal during K1 and must not be add
 - Test: release/import tests.
 
 - [ ] Bind all imported item_version_ids to one migrated release.
-- [ ] Mark release origin explicitly as migration baseline, not fresh factory certification.
+- [ ] Mark release origin explicitly as `migrated-grandfathered`, not fresh factory certification.
+- [ ] Do not attach synthetic QualityReport PASS records for checks that were never historically run.
 - [ ] Validate manifest hash.
 - [ ] Commit `data: add bootstrap governed content release`.
 
@@ -1172,7 +1311,7 @@ These factory artifacts remain repository-internal during K1 and must not be add
 
 - [ ] Invoke Superpowers requesting-code-review.
 - [ ] If independent reviewer/subagent unavailable, record exactly `Final review: self-review (no subagent tool)`.
-- [ ] Review lifecycle bypass, immutability, provider trust boundary, resume/retry, partial batch, provenance honesty, release rollback, learner-event raw/derived separation, current-bank migration and public artifact leakage.
+- [ ] Review lifecycle bypass, objective/source referential integrity, policy versioning, immutability, provider trust boundary, review-store integrity, resume/retry, partial batch, provenance honesty, release rollback, learner-event raw/derived separation, current-bank migration and public artifact leakage.
 - [ ] Fix every Critical/Important finding via TDD.
 - [ ] Record Minor findings explicitly.
 - [ ] Commit review/handoff update.
@@ -1229,15 +1368,15 @@ These factory artifacts remain repository-internal during K1 and must not be add
 # Checkpoint Schedule
 
 - **A0:** Tasks 1–5 — baseline + RED architecture boundary
-- **A1:** Tasks 6–16 — core contracts
-- **B:** Tasks 17–23 — lifecycle/policies/immutability
+- **A1:** Tasks 5A–16 — knowledge/source/core/policy-facing contracts
+- **B:** Tasks 17–23 plus 19A/20A/21A — lifecycle/versioned policies/immutability
 - **C:** Tasks 24–29 — provenance/providers/evaluation
-- **D:** Tasks 30–40 — persistence/local orchestration/resume/batch/SQLite/CLI
+- **D:** Tasks 30–40 plus 33A — persistence/review/local orchestration/resume/batch/SQLite/CLI
 - **E:** Tasks 41–51 — quality pipeline
 - **F:** Tasks 52–55 — coverage engine
 - **G:** Tasks 56–61 — release/canary/rollback/form snapshots/migration delta
 - **H:** Tasks 62–65 — learner events/interoperability seams
-- **I:** Tasks 66–71 — migrate current 1,120 into governed lineage
+- **I:** Tasks 66–71 plus 68A — migrate current 1,120 into governed lineage/knowledge/source baseline
 - **J:** Tasks 72–79 — validator/acceptance/review/CI/merge/post-merge/K2 boundary
 
 After each checkpoint, the checkpoint file must include:
