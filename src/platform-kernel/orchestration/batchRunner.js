@@ -1,0 +1,1 @@
+export async function runBatch(requests,runner){const completed=[],failed=[];for(const request of requests){try{completed.push(await runner.runCandidate(request))}catch(error){failed.push({run_id:request.run_id,error:error.message,retryable:true})}}return{status:failed.length?(completed.length?'PARTIAL':'FAILED'):'COMPLETED',completed,failed}}
