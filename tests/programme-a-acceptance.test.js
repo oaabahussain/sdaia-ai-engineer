@@ -9,23 +9,25 @@ test('browser core derives active track state from loaded/configured contracts',
   const app = read('../src/app.js');
   const runtime = read('../src/content/runtimeBundle.js');
   const browser = read('../src/storage/browser.js');
-  assert.match(config, /ACTIVE_TRACK_ID/);
+  assert.doesNotMatch(config, /ACTIVE_TRACK_ID/);
+  assert.match(app, /loadTrackRegistry/);
   assert.doesNotMatch(app, /const TRACK_ID\s*=\s*['"]sdaia-ai-engineer['"]/);
   assert.match(app, /state\.tracks\[BANK\.track\.id\]/);
   assert.doesNotMatch(app, /QUESTIONS\.length\s*<\s*1000/);
   assert.match(app, /QUESTIONS\.length\s*<\s*PROFILE\.question_count/);
   assert.match(runtime, /loadRuntimeBundle\(fetchJson,trackId\)/);
   assert.doesNotMatch(runtime, /trackId\s*=\s*['"]sdaia-ai-engineer['"]/);
-  assert.match(browser, /ACTIVE_TRACK_ID/);
-  assert.match(browser, /loadRuntimeBundle\(loadJson,ACTIVE_TRACK_ID\)/);
+  assert.doesNotMatch(browser, /ACTIVE_TRACK_ID/);
+  assert.match(browser, /loadRuntimeBundle\(loadJson,trackId\)/);
   const questionBank = read('../src/logic/questionBank.js');
   assert.doesNotMatch(questionBank, /trackId\s*=\s*['"]/);
   assert.match(questionBank, /trackId is required/);
 });
 
-test('server default track is configuration rather than a function default', () => {
+test('server default track is registry driven rather than compiled configuration', () => {
   const server = read('../server/app/main.py');
-  assert.match(server, /os\.getenv\(['"]TRACK_ID['"]/);
+  assert.doesNotMatch(server, /os\.getenv\(['"]TRACK_ID['"]/);
+  assert.match(server, /load_track_registry/);
   assert.match(server, /def load_runtime_bundle\(track_id=None\)/);
   assert.doesNotMatch(server, /def load_runtime_bundle\(track_id=['"]sdaia-ai-engineer['"]\)/);
 });
