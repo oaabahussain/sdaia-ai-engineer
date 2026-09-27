@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const readJson=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+export function loadTrackRegistry(root){return readJson(path.join(root,'tracks','registry.json'))}
 export function loadTrack(root,trackId){
  const manifest=readJson(path.join(root,'tracks',trackId,'manifest.json'));
  const presentation=readJson(path.join(root,'tracks',trackId,'presentation.json'));
