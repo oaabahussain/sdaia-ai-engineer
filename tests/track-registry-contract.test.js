@@ -28,3 +28,10 @@ test('tooling loads the canonical track registry', () => {
   const root = new URL('..', import.meta.url).pathname;
   assert.deepEqual(loadTrackRegistry(root), registry);
 });
+
+
+test('registry validation rejects a missing default and duplicate ids', async () => {
+  const { validateTrackRegistry } = await import('../scripts/load_track.js');
+  assert.throws(() => validateTrackRegistry({schema_version:1, default_track_id:'missing', tracks:[{id:'a'}]}), /default/i);
+  assert.throws(() => validateTrackRegistry({schema_version:1, default_track_id:'a', tracks:[{id:'a'},{id:'a'}]}), /duplicate/i);
+});
