@@ -64,3 +64,31 @@ def list_audit(db_url, run_id):
     with _connect(db_url) as db:
         rows=db.execute('SELECT record_json FROM factory_audit WHERE run_id=? ORDER BY id',(run_id,)).fetchall()
     return [json.loads(row['record_json']) for row in rows]
+
+
+def append_learner_event(db_url, event):
+    with _connect(db_url) as db:
+        db.execute(
+            'INSERT INTO learner_events (event_id,learner_id,track_id,item_version_id,shown_at,event_json) VALUES (?,?,?,?,?,?)',
+            (event['event_id'], event['learner_id'], event['track_id'], event['item_version_id'], event['shown_at'], json.dumps(event, ensure_ascii=False))
+        )
+    return event
+
+def list_learner_events(db_url, track_id=None, item_version_id=None, since=None, until=None):
+    clauses=[]
+    args=[]
+    if track_id is not None:
+        clauses.append('track_id=?'); args.append(track_id)
+    if item_version_id is not None:
+        clauses.append('item_version_id=?'); args.append(item_version_id)
+    if since is not None:
+        clauses.append('shown_at>=?'); args.append(since)
+    if until is not None:
+        clauses.append('shown_at<=?'); args.append(until)
+    sql='SELECT event_json FROM learner_events'
+    if clauses:
+        sql += ' WHERE ' + ' AND '.join(clauses)
+    sql += ' ORDER BY shown_at,event_id'
+    with _connect(db_url) as db:
+        rows=db.execute(sql,tuple(args)).fetchall()
+    return [json.loads(row['event_json']) for row in rows]
