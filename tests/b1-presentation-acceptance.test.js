@@ -105,3 +105,24 @@ test('PWA description claims only implemented capabilities', () => {
   assert.match(manifest.name, /SDAIA AI Engineer/);
   assert.match(manifest.short_name, /SDAIA AI/);
 });
+
+
+test('runtime core has no migrated track presentation leakage', () => {
+  const runtimeFiles = ['../src/app.js','../src/feedback.js','../src/presentation/coreI18n.js','../src/presentation/trackPresentation.js','../index.html','../feedback.html'];
+  const forbidden = [
+    'SDAIA AI Engineer',
+    'تدرّب مثل الاختبار',
+    'عمليات تعلم الآلة والنماذج اللغوية',
+    'البيانات وتعلم الآلة والتقييم'
+  ];
+  for (const file of runtimeFiles) {
+    const source = read(file);
+    for (const literal of forbidden) assert.equal(source.includes(literal), false, `${file}: ${literal}`);
+  }
+  const config = read('../src/config.js');
+  assert.match(config, /ACTIVE_TRACK_ID\s*=\s*['"]sdaia-ai-engineer['"]/);
+  assert.doesNotMatch(config, /SDAIA AI Engineer/);
+  const presentation = read('../tracks/sdaia-ai-engineer/presentation.json');
+  for (const literal of forbidden) assert.equal(presentation.includes(literal), true, literal);
+  assert.doesNotMatch(presentation, /official_status|evidence_status/);
+});
