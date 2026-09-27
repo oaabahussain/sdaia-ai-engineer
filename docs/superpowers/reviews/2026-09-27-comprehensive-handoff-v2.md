@@ -573,7 +573,10 @@ K2 design must resolve:
 9. release cadence;
 10. rollback/quarantine;
 11. bilingual authoring strategy;
-12. quality sampling/critic/human boundaries.
+12. quality sampling/critic/human boundaries;
+13. measurement, observability and continuous-improvement loop, including versioned analytics/event contracts, system/factory/product/learning signals, experiments, anomaly/alert policy, privacy boundaries and a future human-reviewed improvement-agent interface.
+
+Research-refresh rule: recover previous evidence, compare current standards/products/open-source implementations and failure/user signals, decide reuse/adapt/build/defer, and preserve the result durably before each material design point is accepted. See `docs/superpowers/reviews/2026-09-28-k2-plus-research-refresh-register.md`.
 
 ## 17. Future roadmap
 
