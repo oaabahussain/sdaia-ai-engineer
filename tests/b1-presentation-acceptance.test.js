@@ -97,3 +97,11 @@ test('status notice is canonical and presentation cannot override evidence truth
   assert.match(app, /PROFILE\.evidence_status/);
   assert.doesNotMatch(app, /const TRACK_I18N\s*=/);
 });
+
+
+test('PWA description claims only implemented capabilities', () => {
+  const manifest = JSON.parse(read('../manifest.webmanifest'));
+  assert.doesNotMatch(manifest.description, /adaptive/i);
+  assert.match(manifest.name, /SDAIA AI Engineer/);
+  assert.match(manifest.short_name, /SDAIA AI/);
+});
