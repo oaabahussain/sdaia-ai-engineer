@@ -1,17 +1,36 @@
-# CURRENT AUTHORITATIVE HANDOFF — Platform Kernel / K1 Design
+# CURRENT AUTHORITATIVE HANDOFF — Post-K1 / K2 Design
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Verified product-code baseline:** `0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
-**K1 governance source:** prefer these files from current `main` once merged; fallback branch `design/content-factory-governance-core`  
-**Session rule:** resolve the live `main` SHA before any work; documentation-only merges may advance `main` without changing the product baseline.  
-**Current gate:** `PLAN_REVIEW_GATE`
+**Current verified main:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
+**Current gate:** `K2_DESIGN_GATE`
 
 ## Completed foundation
 
-Programme A, B0, B1, B2 and B3 are merged, deployed and post-merge verified.
+The following programmes are merged and post-merge verified:
 
-Current production contracts:
+- Programme A
+- B0
+- B1
+- B2
+- B3
+- **K1 — Content Factory & Governance Core**
+
+K1 PR #15 merged at:
+`d6576a8d2f4f98d2310174f633622c0b96017eb3`
+
+Post-merge verification:
+- Server/Adapter #932: SUCCESS
+- GitHub Pages #23: SUCCESS
+- Pages deploy + live release verification: SUCCESS
+
+Durable evidence:
+`docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
+
+## Current verified architecture
+
+Existing public/runtime contracts remain active:
+
 - TrackRegistryV1
 - TrackManifestV1
 - TrackPresentationV1
@@ -21,113 +40,152 @@ Current production contracts:
 - RuntimeBundleV3
 - StateV2
 
-Current verified runtime:
-- 1,120 generated questions
-- 200-question full exam
-- weighted allocation 36 / 35 / 33 / 29 / 28 / 25 / 14
-- Arabic/English + RTL/LTR
-- Browser/API parity
-- SQLite smoke
-- service-worker/offline reload
-- GitHub Pages live deployment
+K1 governance/kernel foundations now also exist:
+
+- LearningObjectiveV1
+- EvidenceSourceV1
+- QuestionFamilyV2
+- ItemVersionV1
+- QualityReportV1
+- ProvenanceRecordV1
+- ReviewDecisionV1
+- SourcePolicyV1
+- QualityPolicyV1
+- ReviewPolicyV1
+- FactoryRunV1
+- ProviderResultV1
+- ProviderEvaluationV1
+- CoverageGapV1
+- ContentReleaseManifestV1
+- AssessmentFormSnapshotV1
+- LearnerEventV1
+- provider/persistence/orchestration/interoperability ports
+- local deterministic/no-AI execution
+- resumable/retryable LocalRunner
+- file/JSONL/SQLite adapters
+- governed quality pipeline
+- Coverage Engine
+- immutable release/CANARY/rollback boundary
+
+## Current content state
+
+Learner-visible runtime remains unchanged:
+
+- generated bank: **1,120 questions**
+- full exam: **200 questions**
+- weighted allocation: **36 / 35 / 33 / 29 / 28 / 25 / 14**
+- Arabic/English + RTL/LTR: verified
+- browser/API parity: verified
+- offline/service worker: verified
+- GitHub Pages live release: verified
+
+Governed lineage now exists in parallel:
+
+- 1,120 governed QuestionFamily records
+- 1,120 governed ItemVersion records
+- 140 provisional migration-derived LearningObjective records
+- bootstrap release: `sdaia-ai-engineer.bootstrap.v1`
+- bootstrap status: `REVIEW`
+- origin: `migrated-grandfathered`
+- historical quality PASS records were **not invented**
+- approved source registry starts empty where historical evidence provenance was unavailable
+
+Preserved visible payload digest:
+`5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`
 
 ## Current programme
 
-**K1 — Content Factory & Governance Core**
+**K2 — Coverage Expansion & Controlled Release**
 
-This formally replaces the narrower interpretation:
-`Question Factory v2 = generator + checks`
+Status:
+`DESIGN_NEXT`
 
-with:
-`Question Factory v2 → governed Content Factory & Governance Core inside the Platform Kernel`.
+K2 purpose:
 
-Approved conversational direction:
-- modular monolith, not microservices now;
-- strict ports/adapters;
-- immutable ItemVersion and ContentRelease concepts;
-- resumable state-machine pipeline;
-- structured provenance/audit;
-- SourcePolicy;
-- multidimensional quality gates;
-- C-ready orchestration/persistence/provider seams;
-- Coverage Engine;
-- LearnerEventV1 foundation;
-- QTI/CASE/event interoperability as adapters, not internal truth;
-- current 1,120 content must migrate without learner-visible behavior drift.
+Expand content through measured CoverageGap requests and the K1 governed factory rather than raw-count generation.
 
-## Governing authority
+Canonical direction:
+
+`Coverage Gap → Candidate Families → Factory Quality Pipeline → Risk-based Review → CANARY → Promote → Observe`
+
+Potential capacity milestones may be approximately:
+
+`1,120 → 3,000 → 6,000 → 10,000 → 14,000+`
+
+but **count is not an acceptance metric**. Promotion must be governed by coverage, correctness, evidence, bilingual quality, duplicate controls, review policy and release gates.
+
+## K2 constraints already inherited from K1
+
+K2 must:
+
+- use K1 contracts/state machine rather than bypass them;
+- preserve stable family/item identity and version lineage;
+- avoid superficial paraphrase multiplication;
+- maintain Arabic/English equivalence;
+- preserve source/evidence/provenance;
+- use ContentRelease manifests;
+- use CANARY before ACTIVE;
+- expand through structured coverage gaps;
+- keep `data/factory/` private from the public Pages artifact;
+- make no psychometric/calibrated difficulty claims without sufficient learner-response evidence;
+- not silently rewrite historical learner progress;
+- not replace the deterministic/manual path with mandatory AI.
+
+## K2 has NOT started
+
+There is currently:
+
+- no K2 implementation branch;
+- no K2 written spec;
+- no K2 implementation plan;
+- no K2 product mutation.
+
+K2 is architectural work. The next step is to review the post-K1 baseline and approve the K2 design. Only after that design is approved should a written K2 spec be committed; after written-spec approval, create the detailed implementation plan.
+
+## Governing authority for K2
 
 Read in this order:
 
 1. `docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md`
 2. `docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md`
 3. `docs/superpowers/specs/2026-09-27-content-factory-governance-core-design.md`
-4. Future approved K1 implementation plan
-5. Active K1 execution ledger/checkpoint once execution begins
+4. `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
+5. future approved K2 written spec
+6. future approved K2 implementation plan
+7. active K2 execution ledger/checkpoint once execution starts
 
-Current tracker:
+Current programme tracker:
 `docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md`
 
-Current roadmap:
+Current forward roadmap:
 `docs/superpowers/plans/2026-09-27-post-b3-platform-kernel-roadmap.md`
 
-Governance alignment review:
-`docs/superpowers/reviews/2026-09-27-content-factory-governance-alignment.md`
-
-## Exact next action
-
-**Do not implement K1 product code yet.**
-
-The K1 written spec is approved.
-
-The implementation plan now exists:
-`docs/superpowers/plans/2026-09-27-k1-content-factory-governance-core.md`
-
-Plan size:
-- 87 tasks;
-- 425 microsteps;
-- RED → GREEN per implementation task;
-- durable checkpoint after every group;
-- Native / continuous execution already selected.
-
-Exact next gate:
-**user reviews and explicitly approves the written implementation plan.**
-
-After plan approval:
-1. invoke `superpowers:executing-plans`;
-2. resume from Task 1 only after resolving current main/branch state;
-3. execute continuously with TDD/systematic-debugging/checkpoints;
-4. whole-suite verification;
-5. whole-branch review;
-6. exact-head CI;
-7. merge only if green;
-8. post-merge verification;
-9. only then begin K2 design from the real K1 baseline.
-
-## Next programme after K1
-
-**K2 — Coverage Expansion & Controlled Release**
-
-K2 remains `ROADMAP_ONLY` until K1 is merged and post-merge verified. Its design must be based on the real post-K1 main baseline.
-
-## New-chat recovery rule
+## New-chat recovery sequence
 
 A new chat must:
 
 1. read this HANDOFF;
-2. read the authoritative programme tracker;
-3. resolve current `main` SHA;
-4. read the active written spec;
-5. read the active written plan only if it exists and is approved;
-6. read the execution ledger/checkpoint only if implementation has started;
-7. inspect branch/main diff;
-8. resume the first incomplete gate/task.
+2. resolve live `main` SHA;
+3. read the programme tracker;
+4. read K1 post-merge verification;
+5. inspect current main architecture and K1 factory artifacts;
+6. if K2 design/spec/plan artifacts later exist, read them directly;
+7. inspect branch/main diff before any mutation;
+8. resume the earliest incomplete K2 gate only.
 
-Do not reconstruct B1/B2/B3 or K1 from conversation memory when these durable artifacts are available.
+Do not reconstruct Programme A/B0/B1/B2/B3/K1 from conversation memory.
 
-## Historical records
+## Exact next action
 
-Everything below this line is historical evidence. Historical “next action” text must not override the current section above.
+Begin **K2 architectural design** from the verified post-K1 baseline.
+
+Do **not** start K2 product code until:
+1. K2 design is approved;
+2. written K2 spec is created and explicitly approved;
+3. written K2 implementation plan is created and explicitly approved;
+4. execution method is selected.
+
+Everything below this line is historical evidence and cannot override this section.
 
 ---
 
