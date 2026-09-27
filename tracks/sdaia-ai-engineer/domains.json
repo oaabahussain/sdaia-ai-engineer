@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "track_id": "sdaia-ai-engineer",
+  "track_version": "2026.09",
+  "domains": [
+    {
+      "id": "mlops-llmops",
+      "order": 1,
+      "legacy_keys": [
+        "MLOps / LLMOps"
+      ]
+    },
+    {
+      "id": "data-ml",
+      "order": 2,
+      "legacy_keys": [
+        "Data / ML / Evaluation"
+      ]
+    },
+    {
+      "id": "core-ai",
+      "order": 3,
+      "legacy_keys": [
+        "Core AI / Deep Learning / GenAI"
+      ]
+    },
+    {
+      "id": "responsible-ai-security-governance",
+      "order": 4,
+      "legacy_keys": [
+        "Responsible AI / Security / Governance"
+      ]
+    },
+    {
+      "id": "ai-software-engineering",
+      "order": 5,
+      "legacy_keys": [
+        "AI Software Engineering"
+      ]
+    },
+    {
+      "id": "architecture-infrastructure",
+      "order": 6,
+      "legacy_keys": [
+        "Architecture / Infrastructure"
+      ]
+    },
+    {
+      "id": "business-professional-practice",
+      "order": 7,
+      "legacy_keys": [
+        "Business / Professional Practice"
+      ]
+    }
+  ]
+}
