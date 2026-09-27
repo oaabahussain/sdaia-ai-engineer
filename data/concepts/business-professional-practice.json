@@ -1,5 +1,4 @@
 {
-  "domain": "Business / Professional Practice",
   "concepts": [
     {
       "term": "Business KPI",
@@ -141,5 +140,6 @@
       "id": "business-professional-practice.technical-communication",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "business-professional-practice"
 }
