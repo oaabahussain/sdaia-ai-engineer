@@ -2,8 +2,9 @@
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Current main:** `0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
-**Active design branch:** `design/content-factory-governance-core`  
+**Verified product-code baseline:** `0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
+**K1 governance source:** prefer these files from current `main` once merged; fallback branch `design/content-factory-governance-core`  
+**Session rule:** resolve the live `main` SHA before any work; documentation-only merges may advance `main` without changing the product baseline.  
 **Current gate:** `WRITTEN_SPEC_REVIEW_GATE`
 
 ## Completed foundation
