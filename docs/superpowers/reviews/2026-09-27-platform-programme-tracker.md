@@ -40,7 +40,7 @@
 
 Current stage:
 
-`WRITTEN_SPEC_REVIEW_GATE`
+`PLAN_REVIEW_GATE`
 
 Approved conversational design:
 - Platform Kernel direction approved.
@@ -48,11 +48,20 @@ Approved conversational design:
 - C-ready seams are required without C operational complexity.
 - Modular monolith is preferred over microservices now.
 
-Written spec:
+Written spec (APPROVED):
 `docs/superpowers/specs/2026-09-27-content-factory-governance-core-design.md`
 
+Implementation plan (AWAITING REVIEW):
+`docs/superpowers/plans/2026-09-27-k1-content-factory-governance-core.md`
+
+Plan shape:
+- 87 independently reviewable tasks;
+- 425 checkable microsteps;
+- 10 execution checkpoint groups plus final integration boundary;
+- Native / continuous execution selected after plan approval.
+
 Current rule:
-**Do not write the K1 implementation plan or product code until the user explicitly approves the written spec.**
+**Do not modify product code until the user explicitly approves the written K1 implementation plan.**
 
 ## Next programme
 

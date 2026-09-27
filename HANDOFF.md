@@ -5,7 +5,7 @@
 **Verified product-code baseline:** `0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
 **K1 governance source:** prefer these files from current `main` once merged; fallback branch `design/content-factory-governance-core`  
 **Session rule:** resolve the live `main` SHA before any work; documentation-only merges may advance `main` without changing the product baseline.  
-**Current gate:** `WRITTEN_SPEC_REVIEW_GATE`
+**Current gate:** `PLAN_REVIEW_GATE`
 
 ## Completed foundation
 
@@ -76,15 +76,33 @@ Governance alignment review:
 
 ## Exact next action
 
-**Do not implement K1 yet.**
+**Do not implement K1 product code yet.**
 
-The written K1 spec exists and is awaiting explicit user approval.
+The K1 written spec is approved.
 
-After written-spec approval:
-1. invoke Superpowers `writing-plans`;
-2. create the detailed K1 TDD implementation plan;
-3. user reviews/approves that written plan;
-4. execute with RED → GREEN TDD, durable checkpoints, whole-suite verification, whole-branch review, merge, post-merge verification.
+The implementation plan now exists:
+`docs/superpowers/plans/2026-09-27-k1-content-factory-governance-core.md`
+
+Plan size:
+- 87 tasks;
+- 425 microsteps;
+- RED → GREEN per implementation task;
+- durable checkpoint after every group;
+- Native / continuous execution already selected.
+
+Exact next gate:
+**user reviews and explicitly approves the written implementation plan.**
+
+After plan approval:
+1. invoke `superpowers:executing-plans`;
+2. resume from Task 1 only after resolving current main/branch state;
+3. execute continuously with TDD/systematic-debugging/checkpoints;
+4. whole-suite verification;
+5. whole-branch review;
+6. exact-head CI;
+7. merge only if green;
+8. post-merge verification;
+9. only then begin K2 design from the real K1 baseline.
 
 ## Next programme after K1
 
