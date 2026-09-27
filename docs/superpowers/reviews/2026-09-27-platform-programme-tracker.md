@@ -135,6 +135,15 @@ Dependency order:
 
 Do not silently reorder K2 and K3.
 
+## Durable recovery references
+
+- Comprehensive history/research/current-state handoff:
+  `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`
+- Working method / decomposition / TDD / checkpoint protocol:
+  `docs/superpowers/OPERATING_PLAYBOOK.md`
+- Fresh K1 reverification:
+  `docs/superpowers/reviews/2026-09-27-k1-reverification.md`
+
 ## Authoritative recovery sequence
 
 A future chat must:
