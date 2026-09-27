@@ -1,45 +1,119 @@
-# CURRENT AUTHORITATIVE HANDOFF — Post-B3
+# CURRENT AUTHORITATIVE HANDOFF — Platform Kernel / K1 Design
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Current main:** `f880c17d48a4579cf68ae59fb245328334ef1c19`  
-**Status:** Programme A, B0, B1, B2 and B3 are merged, deployed and post-merge verified.  
+**Verified product-code baseline:** `0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
+**K1 governance source:** prefer these files from current `main` once merged; fallback branch `design/content-factory-governance-core`  
+**Session rule:** resolve the live `main` SHA before any work; documentation-only merges may advance `main` without changing the product baseline.  
+**Current gate:** `WRITTEN_SPEC_REVIEW_GATE`
 
-## Current production architecture
+## Completed foundation
 
-- TrackRegistryV1: active and registry-driven.
-- TrackManifestV1: preserved.
-- TrackPresentationV1: preserved; domain labels are keyed by stable domain IDs.
-- DomainCatalogV2: active with seven stable SDAIA domain IDs.
-- ExamProfileV2: active.
-- RenderedQuestionV2: active.
-- RuntimeBundleV3: active in browser/API/server.
-- StateV2: preserved without destructive migration.
-- Current generated bank: 1,120 questions.
-- Current full exam: 200 questions.
-- Current weighted allocation: 36 / 35 / 33 / 29 / 28 / 25 / 14.
-- Browser bilingual/RTL-LTR, offline/service worker, feedback, SQLite, API/browser adapters and Pages deployment are verified.
+Programme A, B0, B1, B2 and B3 are merged, deployed and post-merge verified.
 
-## B3 post-merge evidence
+Current production contracts:
+- TrackRegistryV1
+- TrackManifestV1
+- TrackPresentationV1
+- DomainCatalogV2
+- ExamProfileV2
+- RenderedQuestionV2
+- RuntimeBundleV3
+- StateV2
 
-- PR #11 merged at `f880c17d48a4579cf68ae59fb245328334ef1c19`.
-- GitHub Pages run #19: SUCCESS.
-- Server and adapter contract run #614: SUCCESS.
-- Live content model v3 verification: PASS.
-- B3 whole-branch review: no open Critical or Important findings.
+Current verified runtime:
+- 1,120 generated questions
+- 200-question full exam
+- weighted allocation 36 / 35 / 33 / 29 / 28 / 25 / 14
+- Arabic/English + RTL/LTR
+- Browser/API parity
+- SQLite smoke
+- service-worker/offline reload
+- GitHub Pages live deployment
 
-## Exact next programme
+## Current programme
 
-**Question Factory v2** — design first. It must build the governed question-production pipeline before any 14,000+ question expansion.
+**K1 — Content Factory & Governance Core**
 
-Target future order:
-`Question Factory v2 → large-scale content expansion → learner-response data → psychometric calibration / adaptive systems`.
+This formally replaces the narrower interpretation:
+`Question Factory v2 = generator + checks`
 
-Do not reconstruct B1/B2/B3 from historical handoffs below. Treat them as historical evidence only.
+with:
+`Question Factory v2 → governed Content Factory & Governance Core inside the Platform Kernel`.
+
+Approved conversational direction:
+- modular monolith, not microservices now;
+- strict ports/adapters;
+- immutable ItemVersion and ContentRelease concepts;
+- resumable state-machine pipeline;
+- structured provenance/audit;
+- SourcePolicy;
+- multidimensional quality gates;
+- C-ready orchestration/persistence/provider seams;
+- Coverage Engine;
+- LearnerEventV1 foundation;
+- QTI/CASE/event interoperability as adapters, not internal truth;
+- current 1,120 content must migrate without learner-visible behavior drift.
+
+## Governing authority
+
+Read in this order:
+
+1. `docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md`
+2. `docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md`
+3. `docs/superpowers/specs/2026-09-27-content-factory-governance-core-design.md`
+4. Future approved K1 implementation plan
+5. Active K1 execution ledger/checkpoint once execution begins
+
+Current tracker:
+`docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md`
+
+Current roadmap:
+`docs/superpowers/plans/2026-09-27-post-b3-platform-kernel-roadmap.md`
+
+Governance alignment review:
+`docs/superpowers/reviews/2026-09-27-content-factory-governance-alignment.md`
+
+## Exact next action
+
+**Do not implement K1 yet.**
+
+The written K1 spec exists and is awaiting explicit user approval.
+
+After written-spec approval:
+1. invoke Superpowers `writing-plans`;
+2. create the detailed K1 TDD implementation plan;
+3. user reviews/approves that written plan;
+4. execute with RED → GREEN TDD, durable checkpoints, whole-suite verification, whole-branch review, merge, post-merge verification.
+
+## Next programme after K1
+
+**K2 — Coverage Expansion & Controlled Release**
+
+K2 remains `ROADMAP_ONLY` until K1 is merged and post-merge verified. Its design must be based on the real post-K1 main baseline.
+
+## New-chat recovery rule
+
+A new chat must:
+
+1. read this HANDOFF;
+2. read the authoritative programme tracker;
+3. resolve current `main` SHA;
+4. read the active written spec;
+5. read the active written plan only if it exists and is approved;
+6. read the execution ledger/checkpoint only if implementation has started;
+7. inspect branch/main diff;
+8. resume the first incomplete gate/task.
+
+Do not reconstruct B1/B2/B3 or K1 from conversation memory when these durable artifacts are available.
+
+## Historical records
+
+Everything below this line is historical evidence. Historical “next action” text must not override the current section above.
 
 ---
 
-# B2 — Current Durable Handoff
+# HISTORICAL — B2 Durable Handoff
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
@@ -61,7 +135,7 @@ Latest full pre-review-fix acceptance: quality run 171 SUCCESS with 117/117 Node
 
 ---
 
-# B1 — Current Durable Handoff
+# HISTORICAL — B1 Durable Handoff
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
@@ -82,7 +156,7 @@ Fresh implementation acceptance: PR quality gate run 126 SUCCESS (101/101 Node, 
 
 ---
 
-# Programme A — Durable Handoff
+# HISTORICAL — Programme A Durable Handoff
 
 **Date:** 2026-09-26  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
