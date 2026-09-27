@@ -1,0 +1,19 @@
+{
+  "run_id": "parity-1",
+  "target_id": "item-1",
+  "stage": "generate",
+  "status": "running",
+  "attempt": 1,
+  "input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "output_ref": null,
+  "request": {
+    "input": {
+      "x": 1
+    }
+  },
+  "started_at": "2026-09-27T00:00:00Z",
+  "completed_at": null,
+  "retry": {
+    "eligible": false
+  }
+}

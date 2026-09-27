@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "case-1",
+      "input": {
+        "x": 1
+      },
+      "expected": {
+        "answer": 1,
+        "source_ref": "s1"
+      }
+    },
+    {
+      "id": "case-2",
+      "input": {
+        "x": 2
+      },
+      "expected": {
+        "answer": 2,
+        "source_ref": "s1"
+      }
+    }
+  ]
+}

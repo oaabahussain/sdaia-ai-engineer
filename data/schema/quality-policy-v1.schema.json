@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "version",
+    "required",
+    "abstain_requires_review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "required": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": [
+          "PASS"
+        ]
+      },
+      "required": [
+        "correctness",
+        "evidence_grounding",
+        "ambiguity",
+        "bilingual_equivalence",
+        "accessibility"
+      ],
+      "properties": {
+        "correctness": {
+          "const": "PASS"
+        },
+        "evidence_grounding": {
+          "const": "PASS"
+        },
+        "ambiguity": {
+          "const": "PASS"
+        },
+        "bilingual_equivalence": {
+          "const": "PASS"
+        },
+        "accessibility": {
+          "const": "PASS"
+        }
+      }
+    },
+    "abstain_requires_review": {
+      "type": "boolean"
+    }
+  }
+}

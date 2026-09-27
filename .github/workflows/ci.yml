@@ -19,6 +19,8 @@ jobs:
         run: npm run validate
       - name: Run Node tests
         run: npm test
+      - name: Verify governed current-bank migration
+        run: npm run verify:factory-import
       - name: Parse application module
         run: node --check src/app.js
       - name: Verify service worker shell assets

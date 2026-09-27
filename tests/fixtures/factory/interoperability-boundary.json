@@ -1,0 +1,50 @@
+{
+  "objective": {
+    "schema_version": 1,
+    "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.fixture.v1",
+    "track_id": "sdaia-ai-engineer",
+    "domain_id": "mlops-llmops",
+    "concept_ids": [
+      "mlops-llmops.fixture"
+    ],
+    "version": 1,
+    "status": "provisional",
+    "origin": "migration-derived"
+  },
+  "family": {
+    "schema_version": 2,
+    "family_id": "sdaia-ai-engineer.family.fixture",
+    "track_id": "sdaia-ai-engineer",
+    "domain_id": "mlops-llmops",
+    "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.fixture.v1",
+    "concept_ids": [
+      "mlops-llmops.fixture"
+    ],
+    "misconception_ids": [],
+    "learning_goal": "Fixture goal",
+    "decision_being_tested": "Fixture decision",
+    "cognitive_level": "apply",
+    "intended_difficulty": "medium",
+    "scenario_model": {
+      "type": "fixture"
+    },
+    "variable_model": {},
+    "correct_reasoning": "Fixture reasoning",
+    "common_wrong_reasoning": [],
+    "evidence_refs": [],
+    "language_requirements": [
+      "ar",
+      "en"
+    ],
+    "accessibility_requirements": [],
+    "generation_policy": "k1.source.default.v1",
+    "quality_policy": "k1.quality.default.v1",
+    "release_policy": "k1.review.default.v1",
+    "lifecycle": {
+      "state": "DRAFT"
+    },
+    "version": {
+      "number": 1
+    }
+  }
+}
