@@ -1,3 +1,44 @@
+# CURRENT AUTHORITATIVE HANDOFF — Post-B3
+
+**Date:** 2026-09-27  
+**Repository:** `oaabahussain/sdaia-ai-engineer`  
+**Current main:** `f880c17d48a4579cf68ae59fb245328334ef1c19`  
+**Status:** Programme A, B0, B1, B2 and B3 are merged, deployed and post-merge verified.  
+
+## Current production architecture
+
+- TrackRegistryV1: active and registry-driven.
+- TrackManifestV1: preserved.
+- TrackPresentationV1: preserved; domain labels are keyed by stable domain IDs.
+- DomainCatalogV2: active with seven stable SDAIA domain IDs.
+- ExamProfileV2: active.
+- RenderedQuestionV2: active.
+- RuntimeBundleV3: active in browser/API/server.
+- StateV2: preserved without destructive migration.
+- Current generated bank: 1,120 questions.
+- Current full exam: 200 questions.
+- Current weighted allocation: 36 / 35 / 33 / 29 / 28 / 25 / 14.
+- Browser bilingual/RTL-LTR, offline/service worker, feedback, SQLite, API/browser adapters and Pages deployment are verified.
+
+## B3 post-merge evidence
+
+- PR #11 merged at `f880c17d48a4579cf68ae59fb245328334ef1c19`.
+- GitHub Pages run #19: SUCCESS.
+- Server and adapter contract run #614: SUCCESS.
+- Live content model v3 verification: PASS.
+- B3 whole-branch review: no open Critical or Important findings.
+
+## Exact next programme
+
+**Question Factory v2** — design first. It must build the governed question-production pipeline before any 14,000+ question expansion.
+
+Target future order:
+`Question Factory v2 → large-scale content expansion → learner-response data → psychometric calibration / adaptive systems`.
+
+Do not reconstruct B1/B2/B3 from historical handoffs below. Treat them as historical evidence only.
+
+---
+
 # B2 — Current Durable Handoff
 
 **Date:** 2026-09-27  
