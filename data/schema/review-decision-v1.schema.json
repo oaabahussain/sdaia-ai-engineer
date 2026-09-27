@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "target_id",
+    "reviewer_type",
+    "decision",
+    "reason",
+    "policy_version",
+    "timestamp"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewer_type": {
+      "type": "string",
+      "enum": [
+        "human",
+        "automated",
+        "hybrid"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "APPROVE",
+        "REJECT",
+        "NEEDS_REVISION",
+        "ABSTAIN"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewer_id": {
+      "type": "string"
+    }
+  }
+}
