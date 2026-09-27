@@ -43,3 +43,12 @@ Handoff checkpoint:
 - authoritative branch: `design/b1-track-presentation-contract`
 - recovered HEAD before this checkpoint: `dafc8c8c7a0c6eb81cf200cae04becd16dd3fb88`
 - next exact action: Task 16 GREEN — remove SDAIA brand/hero literals from `src/app.js` and `index.html`, add neutral presentation DOM targets, render presentation dynamically, then verify PR quality gate.
+
+
+## Checkpoint B4 — Tasks 16–18
+
+Task 16: complete — existing RED leakage contract plus added RED generic-title assertion; GREEN migrated main brand/hero/title to presentation data and neutral shell targets. Task-scoped CI assertions `main page brand and hero are sourced from track presentation` and `document title uses generic practice copy` pass on head 8d5c1f5.
+Task 17: complete — pre-existing RED `DOMAIN_AR` assertion became GREEN after importing `getDomainLabel` and sourcing domain labels from presentation; CI assertion `core app no longer owns SDAIA presentation literals` passes on head 8d5c1f5.
+Task 18: complete — RED canonical-status assertion failed before implementation, then GREEN after `CORE_I18N.*.app.statusNotice` was added and app rendering was driven only by `BANK.track.official_status` + `PROFILE.evidence_status`; hard-coded status notice removed from HTML.
+Checkpoint evidence: PR quality gate run 107 reaches Node tests; all Task 16–18 scoped assertions pass. Remaining Node failure is the intentionally future `feedback.html` SDAIA literal assertion for Tasks 19–20, not a B4 regression.
+Next exact task: Task 19 RED — require external `src/feedback.js` module and preserve existing feedback semantics during extraction.
