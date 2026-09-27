@@ -1,0 +1,2 @@
+import {contentHash} from '../release/releases.js';
+export function createProvenanceRecord(input){return{schema_version:1,record_id:input.record_id,record_type:input.record_type,run_id:input.run_id,target_id:input.target_id,stage:input.stage,timestamp:input.timestamp,input_hash:contentHash(input.input),output_hash:contentHash(input.output),policy_refs:[...(input.policy_refs||[])],provider:input.provider??null}}
