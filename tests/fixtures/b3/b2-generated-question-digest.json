@@ -1,0 +1,5 @@
+{
+  "question_count": 1120,
+  "compatibility": "exact-payload-fields:id,family_id,question_ar,question_en,options_ar,options_en,answer,difficulty",
+  "note": "Task 4 computes and pins the canonical digest before migration."
+}
