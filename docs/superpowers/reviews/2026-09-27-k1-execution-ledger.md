@@ -30,3 +30,16 @@ Ruling: default K1 SourcePolicy is GROUNDED, not STRICT, matching approved plan;
 Ruling: default K1 ReviewPolicy requires human approval for new AI candidates and high-risk/quarantined content; deterministic low-risk may be sampled. Cost if wrong: initial throughput is lower but false auto-activation risk is reduced.
 
 Next exact task: Checkpoint D — persistence ports and local orchestration.
+
+Checkpoint D:
+- D RED proven in quality run 259 (missing Node store/runner/CLI modules) and server run 758 (missing app.factory_store).
+- Implemented Runner/ContentStore/JobStore/EventStore/ReviewPort shape contracts.
+- Implemented immutable file content store, append-only JSONL audit, file job store, append-only review store.
+- Implemented LocalRunner run/resume/retry/cancel; resume skips completed stage outputs; retries increment attempt.
+- Implemented partial batch result semantics: COMPLETED/PARTIAL/FAILED with durable successful siblings.
+- Added SQLite factory_runs/factory_stage_outputs/factory_audit tables and Python adapter.
+- Added local CLI status/run/resume/retry shell and npm factory script.
+- Added shared store-parity fixture; file and SQLite adapters preserve same logical run record.
+- Quality run 272 SUCCESS; Server/Adapter run 785 SUCCESS.
+
+Next exact task: Checkpoint E — governed quality pipeline.
