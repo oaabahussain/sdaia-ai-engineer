@@ -34,3 +34,16 @@ test('pages artifact copies canonical track configuration without publishing leg
   assert.match(pages, /test ! -e _site\/data\/legacy/);
   assert.doesNotMatch(pages, /cp -R src data tracks _site\//);
 });
+
+
+test('presentation and feedback runtime assets are part of the offline shell', () => {
+  const sw = read('../sw.js');
+  for (const asset of [
+    './src/presentation/coreI18n.js',
+    './src/presentation/trackPresentation.js',
+    './src/feedback.js',
+    './tracks/sdaia-ai-engineer/presentation.json'
+  ]) assert.equal(sw.includes(`'${asset}'`), true, asset);
+  const verifier = read('../scripts/verify_sw_assets.js');
+  assert.match(verifier, /presentation\.json/);
+});
