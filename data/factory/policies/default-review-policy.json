@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "policy_id": "k1.review.default.v1",
+  "version": 1,
+  "new_ai_requires_human": true,
+  "high_risk_requires_human": true,
+  "quarantined_requires_human": true,
+  "deterministic_sampling_rate": 0.1
+}
