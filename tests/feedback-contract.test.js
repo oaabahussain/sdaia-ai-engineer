@@ -35,3 +35,14 @@ test('feedback behavior is extracted to the shared ES module', () => {
   assert.match(feedbackModule, /learning-platform\.state\.v2/);
   assert.match(feedbackModule, /sdaia\.state\.v1/);
 });
+
+
+test('feedback identity is sourced from active track presentation', () => {
+  assert.doesNotMatch(page, /SDAIA AI Engineer/);
+  assert.doesNotMatch(feedbackModule, /SDAIA AI Engineer/);
+  assert.match(page, /id=['"]feedbackBrand['"]/);
+  assert.match(feedbackModule, /ACTIVE_TRACK_ID/);
+  assert.match(feedbackModule, /loadTrackPresentation/);
+  assert.match(feedbackModule, /resolvePresentationLocale/);
+  assert.match(feedbackModule, /document\.title/);
+});
