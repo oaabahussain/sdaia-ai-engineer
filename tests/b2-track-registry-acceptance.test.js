@@ -31,3 +31,10 @@ test('release and offline verification are registry driven', () => {
   assert.match(sw, /tracks\/registry\.json/);
   assert.doesNotMatch(live, /tracks\/sdaia-ai-engineer\/manifest\.json/);
 });
+
+
+test('single-track bootstrap literals do not leak into runtime or release logic', () => {
+  for (const path of ['src/config.js','src/app.js','src/feedback.js','src/storage/browser.js','src/storage/api.js','scripts/verify_sw_assets.js','scripts/verify_live_release.js','.github/workflows/ci.yml','.github/workflows/pages.yml']) {
+    const source=read(path);assert.doesNotMatch(source,/ACTIVE_TRACK_ID/,path);assert.doesNotMatch(source,/tracks\/sdaia-ai-engineer\/manifest\.json/,path);
+  }
+});
