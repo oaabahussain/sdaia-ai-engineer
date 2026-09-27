@@ -1,5 +1,6 @@
 import json
 import sqlite3
+import pytest
 from app.main import init_db
 from app.factory_store import create_run, get_run, update_run, record_stage_output, append_audit, list_audit
 
