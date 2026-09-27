@@ -4,7 +4,7 @@
 **Status:** Written architectural spec — awaiting user review  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Base:** `main@0b2547a48fe0300a7a3c3348229e7119a5a8ce20`  
-**Programme:** Post-B3 / Question Factory v2 successor design
+**Programme:** K1 — Content Factory & Governance Core
 
 ## 1. Authority and precedence
 
