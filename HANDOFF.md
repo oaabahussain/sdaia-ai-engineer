@@ -112,7 +112,7 @@ Everything below this line is historical evidence. Historical “next action” 
 
 ---
 
-# B2 — Current Durable Handoff
+# HISTORICAL — B2 Durable Handoff
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
@@ -134,7 +134,7 @@ Latest full pre-review-fix acceptance: quality run 171 SUCCESS with 117/117 Node
 
 ---
 
-# B1 — Current Durable Handoff
+# HISTORICAL — B1 Durable Handoff
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
@@ -155,7 +155,7 @@ Fresh implementation acceptance: PR quality gate run 126 SUCCESS (101/101 Node, 
 
 ---
 
-# Programme A — Durable Handoff
+# HISTORICAL — Programme A Durable Handoff
 
 **Date:** 2026-09-26  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
