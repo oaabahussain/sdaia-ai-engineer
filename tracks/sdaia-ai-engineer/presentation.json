@@ -13,13 +13,13 @@
         "description": "أكثر من ألف سؤال بالعربي والإنجليزي، اختبار كامل موزون، واختبارات مستقلة لكل مجال."
       },
       "domain_labels": {
-        "MLOps / LLMOps": "عمليات تعلم الآلة والنماذج اللغوية",
-        "Data / ML / Evaluation": "البيانات وتعلم الآلة والتقييم",
-        "Core AI / Deep Learning / GenAI": "أساسيات الذكاء الاصطناعي والتعلم العميق والذكاء التوليدي",
-        "Responsible AI / Security / Governance": "الذكاء المسؤول والأمن والحوكمة",
-        "AI Software Engineering": "هندسة برمجيات الذكاء الاصطناعي",
-        "Architecture / Infrastructure": "المعمارية والبنية التحتية",
-        "Business / Professional Practice": "الأعمال والممارسة المهنية"
+        "mlops-llmops": "عمليات تعلم الآلة والنماذج اللغوية",
+        "data-ml": "البيانات وتعلم الآلة والتقييم",
+        "core-ai": "أساسيات الذكاء الاصطناعي والتعلم العميق والذكاء التوليدي",
+        "responsible-ai-security-governance": "الذكاء المسؤول والأمن والحوكمة",
+        "ai-software-engineering": "هندسة برمجيات الذكاء الاصطناعي",
+        "architecture-infrastructure": "المعمارية والبنية التحتية",
+        "business-professional-practice": "الأعمال والممارسة المهنية"
       }
     },
     "en": {
@@ -31,13 +31,13 @@
         "description": "More than one thousand Arabic/English questions, a weighted full exam, and standalone domain exams."
       },
       "domain_labels": {
-        "MLOps / LLMOps": "MLOps / LLMOps",
-        "Data / ML / Evaluation": "Data / ML / Evaluation",
-        "Core AI / Deep Learning / GenAI": "Core AI / Deep Learning / GenAI",
-        "Responsible AI / Security / Governance": "Responsible AI / Security / Governance",
-        "AI Software Engineering": "AI Software Engineering",
-        "Architecture / Infrastructure": "Architecture / Infrastructure",
-        "Business / Professional Practice": "Business / Professional Practice"
+        "mlops-llmops": "MLOps / LLMOps",
+        "data-ml": "Data / ML / Evaluation",
+        "core-ai": "Core AI / Deep Learning / GenAI",
+        "responsible-ai-security-governance": "Responsible AI / Security / Governance",
+        "ai-software-engineering": "AI Software Engineering",
+        "architecture-infrastructure": "Architecture / Infrastructure",
+        "business-professional-practice": "Business / Professional Practice"
       }
     }
   }
