@@ -1,5 +1,4 @@
 {
-  "domain": "AI Software Engineering",
   "concepts": [
     {
       "term": "Async I/O",
@@ -141,5 +140,6 @@
       "id": "ai-software-engineering.graceful-degradation",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "ai-software-engineering"
 }

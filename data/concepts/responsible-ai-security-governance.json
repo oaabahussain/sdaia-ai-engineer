@@ -1,5 +1,4 @@
 {
-  "domain": "Responsible AI / Security / Governance",
   "concepts": [
     {
       "term": "Fairness",
@@ -141,5 +140,6 @@
       "id": "responsible-ai-security-governance.incident-response",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "responsible-ai-security-governance"
 }

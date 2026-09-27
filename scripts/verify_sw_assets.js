@@ -19,6 +19,7 @@ for (const manifestAsset of manifestAssets) {
   const manifestPath = manifestAsset.replace(/^\.\//, '');
   const manifest = JSON.parse(fs.readFileSync(path.join(root, manifestPath), 'utf8'));
   const presentationAsset = `./tracks/${manifest.id}/presentation.json`;
+  if(manifest.capabilities?.includes('content-model-v2')){const domainAsset=`./tracks/${manifest.id}/domains.json`;if(!assets.includes(domainAsset))throw new Error(`Domain catalog is not pre-cached: ${domainAsset}`)}
   if (!assets.includes(presentationAsset)) throw new Error(`Track presentation is not pre-cached: ${presentationAsset}`);
   const profiles = manifest.exam_profiles.map(ref => ({
     ref,

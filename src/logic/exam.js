@@ -25,7 +25,7 @@ export function sampleWeightedExam(questions, weights, total, rng = Math.random)
   const allocation = weightedAllocation(weights, total);
   const picked = [];
   for (const [domain, count] of Object.entries(allocation)) {
-    const pool = questions.filter(q => q.domain === domain);
+    const pool = questions.filter(q => q.domain_id === domain);
     if (pool.length < count) throw new Error(`Not enough questions in ${domain}: need ${count}, have ${pool.length}`);
     picked.push(...shuffle(pool, rng).slice(0, count));
   }
@@ -33,7 +33,7 @@ export function sampleWeightedExam(questions, weights, total, rng = Math.random)
 }
 
 export function sampleSectionExam(questions, domain, count, rng = Math.random) {
-  const pool = questions.filter(q => q.domain === domain);
+  const pool = questions.filter(q => q.domain_id === domain);
   if (!pool.length) throw new Error(`No questions for ${domain}`);
   const size = count === 'all' ? pool.length : Math.min(Number(count), pool.length);
   return shuffle(pool, rng).slice(0, size);
@@ -57,8 +57,8 @@ export function scoreExam(examQuestions, answers) {
   let correct = 0;
   let answered = 0;
   for (const q of examQuestions) {
-    if (!perDomain[q.domain]) perDomain[q.domain] = { correct: 0, answered: 0, total: 0 };
-    const bucket = perDomain[q.domain];
+    if (!perDomain[q.domain_id]) perDomain[q.domain_id] = { correct: 0, answered: 0, total: 0 };
+    const bucket = perDomain[q.domain_id];
     bucket.total += 1;
     const selected = answers[q.id];
     if (selected !== undefined && selected !== null) {

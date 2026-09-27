@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const json=p=>JSON.parse(read(p));
+const IDS=['mlops-llmops','data-ml','core-ai','responsible-ai-security-governance','ai-software-engineering','architecture-infrastructure','business-professional-practice'];
+test('B3 contract files exist',()=>{for(const p of ['data/schema/domain-catalog-v2.schema.json','tracks/sdaia-ai-engineer/domains.json','data/schema/exam-profile-v2.schema.json','data/schema/rendered-question-v2.schema.json','data/schema/runtime-bundle-v3.schema.json','src/content/contentModelV2.js','data/migrations/sdaia-domain-v1-to-v2.json'])assert.equal(fs.existsSync(new URL('../'+p,import.meta.url)),true,p)});
+test('canonical domain catalog exposes seven stable ids',()=>{const d=json('tracks/sdaia-ai-engineer/domains.json');assert.equal(d.schema_version,2);assert.deepEqual(d.domains.map(x=>x.id),IDS)});
+test('canonical profile uses stable domain ids',()=>{const p=json('tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json');assert.equal(p.schema_version,2);assert.deepEqual(Object.keys(p.weights),IDS)});
+test('canonical concepts use domain_id',()=>{for(const id of IDS){const c=json('data/concepts/'+id+'.json');assert.equal(c.domain_id,id);assert.equal('domain' in c,false)}});
+test('runtime contract source targets version 3',()=>{const src=read('src/content/runtimeBundle.js');assert.ok(src.includes('contract_version:v2?3:2'))});
+
+test('legacy display labels are not canonical structural keys',()=>{const legacy=['MLOps / LLMOps','Data / ML / Evaluation','Core AI / Deep Learning / GenAI','Responsible AI / Security / Governance','AI Software Engineering','Architecture / Infrastructure','Business / Professional Practice'];for(const p of ['tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json','data/concepts/mlops-llmops.json','data/concepts/data-ml.json','data/concepts/core-ai.json','data/concepts/responsible-ai-security-governance.json','data/concepts/ai-software-engineering.json','data/concepts/architecture-infrastructure.json','data/concepts/business-professional-practice.json']){const src=read(p);for(const label of legacy)assert.equal(src.includes('"'+label+'"'),false,p+': '+label)}});

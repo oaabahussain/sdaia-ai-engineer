@@ -4,9 +4,20 @@
   "version": "2026.09",
   "status": "active",
   "official_status": "unofficial-independent",
-  "locales": ["ar", "en"],
-  "core_contract": { "min": 2, "max": 2 },
-  "capabilities": ["bilingual", "foundation-generated-bank", "exam-profile-v1"],
+  "locales": [
+    "ar",
+    "en"
+  ],
+  "core_contract": {
+    "min": 2,
+    "max": 2
+  },
+  "capabilities": [
+    "bilingual",
+    "foundation-generated-bank",
+    "exam-profile-v1",
+    "content-model-v2"
+  ],
   "content": {
     "concept_files": [
       "data/concepts/ai-software-engineering.json",
@@ -20,6 +31,8 @@
     "learn": "data/learn.json",
     "cases": "data/cases.json"
   },
-  "exam_profiles": ["tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json"],
+  "exam_profiles": [
+    "tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json"
+  ],
   "default_exam_profile": "sdaia-ai-engineer.project-reference.v1"
 }

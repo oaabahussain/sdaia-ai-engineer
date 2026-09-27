@@ -1,5 +1,4 @@
 {
-  "domain": "Data / ML / Evaluation",
   "concepts": [
     {
       "term": "Accuracy",
@@ -141,5 +140,6 @@
       "id": "data-ml.calibration",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "data-ml"
 }

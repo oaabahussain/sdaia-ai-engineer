@@ -1,5 +1,4 @@
 {
-  "domain": "Architecture / Infrastructure",
   "concepts": [
     {
       "term": "Horizontal Scaling",
@@ -141,5 +140,6 @@
       "id": "architecture-infrastructure.capacity-planning",
       "order": 20
     }
-  ]
+  ],
+  "domain_id": "architecture-infrastructure"
 }

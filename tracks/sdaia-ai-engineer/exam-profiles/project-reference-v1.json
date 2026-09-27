@@ -1,18 +1,23 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "sdaia-ai-engineer.project-reference.v1",
   "track_id": "sdaia-ai-engineer",
   "version": "1",
   "evidence_status": "project-reference-unverified",
   "question_count": 200,
-  "section_sizes": [25, 50, 100, "all"],
+  "section_sizes": [
+    25,
+    50,
+    100,
+    "all"
+  ],
   "weights": {
-    "MLOps / LLMOps": 18.0,
-    "Data / ML / Evaluation": 17.3,
-    "Core AI / Deep Learning / GenAI": 16.7,
-    "Responsible AI / Security / Governance": 14.7,
-    "AI Software Engineering": 14.0,
-    "Architecture / Infrastructure": 12.6,
-    "Business / Professional Practice": 6.7
+    "mlops-llmops": 18,
+    "data-ml": 17.3,
+    "core-ai": 16.7,
+    "responsible-ai-security-governance": 14.7,
+    "ai-software-engineering": 14,
+    "architecture-infrastructure": 12.6,
+    "business-professional-practice": 6.7
   }
 }
