@@ -6,6 +6,7 @@ BASE='http://127.0.0.1:4173'
 DRIVER='http://127.0.0.1:9515'
 TRACK_ID='sdaia-ai-engineer'
 with open(os.path.join(ROOT,'tracks',TRACK_ID,'manifest.json'),encoding='utf-8') as f: MANIFEST=json.load(f)
+with open(os.path.join(ROOT,'tracks',TRACK_ID,'presentation.json'),encoding='utf-8') as f: PRESENTATION=json.load(f)
 PROFILES=[]
 for profile_path in MANIFEST['exam_profiles']:
     with open(os.path.join(ROOT,profile_path),encoding='utf-8') as f: PROFILES.append(json.load(f))
@@ -81,8 +82,18 @@ def main():
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
         wait_until(lambda:text(session,find(session,'#bankCount'))==str(EXPECTED_BANK),label='profile bank count')
         assert 'سؤال' in text(session,find(session,'body'))
+        first_domain=next(iter(PROFILE['weights']))
+        ar=PRESENTATION['locales']['ar']
+        assert text(session,find(session,'#brandText'))==ar['brand']
+        assert text(session,find(session,'#heroTitle'))==ar['hero']['title']
+        assert text(session,find(session,'.domainCard h3'))==ar['domain_labels'][first_domain]
+        assert execute(session,"return document.documentElement.dir")=='rtl'
         click(session,find(session,'#langBtn'))
-        wait_until(lambda:'Practice like an exam' in text(session,find(session,'#home')),label='English UI')
+        en=PRESENTATION['locales']['en']
+        wait_until(lambda:text(session,find(session,'#heroTitle'))==en['hero']['title'],label='English presentation')
+        assert text(session,find(session,'#brandText'))==en['brand']
+        assert text(session,find(session,'.domainCard h3'))==en['domain_labels'][first_domain]
+        assert execute(session,"return document.documentElement.dir")=='ltr'
         before=execute(session,"return document.documentElement.dataset.theme")
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
