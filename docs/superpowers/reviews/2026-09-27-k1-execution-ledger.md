@@ -72,3 +72,18 @@ Checkpoint G:
 - Content release delta exposes added/removed item/objective catch-up candidates without marking unseen content learned.
 - Quality run 306 SUCCESS; Server/Adapter run 857 SUCCESS.
 Next exact task: Checkpoint H — raw learner evidence + interoperability seams.
+
+
+Checkpoint H:
+- H implementation existed partially on branch before this resume: LearnerEvent runtime validator, append-only JSONL learner-event store, SQLite learner_events table/adapter, interoperability ports and round-trip fixture.
+- Server/Adapter #880 exposed a test-setup defect only: `pytest.raises` was used without `import pytest`; adapter behavior had already reached the duplicate-insert assertion.
+- Root cause fixed minimally by importing pytest in `server/tests/test_factory_store.py`.
+- LearnerEventV1 runtime rejects derived fields such as mastery/readiness, validates timing/mode/locale, and remains raw evidence only.
+- JSONL and SQLite learner-event stores are append-only and queryable by track/item/time.
+- AssessmentExchangePort, CompetencyExchangePort and LearningEventExchangePort remain adapter seams; canonical internal IDs survive mock QTI/CASE round trips without external formats becoming internal truth.
+- Final H verification at HEAD `9ffd54bb09680903f964a212ebbbdc488128ad26`: Quality #318 SUCCESS; Server/Adapter #882 SUCCESS.
+Ruling: H failure #880 was a test setup defect, not a persistence defect; fixed only the missing pytest import. Cost if wrong: duplicate immutability could be under-tested, mitigated by #882 passing the duplicate IntegrityError assertion.
+
+F/G/H are complete.
+Next exact task: Checkpoint I — migrate current 1,120 items into governed lineage.
+Nothing merged.
