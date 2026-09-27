@@ -25,9 +25,11 @@ const ASSETS = [
   './src/storage/identity.js',
   './src/state/migrate.js',
   './src/content/runtimeBundle.js',
+  './src/content/contentModelV2.js',
   './data/migrations/sdaia-generated-v2-question-ids.json',
   './tracks/sdaia-ai-engineer/manifest.json',
   './tracks/sdaia-ai-engineer/presentation.json',
+  './tracks/sdaia-ai-engineer/domains.json',
   './tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json'
 ];
 
