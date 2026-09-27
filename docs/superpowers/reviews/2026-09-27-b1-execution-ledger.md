@@ -25,3 +25,21 @@ Task 7: complete — locale mismatch/default tests RED, then GREEN on head 55e0f
 Task 8: complete — missing domain-label tests RED, then GREEN on head a2122ea.
 Task 9: complete — coreI18n import test RED on missing module, then GREEN on head 668989b; broader track-leak acceptance assertions intentionally remain RED for later tasks.
 Task 10: Ruling: plan Step 3 included track/version rejection before Task 11's RED tests — implement Task 10 as canonical-path fetch only and defer identity rejection to Task 11 so TDD remains valid — cost if wrong: one-task delay in runtime mismatch protection; CI/release validator already rejects mismatches.
+
+
+## Recovery checkpoint — 2026-09-27 / Stage B1.4–B1.7
+
+Recovered from GitHub commit history after session interruption; no completed task was re-run.
+
+Task 10: complete — RED commit 14449fa defined canonical presentation loader; GREEN commit 2c9a6d6 added canonical-path fetch. Ruling above preserved identity rejection for Task 11.
+Task 11: complete — RED commit e547397 required runtime identity/version rejection; GREEN commit 340786a implemented both.
+Task 12: complete — RED commit 65f6adc defined locale intersection/fallback behavior; GREEN commit 31df98e implemented resolver.
+Task 13: complete — RED commit 2798c01 defined locale/domain accessors; GREEN commit 404ebc8 implemented safe accessors.
+Task 14: complete — RED commit 48cacdd required non-blocking presentation load; GREEN commit 91cb010 integrated presentation loading while server/adapter CI remained green.
+Task 15: complete — RED commit 290e157 required resilient presentation view fallback; GREEN commit 6be1d01 implemented fallback while server/adapter CI remained green.
+Task 16: in progress — RED commits b97204c + dafc8c8 require presentation-driven brand/hero and repaired the acceptance-test assertion syntax. Current quality-gate failure is expected RED until migration implementation.
+
+Handoff checkpoint:
+- authoritative branch: `design/b1-track-presentation-contract`
+- recovered HEAD before this checkpoint: `dafc8c8c7a0c6eb81cf200cae04becd16dd3fb88`
+- next exact action: Task 16 GREEN — remove SDAIA brand/hero literals from `src/app.js` and `index.html`, add neutral presentation DOM targets, render presentation dynamically, then verify PR quality gate.
