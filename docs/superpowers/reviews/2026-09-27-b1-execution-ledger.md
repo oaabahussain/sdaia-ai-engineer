@@ -62,3 +62,15 @@ Task 21: complete — feedback template, encoded suggestion/contribution/rating 
 Task 22: complete — unsupported `Adaptive` description had a verified RED in PR run 115; description corrected without changing PWA name/short_name. Node suite passes in PR run 116.
 Systematic-debugging finding: PR run 116 browser smoke fails only after offline navigation to feedback because newly extracted `src/feedback.js` is not yet pre-cached; this is the planned Task 23 offline-shell gap. Cost if diagnosis wrong: Task 23 cache change would not restore offline feedback and browser smoke will remain red, forcing a new root-cause pass.
 Next exact task: Task 23 — pin and cache presentation/feedback shell assets.
+
+
+## Checkpoint D1/D2 — Tasks 23–28
+
+Task 23: complete — RED service-worker asset contract failed in PR run 118; GREEN after caching `coreI18n.js`, `trackPresentation.js`, `feedback.js`, and active `presentation.json`, with verifier deriving presentation path from manifest. Task assertion passes in run 120.
+Task 24: complete — RED live-release presentation assertion failed in run 120; GREEN verifier now checks track/version, locale equality/default and every profile domain label, and emits `live track presentation: PASS`.
+Task 25: complete — RED explicit artifact assertion failed in run 122; both PR and Pages artifact builds now verify `_site/tracks/sdaia-ai-engineer/presentation.json` while retaining generic `cp -R src tracks` and legacy-data exclusion.
+Task 26: complete — runtime leakage regression scans core runtime/HTML for migrated brand/hero/domain literals, preserves only the B2 bootstrap track ID exception, and confirms presentation remains canonical owner with no evidence override fields.
+Task 27: complete — browser smoke derives Arabic/English expected presentation from `presentation.json`, verifies brand/hero/domain plus RTL/LTR while preserving exam-state language-switch coverage.
+Task 28: complete — browser smoke verifies presentation after controlled online reload, offline cached reload, and offline feedback navigation; feedback brand/title/generic label and issue URL behavior pass. Final output includes `presentation=PASS`.
+Fresh checkpoint verification: PR quality gate run 126 SUCCESS (validator, Node, app parse, SW verifier, Pages artifact/live verifier, browser smoke); server/adapter run 394 SUCCESS.
+Next exact task: Task 29 whole-branch verification and final review.
