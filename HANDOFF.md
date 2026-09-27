@@ -1,11 +1,11 @@
-# CURRENT AUTHORITATIVE HANDOFF — Post-K1 / K2 Design
+# CURRENT AUTHORITATIVE HANDOFF — Post-K1 / K2 Spec Review
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **K1 product merge baseline:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
 **Post-K1 documentation main observed before this audit:** `134313a49514e02209954002c9af8de0a704535b`  
 **Session rule:** always resolve live `main` first; documentation-only merges may advance it without changing the product baseline.  
-**Current gate:** `K2_DESIGN_GATE`
+**Current gate:** `K2_SPEC_REVIEW_GATE`
 
 ## Completed foundation
 
@@ -106,7 +106,7 @@ Preserved visible payload digest:
 **K2 — Coverage Expansion & Controlled Release**
 
 Status:
-`DESIGN_NEXT`
+`SPEC_REVIEW`
 
 K2 purpose:
 
@@ -144,11 +144,11 @@ K2 must:
 There is currently:
 
 - no K2 implementation branch;
-- no K2 written spec;
+- K2 written spec created at `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`; awaiting explicit user approval;
 - no K2 implementation plan;
 - no K2 product mutation.
 
-K2 is architectural work. The next step is to review the post-K1 baseline and approve the K2 design. Only after that design is approved should a written K2 spec be committed; after written-spec approval, create the detailed implementation plan.
+K2 conceptual design has been approved and the written K2 spec has been committed on `docs/k2-research-refresh-register`. The current step is explicit user review/approval of that written spec. Only after written-spec approval may `superpowers:writing-plans` create the detailed implementation plan.
 
 ## Governing authority for K2
 
