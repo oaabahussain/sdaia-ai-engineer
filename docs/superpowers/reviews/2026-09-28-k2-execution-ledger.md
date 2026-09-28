@@ -710,3 +710,26 @@ Status: COMPLETE.
 Checkpoint G is complete.
 Checkpoint H is active.
 Next exact task: Task 30 — Release lifecycle integration.
+
+
+### Task 30 — Release lifecycle integration
+
+Status: COMPLETE
+RED commit: `9a21b3937455f0260edfaf7e32ade351b1a4fdbd`
+RED evidence: Pull request quality gate #454 — Node tests FAILED after setup/validation passed.
+Initial GREEN implementation commit: `f527d568a1dbfda9e6caf25a59b1230163659898`.
+Debugging finding: quality gate #455 still failed. Systematic-debugging reproduced the exact release test locally from HEAD and found the HOLD fixture was structurally incomplete, so validation correctly stopped before reaching the decision assertion. Production logic was not the cause.
+Test-fixture correction commit: `997efcfacc08658a249b1152a8216e5ab47f6e10`.
+Final GREEN evidence:
+- Pull request quality gate #456 — SUCCESS;
+- Server and adapter contract tests #1191 — SUCCESS.
+Behavior:
+- K2 CANARY→ACTIVE requires structured ActivationEvidenceV1 for the same release with decision PROMOTE;
+- truthy legacy strings are rejected for K2;
+- only releases explicitly tagged `origin: migrated-grandfathered` retain legacy string compatibility;
+- CANARY remains mandatory before ACTIVE.
+
+Ruling: K1 legacy activation compatibility is restricted to the explicit `migrated-grandfathered` origin rather than inferred from age, missing fields, or release ID — this prevents new releases from accidentally falling onto the legacy path — cost if wrong: any genuinely historical artifact missing that origin marker must be migrated/annotated before legacy activation replay.
+
+Task 30: complete.
+Next exact task: Task 31 — Insufficient evidence HOLD.
