@@ -733,3 +733,24 @@ Ruling: K1 legacy activation compatibility is restricted to the explicit `migrat
 
 Task 30: complete.
 Next exact task: Task 31 — Insufficient evidence HOLD.
+
+
+### Task 31 — Insufficient evidence HOLD
+
+Status: COMPLETE
+RED head: `736555c077e3e2d5169dfac3edbcb0a029968924`
+RED evidence: Pull request quality gate #459 — Node tests FAILED after setup/validation passed.
+GREEN head: `47a579bc427b2c8978c125dba4cf95c82928a0f4`
+GREEN evidence:
+- Pull request quality gate #461 — SUCCESS;
+- Server and adapter contract tests #1203 — SUCCESS.
+Behavior:
+- CanaryPolicy may carry a versioned minimum_observation_count;
+- ActivationEvidence records observation_count;
+- below-calibrated volume yields HOLD with reason insufficient_observation_volume;
+- no hard-coded observation threshold exists in runtime code.
+
+Ruling: Task 31 extends CanaryPolicyV1 and ActivationEvidenceV1 schemas although the plan listed only evaluator/test files — observation volume cannot be an auditable release gate if its threshold/evidence exist only as unvalidated runtime fields — cost if wrong: schema version 1 gains optional fields, but existing artifacts remain valid because both are optional.
+
+Task 31: complete.
+Next exact task: Task 32 — Family/item quarantine helpers.
