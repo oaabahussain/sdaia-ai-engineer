@@ -125,7 +125,7 @@ export async function evaluateProviderV2(provider, goldSet, policy = {}) {
     Object.entries(counts).map(([key, value]) => [key, value / n])
   );
   metrics.latency_ms = totalLatency / n;
-  metrics.cost = 0;
+  metrics.cost = Number.isFinite(policy.cost) ? policy.cost : null;
 
   const thresholds = policy.thresholds || {};
   const failed = Object.entries(thresholds)
