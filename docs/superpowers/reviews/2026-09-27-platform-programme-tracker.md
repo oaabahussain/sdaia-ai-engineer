@@ -89,7 +89,7 @@ Status:
 - K2 written spec: APPROVED — `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`
 - K2 implementation plan: APPROVED — `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md`
 - K2 implementation branch: `impl/k2-coverage-expansion-controlled-release`
-- K2 execution checkpoint: B — core contracts
+- K2 execution checkpoint: C — coverage prioritization and adaptive tranche planning
 
 Purpose:
 
