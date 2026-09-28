@@ -44,7 +44,7 @@ Pre-flight result: no interface naming conflict found against the approved spec.
 
 ### Task 1 — Create K2 execution baseline
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 Evidence gathered:
 - execution branch and main refs resolved;
@@ -53,4 +53,13 @@ Evidence gathered:
 - exact approved-plan head CI #358 and #979 are SUCCESS;
 - current-main push CI #958 and Pages #26 are SUCCESS.
 
-Next: persist baseline/ledger/checkpoint commit, then record its exact SHA.
+Commit: `fbc683be875d6c718ff22a143055af75b74323ec`
+Verification: Server and adapter contract tests #981 (`36390379205`) — SUCCESS on exact head `fbc683be875d6c718ff22a143055af75b74323ec`.
+
+Task 1: complete (baseline/ledger/checkpoint persisted; exact-head CI green).
+
+### Task 2 — Add K2 acceptance test shell
+
+Status: RED_PENDING
+
+Next: commit an assertion-based acceptance shell that fails only because the approved K2 contracts/modules do not yet exist.
