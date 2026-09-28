@@ -329,3 +329,23 @@ Completed Tasks 10–13:
 - governed TranchePlan builder with lineage-preserving bounded allocation.
 
 Next exact task: Task 14 — Provider routing policy runtime.
+
+
+### Task 14 — Provider routing policy runtime
+
+Status: COMPLETE
+RED commit: `758055fd1324c2a1f6e24374cf971f123c230763`
+RED evidence: Pull request quality gate #401 — Node tests FAILED after setup/validation passed.
+GREEN commit: `af0c2f1c1b3fb4de90512bc4789dd75701c26321`
+GREEN evidence:
+- Pull request quality gate #402 — SUCCESS;
+- Server and adapter contract tests #1076 — SUCCESS.
+Behavior:
+- FAILED/unapproved candidates are never selected;
+- policy provider order is deterministic;
+- APPROVED/RESTRICTED semantics are explicit;
+- no eligible provider uses only the configured DETERMINISTIC/MANUAL/ABSTAIN fallback;
+- no vendor-specific dependency introduced.
+
+Task 14: complete.
+Next exact task: Task 15 — Provider evaluation v2 metrics.
