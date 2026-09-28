@@ -8,6 +8,16 @@ const REQUIRED_POLICY_KEYS = Object.freeze([
   'tranche_calibration_policy_version'
 ]);
 
+function canonical(value) {
+  if (Array.isArray(value)) return '[' + value.map(canonical).join(',') + ']';
+  if (value && typeof value === 'object') {
+    return '{' + Object.keys(value).sort()
+      .map(key => JSON.stringify(key) + ':' + canonical(value[key]))
+      .join(',') + '}';
+  }
+  return JSON.stringify(value);
+}
+
 function validatePolicyVersions(policyVersions) {
   for (const key of REQUIRED_POLICY_KEYS) {
     if (typeof policyVersions?.[key] !== 'string' || !policyVersions[key]) {
@@ -45,19 +55,24 @@ export function buildExpansionPlan({
 
   const prioritized = prioritizeCoverageGaps(gaps, context);
   const coverageGapIds = prioritized.map(item => item.gap_id);
+  const priorities = prioritized.map((item, index) => ({
+    gap_id: item.gap_id,
+    rank: index + 1,
+    reason: item.priority_reasons.join(','),
+    requested_count: item.requested_count,
+    blocked: item.priority.blocked
+  }));
   const identityPayload = {
     track_id: trackId,
-    gaps: prioritized.map(item => ({
-      gap_id: item.gap_id,
-      requested_count: item.requested_count,
-      blocked: item.priority.blocked
-    })),
+    coverage_gap_ids: coverageGapIds,
+    priorities,
     policy_versions: policyVersions,
+    status: 'PLANNED',
     created_at: context.createdAt
   };
   const identityHash = crypto
     .createHash('sha256')
-    .update(JSON.stringify(identityPayload))
+    .update(canonical(identityPayload))
     .digest('hex')
     .slice(0, 16);
 
@@ -66,13 +81,7 @@ export function buildExpansionPlan({
     plan_id: `expansion:${trackId}:${identityHash}`,
     track_id: trackId,
     coverage_gap_ids: coverageGapIds,
-    priorities: prioritized.map((item, index) => ({
-      gap_id: item.gap_id,
-      rank: index + 1,
-      reason: item.priority_reasons.join(','),
-      requested_count: item.requested_count,
-      blocked: item.priority.blocked
-    })),
+    priorities,
     tranche_refs: [],
     policy_versions: { ...policyVersions },
     status: 'PLANNED',
