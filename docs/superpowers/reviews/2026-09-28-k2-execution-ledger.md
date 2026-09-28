@@ -970,3 +970,24 @@ Behavior:
 
 Task 41: complete.
 Next exact task: Task 42 — SQLite reference support.
+
+
+### Task 42 — SQLite reference support
+
+Status: COMPLETE
+RED commit: `5ca855f07e16b1f4101acfe7c52db56b16379166`
+RED evidence: Server and adapter contract tests #1262 — server tests FAILED.
+GREEN head: `86ac6729767b2d62769be8b73f18ffa67c2ed915`
+GREEN evidence:
+- Pull request quality gate #488 — SUCCESS;
+- Server and adapter contract tests #1266 — SUCCESS.
+Behavior:
+- generic SQLite K2 governance table supports expansion/tranche/activation/improvement;
+- immutable (kind,id) identity with idempotent identical-body writes;
+- changed body under same identity rejected;
+- K1 factory/learner APIs unchanged.
+
+Ruling: Task 42 also updates `db/schema.sql` although the plan named only factory_store.py/tests — init_db is the repository's authoritative table-creation path, so the adapter cannot truthfully support persistence without declaring the table there — cost if wrong: schema grows by one additive table/index only.
+
+Task 42: complete.
+Next exact task: Task 43 — File/SQLite parity fixture.
