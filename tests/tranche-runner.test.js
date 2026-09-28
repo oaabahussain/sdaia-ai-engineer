@@ -212,3 +212,34 @@ test('retryFailedTrancheItems retries only failed items and preserves durable su
   );
   assert.deepEqual(result.failed, []);
 });
+
+
+test('partial tranche failure records the exact failed stage while preserving successful siblings', async () => {
+  if (!moduleExists()) return;
+  const { runTranche } = await import(moduleUrl);
+
+  const runner = {
+    async runCandidate(request) {
+      if (request.run_id === 'run:gap:a:1') {
+        const error = new Error('evidence mismatch');
+        error.factory_stage = 'evidence';
+        throw error;
+      }
+      return { run_id: request.run_id, status: 'completed' };
+    }
+  };
+
+  const result = await runTranche(tranchePlan, runner, {
+    approved: true,
+    buildRequest
+  });
+
+  assert.equal(result.status, 'PARTIAL');
+  assert.deepEqual(
+    result.completed.map(x => x.run_id),
+    ['run:gap:a:0', 'run:gap:b:0']
+  );
+  assert.equal(result.failed[0].run_id, 'run:gap:a:1');
+  assert.equal(result.failed[0].stage, 'evidence');
+  assert.match(result.failed[0].error, /evidence mismatch/);
+});
