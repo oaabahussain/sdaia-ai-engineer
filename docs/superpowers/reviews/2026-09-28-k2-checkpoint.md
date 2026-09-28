@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** E — Deduplication v2 and bilingual equivalence
-**Status:** EXECUTING — Checkpoints A–D complete
+**Checkpoint:** F — Risk-based review calibration
+**Status:** EXECUTING — Checkpoints A–E complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 17 — Structural duplicate evidence.
+Task 21 — Review calibration runtime.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 17: write structural-dedup RED tests, prove current stage lacks the behavior, implement minimal structural evidence, then verify exact-head gates.
+Task 21: write RED review-calibration runtime tests, prove missing behavior, implement deterministic risk/escalation/sampling decisions, then verify exact-head gates.
 
 ## Checkpoint A completion evidence
 
@@ -108,3 +108,20 @@ Fresh CI:
 - Server and adapter contract tests #1089 SUCCESS.
 
 Next: Checkpoint E / Task 17.
+
+
+## Checkpoint E completion evidence
+
+Exact verified head: `76a02f22e1450cf816116f0e677b5fa50dd64fb4`.
+
+Completed:
+- Task 17 structural duplicate evidence;
+- Task 18 calibrated cross-lingual dedup;
+- Task 19 BilingualEquivalenceReportV1;
+- Task 20 bilingual stage v2.
+
+Fresh CI:
+- Pull request quality gate #420 SUCCESS;
+- Server and adapter contract tests #1114 SUCCESS.
+
+Next: Checkpoint F / Task 21.
