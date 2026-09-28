@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** F — Risk-based review calibration
-**Status:** EXECUTING — Checkpoints A–E complete
+**Checkpoint:** G — Tranche execution and durable partial results
+**Status:** EXECUTING — Checkpoints A–F complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 21 — Review calibration runtime.
+Task 25 — Tranche metrics summarizer.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 21: write RED review-calibration runtime tests, prove missing behavior, implement deterministic risk/escalation/sampling decisions, then verify exact-head gates.
+Task 25: write RED tranche-metrics tests first, preserve unknowns for empty evidence, implement deterministic summaries, then verify exact-head gates.
 
 ## Checkpoint A completion evidence
 
@@ -125,3 +125,29 @@ Fresh CI:
 - Server and adapter contract tests #1114 SUCCESS.
 
 Next: Checkpoint F / Task 21.
+
+
+## Checkpoint F completion evidence
+
+Automation-first review governance is approved and implemented.
+
+Completed:
+- Task 21 review calibration runtime;
+- Task 22 review-stage integration.
+
+Task 22 exact implementation evidence:
+- RED quality gate #427;
+- GREEN quality gate #428 SUCCESS;
+- Server and adapter contract tests #1133 SUCCESS.
+
+Automation behavior:
+- mature low/medium-risk AUTO_ELIGIBLE content avoids routine human review after governed gates pass;
+- humans remain escalation-only for configured critical/high-risk, ambiguity, drift, uncalibrated, exception-sample, or quarantine cases.
+
+## Checkpoint G progress
+
+Completed:
+- Task 23 governed tranche run envelope — GREEN #432 / server #1141;
+- Task 24 durable resume/retry — GREEN #435 / server #1146.
+
+Next: Task 25.
