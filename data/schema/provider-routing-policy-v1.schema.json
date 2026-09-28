@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "version",
+    "routes",
+    "fallback",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capability",
+          "language",
+          "risk_classes",
+          "required_evaluation_status",
+          "provider_refs"
+        ],
+        "properties": {
+          "capability": {
+            "type": "string",
+            "enum": [
+              "generate",
+              "critique",
+              "evidence",
+              "embedding",
+              "translation"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "ar",
+              "en",
+              "any"
+            ]
+          },
+          "risk_classes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            }
+          },
+          "required_evaluation_status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "RESTRICTED"
+            ]
+          },
+          "provider_refs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "DETERMINISTIC",
+            "MANUAL",
+            "ABSTAIN"
+          ]
+        },
+        "provider_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "DETERMINISTIC"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "provider_ref"
+            ]
+          }
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
