@@ -84,6 +84,10 @@
     "created_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "minimum_observation_count": {
+      "type": "integer",
+      "minimum": 1
     }
   }
 }
