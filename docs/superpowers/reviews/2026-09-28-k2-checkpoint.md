@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** L — final review, exact-head CI, merge and post-merge verification
-**Status:** EXECUTING — Tasks 1–50 complete; Task 51 exact-head CI active
+**Checkpoint:** L — COMPLETE
+**Status:** K2 MERGED + POST-MERGE VERIFIED — Tasks 1–53 complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 51 — Exact-head CI gate.
+None. K2 is complete. Current programme gate is K3 DESIGN.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 51: verify both required workflows are SUCCESS on the exact final documentation/review branch HEAD. If green, proceed to Task 52 merge; otherwise debug and repeat.
+Begin K3 — Learner Evidence Engine architectural design. Do not implement K3 until its design/spec/plan/execution gates are approved.
 
 ## Checkpoint A completion evidence
 
@@ -247,3 +247,19 @@ Final review product head `80431fae4f846a6aea53040b22aad86dea5d4c00`:
 - no open Critical/Important findings.
 
 Task 51 exact-head final documentation CI: ACTIVE.
+
+
+## Checkpoint L completion evidence
+
+- Task 50 whole-plan final review completed; 1 Critical + 7 Important findings/refinements fixed; no open Critical/Important findings.
+- Final reviewed branch head `919ed987c9d78d61fc1811d70fd00566735b0354`.
+- Task 51 exact-head quality #536 SUCCESS.
+- Task 51 exact-head server/adapter #1374 SUCCESS.
+- Task 52 PR #20 merged exact expected head.
+- K2 merge/product baseline `dced183980199ca8b7e359b48ddc7fd61f29488f`.
+- Task 53 post-merge server/adapter #1375 SUCCESS.
+- Task 53 post-merge Pages #27 SUCCESS including deploy + live-release verification.
+- Node 351/351; Python 22; SQLite/browser/API/browser-smoke/live release all PASS.
+- Tracker/HANDOFF advance to K3 DESIGN only.
+
+K2 is complete. This checkpoint is historical execution evidence from this point forward.
