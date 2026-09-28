@@ -48,6 +48,16 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     return result('HOLD', 'insufficient_evidence', [], []);
   }
 
+  if (Number.isFinite(canaryPolicy.minimum_observation_count)) {
+    const observedCount = evidence.canary_observation?.observation_count;
+    if (
+      !Number.isFinite(observedCount) ||
+      observedCount < canaryPolicy.minimum_observation_count
+    ) {
+      return result('HOLD', 'insufficient_observation_volume', [], []);
+    }
+  }
+
   if (
     evidence.runtime_verification?.status === 'FAIL' ||
     evidence.correctness_summary?.status === 'FAIL' ||
