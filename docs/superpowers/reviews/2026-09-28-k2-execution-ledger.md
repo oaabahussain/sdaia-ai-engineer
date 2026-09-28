@@ -300,20 +300,32 @@ Ruling: Task 13 treats `trancheDecision` as a planning decision envelope: the Ta
 Next exact task: Task 13 — Tranche plan builder.
 
 
-### Task 7 — ReviewCalibrationPolicyV1 schema
+### Task 13 — Tranche plan builder
 
 Status: COMPLETE
-RED commit: `2a6ab0af8403b89eea5d04615c7cef460068b306`
-RED evidence: Pull request quality gate #374 — Node tests FAILED after setup/validation passed.
-GREEN commit: `8409e03768c2753d6320de4c7145ddff1314ddb2`
+RED head: `3de4b8328176267d0020ae94f23105cf24945f9b`
+RED evidence: Pull request quality gate #398 — Node tests FAILED after setup/validation passed; Server and adapter #1067 remained SUCCESS.
+GREEN commit: `dabce5ce14c55403adb39e520cd922bcba2c690c`
 GREEN evidence:
-- Pull request quality gate #375 — SUCCESS;
-- Server and adapter contract tests #1020 — SUCCESS.
-Contract outcome:
-- review policy requires scope and evidence basis;
-- sampled review requires explicit sampling rate;
-- escalation triggers are mandatory;
-- bare sampling percentages are invalid.
+- Pull request quality gate #399 — SUCCESS;
+- Server and adapter contract tests #1069 — SUCCESS.
+Behavior:
+- only gaps present in ExpansionPlan lineage are allocatable;
+- allocation follows stable priority order;
+- per-gap allocation never exceeds preserved requested_count;
+- HOLD decisions are not runnable;
+- risk/capacity/timestamp evidence comes from the explicit tranche-decision envelope;
+- no hidden operational evidence is fabricated.
 
-Task 7: complete.
-Next exact task: Task 8 — DedupCalibrationPolicyV1 schema.
+Task 13: complete.
+
+## Checkpoint C result
+
+Status: COMPLETE.
+Completed Tasks 10–13:
+- deterministic explainable coverage prioritization;
+- governed ExpansionPlan builder;
+- adaptive tranche policy;
+- governed TranchePlan builder with lineage-preserving bounded allocation.
+
+Next exact task: Task 14 — Provider routing policy runtime.
