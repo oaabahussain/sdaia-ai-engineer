@@ -95,3 +95,20 @@ test('routeProvider returns ABSTAIN fallback without inventing a provider', asyn
     reason: 'no_eligible_provider'
   });
 });
+
+
+test('routeProvider skips approved providers outside configured cost or latency bounds', async () => {
+  const { routeProvider } = await import(moduleUrl);
+  const boundedPolicy = structuredClone(policy);
+  boundedPolicy.routes[0].max_latency_ms = 500;
+  boundedPolicy.routes[0].max_cost = 0.10;
+  const decision = routeProvider({
+    capability:'generate',language:'ar',riskClass:'low',
+    candidates:[
+      {provider_ref:'ai-primary',evaluation_status:'APPROVED',metrics:{latency_ms:900,cost:0.05}},
+      {provider_ref:'ai-secondary',evaluation_status:'APPROVED',metrics:{latency_ms:400,cost:0.08}}
+    ],
+    policy:boundedPolicy
+  });
+  assert.equal(decision.providerRef,'ai-secondary');
+});
