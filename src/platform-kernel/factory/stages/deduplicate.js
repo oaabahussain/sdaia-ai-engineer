@@ -54,16 +54,63 @@ function cosine(a, b) {
   return aa && bb ? dot / (Math.sqrt(aa) * Math.sqrt(bb)) : null;
 }
 
+function languageOf(item) {
+  if (item?.language === 'ar' || item?.language === 'en') return item.language;
+
+  const hasAr = typeof item?.question_ar === 'string' && item.question_ar.trim();
+  const hasEn = typeof item?.question_en === 'string' && item.question_en.trim();
+
+  if (hasAr && !hasEn) return 'ar';
+  if (hasEn && !hasAr) return 'en';
+  return null;
+}
+
+function semanticScope(candidate, item) {
+  const candidateLanguage = languageOf(candidate);
+  const itemLanguage = languageOf(item);
+
+  if (
+    candidateLanguage &&
+    itemLanguage &&
+    candidateLanguage !== itemLanguage
+  ) {
+    return 'cross_language';
+  }
+
+  return 'same_language';
+}
+
+function validateThresholds(thresholds, label) {
+  if (
+    !thresholds ||
+    !Number.isFinite(thresholds.review_lower_bound) ||
+    !Number.isFinite(thresholds.duplicate_threshold) ||
+    thresholds.review_lower_bound < 0 ||
+    thresholds.duplicate_threshold > 1 ||
+    thresholds.review_lower_bound > thresholds.duplicate_threshold
+  ) {
+    throw new Error(`Invalid ${label} dedup calibration thresholds`);
+  }
+}
+
+function validateCalibrationPolicy(policy) {
+  if (!policy) return;
+  validateThresholds(policy.same_language, 'same-language');
+  validateThresholds(policy.cross_language, 'cross-language');
+}
+
 export function createDeduplicateStage({
   inventory = [],
   embeddingProvider = null,
   threshold = 0.95,
-  structuralPolicy = { on_match: 'DUPLICATE' }
+  structuralPolicy = { on_match: 'DUPLICATE' },
+  calibrationPolicy = null
 } = {}) {
   if (embeddingProvider) assertEmbeddingProvider(embeddingProvider);
   if (!['DUPLICATE', 'REVIEW_REQUIRED'].includes(structuralPolicy?.on_match)) {
     throw new Error('Unsupported structural duplicate policy');
   }
+  validateCalibrationPolicy(calibrationPolicy);
 
   return {
     name: 'deduplicate',
@@ -79,6 +126,7 @@ export function createDeduplicateStage({
 
       let result = 'PASS';
       let structuralMatch = false;
+      let semanticEvidenceScope = null;
       const structural = structuralFingerprint(candidate);
 
       if (
@@ -107,6 +155,21 @@ export function createDeduplicateStage({
               continue;
             }
 
+            if (calibrationPolicy) {
+              const scope = semanticScope(candidate, item);
+              const thresholds = calibrationPolicy[scope];
+
+              if (similarity >= thresholds.duplicate_threshold) {
+                throw new Error('Semantic near-duplicate candidate detected');
+              }
+
+              if (similarity >= thresholds.review_lower_bound) {
+                result = 'REVIEW_REQUIRED';
+                semanticEvidenceScope = scope;
+              }
+              continue;
+            }
+
             if (similarity >= threshold) {
               throw new Error('Near-duplicate candidate detected');
             }
@@ -121,7 +184,8 @@ export function createDeduplicateStage({
           ...(prev.quality || {}),
           duplication: {
             result,
-            structural_match: structuralMatch
+            structural_match: structuralMatch,
+            semantic_scope: semanticEvidenceScope
           }
         }
       };
