@@ -47,7 +47,8 @@ const valid = {
   runtime_verification: { status: 'PASS' },
   canary_observation: {
     evidence_classes: ['runtime_compatibility', 'quality', 'review'],
-    observation_ref: 'canary:obs:1'
+    observation_ref: 'canary:obs:1',
+    observation_count: 100
   },
   blockers: [],
   evidence_sufficiency: 'SUFFICIENT',
@@ -88,4 +89,13 @@ test('ActivationEvidenceV1 constrains lifecycle decisions and content hash', () 
     candidate.decision = decision;
     assert.equal(validate(candidate), true, JSON.stringify(validate.errors));
   }
+});
+
+
+test('ActivationEvidenceV1 requires positive observation_count when provided', () => {
+  const validate = compile('activation-evidence-v1.schema.json');
+  assert.equal(validate(valid), true, JSON.stringify(validate.errors));
+  const invalid = structuredClone(valid);
+  invalid.canary_observation.observation_count = 0;
+  assert.equal(validate(invalid), false);
 });
