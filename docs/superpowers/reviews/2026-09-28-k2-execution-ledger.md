@@ -95,3 +95,21 @@ Contract outcome:
 
 Task 3: complete.
 Next exact task: Task 4 — TranchePlanV1 schema.
+
+
+### Task 4 — TranchePlanV1 schema
+
+Status: COMPLETE
+RED commit: `9114474b718af649971c324cd89a12d5a98352ab`
+RED evidence: Pull request quality gate #365 — Node tests FAILED after setup/validation passed.
+GREEN commit: `796beccadac2fb29c56a282cb6a0c7ef328f6dbc`
+GREEN evidence:
+- Pull request quality gate #366 — SUCCESS;
+- Server and adapter contract tests #1002 — SUCCESS.
+Contract outcome:
+- coverage-derived requests required;
+- tranche calibration policy reference required;
+- lifecycle constrained to PLANNED/RUNNING/PARTIAL/COMPLETED/PAUSED/FAILED.
+
+Task 4: complete.
+Next exact task: Task 5 — shared CalibrationPolicy metadata schema.
