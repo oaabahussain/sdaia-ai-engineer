@@ -148,7 +148,7 @@ There is currently:
 - no K2 implementation plan;
 - no K2 product mutation.
 
-K2 conceptual design, written spec, implementation plan and Native execution method are approved. Execution is active on `impl/k2-coverage-expansion-controlled-release`. Resume from the durable K2 ledger/checkpoint; do not reconstruct from chat.
+K2 conceptual design, written spec, implementation plan and Native execution method are approved. Execution is active on `impl/k2-coverage-expansion-controlled-release`. Checkpoints A–B are complete; current execution checkpoint: C — coverage prioritization and adaptive tranche planning. Resume from the durable K2 ledger/checkpoint; do not reconstruct from chat.
 
 ## Governing authority for K2
 
