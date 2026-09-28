@@ -264,31 +264,33 @@ Missing or contradictory evidence must produce ABSTAIN / REVIEW_REQUIRED where a
 
 The exact approved source classes for SDAIA content are track policy/research data, not generic core code.
 
-## 11. Human review scaling
+## 11. Automation-first review scaling
 
-Human review is risk-based.
+K2 minimizes routine human review. The default quality path is automated and must combine independent evidence channels rather than a single model judgment.
 
-Mandatory human review applies to at least:
-- new provider/model classes;
-- new or poorly calibrated domains;
-- high-risk content;
-- ambiguous correctness/evidence;
-- quarantine recovery;
-- bilingual disagreement beyond calibrated confidence;
-- critical source conflicts.
+AUTO_ELIGIBLE content may proceed without human review when:
+- deterministic validation passes;
+- correctness/evidence checks pass;
+- deduplication is outside the review gray zone;
+- bilingual critical dimensions pass where applicable;
+- provider/model evaluation is approved for the applicable capability;
+- risk is low or medium under the active ReviewCalibrationPolicy;
+- no drift/escalation trigger is active.
 
-Mature low-risk classes may move to sampled human review only after observed error/yield evidence supports it.
+Human review is an escalation path, not the default. Mandatory human review applies to at least:
+- high/critical-risk content;
+- ambiguous or conflicting correctness/evidence;
+- unresolved bilingual disagreement;
+- quarantine/recovery cases;
+- new or poorly calibrated provider/model/domain combinations until evidence supports automation;
+- critical source conflicts;
+- explicit drift/anomaly escalation.
 
-Sampling must automatically become stricter when:
-- rejection increases;
-- drift/anomalies appear;
-- source quality worsens;
-- provider changes;
-- production complaints/failures increase.
+Routine quality assurance uses exception sampling rather than broad fixed review. Sampling remains small for mature low-risk classes and increases automatically only when observed failure, drift, complaints, source-quality degradation, or provider changes justify it.
 
-Automated review may assist but may not impersonate a human approval.
+No single AI evaluator may self-authorize production. Automated approval requires the configured independent deterministic/evidence/quality gates to agree.
 
-Exact sampling percentages are versioned ReviewCalibrationPolicy data.
+Exact sampling percentages and escalation thresholds are versioned ReviewCalibrationPolicy data.
 
 ## 12. Deduplication v2
 
