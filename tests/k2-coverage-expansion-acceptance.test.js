@@ -39,6 +39,40 @@ const requiredContractsAndModules = [
   'scripts/platform-kernel/adapters/k2GovernanceFileStore.js'
 ];
 
+function activationEvidenceFixture(overrides = {}) {
+  return {
+    schema_version: 1,
+    activation_evidence_id: 'activation:release:acceptance:1',
+    release_id: 'release:acceptance',
+    tranche_id: 'tranche:acceptance',
+    content_hash: 'a'.repeat(64),
+    policy_versions: {
+      quality_policy_version: 'quality:v1',
+      review_policy_version: 'review:v1',
+      calibration_policy_versions: ['canary:v1']
+    },
+    provider_evaluation_refs: ['provider-eval:1'],
+    coverage_delta: { closed_gap_ids: ['gap:1'], added_family_count: 1 },
+    duplicate_findings: { status: 'PASS', finding_count: 0 },
+    correctness_summary: { status: 'PASS' },
+    bilingual_summary: { status: 'PASS' },
+    accessibility_summary: { status: 'PASS' },
+    review_summary: { status: 'PASS', unresolved_count: 0 },
+    runtime_verification: { status: 'PASS' },
+    canary_observation: {
+      evidence_classes: ['runtime_compatibility','quality','review'],
+      observation_ref: 'canary:obs:acceptance'
+    },
+    blockers: [],
+    evidence_sufficiency: 'SUFFICIENT',
+    decision: 'PROMOTE',
+    actor: 'release-controller',
+    approver: 'release-policy',
+    created_at: '2026-09-28T00:00:00Z',
+    ...overrides
+  };
+}
+
 test('K2 required contracts and modules exist', () => {
   assert.deepEqual(requiredContractsAndModules.filter(path => !exists(path)), []);
   assert.equal(new Set(requiredContractsAndModules).size, requiredContractsAndModules.length);
@@ -154,12 +188,23 @@ test('K2 risk based review escalates on high risk or observed drift', async () =
 
 test('K2 activation evidence is required before CANARY promotion to ACTIVE', async () => {
   const { transitionContentRelease } = await import('../src/platform-kernel/release/releases.js');
+  const { evaluateActivationEvidence } = await import('../src/platform-kernel/release/activationEvidence.js');
   const canary = { release_id: 'release:acceptance', status: 'CANARY' };
-  assert.throws(() => transitionContentRelease(canary, 'activate', {
-    activation_evidence: { schema_version: 1, activation_evidence_id: 'a1', release_id: canary.release_id, decision: 'HOLD' }
-  }), /PROMOTE/i);
+  const policy = {
+    required_evidence_classes: ['runtime_compatibility','quality','review'],
+    blocker_policy: { critical_alert: 'QUARANTINE', missing_required_metric: 'HOLD' }
+  };
+  const evidence = activationEvidenceFixture();
+
+  assert.throws(
+    () => transitionContentRelease(canary, 'activate', { activation_evidence: evidence }),
+    /evaluat|trusted/i
+  );
+
+  const evaluation = evaluateActivationEvidence(evidence, policy);
   const active = transitionContentRelease(canary, 'activate', {
-    activation_evidence: { schema_version: 1, activation_evidence_id: 'a2', release_id: canary.release_id, decision: 'PROMOTE' }
+    activation_evidence: evidence,
+    activation_evaluation: evaluation
   });
   assert.equal(active.status, 'ACTIVE');
 });
@@ -170,16 +215,14 @@ test('K2 insufficient CANARY evidence yields HOLD', async () => {
     required_evidence_classes: ['runtime_compatibility','quality','review'],
     blocker_policy: { critical_alert: 'QUARANTINE', missing_required_metric: 'HOLD' }
   };
-  const out = evaluateActivationEvidence({
-    blockers: [], evidence_sufficiency: 'SUFFICIENT',
-    canary_observation: { evidence_classes: ['runtime_compatibility','quality'] },
-    runtime_verification: { status: 'PASS' },
-    correctness_summary: { status: 'PASS' },
-    duplicate_findings: { status: 'PASS' },
-    review_summary: { status: 'PASS', unresolved_count: 0 },
-    bilingual_summary: { status: 'PASS' },
-    accessibility_summary: { status: 'PASS' }
-  }, policy);
+  const evidence = activationEvidenceFixture({
+    canary_observation: {
+      evidence_classes: ['runtime_compatibility','quality'],
+      observation_ref: 'canary:obs:missing-review'
+    },
+    decision: 'HOLD'
+  });
+  const out = evaluateActivationEvidence(evidence, policy);
   assert.equal(out.decision, 'HOLD');
   assert.deepEqual(out.missingEvidenceClasses, ['review']);
 });
