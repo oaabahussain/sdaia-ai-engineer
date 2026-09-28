@@ -1202,3 +1202,73 @@ GREEN product-head evidence:
 
 Task 50: complete.
 Next exact task: Task 51 — Exact-head CI gate on final review/checkpoint documentation head.
+
+
+### Task 51 — Exact-head CI gate
+
+Status: COMPLETE
+
+Final reviewed branch head:
+`919ed987c9d78d61fc1811d70fd00566735b0354`
+
+Exact-head evidence:
+- Pull request quality gate #536 — SUCCESS;
+- Server and adapter contract tests #1374 — SUCCESS.
+
+Both workflow runs reported the exact expected branch HEAD before integration.
+
+Task 51: complete.
+
+### Task 52 — Finish branch and merge
+
+Status: COMPLETE
+
+Integration:
+- PR: #20 — K2: Coverage Expansion & Controlled Release;
+- base: `main@6eb108338857dec9471f441a37d1819b98045cbb`;
+- exact reviewed head: `919ed987c9d78d61fc1811d70fd00566735b0354`;
+- branch was 228 commits ahead / 0 behind immediately before merge;
+- PR was mergeable and had no discussion comments;
+- merge used `expected_head_sha=919ed987c9d78d61fc1811d70fd00566735b0354`;
+- merge result: SUCCESS;
+- merge SHA: `dced183980199ca8b7e359b48ddc7fd61f29488f`.
+
+Task 52: complete.
+
+### Task 53 — Post-merge verification
+
+Status: COMPLETE
+
+Product merge baseline:
+`main@dced183980199ca8b7e359b48ddc7fd61f29488f`
+
+Post-merge product evidence:
+- Server and adapter contract tests #1375 — SUCCESS;
+- Validate and deploy GitHub Pages #27 — SUCCESS;
+- Pages deploy — SUCCESS;
+- live-release verifier — SUCCESS;
+- Node 351/351 PASS;
+- Python 22 PASS;
+- SQLite/browser/API contracts PASS;
+- browser smoke PASS;
+- learner-visible questions 1,120;
+- full exam 200;
+- preserved payload digest `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`.
+
+Durable post-merge record:
+`docs/superpowers/reviews/2026-09-28-k2-post-merge-verification.md`
+
+Tracker and HANDOFF now advance to **K3 DESIGN only**.
+K3 implementation remains NOT STARTED and gated by its own design/spec/plan/execution approvals.
+
+Ruling: the immutable K2 product baseline remains the merge SHA even if post-merge documentation commits advance `main`; future recovery must resolve live main and distinguish documentation-only advancement from product-code changes — cost if wrong: a future session could confuse a later documentation SHA with the product merge, mitigated by recording both the product baseline and live-main resolution rule.
+
+Task 53: complete.
+
+## K2 programme result
+
+Status: **MERGED + POST-MERGE VERIFIED**.
+
+Tasks 1–53 are complete.
+Next programme gate: **K3 — Learner Evidence Engine DESIGN**.
+Do not begin K3 implementation until its design/spec/plan/execution approvals are complete.
