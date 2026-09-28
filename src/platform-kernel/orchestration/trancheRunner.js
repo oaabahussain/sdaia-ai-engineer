@@ -98,7 +98,8 @@ function failureRecord(entry, error, prior = null) {
     error: error instanceof Error ? error.message : String(error),
     retryable: true
   };
-  if (prior?.stage) record.stage = prior.stage;
+  const stage = prior?.stage ?? error?.factory_stage ?? error?.stage ?? null;
+  if (stage) record.stage = stage;
   return record;
 }
 
