@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** B — Core K2 schemas and calibration metadata
-**Status:** EXECUTING — Checkpoint A complete
+**Checkpoint:** C — Coverage prioritization and adaptive tranche planning
+**Status:** EXECUTING — Checkpoints A–B complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 3 — ExpansionPlanV1 schema.
+Task 10 — Coverage priority model.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 3: write ExpansionPlanV1 RED test first, prove missing-schema RED, implement minimal schema, then verify targeted/full quality gates.
+Task 10: write coverage-priority RED tests first, prove missing module behavior, implement deterministic prioritization, then verify full quality gates.
 
 
 ## Checkpoint A completion evidence
@@ -56,3 +56,23 @@ Task 3: write ExpansionPlanV1 RED test first, prove missing-schema RED, implemen
 - Task 1 baseline commit `fbc683be875d6c718ff22a143055af75b74323ec` — Server/adapter #981 SUCCESS.
 - Task 2 RED `a58acf8811086fc61943ad40b784685e46ea00e0` — quality gate #359 failed at Node tests as intended.
 - Task 2 GREEN `f440a4d3d165be8e793b1cce3183eb40d47596dd` — quality gate #360 SUCCESS; server/adapter #987 SUCCESS.
+
+
+## Checkpoint B completion evidence
+
+Exact verified head: `05bce1aa3e1d0c22346292247277666b7894e539`.
+
+Completed contracts:
+- ExpansionPlanV1;
+- TranchePlanV1;
+- CalibrationPolicy metadata;
+- ProviderRoutingPolicyV1;
+- ReviewCalibrationPolicyV1;
+- DedupCalibrationPolicyV1;
+- CanaryPolicyV1.
+
+Fresh CI:
+- Pull request quality gate #381 SUCCESS;
+- Server and adapter contract tests #1032 SUCCESS.
+
+Next: Checkpoint C / Task 10.
