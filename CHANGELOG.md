@@ -4,7 +4,7 @@
 
 ### Programme A — repository and runtime contract stabilisation
 
-Implemented on the Programme A branch; this entry does **not** claim that the work has been merged to `main` or deployed.
+Programme A was merged to `main` and post-merge verified. The bullets below remain the historical implementation record for that programme.
 
 - Frozen the pre-Programme-A learner-visible compatibility baseline.
 - Added canonical TrackManifestV1 and ExamProfileV1.
@@ -18,9 +18,13 @@ Implemented on the Programme A branch; this entry does **not** claim that the wo
 - Made CI/Pages validation manifest-driven and excluded `data/legacy/` from the public artifact.
 - Added architecture, migration, testing, deployment, data-model, security, handoff and ADR documentation.
 
+### K2 — Coverage Expansion & Controlled Release implementation
+
+K2 implementation is in progress on the isolated implementation branch. Its governed expansion, release, observability, persistence, CLI, validation, and privacy infrastructure is being added without changing the current learner-visible 1,120-question runtime. No K2-generated expansion content is claimed as promoted or live until CANARY/activation evidence and post-merge verification complete.
+
 ### Known gaps
 
-- 14,000+ content expansion has not started.
+- 14,000+ remains a capacity milestone, not a released-content claim; new learner-visible expansion content has not yet been promoted.
 - Current SDAIA weights/exam rules remain `project-reference-unverified`.
 - Protected content delivery and production authentication are not implemented.
 - The planned rollback tag `pre-programme-a-2026-09-23` has not been verified on the GitHub remote; the baseline SHA remains authoritative.
