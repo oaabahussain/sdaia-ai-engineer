@@ -95,3 +95,11 @@ test('coverage priority sends source-unready gaps behind ready gaps', async () =
   assert.equal(ranked[1].priority.blocked, true);
   assert.ok(ranked[1].priority_reasons.includes('source_not_ready'));
 });
+
+
+test('coverage priority treats missing source readiness as blocked rather than approved', async () => {
+  const { prioritizeCoverageGaps } = await import(moduleUrl);
+  const ranked = prioritizeCoverageGaps([gap('gap:unknown-source', 3)], {});
+  assert.equal(ranked[0].priority.blocked, true);
+  assert.ok(ranked[0].priority_reasons.includes('source_not_ready'));
+});
