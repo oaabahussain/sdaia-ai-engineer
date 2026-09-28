@@ -22,7 +22,8 @@ const valid = {
     {
       gap_id: 'gap:mlops:1',
       rank: 1,
-      reason: 'coverage deficit'
+      reason: 'coverage deficit',
+      requested_count: 4
     }
   ],
   tranche_refs: [],
@@ -36,13 +37,17 @@ const valid = {
   created_at: '2026-09-28T00:00:00Z'
 };
 
-test('ExpansionPlanV1 requires coverage gaps and versioned policies', () => {
+test('ExpansionPlanV1 requires coverage gaps, deficits and versioned policies', () => {
   const validate = compile('expansion-plan-v1.schema.json');
   assert.equal(validate(valid), true, JSON.stringify(validate.errors));
 
   const noGaps = structuredClone(valid);
   noGaps.coverage_gap_ids = [];
   assert.equal(validate(noGaps), false);
+
+  const noDeficit = structuredClone(valid);
+  delete noDeficit.priorities[0].requested_count;
+  assert.equal(validate(noDeficit), false);
 
   const noPolicies = structuredClone(valid);
   delete noPolicies.policy_versions;

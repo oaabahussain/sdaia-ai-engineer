@@ -52,6 +52,7 @@ test('buildExpansionPlan creates stable coverage-derived plans', async () => {
   assert.equal(first.track_id, 'sdaia-ai-engineer');
   assert.deepEqual(first.coverage_gap_ids, ['gap:a', 'gap:b']);
   assert.deepEqual(first.priorities.map(x => x.rank), [1, 2]);
+  assert.deepEqual(first.priorities.map(x => x.requested_count), [5, 2]);
   assert.deepEqual(first.tranche_refs, []);
   assert.deepEqual(first.policy_versions, policyVersions);
   assert.equal(first.status, 'PLANNED');
