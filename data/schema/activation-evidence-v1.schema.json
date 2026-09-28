@@ -245,6 +245,10 @@
         "observation_ref": {
           "type": "string",
           "minLength": 1
+        },
+        "observation_count": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },
