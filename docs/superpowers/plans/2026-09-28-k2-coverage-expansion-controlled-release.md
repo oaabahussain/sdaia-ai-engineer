@@ -376,7 +376,7 @@
 - [ ] Run review suite.
 - [ ] Commit: `feat: calibrate review requirements by risk and evidence`.
 
-### Task 22: Review stage integration
+### Task 22: Review stage integration — automation-first
 
 **Files:**
 - Modify: `src/platform-kernel/factory/stages/review.js`
@@ -384,10 +384,12 @@
 
 **Interfaces:**
 - Consumes existing ReviewPolicy + ReviewCalibrationPolicy.
-- Produces explicit review requirement/evidence.
+- Produces explicit review requirement/evidence with AUTO_ELIGIBLE as the normal mature low/medium-risk path.
 
 - [ ] RED calibrated HUMAN_REQUIRED cannot be bypassed by automated approval.
-- [ ] Implement calibration decision before activation eligibility.
+- [ ] RED AUTO_ELIGIBLE content can pass without a human decision when upstream governed gates have passed.
+- [ ] RED unresolved HOLD/SAMPLED states cannot silently become AUTO approval.
+- [ ] Implement calibration decision before activation eligibility; require humans only for configured escalation conditions.
 - [ ] Run review + activation + pipeline tests.
 - [ ] Verify K1 default behavior unchanged when no K2 calibration policy supplied.
 - [ ] Commit: `feat: integrate calibrated review policy`.
