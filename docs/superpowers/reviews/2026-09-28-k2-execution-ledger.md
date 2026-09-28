@@ -169,3 +169,22 @@ Contract outcome:
 
 Task 7: complete.
 Next exact task: Task 8 — DedupCalibrationPolicyV1 schema.
+
+
+### Task 8 — DedupCalibrationPolicyV1 schema
+
+Status: COMPLETE
+RED commit: `e9088faf959b63f1c7978dcf8b2f809d4b720b7f`
+RED evidence: Pull request quality gate #377 — Node tests FAILED after setup/validation passed.
+GREEN commit: `b15c152395a1064235fc2e75cfde239d326d6a36`
+GREEN evidence:
+- Pull request quality gate #378 — SUCCESS;
+- Server and adapter contract tests #1026 — SUCCESS.
+Contract outcome:
+- labeled duplicate/non-duplicate calibration set required;
+- embedding profile versioned;
+- same-language and cross-language thresholds separated;
+- threshold values constrained to [0,1].
+
+Task 8: complete.
+Next exact task: Task 9 — CanaryPolicyV1 schema.
