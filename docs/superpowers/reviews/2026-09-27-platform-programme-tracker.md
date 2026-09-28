@@ -1,8 +1,8 @@
 # Learning Platform — Authoritative Programme Tracker
 
-**Date:** 2026-09-27  
+**Date:** 2026-09-28  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Current verified product baseline:** `main@d6576a8d2f4f98d2310174f633622c0b96017eb3`  
+**Current verified product baseline:** `main@dced183980199ca8b7e359b48ddc7fd61f29488f`  
 **Tracker status:** authoritative current programme index
 
 ## Completed programmes
@@ -14,33 +14,53 @@
 | B1 | MERGED + VERIFIED | `docs/superpowers/reviews/2026-09-27-b1-post-merge-verification.md` |
 | B2 | MERGED + VERIFIED | B2 final review/checkpoint + verified later main |
 | B3 | MERGED + VERIFIED | `docs/superpowers/reviews/2026-09-27-b3-post-merge-verification.md` |
-| **K1 — Content Factory & Governance Core** | **MERGED + VERIFIED** | `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md` |
+| K1 — Content Factory & Governance Core | MERGED + VERIFIED | `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md` |
+| **K2 — Coverage Expansion & Controlled Release** | **MERGED + POST-MERGE VERIFIED** | `docs/superpowers/reviews/2026-09-28-k2-post-merge-verification.md` |
 
-## K1 completion facts
+## Current learner-visible baseline
 
-K1 PR #15 merged at:
+K2 deliberately preserved the existing runtime until a future governed content release is intentionally promoted:
 
-`d6576a8d2f4f98d2310174f633622c0b96017eb3`
+- learner-visible questions: **1,120**;
+- domains: **7 × 160**;
+- full exam: **200**;
+- weighted allocation: **36 / 35 / 33 / 29 / 28 / 25 / 14**;
+- Arabic/English + RTL/LTR: verified;
+- browser/API parity: verified;
+- offline/service worker: verified;
+- payload digest:
+  `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`;
+- bootstrap release: `sdaia-ai-engineer.bootstrap.v1`;
+- governed QuestionFamily records: 1,120;
+- governed ItemVersion records: 1,120;
+- provisional migration-derived LearningObjective records: 140.
 
-Integration evidence:
+K2 scale references (~3k / ~6k / ~10k / 14k+) remain capacity checkpoints, not claims that those items are live.
 
-- exact-head Quality #343: SUCCESS;
-- exact-head Server/Adapter #931: SUCCESS;
-- post-merge Server/Adapter #932: SUCCESS;
-- post-merge Pages #23: SUCCESS.
+## K2 completion facts
 
-Current governed content baseline:
+PR #20 merged the exact reviewed implementation head:
 
-- 1,120 learner-visible runtime questions;
-- 1,120 governed QuestionFamily records;
-- 1,120 governed ItemVersion records;
-- 140 provisional migration-derived LearningObjective records;
-- bootstrap release `sdaia-ai-engineer.bootstrap.v1` in REVIEW state;
-- legacy payload digest preserved;
-- 200-question exam behavior preserved;
-- StateV2 and RuntimeBundleV3 preserved.
+- reviewed head: `919ed987c9d78d61fc1811d70fd00566735b0354`;
+- merge / product baseline: `dced183980199ca8b7e359b48ddc7fd61f29488f`.
 
-K1 whole-branch review was self-review only because no subagent capability was available. No open Critical/Important findings remained at merge.
+Pre-merge exact-head:
+- Pull request quality gate #536 — SUCCESS;
+- Server and adapter contract tests #1374 — SUCCESS.
+
+Post-merge:
+- Server and adapter contract tests #1375 — SUCCESS;
+- GitHub Pages #27 — SUCCESS including deploy + live release verification;
+- Node: 351/351 PASS;
+- Python: 22 PASS;
+- SQLite/browser/API contracts: PASS;
+- browser smoke: PASS;
+- live content model/registry/service worker: PASS.
+
+Whole-plan review:
+- 1 Critical + 7 Important findings/refinements were found and fixed;
+- 0 open Critical/Important findings remained at merge;
+- review record: `docs/superpowers/reviews/2026-09-28-k2-final-review.md`.
 
 ## Current architecture
 
@@ -54,7 +74,7 @@ Public/runtime:
 - RuntimeBundleV3
 - StateV2
 
-K1 kernel/governance:
+K1/K2 governance/kernel now includes:
 - LearningObjectiveV1
 - EvidenceSourceV1
 - QuestionFamilyV2
@@ -67,58 +87,67 @@ K1 kernel/governance:
 - ReviewPolicyV1
 - FactoryRunV1
 - ProviderResultV1
-- ProviderEvaluationV1
+- ProviderEvaluationV1 + K2 evaluation profile
 - CoverageGapV1
+- ExpansionPlanV1
+- TranchePlanV1
+- CalibrationPolicy metadata
+- ProviderRoutingPolicyV1
+- ReviewCalibrationPolicyV1
+- DedupCalibrationPolicyV1
+- BilingualEquivalenceReportV1
+- CanaryPolicyV1
+- ActivationEvidenceV1
+- EventDefinitionV1
+- ImprovementFindingV1
+- ExperimentRecordV1
 - ContentReleaseManifestV1
 - AssessmentFormSnapshotV1
 - LearnerEventV1
-- provider/persistence/orchestration/interoperability ports
-- governed lifecycle/quality/release/coverage foundations
+- vendor-neutral provider/persistence/orchestration/analytics/telemetry/feature-flag ports
+- source-readiness fail-closed coverage scheduling
+- adaptive tranche execution/resume/retry/PARTIAL semantics
+- automation-first risk/drift review
+- immutable CANARY/activation/rollback/quarantine
+- event privacy/data-minimization trust boundary
+- file + SQLite K2 governance persistence parity
+- private/public Pages artifact boundary
 
 ## Active programme
 
-**K2 — Coverage Expansion & Controlled Release**
+**K3 — Learner Evidence Engine**
 
 Current stage:
 
-`EXECUTING`
+`DESIGN`
 
 Status:
+- K3 architectural design: NOT STARTED;
+- K3 written spec: NOT CREATED;
+- K3 implementation plan: NOT CREATED;
+- K3 implementation: NOT STARTED;
+- K3 implementation branch: NONE.
 
-- K2 implementation: NOT STARTED
-- K2 written spec: APPROVED — `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`
-- K2 implementation plan: APPROVED — `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md`
-- K2 implementation branch: `impl/k2-coverage-expansion-controlled-release`
-- K2 execution checkpoint: C — coverage prioritization and adaptive tranche planning
+K3 may now enter design because K2 is merged and post-merge verified.
 
-Purpose:
+Do **not** begin K3 product implementation until:
+1. architectural design is approved;
+2. written design/spec is created and explicitly approved;
+3. implementation plan is created and explicitly approved;
+4. execution method is approved.
 
-Expand the question/content bank through structured coverage gaps and K1 factory quality/release gates, rather than raw-count generation.
+## K2 deferred calibration
 
-Inherited canonical direction:
-
-`Coverage Gap → Candidate Families → Factory Quality Pipeline → Risk-based Review → CANARY → Promote → Observe`
-
-Possible scale milestones:
-
-`1,120 → 3,000 → 6,000 → 10,000 → 14,000+`
-
-Milestones are capacity references only. Quality/coverage gates decide promotion.
-
-## K2 minimum constraints
-
-K2 must:
-- use K1 contracts and state machine;
-- preserve stable family/item IDs and version lineage;
-- avoid superficial paraphrase multiplication;
-- maintain Arabic/English equivalence;
-- preserve source/evidence/provenance;
-- use release manifests and CANARY;
-- measure coverage and duplicate gaps;
-- keep factory governance/private artifacts out of public Pages;
-- avoid psychometric/calibrated claims before sufficient learner evidence;
-- preserve learner progress and current runtime behavior;
-- keep deterministic/manual paths available.
+The following remain evidence-driven inputs rather than hidden constants:
+- tranche numeric sizes;
+- review sampling percentages;
+- duplicate similarity thresholds;
+- bilingual supporting thresholds;
+- CANARY exposure/duration/minimum observation values;
+- alert/anomaly thresholds;
+- analytics retention periods;
+- final analytics/observability vendor;
+- future source-class approvals.
 
 ## Future order
 
@@ -134,51 +163,35 @@ Dependency order:
 
 `A/B0/B1/B2/B3 → K1 → K2 → K3 → K4 → K5 → K6 → K7/K8 → K9`
 
-Do not silently reorder K2 and K3.
+Do not silently reorder these programmes.
 
 ## Durable recovery references
 
-- Comprehensive history/research/current-state handoff:
-  `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`
-- Working method / decomposition / TDD / checkpoint protocol:
-  `docs/superpowers/OPERATING_PLAYBOOK.md`
-- Fresh K1 reverification:
-  `docs/superpowers/reviews/2026-09-27-k1-reverification.md`
-
-## Authoritative recovery sequence
-
-A future chat must:
-
-1. read `HANDOFF.md`;
-2. resolve current `main` SHA;
-3. read this tracker;
-4. read `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`;
-5. inspect the post-K1 main state;
-6. read active K2 spec/plan/checkpoint only if those artifacts later exist;
-7. inspect branch/main diff before changing anything;
-8. resume the first incomplete K2 gate only.
+Read in this order:
+1. `HANDOFF.md`;
+2. resolve live `main`;
+3. this tracker;
+4. `docs/superpowers/reviews/2026-09-28-k2-post-merge-verification.md`;
+5. `docs/superpowers/reviews/2026-09-28-k2-final-review.md`;
+6. K2 spec/plan/ledger only when historical detail is needed;
+7. architecture constitution + Research Amendment before K3 design.
 
 ## Historical document rule
 
-Programme A/B0/B1/B2/B3/K1 plans/checkpoints/ledgers remain durable evidence and must not be deleted, but completed programme records do not override this tracker or current HANDOFF.
+Programme A/B0/B1/B2/B3/K1/K2 plans/checkpoints/ledgers remain durable evidence and must not be deleted. Completed-programme records do not override this tracker or the current top section of `HANDOFF.md`.
 
-The following are especially historical now:
-- `docs/superpowers/plans/2026-09-27-k1-content-factory-governance-core.md`;
-- `docs/superpowers/reviews/2026-09-27-k1-execution-ledger.md`;
-- `docs/superpowers/reviews/2026-09-27-k1-checkpoint.md`;
-- `docs/superpowers/reviews/2026-09-27-k1-final-review.md`.
-
-## Conflict precedence
+## Conflict precedence for K3 design
 
 1. architecture constitution;
 2. Research Amendment;
-3. completed K1 contract/spec where K2 consumes its interfaces;
-4. future active approved K2 written spec;
-5. future active approved K2 implementation plan;
-6. active K2 execution rulings/checkpoint;
-7. historical plans/reviews.
+3. merged K1/K2 public and governance contracts;
+4. K2 post-merge verification;
+5. future approved K3 written spec;
+6. future approved K3 implementation plan;
+7. active K3 design rulings;
+8. historical plans/reviews.
 
-Any implementation conflict must be recorded as a Ruling.
+Any conflict must be recorded as a Ruling.
 
 ## User execution preference
 
@@ -190,4 +203,4 @@ Any implementation conflict must be recorded as a Ruling.
 - continuous execution after approvals;
 - merge only after exact-head tests pass;
 - post-merge verification before advancing;
-- where practical, complete two consecutive programmes end-to-end while respecting each programme's design/spec/plan approval gates.
+- preserve repository cleanliness and zero-tribal-knowledge handoffs.
