@@ -368,3 +368,32 @@ Behavior:
 
 Task 15: complete.
 Next exact task: Task 16 — production-failure eval ingestion seam.
+
+
+### Task 16 — Production-failure eval ingestion seam
+
+Status: COMPLETE
+RED commit: `e9e98d1b31e0e080220e9f73dad6a2bafcd293a7`
+RED evidence: Pull request quality gate #407 — Node tests FAILED after setup/validation passed.
+GREEN commit: `414724c92c90f09cc885cef55d596f810dbd1063`
+GREEN evidence:
+- Pull request quality gate #408 — SUCCESS;
+- Server and adapter contract tests #1089 — SUCCESS.
+Behavior:
+- only supported failure finding types enter the seam;
+- output is immutable and detached from mutable caller input;
+- all cases start CANDIDATE / PENDING_REVIEW;
+- caller cannot self-declare GOLD or reviewed authority;
+- unsupported product-usage signals are rejected.
+
+Task 16: complete.
+
+## Checkpoint D result
+
+Status: COMPLETE.
+Completed Tasks 14–16:
+- governed provider routing runtime;
+- backward-compatible K2 provider evaluation profile;
+- production-failure candidate eval ingestion seam.
+
+Next exact task: Task 17 — Structural duplicate evidence.
