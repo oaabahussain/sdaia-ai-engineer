@@ -3,3 +3,25 @@ function memoryStores(){let job=null;const audit=[];return{jobStore:{async creat
 test('local runner executes stages and persists audit',async()=>{const {createLocalRunner}=await import('../src/platform-kernel/orchestration/localRunner.js');const s=memoryStores();const pipeline={stages:[{name:'generate',run:async()=>({n:1})},{name:'evidence',run:async c=>({n:c.previous_output.n+1})}]};const r=createLocalRunner({pipeline,jobStore:s.jobStore,auditStore:s.auditStore});const out=await r.runCandidate({run_id:'r1',target_id:'i1',input:{x:1}});assert.equal(out.status,'completed');assert.equal(s.peek().stage_outputs.evidence.output.n,2);assert.equal(s.audit.length,2)});
 test('resume skips completed stages after interruption',async()=>{const {createLocalRunner}=await import('../src/platform-kernel/orchestration/localRunner.js');const s=memoryStores();let generated=0,evidence=0;const pipeline={stages:[{name:'generate',run:async()=>{generated++;return{n:1}}},{name:'evidence',run:async c=>{evidence++;if(evidence===1)throw new Error('transient');return{n:c.previous_output.n+1}}}]};const r=createLocalRunner({pipeline,jobStore:s.jobStore,auditStore:s.auditStore});await assert.rejects(()=>r.runCandidate({run_id:'r2',target_id:'i2',input:{}}),/transient/);assert.equal(generated,1);const out=await r.resumeRun('r2');assert.equal(out.status,'completed');assert.equal(generated,1);assert.equal(evidence,2)});
 test('retryStage reruns only failed retryable stage and cancel is explicit',async()=>{const {createLocalRunner}=await import('../src/platform-kernel/orchestration/localRunner.js');const s=memoryStores();let e=0;const pipeline={stages:[{name:'generate',run:async()=>({})},{name:'evidence',run:async()=>{e++;if(e===1)throw new Error('boom');return{ok:true}}}]};const r=createLocalRunner({pipeline,jobStore:s.jobStore,auditStore:s.auditStore});await assert.rejects(()=>r.runCandidate({run_id:'r3',target_id:'i3',input:{}}));const out=await r.retryStage('r3','evidence');assert.equal(out.status,'completed');assert.equal(s.peek().attempt,2);await r.cancelRun('r3');assert.equal(s.peek().status,'cancelled')});
+
+test('local runner annotates thrown stage errors with exact factory stage', async () => {
+  const {createLocalRunner}=await import('../src/platform-kernel/orchestration/localRunner.js');
+  const s=memoryStores();
+  const pipeline={stages:[
+    {name:'generate',run:async()=>({ok:true})},
+    {name:'evidence',run:async()=>{throw new Error('bad evidence')}}
+  ]};
+  const runner=createLocalRunner({pipeline,jobStore:s.jobStore,auditStore:s.auditStore});
+
+  await assert.rejects(
+    async () => {
+      try {
+        await runner.runCandidate({run_id:'r-stage',target_id:'i-stage',input:{}});
+      } catch (error) {
+        assert.equal(error.factory_stage,'evidence');
+        throw error;
+      }
+    },
+    /bad evidence/
+  );
+});
