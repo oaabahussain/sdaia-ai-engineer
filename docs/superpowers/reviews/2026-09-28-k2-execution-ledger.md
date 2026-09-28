@@ -1114,3 +1114,60 @@ Ruling: Task 47 is a characterization/regression gate over an intentionally unch
 
 Task 47: complete.
 Next exact task: Task 48 — Documentation contract and changelog repair.
+
+
+### Task 48 — Documentation contract and changelog repair
+
+Status: COMPLETE
+RED commit: `ae77cf6a78f5f05f3354da74445028bd93452faf`
+RED evidence: Pull request quality gate #504 — Node tests FAILED on the stale Programme A changelog contract.
+GREEN commit: `96187c8c859aaf3a35763e94b806394abfa5d2e7`
+GREEN evidence:
+- Pull request quality gate #505 — SUCCESS;
+- Server and adapter contract tests #1306 — SUCCESS.
+Outcome:
+- Programme A is recorded as merged + verified;
+- K2 implementation is recorded as unreleased infrastructure work;
+- no K2-generated expansion content is claimed as learner-visible/live.
+
+Task 48: complete.
+
+### Task 49 — Enable full K2 acceptance contract
+
+Status: COMPLETE
+Acceptance commit: `fe249f0e7b811f76be7dc2dbe5690c225b058de5`
+GREEN evidence:
+- Pull request quality gate #506 — SUCCESS;
+- Server and adapter contract tests #1308 — SUCCESS.
+Outcome:
+- all K2 acceptance TODO gates were replaced with executable assertions;
+- coverage/tranche/provider/dedup/bilingual/review/activation/quarantine/event/improvement/runtime invariants execute in the full suite.
+
+Ruling: Task 49 enables acceptance assertions over behavior already implemented and individually TDD-proven in Tasks 3–47; no synthetic production regression was introduced merely to manufacture a RED at final integration — cost if wrong: the acceptance file itself has characterization-style first-run GREEN, while each owned behavior retains its earlier RED→GREEN evidence.
+
+Task 49: complete.
+
+### Task 50 — Whole-plan review findings before fix pass
+
+Review mode: self-review (no subagent dispatch capability available).
+Branch comparison at review start:
+- main: `6eb108338857dec9471f441a37d1819b98045cbb`;
+- reviewed head: `fe249f0e7b811f76be7dc2dbe5690c225b058de5`;
+- ahead: 192 commits; behind: 0; changed files: 100.
+
+Critical:
+1. CANARY→ACTIVE boundary trusts a minimally shaped `activation_evidence.decision=PROMOTE` and can bypass `evaluateActivationEvidence`; incomplete/blocked evidence can therefore be promoted if a caller forges the metadata.
+
+Important:
+1. EventRegistry marks events trusted before applying REDACT/REJECT privacy policy; a caller can bypass `evaluateEventPrivacy` and export declared sensitive fields through GuardedAnalyticsSink.
+2. Source-unready coverage gaps are only sorted later, not excluded from TranchePlan allocation; a blocked gap can execute when demand reaches it.
+3. Dedup semantic fallback contains hidden default threshold `0.95` when embeddings are available without DedupCalibrationPolicy, contradicting deferred/calibrated threshold governance.
+4. LocalRunner/TrancheRunner default every stage failure to retryable=true and discard an explicit non-retryable classification.
+5. ProviderRoutingPolicy/routeProvider omit the approved plan's optional latency/cost budget boundary, so an otherwise approved provider cannot be excluded for exceeding a configured route budget.
+6. ExpansionPlan identity depends only on track + gap IDs; replanning the same gap IDs with changed deficits/evidence produces the same immutable ID with a different body, colliding with immutable persistence.
+
+Minor / deferred:
+1. Default CLI K2 runner is a local deterministic reference pipeline; `COMPLETED` means local orchestration completion, not content release/quality promotion. Release activation remains separately governed, so this is documentation/operational clarity rather than a merge blocker.
+2. WeakSet trust markers intentionally require revalidation after serialization/process boundaries; this is already an explicit Task 34 ruling.
+
+Fix-pass rule: every Critical/Important finding above requires a dedicated RED assertion before its production change; one full-suite verification follows the bounded fix pass.
