@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** D — Provider routing and evaluation upgrade
-**Status:** EXECUTING — Checkpoints A–C complete
+**Checkpoint:** E — Deduplication v2 and bilingual equivalence
+**Status:** EXECUTING — Checkpoints A–D complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 14 — Provider routing policy runtime.
+Task 17 — Structural duplicate evidence.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 14: write RED routing tests, prove missing runtime behavior, implement provider selection/fallback, then verify exact-head quality and server/adapter gates.
+Task 17: write structural-dedup RED tests, prove current stage lacks the behavior, implement minimal structural evidence, then verify exact-head gates.
 
 ## Checkpoint A completion evidence
 
@@ -92,3 +92,19 @@ Fresh CI:
 - Server and adapter contract tests #1069 SUCCESS.
 
 Next: Checkpoint D / Task 14.
+
+
+## Checkpoint D completion evidence
+
+Exact verified head: `414724c92c90f09cc885cef55d596f810dbd1063`.
+
+Completed:
+- Task 14 provider routing runtime;
+- Task 15 provider evaluation v2;
+- Task 16 production-failure eval ingestion.
+
+Fresh CI:
+- Pull request quality gate #408 SUCCESS;
+- Server and adapter contract tests #1089 SUCCESS.
+
+Next: Checkpoint E / Task 17.
