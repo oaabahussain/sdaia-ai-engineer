@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** A — Baseline, execution governance and acceptance contract
-**Status:** EXECUTING
+**Checkpoint:** B — Core K2 schemas and calibration metadata
+**Status:** EXECUTING — Checkpoint A complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 2 — add K2 acceptance-test shell and prove intended RED.
+Task 3 — ExpansionPlanV1 schema.
 
 ## Verification evidence
 
@@ -48,4 +48,11 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 2: commit acceptance shell, verify intended RED on exact-head CI, then gate future assertions to restore GREEN. Do not begin Task 3 until Task 2 has a proven RED and green end state.
+Task 3: write ExpansionPlanV1 RED test first, prove missing-schema RED, implement minimal schema, then verify targeted/full quality gates.
+
+
+## Checkpoint A completion evidence
+
+- Task 1 baseline commit `fbc683be875d6c718ff22a143055af75b74323ec` — Server/adapter #981 SUCCESS.
+- Task 2 RED `a58acf8811086fc61943ad40b784685e46ea00e0` — quality gate #359 failed at Node tests as intended.
+- Task 2 GREEN `f440a4d3d165be8e793b1cce3183eb40d47596dd` — quality gate #360 SUCCESS; server/adapter #987 SUCCESS.
