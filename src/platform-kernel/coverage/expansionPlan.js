@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { prioritizeCoverageGaps } from './prioritize.js';
 
 const REQUIRED_POLICY_KEYS = Object.freeze([
@@ -44,17 +45,33 @@ export function buildExpansionPlan({
 
   const prioritized = prioritizeCoverageGaps(gaps, context);
   const coverageGapIds = prioritized.map(item => item.gap_id);
+  const identityPayload = {
+    track_id: trackId,
+    gaps: prioritized.map(item => ({
+      gap_id: item.gap_id,
+      requested_count: item.requested_count,
+      blocked: item.priority.blocked
+    })),
+    policy_versions: policyVersions,
+    created_at: context.createdAt
+  };
+  const identityHash = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(identityPayload))
+    .digest('hex')
+    .slice(0, 16);
 
   return {
     schema_version: 1,
-    plan_id: `expansion:${trackId}:${coverageGapIds.join('|')}`,
+    plan_id: `expansion:${trackId}:${identityHash}`,
     track_id: trackId,
     coverage_gap_ids: coverageGapIds,
     priorities: prioritized.map((item, index) => ({
       gap_id: item.gap_id,
       rank: index + 1,
       reason: item.priority_reasons.join(','),
-      requested_count: item.requested_count
+      requested_count: item.requested_count,
+      blocked: item.priority.blocked
     })),
     tranche_refs: [],
     policy_versions: { ...policyVersions },
