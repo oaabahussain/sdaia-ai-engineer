@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "cases": [
+    {
+      "id": "k2-case-1",
+      "input": { "x": 1 },
+      "expected": {
+        "answer": 1,
+        "source_ref": "s1",
+        "cognitive_level": "apply"
+      }
+    },
+    {
+      "id": "k2-case-2",
+      "input": { "x": 2 },
+      "expected": {
+        "answer": 2,
+        "source_ref": "s1",
+        "cognitive_level": "analyze"
+      }
+    }
+  ]
+}
