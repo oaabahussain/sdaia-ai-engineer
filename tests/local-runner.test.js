@@ -25,3 +25,14 @@ test('local runner annotates thrown stage errors with exact factory stage', asyn
     /bad evidence/
   );
 });
+
+
+test('local runner persists explicit non-retryable stage failure', async () => {
+  const {createLocalRunner}=await import('../src/platform-kernel/orchestration/localRunner.js');
+  const s=memoryStores();
+  const pipeline={stages:[{name:'validate',run:async()=>{const e=new Error('permanent');e.retryable=false;throw e}}]};
+  const runner=createLocalRunner({pipeline,jobStore:s.jobStore,auditStore:s.auditStore});
+  await assert.rejects(()=>runner.runCandidate({run_id:'r-permanent',target_id:'i-permanent',input:{}}),/permanent/);
+  const job=await s.jobStore.get('r-permanent');
+  assert.equal(job.retry.eligible,false);
+});
