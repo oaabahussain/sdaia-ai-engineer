@@ -113,3 +113,22 @@ Contract outcome:
 
 Task 4: complete.
 Next exact task: Task 5 — shared CalibrationPolicy metadata schema.
+
+
+### Task 5 — Shared CalibrationPolicy metadata schema
+
+Status: COMPLETE
+RED commit: `32feb8e46b39c35bb6dd236d014670e6d0206587`
+RED evidence: Pull request quality gate #368 — Node tests FAILED after setup/validation passed.
+GREEN commit: `920b3bf8e7c14b0a2ca5c65936c1f96fba88c33e`
+GREEN evidence:
+- Pull request quality gate #369 — SUCCESS;
+- Server and adapter contract tests #1008 — SUCCESS.
+Contract outcome:
+- policy identity/version required;
+- scope and evidence basis required;
+- effective date/owner/approver/reconsideration trigger explicit;
+- no operating threshold hard-coded.
+
+Task 5: complete.
+Next exact task: Task 6 — ProviderRoutingPolicyV1 schema.
