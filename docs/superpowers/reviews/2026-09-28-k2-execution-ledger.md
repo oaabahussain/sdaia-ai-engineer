@@ -519,3 +519,26 @@ Ruling: K2 review governance is Automation-first — the user explicitly approve
 Ruling: execution reports are grouped in batches of three completed Tasks — the user explicitly requested three full tasks per update — cost if wrong: progress visibility is less granular, mitigated by per-task durable ledger and exact-head CI evidence.
 
 Current execution batch: Tasks 22–24.
+
+
+### Task 22 — Review stage integration — automation-first
+
+Status: COMPLETE
+RED commit: `5242993ff97676cf5c398a8e7c5051ad34e26507`
+RED evidence: Pull request quality gate #427 — Node tests FAILED after setup/validation passed.
+GREEN commit: `427988611db68f3338a8ecced02f8d3c2a43d528`
+GREEN evidence:
+- Pull request quality gate #428 — SUCCESS;
+- Server and adapter contract tests #1133 — SUCCESS.
+Behavior:
+- AUTO_ELIGIBLE low/medium-risk content can pass without a human only after governed upstream gates are explicitly marked passed;
+- HUMAN_REQUIRED cannot be bypassed by AI approval;
+- HOLD cannot silently approve;
+- selected exception-sample cases require human approval;
+- unselected sample cases and AUTO_ELIGIBLE cases use automation-policy approval;
+- K1 behavior is unchanged when no K2 ReviewCalibrationPolicy is supplied.
+
+Ruling: upstream automated quality evidence is represented at the review boundary by `review_context.governed_gates_passed === true` — the stage must not infer that earlier gates passed merely because it was called — cost if wrong: orchestration must set this explicit signal after successful prior stages, but this prevents silent auto-approval on incomplete context.
+
+Task 22: complete.
+Next exact task: Task 23 — Tranche run envelope.
