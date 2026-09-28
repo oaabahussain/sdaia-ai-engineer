@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import Ajv from 'ajv';
+import { evaluateEventPrivacy } from './privacyPolicy.js';
 
 const definitionSchema = JSON.parse(
   fs.readFileSync(
@@ -97,13 +98,20 @@ export function validateEvent(id, event = {}) {
     }
   }
 
+  const privacy = evaluateEventPrivacy(definition, properties);
+  if (privacy.decision === 'REJECT') {
+    throw new Error(
+      'Event rejected by privacy policy: ' + privacy.reasons.join(',')
+    );
+  }
+
   const envelope = deepFreeze({
     definition_id: id,
     event_name: definition.event_name,
     event_version: definition.event_version,
     occurred_at: event.occurred_at,
     producer: definition.producer,
-    properties: structuredClone(properties)
+    properties: structuredClone(privacy.payload)
   });
   validatedEvents.add(envelope);
   return envelope;
