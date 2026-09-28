@@ -1202,3 +1202,17 @@ GREEN product-head evidence:
 
 Task 50: complete.
 Next exact task: Task 51 — Exact-head CI gate on final review/checkpoint documentation head.
+
+
+### Task 51 — Exact-head CI gate
+
+Status: COMPLETE
+Verified documentation/review head:
+`919ed987c9d78d61fc1811d70fd00566735b0354`
+
+Fresh exact-head evidence:
+- Pull request quality gate #536 — SUCCESS;
+- Server and adapter contract tests #1374 — SUCCESS.
+
+Task 51: complete.
+Next exact task: Task 52 — Merge K2 implementation branch to main.
