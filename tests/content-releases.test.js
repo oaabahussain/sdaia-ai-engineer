@@ -41,7 +41,12 @@ test('release lifecycle requires CANARY before ACTIVE and governed K2 activation
 
   assert.throws(
     () => transitionContentRelease(r, 'activate', {
-      activation_evidence: { schema_version: 1, decision: 'HOLD' }
+      activation_evidence: {
+        schema_version: 1,
+        activation_evidence_id: 'activation:r:hold',
+        release_id: 'r',
+        decision: 'HOLD'
+      }
     }),
     /PROMOTE/i
   );
