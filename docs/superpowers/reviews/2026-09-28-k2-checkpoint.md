@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** C — Coverage prioritization and adaptive tranche planning
-**Status:** EXECUTING — Checkpoints A–B complete
+**Checkpoint:** D — Provider routing and evaluation upgrade
+**Status:** EXECUTING — Checkpoints A–C complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 10 — Coverage priority model.
+Task 14 — Provider routing policy runtime.
 
 ## Verification evidence
 
@@ -48,8 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 10: write coverage-priority RED tests first, prove missing module behavior, implement deterministic prioritization, then verify full quality gates.
-
+Task 14: write RED routing tests, prove missing runtime behavior, implement provider selection/fallback, then verify exact-head quality and server/adapter gates.
 
 ## Checkpoint A completion evidence
 
@@ -76,3 +75,20 @@ Fresh CI:
 - Server and adapter contract tests #1032 SUCCESS.
 
 Next: Checkpoint C / Task 10.
+
+
+## Checkpoint C completion evidence
+
+Exact verified head: `dabce5ce14c55403adb39e520cd922bcba2c690c`.
+
+Completed:
+- Task 10 coverage priority;
+- Task 11 ExpansionPlan builder;
+- Task 12 adaptive tranche policy;
+- Task 13 TranchePlan builder.
+
+Fresh CI:
+- Pull request quality gate #399 SUCCESS;
+- Server and adapter contract tests #1069 SUCCESS.
+
+Next: Checkpoint D / Task 14.
