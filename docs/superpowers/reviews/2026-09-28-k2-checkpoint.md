@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** K — Integration, regression and private/public boundaries
-**Status:** EXECUTING — Checkpoints A–J complete; K Tasks 45–46 complete
+**Checkpoint:** L — final review, exact-head CI, merge and post-merge verification
+**Status:** EXECUTING — Tasks 1–50 complete; Task 51 exact-head CI active
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 47 — Current runtime regression gate.
+Task 51 — Exact-head CI gate.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 47: lock the unchanged 1,120-bank/runtime digest/profile/bilingual/offline/browser/API compatibility baseline before any intentional K2 release promotion.
+Task 51: verify both required workflows are SUCCESS on the exact final documentation/review branch HEAD. If green, proceed to Task 52 merge; otherwise debug and repeat.
 
 ## Checkpoint A completion evidence
 
@@ -222,3 +222,28 @@ Completed:
 - Task 46 GREEN quality #499 / server #1294.
 
 Next: Task 47 — Current runtime regression gate.
+
+
+## Checkpoint K completion evidence
+
+Completed:
+- Task 45 validator integration;
+- Task 46 public/private artifact guard;
+- Task 47 runtime regression gate;
+- Task 48 changelog/documentation repair;
+- Task 49 full K2 acceptance contract.
+
+Key evidence:
+- Task 47 quality #502 / server #1300 SUCCESS;
+- Task 48 RED #504 → GREEN quality #505 / server #1306;
+- Task 49 quality #506 / server #1308 SUCCESS.
+
+## Checkpoint L progress
+
+Task 50 whole-plan review: COMPLETE.
+Final review product head `80431fae4f846a6aea53040b22aad86dea5d4c00`:
+- quality #534 SUCCESS — 351/351 Node;
+- server/adapter #1369 SUCCESS — 22 Python + SQLite/browser/API;
+- no open Critical/Important findings.
+
+Task 51 exact-head final documentation CI: ACTIVE.
