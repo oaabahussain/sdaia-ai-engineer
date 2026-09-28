@@ -96,7 +96,12 @@ function failureRecord(entry, error, prior = null) {
     target_id: entry.request.target_id,
     coverage_gap_id: entry.coverage_gap_id,
     error: error instanceof Error ? error.message : String(error),
-    retryable: true
+    retryable:
+      typeof error?.retryable === 'boolean'
+        ? error.retryable
+        : typeof prior?.retryable === 'boolean'
+          ? prior.retryable
+          : true
   };
   const stage = prior?.stage ?? error?.factory_stage ?? error?.stage ?? null;
   if (stage) record.stage = stage;
