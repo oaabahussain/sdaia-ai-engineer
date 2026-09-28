@@ -20,7 +20,7 @@ Programme A was merged to `main` and post-merge verified. The bullets below rema
 
 ### K2 — Coverage Expansion & Controlled Release implementation
 
-K2 implementation is in progress on the isolated implementation branch. Its governed expansion, release, observability, persistence, CLI, validation, and privacy infrastructure is being added without changing the current learner-visible 1,120-question runtime. No K2-generated expansion content is claimed as promoted or live until CANARY/activation evidence and post-merge verification complete.
+K2 was merged through PR #20 and post-merge verified on `main` at product baseline `dced183980199ca8b7e359b48ddc7fd61f29488f`. Its governed expansion, release, observability, persistence, CLI, validation, and privacy infrastructure is now merged while the learner-visible runtime remains 1,120 questions. No K2-generated expansion content is claimed as newly promoted or live.
 
 ### Known gaps
 
