@@ -911,3 +911,24 @@ Contract outcome:
 
 Task 38: complete.
 Next exact task: Task 39 — Improvement finding builder.
+
+
+### Task 39 — Improvement finding builder
+
+Status: COMPLETE
+RED commit: `9c67a770828066bc2e502f60cee21e8b02fe3754`
+RED evidence: Pull request quality gate #478 — Node tests FAILED after setup/validation passed.
+Implementation commit: `fc874212d9745c98101bab39d39450850f226c73`.
+Debugging finding: quality #479 failed because the test fixture placed `await signal()` inside a synchronous `assert.throws` callback; production builder was not the cause.
+Fixture correction: `58b616184ad55b59b06491f00eb4b652ad5bc168`.
+Final GREEN evidence:
+- Pull request quality gate #480 — SUCCESS;
+- Server and adapter contract test job #1248 — all server/SQLite/browser/API steps SUCCESS.
+Behavior:
+- only registry-validated signals may seed findings;
+- correlation cannot become causal=true;
+- output is immutable status CANDIDATE;
+- observation/evidence/hypothesis/counter-evidence remain separate.
+
+Task 39: complete.
+Next exact task: Task 40 — ExperimentRecordV1 schema.
