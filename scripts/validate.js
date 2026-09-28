@@ -25,3 +25,38 @@ const releaseDoc=read('data/factory/releases/sdaia-bootstrap-v1.manifest.json');
 const rows=fs.readFileSync(path.join(factoryRoot,'releases','sdaia-bootstrap-v1.items.ndjson'),'utf8').trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);if(rows.length!==1120)throw new Error('Factory item migration count mismatch');for(const row of rows){assertCompiled(factorySchemas.family,row.family,'factory family '+row.family?.family_id);assertCompiled(factorySchemas.item,row.item,'factory item '+row.item?.item_version_id)}
 const migrationDoc=read('data/factory/migrations/sdaia-current-bank-v1.json');if(migrationDoc.origin!=='migrated-grandfathered'||migrationDoc.quality_reports_created!==0)throw new Error('Factory migration provenance is not honest');if(!Array.isArray(migrationDoc.provenance_records)||migrationDoc.provenance_records.length!==1120)throw new Error('Factory migration provenance count mismatch');for(const p of migrationDoc.provenance_records)assertCompiled(factorySchemas.provenance,p,'factory provenance '+p.record_id);
 const factoryVerification=verifyCurrentImport(root,factoryRoot);console.log(`factory governance: PASS items=${factoryVerification.items} objectives=${factoryVerification.objectives} release=${factoryVerification.release_id}`);
+
+
+const K2_GOVERNANCE_SCHEMA_MAP=Object.freeze({
+  expansion:'expansion-plan-v1.schema.json',
+  tranche:'tranche-plan-v1.schema.json',
+  activation:'activation-evidence-v1.schema.json',
+  improvement:'improvement-finding-v1.schema.json',
+  experiments:'experiment-record-v1.schema.json',
+  'event-definitions':'event-definition-v1.schema.json',
+  'provider-routing':'provider-routing-policy-v1.schema.json',
+  'review-calibration':'review-calibration-policy-v1.schema.json',
+  'dedup-calibration':'dedup-calibration-policy-v1.schema.json',
+  'canary-policy':'canary-policy-v1.schema.json'
+});
+
+export function validateK2GovernanceArtifacts(artifactRoot, schemaRoot=artifactRoot){
+  const base=path.join(artifactRoot,'data','factory','k2');
+  const schemaBase=path.join(schemaRoot,'data','schema');
+  for(const [kind,schemaName] of Object.entries(K2_GOVERNANCE_SCHEMA_MAP)){
+    const dir=path.join(base,kind);
+    if(!fs.existsSync(dir))continue;
+    const schema=JSON.parse(fs.readFileSync(path.join(schemaBase,schemaName),'utf8'));
+    const validate=ajv.compile(schema);
+    for(const name of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
+      const file=path.join(dir,name);
+      let value;
+      try{value=JSON.parse(fs.readFileSync(file,'utf8'))}catch(error){throw new Error(`K2 ${kind} ${name}: invalid JSON: ${error.message}`)}
+      if(!validate(value))throw new Error(`K2 ${kind} ${name}: ${ajv.errorsText(validate.errors)}`);
+    }
+  }
+  return true;
+}
+
+validateK2GovernanceArtifacts(root,root);
+console.log('k2 governance artifacts: PASS');
