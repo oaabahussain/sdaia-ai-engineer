@@ -458,3 +458,33 @@ Contract outcome:
 
 Task 19: complete.
 Next exact task: Task 20 — Bilingual stage v2.
+
+
+### Task 20 — Bilingual stage v2
+
+Status: COMPLETE
+RED commit: `834f6126f526116d98ebc681c68d72d960867bbc`
+RED evidence: Pull request quality gate #419 — Node tests FAILED after setup/validation passed.
+GREEN commit: `76a02f22e1450cf816116f0e677b5fa50dd64fb4`
+GREEN evidence:
+- Pull request quality gate #420 — SUCCESS;
+- Server and adapter contract tests #1114 — SUCCESS.
+Behavior:
+- critical report dimensions are authoritative;
+- failed critical dimension blocks PASS even with strong supporting metric;
+- missing/ABSTAIN critical dimension yields REVIEW_REQUIRED;
+- all critical dimensions must PASS for report-driven PASS;
+- legacy provider PASS/FAIL/ABSTAIN behavior remains supported.
+
+Task 20: complete.
+
+## Checkpoint E result
+
+Status: COMPLETE.
+Completed Tasks 17–20:
+- structural duplicate evidence;
+- calibrated same/cross-language semantic gray zones;
+- BilingualEquivalenceReportV1;
+- report-driven bilingual enforcement.
+
+Next exact task: Task 21 — Review calibration runtime.
