@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/k2/store-parity.json',import.meta.url),'utf8'));
+test('K2 file adapter preserves shared logical governance fixture',async()=>{const {createK2GovernanceFileStore}=await import('../scripts/platform-kernel/adapters/k2GovernanceFileStore.js');const s=createK2GovernanceFileStore(fs.mkdtempSync(path.join(os.tmpdir(),'k2-parity-')));await s.putRecord(fixture);assert.deepEqual(await s.getRecord(fixture.kind,fixture.artifact_id),fixture.record)});

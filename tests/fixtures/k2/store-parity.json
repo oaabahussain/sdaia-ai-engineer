@@ -1,0 +1,12 @@
+{
+  "kind": "activation",
+  "artifact_id": "activation:parity:1",
+  "record": {
+    "schema_version": 1,
+    "activation_evidence_id": "activation:parity:1",
+    "release_id": "release:parity",
+    "tranche_id": "tranche:parity",
+    "evidence_sufficiency": "SUFFICIENT",
+    "decision": "HOLD"
+  }
+}

@@ -135,3 +135,52 @@ def list_learner_events(db_url, track_id=None, item_version_id=None, since=None,
     with _connect(db_url) as db:
         rows=db.execute(sql,tuple(args)).fetchall()
     return [json.loads(row['event_json']) for row in rows]
+
+
+_K2_GOVERNANCE_KINDS={'expansion','tranche','activation','improvement'}
+
+def _k2_kind(kind):
+    if kind not in _K2_GOVERNANCE_KINDS:
+        raise ValueError('Unsupported K2 governance artifact kind')
+    return kind
+
+def _canonical_json(value):
+    return json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'))
+
+def put_k2_governance_record(db_url, kind, artifact_id, record):
+    _k2_kind(kind)
+    if not isinstance(artifact_id,str) or not artifact_id:
+        raise ValueError('K2 governance artifact id is required')
+    body=_canonical_json(record)
+    with _connect(db_url) as db:
+        row=db.execute(
+            'SELECT body_json FROM k2_governance_records WHERE kind=? AND artifact_id=?',
+            (kind,artifact_id)
+        ).fetchone()
+        if row is not None:
+            if row['body_json'] != body:
+                raise ValueError('Immutable K2 governance artifact ID has different body')
+            return artifact_id
+        db.execute(
+            'INSERT INTO k2_governance_records (kind,artifact_id,body_json) VALUES (?,?,?)',
+            (kind,artifact_id,body)
+        )
+    return artifact_id
+
+def get_k2_governance_record(db_url, kind, artifact_id):
+    _k2_kind(kind)
+    with _connect(db_url) as db:
+        row=db.execute(
+            'SELECT body_json FROM k2_governance_records WHERE kind=? AND artifact_id=?',
+            (kind,artifact_id)
+        ).fetchone()
+    return json.loads(row['body_json']) if row is not None else None
+
+def list_k2_governance_records(db_url, kind):
+    _k2_kind(kind)
+    with _connect(db_url) as db:
+        rows=db.execute(
+            'SELECT artifact_id FROM k2_governance_records WHERE kind=? ORDER BY artifact_id',
+            (kind,)
+        ).fetchall()
+    return [row['artifact_id'] for row in rows]

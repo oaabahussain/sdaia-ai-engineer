@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "family_id",
+    "dimensions",
+    "supporting_metrics",
+    "overall_result",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "report_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "learning_intent",
+        "correct_answer",
+        "reasoning",
+        "distractor_logic",
+        "terminology",
+        "accuracy",
+        "locale",
+        "audience",
+        "layout_markup"
+      ],
+      "properties": {
+        "learning_intent": { "$ref": "#/definitions/dimension" },
+        "correct_answer": { "$ref": "#/definitions/dimension" },
+        "reasoning": { "$ref": "#/definitions/dimension" },
+        "distractor_logic": { "$ref": "#/definitions/dimension" },
+        "terminology": { "$ref": "#/definitions/dimension" },
+        "accuracy": { "$ref": "#/definitions/dimension" },
+        "locale": { "$ref": "#/definitions/dimension" },
+        "audience": { "$ref": "#/definitions/dimension" },
+        "layout_markup": { "$ref": "#/definitions/dimension" }
+      }
+    },
+    "supporting_metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "overall_result": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "REVIEW_REQUIRED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "definitions": {
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result"
+      ],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "ABSTAIN"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

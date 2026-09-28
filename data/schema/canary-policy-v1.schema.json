@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "version",
+    "required_evidence_classes",
+    "hold_conditions",
+    "blocker_policy",
+    "exposure_calibration_ref",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_evidence_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "runtime_compatibility",
+          "quality",
+          "review",
+          "coverage",
+          "bilingual",
+          "accessibility",
+          "product_guardrail"
+        ]
+      }
+    },
+    "hold_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "insufficient_evidence",
+          "metric_not_mature",
+          "conflicting_signals",
+          "review_incomplete"
+        ]
+      }
+    },
+    "blocker_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "critical_alert",
+        "missing_required_metric"
+      ],
+      "properties": {
+        "critical_alert": {
+          "type": "string",
+          "enum": [
+            "HOLD",
+            "QUARANTINE",
+            "ROLLBACK"
+          ]
+        },
+        "missing_required_metric": {
+          "type": "string",
+          "const": "HOLD"
+        }
+      }
+    },
+    "exposure_calibration_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "minimum_observation_count": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

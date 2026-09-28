@@ -93,4 +93,4 @@ test('Pages and PR artifact gates explicitly verify active presentation is assem
 test('synthetic track fixtures are excluded from release artifact inputs',()=>{for(const workflow of [pages,ci]){assert.doesNotMatch(workflow,/tests\/fixtures/)}const registry=JSON.parse(read('../tracks/registry.json'));assert.deepEqual(registry.tracks,[{id:'sdaia-ai-engineer'}]);});
 
 
-test('factory governance artifacts stay outside public Pages assembly',()=>{for(const workflow of [pages,ci]){assert.doesNotMatch(workflow,/cp\s+-R\s+data\/factory|_site\/data\/factory/)} });
+test('factory governance artifacts stay outside public Pages assembly',()=>{for(const workflow of [pages,ci]){assert.doesNotMatch(workflow,/cp\s+-[rR]\s+data\/factory/)} });

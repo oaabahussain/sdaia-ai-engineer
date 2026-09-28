@@ -39,6 +39,6 @@ test('K1 state machine forbids GENERATED to ACTIVE',async()=>{
 test('public release workflows do not copy private factory governance artifacts',()=>{
   for(const p of ['.github/workflows/ci.yml','.github/workflows/pages.yml']){
     const src=fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
-    assert.doesNotMatch(src,/cp\s+-r\s+data\/factory|_site\/data\/factory/);
+    assert.doesNotMatch(src,/cp\s+-[rR]\s+data\/factory/);
   }
 });

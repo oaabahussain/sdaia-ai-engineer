@@ -1,0 +1,249 @@
+# K2 Coverage Expansion & Controlled Release — Checkpoint
+
+**Date:** 2026-09-28
+**Programme:** K2
+**Checkpoint:** L — final review, exact-head CI, merge and post-merge verification
+**Status:** EXECUTING — Tasks 1–50 complete; Task 51 exact-head CI active
+**Branch:** `impl/k2-coverage-expansion-controlled-release`
+**Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
+**Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
+
+## Completed
+
+- K2 conceptual design approved.
+- K2 written spec approved.
+- K2 implementation plan approved.
+- Native execution method approved.
+- Isolated implementation branch created.
+- Fresh pre-execution CI evidence captured.
+- Task 1 baseline artifacts committed and exact-head CI verified.
+
+## Active task
+
+Task 51 — Exact-head CI gate.
+
+## Verification evidence
+
+At plan head `9b9d416e9c025563c299d54347984954ccdb0455`:
+- Pull request quality gate #358 SUCCESS.
+- Server and adapter contract tests #979 SUCCESS.
+
+At main `6eb108338857dec9471f441a37d1819b98045cbb`:
+- Server and adapter contract tests #958 SUCCESS.
+- GitHub Pages #26 SUCCESS.
+
+## Failures / rulings
+
+Ruling: local clone/worktree is unavailable because the container cannot resolve GitHub; use the isolated remote implementation branch and exact-head GitHub Actions for complete RED/GREEN verification — cost if wrong: slower TDD cycle and stronger synchronization discipline required.
+
+## Resume safety
+
+Do not reconstruct K2 from chat. Read:
+1. `HANDOFF.md`;
+2. approved K2 spec;
+3. approved K2 plan;
+4. `docs/superpowers/reviews/2026-09-28-k2-execution-ledger.md`;
+5. this checkpoint;
+6. branch HEAD and exact-head CI.
+
+## Next exact task
+
+Task 51: verify both required workflows are SUCCESS on the exact final documentation/review branch HEAD. If green, proceed to Task 52 merge; otherwise debug and repeat.
+
+## Checkpoint A completion evidence
+
+- Task 1 baseline commit `fbc683be875d6c718ff22a143055af75b74323ec` — Server/adapter #981 SUCCESS.
+- Task 2 RED `a58acf8811086fc61943ad40b784685e46ea00e0` — quality gate #359 failed at Node tests as intended.
+- Task 2 GREEN `f440a4d3d165be8e793b1cce3183eb40d47596dd` — quality gate #360 SUCCESS; server/adapter #987 SUCCESS.
+
+
+## Checkpoint B completion evidence
+
+Exact verified head: `05bce1aa3e1d0c22346292247277666b7894e539`.
+
+Completed contracts:
+- ExpansionPlanV1;
+- TranchePlanV1;
+- CalibrationPolicy metadata;
+- ProviderRoutingPolicyV1;
+- ReviewCalibrationPolicyV1;
+- DedupCalibrationPolicyV1;
+- CanaryPolicyV1.
+
+Fresh CI:
+- Pull request quality gate #381 SUCCESS;
+- Server and adapter contract tests #1032 SUCCESS.
+
+Next: Checkpoint C / Task 10.
+
+
+## Checkpoint C completion evidence
+
+Exact verified head: `dabce5ce14c55403adb39e520cd922bcba2c690c`.
+
+Completed:
+- Task 10 coverage priority;
+- Task 11 ExpansionPlan builder;
+- Task 12 adaptive tranche policy;
+- Task 13 TranchePlan builder.
+
+Fresh CI:
+- Pull request quality gate #399 SUCCESS;
+- Server and adapter contract tests #1069 SUCCESS.
+
+Next: Checkpoint D / Task 14.
+
+
+## Checkpoint D completion evidence
+
+Exact verified head: `414724c92c90f09cc885cef55d596f810dbd1063`.
+
+Completed:
+- Task 14 provider routing runtime;
+- Task 15 provider evaluation v2;
+- Task 16 production-failure eval ingestion.
+
+Fresh CI:
+- Pull request quality gate #408 SUCCESS;
+- Server and adapter contract tests #1089 SUCCESS.
+
+Next: Checkpoint E / Task 17.
+
+
+## Checkpoint E completion evidence
+
+Exact verified head: `76a02f22e1450cf816116f0e677b5fa50dd64fb4`.
+
+Completed:
+- Task 17 structural duplicate evidence;
+- Task 18 calibrated cross-lingual dedup;
+- Task 19 BilingualEquivalenceReportV1;
+- Task 20 bilingual stage v2.
+
+Fresh CI:
+- Pull request quality gate #420 SUCCESS;
+- Server and adapter contract tests #1114 SUCCESS.
+
+Next: Checkpoint F / Task 21.
+
+
+## Checkpoint F completion evidence
+
+Automation-first review governance is approved and implemented.
+
+Completed:
+- Task 21 review calibration runtime;
+- Task 22 review-stage integration.
+
+Task 22 exact implementation evidence:
+- RED quality gate #427;
+- GREEN quality gate #428 SUCCESS;
+- Server and adapter contract tests #1133 SUCCESS.
+
+Automation behavior:
+- mature low/medium-risk AUTO_ELIGIBLE content avoids routine human review after governed gates pass;
+- humans remain escalation-only for configured critical/high-risk, ambiguity, drift, uncalibrated, exception-sample, or quarantine cases.
+
+## Checkpoint G progress
+
+Completed:
+- Task 23 governed tranche run envelope — GREEN #432 / server #1141;
+- Task 24 durable resume/retry — GREEN #435 / server #1146.
+
+Next: Task 25.
+
+
+## Checkpoint G completion evidence
+
+Completed:
+- Task 23 governed tranche execution;
+- Task 24 durable resume/retry;
+- Task 25 tranche metrics summarizer;
+- Task 26 adaptive follow-up integration;
+- Task 27 exact partial-failure stage evidence.
+
+Task 25–27 final evidence:
+- Task 25 GREEN quality #439 / server #1155;
+- Task 26 GREEN quality #442 / server #1161;
+- Task 27 GREEN quality #446 / server #1170.
+
+## Checkpoint H progress
+
+Completed:
+- Task 28 ActivationEvidenceV1 — GREEN quality #449 / server #1176;
+- Task 29 activation evidence evaluator — GREEN quality #452 / server #1182.
+
+Next: Task 30 — Release lifecycle integration.
+
+
+## Checkpoint H completion evidence
+
+Completed:
+- Task 28 ActivationEvidenceV1;
+- Task 29 activation evidence evaluator;
+- Task 30 governed release lifecycle integration;
+- Task 31 insufficient observation-volume HOLD;
+- Task 32 immutable quarantine helpers.
+
+Latest H evidence:
+- Task 30 GREEN quality #456 / server #1191;
+- Task 31 GREEN quality #461 / server #1203;
+- Task 32 GREEN quality #464 / server #1209.
+
+## Checkpoint I progress
+
+Completed:
+- Task 33 EventDefinitionV1 — GREEN quality #466 / server #1214;
+- Task 34 event registry — GREEN quality #468 / server #1219;
+- Task 35 privacy enforcement — GREEN quality #470 / server #1224;
+- Task 36 observability ports — GREEN quality #472 / server #1229.
+
+Next: Task 37 — Factory metric events.
+
+
+## Checkpoints I–J completion evidence
+
+Checkpoint I:
+- Task 37 GREEN quality #475 / server #1236;
+- Task 38 GREEN quality #477 / server #1241;
+- Task 39 GREEN quality #480 / server job #1248 all steps successful;
+- Task 40 GREEN quality #482 / server #1253.
+
+Checkpoint J:
+- Task 41 GREEN quality #484 / server #1258;
+- Task 42 GREEN quality #488 / server #1266;
+- Task 43 GREEN quality #491 / server #1274;
+- Task 44 GREEN quality #493 / server #1279.
+
+## Checkpoint K progress
+
+Completed:
+- Task 45 GREEN quality #495 / server #1284;
+- Task 46 GREEN quality #499 / server #1294.
+
+Next: Task 47 — Current runtime regression gate.
+
+
+## Checkpoint K completion evidence
+
+Completed:
+- Task 45 validator integration;
+- Task 46 public/private artifact guard;
+- Task 47 runtime regression gate;
+- Task 48 changelog/documentation repair;
+- Task 49 full K2 acceptance contract.
+
+Key evidence:
+- Task 47 quality #502 / server #1300 SUCCESS;
+- Task 48 RED #504 → GREEN quality #505 / server #1306;
+- Task 49 quality #506 / server #1308 SUCCESS.
+
+## Checkpoint L progress
+
+Task 50 whole-plan review: COMPLETE.
+Final review product head `80431fae4f846a6aea53040b22aad86dea5d4c00`:
+- quality #534 SUCCESS — 351/351 Node;
+- server/adapter #1369 SUCCESS — 22 Python + SQLite/browser/API;
+- no open Critical/Important findings.
+
+Task 51 exact-head final documentation CI: ACTIVE.

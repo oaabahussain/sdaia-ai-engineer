@@ -81,14 +81,15 @@ K1 kernel/governance:
 
 Current stage:
 
-`DESIGN_GATE`
+`EXECUTING`
 
 Status:
 
 - K2 implementation: NOT STARTED
-- K2 written spec: NOT CREATED
-- K2 implementation plan: NOT CREATED
-- K2 branch: NONE
+- K2 written spec: APPROVED — `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`
+- K2 implementation plan: APPROVED — `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md`
+- K2 implementation branch: `impl/k2-coverage-expansion-controlled-release`
+- K2 execution checkpoint: C — coverage prioritization and adaptive tranche planning
 
 Purpose:
 

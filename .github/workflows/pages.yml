@@ -37,10 +37,13 @@ jobs:
           mkdir _site
           cp index.html feedback.html manifest.webmanifest sw.js icon.svg icon-180.png icon-192.png icon-512.png _site/
           cp -R src tracks _site/
+          rm -rf _site/src/platform-kernel
           mkdir -p _site/data
           cp -R data/concepts data/migrations _site/data/
           cp data/learn.json data/cases.json _site/data/
           test ! -e _site/data/legacy
+          test ! -e _site/data/factory
+          test ! -e _site/src/platform-kernel
           test -f _site/tracks/registry.json
           touch _site/.nojekyll
           node --check _site/src/app.js

@@ -1,11 +1,11 @@
-# CURRENT AUTHORITATIVE HANDOFF — Post-K1 / K2 Design
+# CURRENT AUTHORITATIVE HANDOFF — K2 Execution
 
 **Date:** 2026-09-27  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **K1 product merge baseline:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
 **Post-K1 documentation main observed before this audit:** `134313a49514e02209954002c9af8de0a704535b`  
 **Session rule:** always resolve live `main` first; documentation-only merges may advance it without changing the product baseline.  
-**Current gate:** `K2_DESIGN_GATE`
+**Current gate:** `K2_EXECUTING`
 
 ## Completed foundation
 
@@ -106,7 +106,7 @@ Preserved visible payload digest:
 **K2 — Coverage Expansion & Controlled Release**
 
 Status:
-`DESIGN_NEXT`
+`EXECUTING`
 
 K2 purpose:
 
@@ -144,11 +144,11 @@ K2 must:
 There is currently:
 
 - no K2 implementation branch;
-- no K2 written spec;
+- K2 written spec created at `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`; awaiting explicit user approval;
 - no K2 implementation plan;
 - no K2 product mutation.
 
-K2 is architectural work. The next step is to review the post-K1 baseline and approve the K2 design. Only after that design is approved should a written K2 spec be committed; after written-spec approval, create the detailed implementation plan.
+K2 conceptual design, written spec, implementation plan and Native execution method are approved. Execution is active on `impl/k2-coverage-expansion-controlled-release`. Checkpoints A–B are complete; current execution checkpoint: C — coverage prioritization and adaptive tranche planning. Resume from the durable K2 ledger/checkpoint; do not reconstruct from chat.
 
 ## Governing authority for K2
 
