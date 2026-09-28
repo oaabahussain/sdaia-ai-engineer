@@ -48,3 +48,14 @@ test('ProviderRoutingPolicyV1 requires explicit fallback behavior', () => {
   delete noFallback.fallback;
   assert.equal(validate(noFallback), false);
 });
+
+
+test('ProviderRoutingPolicyV1 validates optional cost and latency bounds', () => {
+  const validate=compile('provider-routing-policy-v1.schema.json');
+  const bounded=structuredClone(valid);
+  bounded.routes[0].max_latency_ms=500;
+  bounded.routes[0].max_cost=0.1;
+  assert.equal(validate(bounded),true,JSON.stringify(validate.errors));
+  bounded.routes[0].max_cost=-1;
+  assert.equal(validate(bounded),false);
+});
