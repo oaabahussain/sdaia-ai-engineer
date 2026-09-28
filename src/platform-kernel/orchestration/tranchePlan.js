@@ -65,6 +65,7 @@ function allocateRequests(priorities, requestedCount) {
 
   for (const priority of [...priorities].sort((a, b) => a.rank - b.rank)) {
     if (remaining <= 0) break;
+    if (priority.blocked === true) continue;
     const requestedFamilies = Math.min(priority.requested_count, remaining);
     if (requestedFamilies > 0) {
       requests.push({
