@@ -542,3 +542,6 @@ Ruling: upstream automated quality evidence is represented at the review boundar
 
 Task 22: complete.
 Next exact task: Task 23 — Tranche run envelope.
+
+
+Task 23: Ruling: aggregate TranchePlan requests are expanded through an explicit deterministic `options.buildRequest({tranchePlan,request,indexWithinGap,globalIndex})` seam before calling LocalRunner — TranchePlanV1 intentionally stores coverage demand counts rather than inventing FactoryRun IDs/targets, so the orchestration boundary must receive the concrete request construction policy from its caller — cost if wrong: callers must provide one small adapter, but IDs/targets remain explicit and reproducible rather than hidden in the runner.
