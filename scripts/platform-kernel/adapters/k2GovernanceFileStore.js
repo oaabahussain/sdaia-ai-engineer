@@ -32,6 +32,13 @@ export function createK2GovernanceFileStore(root){
    const {file}=fileFor(root,kind,id);
    return read(file);
   },
+  async putRecord(envelope){
+   if(!envelope||typeof envelope!=='object')throw new Error('K2 governance envelope is required');
+   return this.put(envelope.kind,envelope.artifact_id,envelope.record);
+  },
+  async getRecord(kind,id){
+   return this.get(kind,id);
+  },
   async list(kind){
    assertKind(kind);
    const dir=path.resolve(root,kind);
