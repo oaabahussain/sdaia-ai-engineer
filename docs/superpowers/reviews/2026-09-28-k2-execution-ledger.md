@@ -634,3 +634,25 @@ Behavior:
 
 Task 26: complete.
 Next exact task: Task 27 — Partial tranche failure semantics.
+
+
+### Task 27 — Partial tranche failure semantics
+
+Status: COMPLETE
+RED head: `dfc979c294c7abc26bfffc4fa5c9247a43f6cef9`
+RED evidence: Pull request quality gate #444 — Node tests FAILED after setup/validation passed.
+GREEN commit: `f3c09ef84c45c59b78bcbe124f6f415b95f602af`
+GREEN evidence:
+- Pull request quality gate #446 — SUCCESS;
+- Server and adapter contract tests #1170 — SUCCESS.
+Behavior:
+- PARTIAL preserves successful siblings;
+- failed items carry exact failed stage evidence when the runner knows it;
+- LocalRunner annotates thrown stage errors with factory_stage before rethrow;
+- TrancheRunner persists factory_stage into failed-item evidence.
+
+Ruling: Task 27 also modifies LocalRunner although the plan listed only TrancheRunner/tests — exact failure-stage evidence cannot be truthfully produced at the tranche layer if the runner discards the stage it alone knows; the change only annotates the existing thrown Error and preserves all existing retry/audit behavior — cost if wrong: callers that freeze/non-extensibly wrap thrown objects could need a different metadata carrier, but ordinary Error behavior remains compatible.
+
+Task 27: complete.
+Checkpoint G Tasks 23–27 are now functionally complete.
+Next exact task: Task 28 — ActivationEvidenceV1 schema.
