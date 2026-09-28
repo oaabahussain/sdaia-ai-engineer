@@ -88,3 +88,21 @@ test('buildTranchePlan refuses HOLD decisions', async () => {
     /HOLD|runnable/i
   );
 });
+
+
+test('buildTranchePlan never allocates source-blocked coverage gaps', async () => {
+  const { buildTranchePlan } = await import(moduleUrl);
+  const plan = structuredClone(expansionPlan);
+  plan.priorities = [
+    { gap_id:'gap:a', rank:1, reason:'source_not_ready', requested_count:5, blocked:true },
+    { gap_id:'gap:b', rank:2, reason:'coverage_deficit', requested_count:2, blocked:false }
+  ];
+  const out = buildTranchePlan(plan,{...trancheDecision,requestedCount:6},policyRefs);
+  assert.deepEqual(out.requests,[{coverage_gap_id:'gap:b',requested_families:2}]);
+
+  plan.priorities[1].blocked = true;
+  assert.throws(
+    ()=>buildTranchePlan(plan,{...trancheDecision,requestedCount:6},policyRefs),
+    /No runnable coverage gap demand remains/
+  );
+});
