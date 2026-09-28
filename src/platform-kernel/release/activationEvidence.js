@@ -13,11 +13,16 @@ const validateActivationEvidenceV1 = new Ajv({
   formats: { 'date-time': true }
 }).compile(activationSchema);
 
-const evaluatedDecisions = new WeakSet();
+const evaluatedDecisions = new WeakMap();
 
-function result(decision, reason, missingEvidenceClasses = [], blockers = []) {
-  const value = Object.freeze({ decision, reason, missingEvidenceClasses, blockers });
-  evaluatedDecisions.add(value);
+function result(evidence, decision, reason, missingEvidenceClasses = [], blockers = []) {
+  const value = Object.freeze({
+    decision,
+    reason,
+    missingEvidenceClasses,
+    blockers
+  });
+  evaluatedDecisions.set(value, evidence);
   return value;
 }
 
@@ -26,8 +31,8 @@ function criticalDecision(policy) {
   return ['HOLD', 'QUARANTINE', 'ROLLBACK'].includes(action) ? action : 'HOLD';
 }
 
-export function isEvaluatedActivationDecision(value) {
-  return !!value && evaluatedDecisions.has(value);
+export function isEvaluatedActivationDecision(value, evidence) {
+  return !!value && evaluatedDecisions.get(value) === evidence;
 }
 
 export function evaluateActivationEvidence(evidence, canaryPolicy) {
@@ -46,7 +51,13 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
 
   const blockers = [...evidence.blockers];
   if (blockers.length) {
-    return result(criticalDecision(canaryPolicy), 'critical_blocker', [], blockers);
+    return result(
+      evidence,
+      criticalDecision(canaryPolicy),
+      'critical_blocker',
+      [],
+      blockers
+    );
   }
 
   const observed = new Set(evidence.canary_observation.evidence_classes);
@@ -54,7 +65,13 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     .filter(item => !observed.has(item));
 
   if (missingEvidenceClasses.length) {
-    return result('HOLD', 'missing_required_evidence', missingEvidenceClasses, []);
+    return result(
+      evidence,
+      'HOLD',
+      'missing_required_evidence',
+      missingEvidenceClasses,
+      []
+    );
   }
 
   if (evidence.evidence_sufficiency !== 'SUFFICIENT') {
@@ -67,7 +84,13 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
       !Number.isFinite(observedCount) ||
       observedCount < canaryPolicy.minimum_observation_count
     ) {
-      return result(evidence, 'HOLD', 'insufficient_observation_volume', [], []);
+      return result(
+        evidence,
+        'HOLD',
+        'insufficient_observation_volume',
+        [],
+        []
+      );
     }
   }
 
@@ -76,7 +99,13 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     evidence.correctness_summary.status === 'FAIL' ||
     evidence.duplicate_findings.status === 'FAIL'
   ) {
-    return result(criticalDecision(canaryPolicy), 'critical_quality_failure', [], []);
+    return result(
+      evidence,
+      criticalDecision(canaryPolicy),
+      'critical_quality_failure',
+      [],
+      []
+    );
   }
 
   if (
@@ -91,7 +120,11 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     evidence.bilingual_summary.status,
     evidence.accessibility_summary.status
   ];
-  if (nonCritical.some(status => ['FAIL', 'REVIEW_REQUIRED', 'ABSTAIN'].includes(status))) {
+  if (
+    nonCritical.some(
+      status => ['FAIL', 'REVIEW_REQUIRED', 'ABSTAIN'].includes(status)
+    )
+  ) {
     return result(evidence, 'HOLD', 'quality_evidence_incomplete', [], []);
   }
 
