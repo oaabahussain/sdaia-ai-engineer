@@ -88,3 +88,29 @@ test('expansion plan identity changes when immutable planning inputs change', as
   assert.notEqual(first.plan_id,changedCount.plan_id);
   assert.notEqual(first.plan_id,changedTime.plan_id);
 });
+
+
+test('expansion plan identity is canonical and changes with material priority evidence', async () => {
+  const { buildExpansionPlan } = await import(moduleUrl);
+  const base={
+    trackId:'sdaia-ai-engineer',
+    gaps:[gap('gap:a',5)],
+    context:{createdAt:'2026-09-28T00:00:00Z',sourceReadiness:{'gap:a':true}},
+    policyVersions
+  };
+  const first=buildExpansionPlan(base);
+  const reorderedPolicies={
+    tranche_calibration_policy_version:policyVersions.tranche_calibration_policy_version,
+    review_policy_version:policyVersions.review_policy_version,
+    quality_policy_version:policyVersions.quality_policy_version,
+    source_policy_version:policyVersions.source_policy_version
+  };
+  const same=buildExpansionPlan({...base,policyVersions:reorderedPolicies});
+  assert.equal(first.plan_id,same.plan_id);
+
+  const changedEvidence=buildExpansionPlan({
+    ...base,
+    context:{...base.context,duplicatePressure:{'gap:a':0.2}}
+  });
+  assert.notEqual(first.plan_id,changedEvidence.plan_id);
+});
