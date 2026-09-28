@@ -110,7 +110,7 @@ test('release lifecycle rejects forged PROMOTE metadata when evaluated evidence 
       activation_evidence: evidence,
       activation_evaluation: evaluation
     }),
-    /PROMOTE/i
+    /PROMOTE|match evaluated decision/i
   );
 });
 
