@@ -594,3 +594,23 @@ Status: COMPLETE.
 - Task 24: durable tranche resume/retry.
 
 Next exact task: Task 25 — Tranche metrics summarizer.
+
+
+### Task 25 — Tranche metrics summarizer
+
+Status: COMPLETE
+RED commit: `fb03c11bcc8c6f53ac52d1c9c1f994ad7631f9c4`
+RED evidence: Pull request quality gate #438 — Node tests FAILED after setup/validation passed.
+GREEN commit: `f3b7548a9c947d51320c138c38808939174d6354`
+GREEN evidence:
+- Pull request quality gate #439 — SUCCESS;
+- Server and adapter contract tests #1155 — SUCCESS.
+Behavior:
+- empty/insufficient tranche evidence yields explicit null/unknown metrics, never fabricated zero quality;
+- yield/failure rates use tranche request_count;
+- duplicate/evidence/bilingual/review rates use only observations where that signal is known;
+- stage PASS/FAIL/ABSTAIN counts are deterministic;
+- external review backlog/queue latency remain explicit inputs.
+
+Task 25: complete.
+Next exact task: Task 26 — Adaptive follow-up decision integration.
