@@ -62,6 +62,9 @@
           "requested_count": {
             "type": "integer",
             "minimum": 1
+          },
+          "blocked": {
+            "type": "boolean"
           }
         }
       }
