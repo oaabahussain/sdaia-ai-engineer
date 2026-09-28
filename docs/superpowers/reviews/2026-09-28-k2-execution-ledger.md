@@ -656,3 +656,23 @@ Ruling: Task 27 also modifies LocalRunner although the plan listed only TrancheR
 Task 27: complete.
 Checkpoint G Tasks 23–27 are now functionally complete.
 Next exact task: Task 28 — ActivationEvidenceV1 schema.
+
+
+### Task 28 — ActivationEvidenceV1 schema
+
+Status: COMPLETE
+RED commit: `13a83063f394abb7a4fab8389989366263f9a4aa`
+RED evidence: Pull request quality gate #448 — Node tests FAILED after setup/validation passed.
+GREEN commit: `d14a34dfa6348800986fb877901a10939b104a63`
+GREEN evidence:
+- Pull request quality gate #449 — SUCCESS;
+- Server and adapter contract tests #1176 — SUCCESS.
+Contract outcome:
+- activation evidence is structured and versioned;
+- release/tranche/content hash/policy/provider/coverage/quality/review/runtime/CANARY evidence are explicit;
+- blockers and evidence sufficiency are first-class;
+- allowed decisions are PROMOTE/HOLD/REVISE/QUARANTINE/ROLLBACK;
+- bare string evidence is invalid.
+
+Task 28: complete.
+Next exact task: Task 29 — Activation evidence evaluator.
