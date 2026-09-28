@@ -3,7 +3,7 @@
 **Date:** 2026-09-28
 **Programme:** K2
 **Checkpoint:** L — final review, exact-head CI, merge and post-merge verification
-**Status:** EXECUTING — Tasks 1–50 complete; Task 51 exact-head CI active
+**Status:** EXECUTING — Tasks 1–51 complete; Task 52 merge pending exact-head documentation verification
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 51 — Exact-head CI gate.
+Task 52 — Merge K2 implementation branch to main.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 51: verify both required workflows are SUCCESS on the exact final documentation/review branch HEAD. If green, proceed to Task 52 merge; otherwise debug and repeat.
+Task 52: after this documentation-only checkpoint head is exact-head green, merge the isolated K2 branch to main, then run Task 53 post-merge verification on the resulting main SHA.
 
 ## Checkpoint A completion evidence
 
@@ -247,3 +247,14 @@ Final review product head `80431fae4f846a6aea53040b22aad86dea5d4c00`:
 - no open Critical/Important findings.
 
 Task 51 exact-head final documentation CI: ACTIVE.
+
+
+## Task 51 completion evidence
+
+Verified head before this documentation-only checkpoint update:
+`919ed987c9d78d61fc1811d70fd00566735b0354`
+
+- quality #536 SUCCESS;
+- server/adapter #1374 SUCCESS.
+
+The checkpoint update itself is documentation-only and must receive a fresh exact-head gate before Task 52 merge.
