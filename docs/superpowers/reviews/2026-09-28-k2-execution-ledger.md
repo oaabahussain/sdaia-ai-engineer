@@ -1094,3 +1094,23 @@ Checkpoint I Tasks 37–40: COMPLETE.
 Checkpoint J Tasks 41–44: COMPLETE.
 Checkpoint K Tasks 45–46: COMPLETE SO FAR.
 Next exact task: Task 47 — Current runtime regression gate.
+
+
+### Task 47 — Current runtime regression gate
+
+Status: COMPLETE
+Characterization commit: `078705b3b47179bac92c980938238b8299817a5f`
+GREEN evidence:
+- Pull request quality gate #502 — SUCCESS;
+- Server and adapter contract tests #1300 — SUCCESS.
+Locked compatibility:
+- rendered questions: 1,120;
+- legacy payload SHA256: `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`;
+- exam profile question_count: 200;
+- content-model-v2 + ExamProfileV2 boundary unchanged;
+- Pages/offline/browser/API compatibility gates remain green.
+
+Ruling: Task 47 is a characterization/regression gate over an intentionally unchanged baseline, so creating a fabricated RED by changing baseline values would violate the task's purpose. The existing K1 regression suite already proves the baseline, and K2 adds an independent compatibility assertion that passed on first execution — cost if wrong: this task lacks a synthetic RED cycle, but it preserves the stronger invariant that no learner-visible baseline was modified merely to demonstrate TDD.
+
+Task 47: complete.
+Next exact task: Task 48 — Documentation contract and changelog repair.
