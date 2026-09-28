@@ -81,14 +81,15 @@ K1 kernel/governance:
 
 Current stage:
 
-`PLAN_REVIEW_GATE`
+`EXECUTING`
 
 Status:
 
 - K2 implementation: NOT STARTED
 - K2 written spec: APPROVED — `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`
-- K2 implementation plan: CREATED — `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md` — awaiting explicit user approval
-- K2 design/research branch: `docs/k2-research-refresh-register`
+- K2 implementation plan: APPROVED — `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md`
+- K2 implementation branch: `impl/k2-coverage-expansion-controlled-release`
+- K2 execution checkpoint: B — core contracts
 
 Purpose:
 
