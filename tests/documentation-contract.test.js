@@ -88,5 +88,7 @@ test('handoff is zero-tribal-knowledge and changelog does not claim release', ()
   const changelog = read('../CHANGELOG.md');
   assert.match(changelog, /Unreleased/);
   assert.match(changelog, /Programme A/);
-  assert.match(changelog, /Implemented on the Programme A branch;.*not.*merged to `main`/i);
+  assert.doesNotMatch(changelog, /Programme A branch;.*not.*merged to `main`/i);
+  assert.match(changelog, /Programme A.*merged.*verified/i);
+  assert.match(changelog, /K2.*Coverage Expansion.*implementation/i);
 });
