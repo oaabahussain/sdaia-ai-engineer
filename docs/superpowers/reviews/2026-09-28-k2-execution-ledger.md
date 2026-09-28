@@ -417,3 +417,24 @@ Behavior:
 
 Task 17: complete.
 Next exact task: Task 18 — Cross-lingual semantic gray-zone behavior.
+
+
+### Task 18 — Cross-lingual semantic gray-zone behavior
+
+Status: COMPLETE
+RED commit: `e6c7e109613ec48d637b409a823bb14f8ff4b958`
+RED evidence: Pull request quality gate #413 — Node tests FAILED after setup/validation passed.
+GREEN commit: `51c986d6b74caad8c7843940d435c1fdb6e5a571`
+GREEN evidence:
+- Pull request quality gate #414 — SUCCESS;
+- Server and adapter contract tests #1102 — SUCCESS.
+Behavior:
+- DedupCalibrationPolicy same/cross-language thresholds are runtime inputs;
+- similarity below review bound passes;
+- calibrated gray zone returns REVIEW_REQUIRED;
+- score at/above duplicate threshold rejects;
+- unusable semantic evidence remains REVIEW_REQUIRED;
+- K1 uncalibrated threshold behavior remains available when no K2 policy is supplied.
+
+Task 18: complete.
+Next exact task: Task 19 — BilingualEquivalenceReportV1 schema.
