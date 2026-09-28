@@ -438,3 +438,23 @@ Behavior:
 
 Task 18: complete.
 Next exact task: Task 19 — BilingualEquivalenceReportV1 schema.
+
+
+### Task 19 — BilingualEquivalenceReportV1 schema
+
+Status: COMPLETE
+RED commit: `a79dc1e03ee56606e59536c137c7f8c0c5368bb1`
+RED evidence: Pull request quality gate #416 — Node tests FAILED after setup/validation passed.
+GREEN commit: `f5f8f9c8294d294a4190d3834856e4535a708f68`
+GREEN evidence:
+- Pull request quality gate #417 — SUCCESS;
+- Server and adapter contract tests #1108 — SUCCESS.
+Contract outcome:
+- nine critical bilingual dimensions are mandatory;
+- each dimension is PASS/FAIL/ABSTAIN;
+- supporting automatic metrics are non-authoritative evidence;
+- aggregate-score-only reports are invalid;
+- REVIEW_REQUIRED is allowed at report level when a dimension abstains.
+
+Task 19: complete.
+Next exact task: Task 20 — Bilingual stage v2.
