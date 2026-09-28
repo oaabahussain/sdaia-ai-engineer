@@ -237,3 +237,23 @@ Behavior:
 
 Task 10: complete.
 Next exact task: Task 11 — Expansion plan builder.
+
+
+### Task 11 — Expansion plan builder
+
+Status: COMPLETE
+RED commit: `367185b1dd0224e454a980080f51dddb3c96b0ae`
+RED evidence: Pull request quality gate #388 — Node tests FAILED after setup/validation passed.
+GREEN commit: `bd0368a633809740695ef18525e37a7e2c99535c`
+GREEN evidence:
+- Pull request quality gate #389 — SUCCESS;
+- Server and adapter contract tests #1049 — SUCCESS.
+Behavior:
+- count-only/malformed gaps rejected;
+- track identity must match;
+- Task 10 priority ordering is consumed directly;
+- the same inputs/policies/createdAt produce the same ExpansionPlanV1;
+- plan contains no provider choice and starts with no tranche refs.
+
+Task 11: complete.
+Next exact task: Task 12 — adaptive tranche policy engine.
