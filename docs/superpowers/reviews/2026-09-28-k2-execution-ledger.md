@@ -150,3 +150,22 @@ Contract outcome:
 
 Task 6: complete.
 Next exact task: Task 7 — ReviewCalibrationPolicyV1 schema.
+
+
+### Task 7 — ReviewCalibrationPolicyV1 schema
+
+Status: COMPLETE
+RED commit: `2a6ab0af8403b89eea5d04615c7cef460068b306`
+RED evidence: Pull request quality gate #374 — Node tests FAILED after setup/validation passed.
+GREEN commit: `8409e03768c2753d6320de4c7145ddff1314ddb2`
+GREEN evidence:
+- Pull request quality gate #375 — SUCCESS;
+- Server and adapter contract tests #1020 — SUCCESS.
+Contract outcome:
+- scoped evidence-backed review rules required;
+- bare sampling percentage rejected;
+- SAMPLED decisions require sampling_rate;
+- escalation triggers explicit.
+
+Task 7: complete.
+Next exact task: Task 8 — DedupCalibrationPolicyV1 schema.
