@@ -991,3 +991,21 @@ Ruling: Task 42 also updates `db/schema.sql` although the plan named only factor
 
 Task 42: complete.
 Next exact task: Task 43 — File/SQLite parity fixture.
+
+
+### Task 43 — File/SQLite parity fixture
+
+Status: COMPLETE
+RED head: `bcedc974a82f6a2a3abda838314049f17e6aa3b1`
+RED evidence: Pull request quality gate #490 — Node tests FAILED because the file adapter lacked parity-envelope mapping.
+GREEN commit: `a91e05905f265df43deb10fc5af8782126bf4b78`
+GREEN evidence:
+- Pull request quality gate #491 — SUCCESS;
+- Server and adapter contract tests #1274 — SUCCESS.
+Behavior:
+- one shared K2 fixture is preserved by both file and SQLite reference adapters;
+- file adapter accepts a logical {kind,artifact_id,record} envelope;
+- both adapters return the same logical record body.
+
+Task 43: complete.
+Next exact task: Task 44 — CLI K2 commands.
