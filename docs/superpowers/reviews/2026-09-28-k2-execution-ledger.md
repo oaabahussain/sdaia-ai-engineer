@@ -614,3 +614,23 @@ Behavior:
 
 Task 25: complete.
 Next exact task: Task 26 — Adaptive follow-up decision integration.
+
+
+### Task 26 — Adaptive follow-up decision integration
+
+Status: COMPLETE
+RED commit: `3fdcacfb88ae613434a5c4c78f87e75831204fe4`
+RED evidence: Pull request quality gate #441 — Node tests FAILED after setup/validation passed.
+GREEN commit: `5f27c0e7c35a25dcd17d3b7f2c42ddc133523137`
+GREEN evidence:
+- Pull request quality gate #442 — SUCCESS;
+- Server and adapter contract tests #1161 — SUCCESS.
+Behavior:
+- adaptive follow-up consumes raw tranche evidence through the Task 25 summarizer;
+- unknown/empty evidence yields HOLD rather than guessed sizing;
+- degraded yield contracts;
+- failure-rate and review-backlog guardrails hold;
+- no duplicate metrics mapping exists outside the canonical summarizer.
+
+Task 26: complete.
+Next exact task: Task 27 — Partial tranche failure semantics.
