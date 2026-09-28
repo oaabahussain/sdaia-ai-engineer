@@ -101,3 +101,30 @@ test('evaluateProviderV2 fails a configured mandatory K2 dimension', async () =>
 
   assert.equal(result.decision, 'FAIL');
 });
+
+
+test('evaluateProviderV2 does not report unknown provider cost as zero', async () => {
+  const { evaluateProviderV2 } = await import('../src/platform-kernel/providers/evaluateProvider.js');
+  const provider = {
+    name:'unknown-cost',
+    model:'m1',
+    generate:async input=>({
+      answer:input.x,
+      source_refs:['s1'],
+      evidence_refs:['s1'],
+      ar:'سؤال',
+      en:'Question',
+      distractors:['a','b','c'],
+      format_ok:true,
+      unsupported_claims:[],
+      ambiguity_flags:[],
+      bilingual_equivalent:true,
+      cognitive_level:input.x===1?'apply':'analyze'
+    })
+  };
+  const result=await evaluateProviderV2(provider,fixture.cases,{
+    policy_version:'k2.provider-eval.v2',
+    created_at:'2026-09-28T00:00:00Z'
+  });
+  assert.equal(result.metrics.cost,null);
+});
