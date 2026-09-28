@@ -397,3 +397,23 @@ Completed Tasks 14–16:
 - production-failure candidate eval ingestion seam.
 
 Next exact task: Task 17 — Structural duplicate evidence.
+
+
+### Task 17 — Structural duplicate evidence
+
+Status: COMPLETE
+RED commit: `1339a2b67b81a1cca4203c5daacf8ae95fb7d3b7`
+RED evidence: Pull request quality gate #410 — Node tests FAILED after setup/validation passed.
+GREEN commit: `e258b6203099a7617aeee217f2153486ac9ddb39`
+GREEN evidence:
+- Pull request quality gate #411 — SUCCESS;
+- Server and adapter contract tests #1096 — SUCCESS.
+Behavior:
+- exact-text duplicate behavior preserved;
+- structural fingerprint uses objective + normalized correct reasoning + sorted misconceptions;
+- sparse candidates do not fabricate structural identity;
+- structural matches can be DUPLICATE or REVIEW_REQUIRED by policy;
+- structural evidence is recorded without replacing semantic checks.
+
+Task 17: complete.
+Next exact task: Task 18 — Cross-lingual semantic gray-zone behavior.
