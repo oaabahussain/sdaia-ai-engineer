@@ -132,3 +132,21 @@ Contract outcome:
 
 Task 5: complete.
 Next exact task: Task 6 — ProviderRoutingPolicyV1 schema.
+
+
+### Task 6 — ProviderRoutingPolicyV1 schema
+
+Status: COMPLETE
+RED commit: `b555ff4cf64b1608ac88416533cd9dbd955bc26d`
+RED evidence: Pull request quality gate #371 — Node tests FAILED after setup/validation passed.
+GREEN commit: `1e2a0da1408046984d5470f6da01102c6a80dd40`
+GREEN evidence:
+- Pull request quality gate #372 — SUCCESS;
+- Server and adapter contract tests #1014 — SUCCESS.
+Contract outcome:
+- only APPROVED/RESTRICTED evaluation states are routable;
+- deterministic/manual/abstain fallback is explicit;
+- deterministic fallback requires provider_ref.
+
+Task 6: complete.
+Next exact task: Task 7 — ReviewCalibrationPolicyV1 schema.
