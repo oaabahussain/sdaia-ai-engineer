@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** G — Tranche execution and durable partial results
-**Status:** EXECUTING — Checkpoints A–F complete
+**Checkpoint:** H — Activation evidence, CANARY and rollback
+**Status:** EXECUTING — Checkpoints A–G complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 25 — Tranche metrics summarizer.
+Task 30 — Release lifecycle integration.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 25: write RED tranche-metrics tests first, preserve unknowns for empty evidence, implement deterministic summaries, then verify exact-head gates.
+Task 30: write RED release-lifecycle tests proving K2 CANARY→ACTIVE requires ActivationEvidenceV1 PROMOTE, preserve explicit grandfathered K1 behavior only where identified, then verify exact-head quality and server/adapter gates.
 
 ## Checkpoint A completion evidence
 
@@ -151,3 +151,26 @@ Completed:
 - Task 24 durable resume/retry — GREEN #435 / server #1146.
 
 Next: Task 25.
+
+
+## Checkpoint G completion evidence
+
+Completed:
+- Task 23 governed tranche execution;
+- Task 24 durable resume/retry;
+- Task 25 tranche metrics summarizer;
+- Task 26 adaptive follow-up integration;
+- Task 27 exact partial-failure stage evidence.
+
+Task 25–27 final evidence:
+- Task 25 GREEN quality #439 / server #1155;
+- Task 26 GREEN quality #442 / server #1161;
+- Task 27 GREEN quality #446 / server #1170.
+
+## Checkpoint H progress
+
+Completed:
+- Task 28 ActivationEvidenceV1 — GREEN quality #449 / server #1176;
+- Task 29 activation evidence evaluator — GREEN quality #452 / server #1182.
+
+Next: Task 30 — Release lifecycle integration.
