@@ -951,3 +951,22 @@ Contract outcome:
 
 Task 40: complete.
 Next exact task: Task 41 — File-store support for K2 artifacts.
+
+
+### Task 41 — File-store support for K2 artifacts
+
+Status: COMPLETE
+RED commit: `f391d47a68c0def3da76462f7ce9d71c5cf5f1db`
+RED evidence: Pull request quality gate #483 — Node tests FAILED after setup/validation passed.
+GREEN commit: `b66e13422cd8bc0c1a891706d0266de6d59ac581`
+GREEN evidence:
+- Pull request quality gate #484 — SUCCESS;
+- Server and adapter contract tests #1258 — SUCCESS.
+Behavior:
+- expansion/tranche/activation/improvement kinds are isolated;
+- same immutable ID + identical canonical body is idempotent;
+- same immutable ID + different body is rejected;
+- records use atomic file replacement only on first creation.
+
+Task 41: complete.
+Next exact task: Task 42 — SQLite reference support.
