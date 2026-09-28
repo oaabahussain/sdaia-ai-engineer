@@ -108,3 +108,43 @@ test('validateEvent returns canonical frozen envelope and enforces property cont
     /unknown|email/i
   );
 });
+
+
+test('event registry enforces REDACT and REJECT privacy actions before trust', async () => {
+  const { registerEventDefinition, validateEvent } = await import('../src/platform-kernel/observability/eventRegistry.js');
+
+  const redactId = registerEventDefinition({
+    schema_version:1,event_name:'privacy.redact.test',event_version:1,
+    purpose:'prove registry privacy enforcement',owner:'test',
+    trigger_semantics:'test only',
+    properties:{
+      track_id:{type:'string',required:true,privacy_class:'ANONYMOUS',export:'ALLOW'},
+      free_text:{type:'string',required:false,privacy_class:'SENSITIVE',export:'REDACT'}
+    },
+    privacy_class:'SENSITIVE',retention_class:'SHORT',producer:'test',
+    compatibility:{strategy:'NEW_EVENT',previous_versions:[]},
+    created_at:'2026-09-28T00:00:00Z'
+  });
+  const redacted = validateEvent(redactId,{
+    occurred_at:'2026-09-28T00:00:01Z',
+    properties:{track_id:'t1',free_text:'private'}
+  });
+  assert.deepEqual(redacted.properties,{track_id:'t1'});
+
+  const rejectId = registerEventDefinition({
+    schema_version:1,event_name:'privacy.reject.test',event_version:1,
+    purpose:'prove registry privacy rejection',owner:'test',
+    trigger_semantics:'test only',
+    properties:{
+      track_id:{type:'string',required:true,privacy_class:'ANONYMOUS',export:'ALLOW'},
+      raw_secret:{type:'string',required:false,privacy_class:'SENSITIVE',export:'REJECT'}
+    },
+    privacy_class:'SENSITIVE',retention_class:'SHORT',producer:'test',
+    compatibility:{strategy:'NEW_EVENT',previous_versions:[]},
+    created_at:'2026-09-28T00:00:00Z'
+  });
+  assert.throws(()=>validateEvent(rejectId,{
+    occurred_at:'2026-09-28T00:00:01Z',
+    properties:{track_id:'t1',raw_secret:'secret'}
+  }),/privacy|reject/i);
+});
