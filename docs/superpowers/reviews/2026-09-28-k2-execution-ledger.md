@@ -872,3 +872,22 @@ Status: COMPLETE.
 Checkpoint H is complete.
 Checkpoint I is active.
 Next exact task: Task 37 — Factory metric events.
+
+
+### Task 37 — Factory metric events
+
+Status: COMPLETE
+RED commit: `36a414bff9cc06786215f7c91206d5aaa7c6173d`
+RED evidence: Pull request quality gate #474 — Node tests FAILED after setup/validation passed.
+GREEN commit: `165170ca19964311ed99e4d3f7cf36deee756026`
+GREEN evidence:
+- Pull request quality gate #475 — SUCCESS;
+- Server and adapter contract tests #1236 — SUCCESS.
+Behavior:
+- factory/tranche telemetry exports governed aggregate IDs/counts/rates only;
+- raw prompts, source text, reviewer text and raw failure text never enter the event payload;
+- unknown metrics are omitted rather than fabricated;
+- the event passes privacy enforcement and EventRegistry validation before export.
+
+Task 37: complete.
+Next exact task: Task 38 — ImprovementFindingV1 schema.
