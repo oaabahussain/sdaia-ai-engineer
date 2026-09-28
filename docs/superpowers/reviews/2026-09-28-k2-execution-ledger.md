@@ -676,3 +676,37 @@ Contract outcome:
 
 Task 28: complete.
 Next exact task: Task 29 — Activation evidence evaluator.
+
+
+### Task 29 — Activation evidence evaluator
+
+Status: COMPLETE
+RED commit: `d9d6752eff78a96aaa0c2bbb3ce0fc602da1807c`
+RED evidence: Pull request quality gate #451 — Node tests FAILED after setup/validation passed.
+GREEN commit: `48ee34c09081ffa3f791a4b91f942c8711ace8d6`
+GREEN evidence:
+- Pull request quality gate #452 — SUCCESS;
+- Server and adapter contract tests #1182 — SUCCESS.
+Behavior:
+- PROMOTE is derived from evidence, not trusted from metadata;
+- missing required CANARY evidence yields HOLD;
+- INSUFFICIENT evidence yields HOLD;
+- critical blockers apply the CanaryPolicy critical action;
+- failed runtime/correctness/duplicate evidence cannot PROMOTE;
+- unresolved review evidence yields HOLD;
+- bilingual/accessibility unresolved or failed evidence yields HOLD.
+
+Task 29: complete.
+
+## Execution batch result — Tasks 25–29
+
+Status: COMPLETE.
+- Task 25: deterministic tranche metrics with explicit unknowns;
+- Task 26: adaptive follow-up decision consumes canonical tranche evidence summary;
+- Task 27: PARTIAL failures preserve successful siblings and exact failed-stage evidence;
+- Task 28: ActivationEvidenceV1 structured contract;
+- Task 29: activation evidence evaluator.
+
+Checkpoint G is complete.
+Checkpoint H is active.
+Next exact task: Task 30 — Release lifecycle integration.
