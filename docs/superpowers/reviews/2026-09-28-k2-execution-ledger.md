@@ -76,3 +76,22 @@ Task 2: complete (RED #359 → GREEN #360/#987).
 
 Status: COMPLETE.
 Next exact task: Task 3 — ExpansionPlanV1 schema.
+
+
+### Task 3 — ExpansionPlanV1 schema
+
+Status: COMPLETE
+RED commit: `adc76cf3af6e273ba1262fc3398ab8f773c7ffbd`
+RED evidence: Pull request quality gate #362 — Node tests FAILED after setup/validation passed; schema file was intentionally absent.
+GREEN commit: `893c91f31ffa4aa505b879885106166a0c666a41`
+GREEN evidence:
+- Pull request quality gate #363 — SUCCESS;
+- Server and adapter contract tests #996 — SUCCESS.
+Contract outcome:
+- non-empty coverage gaps required;
+- versioned policy references required;
+- count-only expansion rejected;
+- no K1 runtime behavior changed.
+
+Task 3: complete.
+Next exact task: Task 4 — TranchePlanV1 schema.
