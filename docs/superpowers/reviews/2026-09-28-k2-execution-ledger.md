@@ -257,3 +257,28 @@ Behavior:
 
 Task 11: complete.
 Next exact task: Task 12 — adaptive tranche policy engine.
+
+
+### Task 12 — Adaptive tranche policy engine
+
+Status: COMPLETE
+RED commit: `f8553d9a06ab416460315e0efb7b76f39cf374b0`
+RED evidence: Pull request quality gate #391 — Node tests FAILED after setup/validation passed.
+GREEN commit: `69cf3ac6f694d37744e1a8c895682670d18964d6`
+GREEN evidence:
+- Pull request quality gate #392 — SUCCESS;
+- Server and adapter contract tests #1055 — SUCCESS.
+Behavior:
+- missing operational metrics returns HOLD with requestedCount=null;
+- failure/review-backlog guardrails HOLD;
+- low yield contracts;
+- high yield expands;
+- all bounds, thresholds and expansion/contraction factors come from policy.
+
+Task 12: complete.
+
+### Task 13 prerequisite ruling
+
+Ruling: ExpansionPlanV1 must carry each prioritized gap's `requested_count` alongside gap_id/rank/reason before TranchePlan construction — the approved spec requires bounded coverage-driven tranche requests, but the original Task 3/11 interface retained only gap IDs and therefore could not allocate a tranche without guessing per-gap deficit — cost if wrong: one additive K2-only field is introduced before any public K2 release; omitting it would allow overfilling gaps or require hidden state.
+
+Next: prove this interface correction RED→GREEN, then implement Task 13.
