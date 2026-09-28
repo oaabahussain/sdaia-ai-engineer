@@ -488,3 +488,25 @@ Completed Tasks 17–20:
 - report-driven bilingual enforcement.
 
 Next exact task: Task 21 — Review calibration runtime.
+
+
+### Task 21 — Review calibration runtime
+
+Status: COMPLETE
+RED commit: `363c51d6d6c64d420ddf05ab45eeb6fdb6608fc0`
+RED evidence: Pull request quality gate #422 — Node tests FAILED after setup/validation passed.
+GREEN commit: `04cd024aa5bea43de6735454dd731ddb8b8131f0`
+GREEN evidence:
+- Pull request quality gate #423 — SUCCESS;
+- Server and adapter contract tests #1121 — SUCCESS.
+Behavior:
+- mandatory conditions and high-risk classes require human review;
+- observed trigger breaches escalate conservatively;
+- sampled selection is deterministic from stable candidate identity;
+- unknown risk class yields HOLD;
+- no random sampling or hidden threshold.
+
+Ruling: `INCREASE_SAMPLING` escalation without an explicit target rate is conservatively treated as HUMAN_REQUIRED — the policy schema does not carry a calibrated replacement sampling rate, so inventing one would violate the calibration boundary — cost if wrong: review load may temporarily be higher until a future policy version adds an explicit escalated rate.
+
+Task 21: complete.
+Next exact task: Task 22 — Review stage integration.
