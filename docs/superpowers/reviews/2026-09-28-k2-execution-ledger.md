@@ -1009,3 +1009,25 @@ Behavior:
 
 Task 43: complete.
 Next exact task: Task 44 — CLI K2 commands.
+
+
+### Task 44 — CLI K2 commands
+
+Status: COMPLETE
+RED commit: `eab1a7c2e347e0b982f7363e0c3237bd87303cdc`
+RED evidence: Pull request quality gate #492 — Node tests FAILED after setup/validation passed.
+GREEN commit: `51ec9e1008d257657e7fd02d854122db0f1845f4`
+GREEN evidence:
+- Pull request quality gate #493 — SUCCESS;
+- Server and adapter contract tests #1279 — SUCCESS.
+Behavior:
+- nested `k2 read/plan/run/status/resume` commands are available;
+- CLI is wired to governed file storage + tranche orchestration + durable FactoryRuns;
+- status is reconstructed from durable candidate jobs;
+- resume reconstructs completed/failed siblings and reuses existing resume logic;
+- no vendor dependency introduced.
+
+Ruling: CLI aggregate status is derived from immutable TranchePlan + durable FactoryRuns rather than introducing a mutable tranche-status store — cost if wrong: status calculation does O(n) job reads per tranche, acceptable for the reference CLI and replaceable behind later adapters.
+
+Task 44: complete.
+Next exact task: Task 45 — K2 validator integration.
