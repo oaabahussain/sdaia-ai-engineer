@@ -58,7 +58,7 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
   }
 
   if (evidence.evidence_sufficiency !== 'SUFFICIENT') {
-    return result('HOLD', 'insufficient_evidence', [], []);
+    return result(evidence, 'HOLD', 'insufficient_evidence', [], []);
   }
 
   if (Number.isFinite(canaryPolicy.minimum_observation_count)) {
@@ -67,7 +67,7 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
       !Number.isFinite(observedCount) ||
       observedCount < canaryPolicy.minimum_observation_count
     ) {
-      return result('HOLD', 'insufficient_observation_volume', [], []);
+      return result(evidence, 'HOLD', 'insufficient_observation_volume', [], []);
     }
   }
 
@@ -84,7 +84,7 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     evidence.review_summary.status === 'REVIEW_REQUIRED' ||
     evidence.review_summary.status === 'ABSTAIN'
   ) {
-    return result('HOLD', 'review_incomplete', [], []);
+    return result(evidence, 'HOLD', 'review_incomplete', [], []);
   }
 
   const nonCritical = [
@@ -92,8 +92,8 @@ export function evaluateActivationEvidence(evidence, canaryPolicy) {
     evidence.accessibility_summary.status
   ];
   if (nonCritical.some(status => ['FAIL', 'REVIEW_REQUIRED', 'ABSTAIN'].includes(status))) {
-    return result('HOLD', 'quality_evidence_incomplete', [], []);
+    return result(evidence, 'HOLD', 'quality_evidence_incomplete', [], []);
   }
 
-  return result('PROMOTE', 'activation_evidence_passed', [], []);
+  return result(evidence, 'PROMOTE', 'activation_evidence_passed', [], []);
 }
