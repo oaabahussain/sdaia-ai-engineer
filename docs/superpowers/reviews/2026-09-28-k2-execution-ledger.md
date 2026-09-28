@@ -545,3 +545,23 @@ Next exact task: Task 23 — Tranche run envelope.
 
 
 Task 23: Ruling: aggregate TranchePlan requests are expanded through an explicit deterministic `options.buildRequest({tranchePlan,request,indexWithinGap,globalIndex})` seam before calling LocalRunner — TranchePlanV1 intentionally stores coverage demand counts rather than inventing FactoryRun IDs/targets, so the orchestration boundary must receive the concrete request construction policy from its caller — cost if wrong: callers must provide one small adapter, but IDs/targets remain explicit and reproducible rather than hidden in the runner.
+
+
+### Task 23 — Tranche run envelope
+
+Status: COMPLETE
+RED commit: `9c4c921465ed011dca75a957b5b39b7d905d940c`
+RED evidence: Pull request quality gate #431 — Node tests FAILED after setup/validation passed.
+GREEN commit: `25ac09b3b9dc8efede4f16f63f3d9a72fe6d5bd2`
+GREEN evidence:
+- Pull request quality gate #432 — SUCCESS;
+- Server and adapter contract tests #1141 — SUCCESS.
+Behavior:
+- only explicitly authorized PLANNED tranches execute;
+- aggregate coverage requests expand through the explicit deterministic buildRequest seam;
+- concrete requests execute sequentially through the existing runner;
+- mixed outcomes preserve successful siblings and report PARTIAL;
+- no workflow engine or provider-specific dependency introduced.
+
+Task 23: complete.
+Next exact task: Task 24 — Tranche resume/retry.
