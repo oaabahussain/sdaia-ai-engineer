@@ -31,6 +31,7 @@ const valid = {
     missing_required_metric: 'HOLD'
   },
   exposure_calibration_ref: 'k2.canary.exposure.v1',
+  minimum_observation_count: 100,
   created_at: '2026-09-28T00:00:00Z'
 };
 
@@ -54,4 +55,13 @@ test('CanaryPolicyV1 rejects fixed duration as sufficient promotion policy', () 
     duration_hours: 24,
     exposure_percent: 10
   }), false);
+});
+
+
+test('CanaryPolicyV1 accepts a versioned minimum observation count', () => {
+  const validate = compile('canary-policy-v1.schema.json');
+  assert.equal(validate(valid), true, JSON.stringify(validate.errors));
+  const invalid = structuredClone(valid);
+  invalid.minimum_observation_count = 0;
+  assert.equal(validate(invalid), false);
 });
