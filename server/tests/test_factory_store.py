@@ -49,3 +49,18 @@ def test_learner_events_are_append_only_validated_and_queryable(tmp_path):
         append_learner_event(db_url,a)
     with pytest.raises(ValueError):
         append_learner_event(db_url,{**base,'event_id':'bad','track_id':'t1','item_version_id':'i3','shown_at':'2026-09-27T00:00:00Z','answered_at':'2026-09-27T00:00:05Z','mastery':0.9})
+
+
+def test_k2_governance_records_are_immutable_and_queryable(tmp_path):
+    from app.factory_store import put_k2_governance_record, get_k2_governance_record, list_k2_governance_records
+    db_url=f"sqlite:///{tmp_path / 'k2.db'}"
+    init_db(db_url)
+    record={'schema_version':1,'plan_id':'expansion:1','track_id':'sdaia-ai-engineer'}
+    assert put_k2_governance_record(db_url,'expansion','expansion:1',record) == 'expansion:1'
+    assert get_k2_governance_record(db_url,'expansion','expansion:1') == record
+    assert put_k2_governance_record(db_url,'expansion','expansion:1',dict(record)) == 'expansion:1'
+    assert list_k2_governance_records(db_url,'expansion') == ['expansion:1']
+    with pytest.raises(ValueError, match='immutable|different'):
+        put_k2_governance_record(db_url,'expansion','expansion:1',{**record,'track_id':'changed'})
+    with pytest.raises(ValueError, match='kind'):
+        put_k2_governance_record(db_url,'unknown','x',{})
