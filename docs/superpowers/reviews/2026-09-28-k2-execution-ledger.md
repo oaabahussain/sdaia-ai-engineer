@@ -188,3 +188,32 @@ Contract outcome:
 
 Task 8: complete.
 Next exact task: Task 9 — CanaryPolicyV1 schema.
+
+
+### Task 9 — CanaryPolicyV1 schema
+
+Status: COMPLETE
+RED commit: `fbe4fc2a1720943bc9ce87254b04070e332caedf`
+RED evidence: Pull request quality gate #380 — Node tests FAILED after setup/validation passed.
+GREEN commit: `05bce1aa3e1d0c22346292247277666b7894e539`
+GREEN evidence:
+- Pull request quality gate #381 — SUCCESS;
+- Server and adapter contract tests #1032 — SUCCESS.
+Contract outcome:
+- required evidence classes explicit;
+- HOLD conditions required;
+- critical/missing-metric blocker behavior explicit;
+- fixed duration/exposure alone rejected as promotion policy.
+
+Task 9: complete.
+
+## Checkpoint B result
+
+Status: COMPLETE.
+Fresh checkpoint verification on `05bce1aa3e1d0c22346292247277666b7894e539`:
+- all seven K2 schema files from Tasks 3–9 present;
+- all seven owning contract test files present;
+- Pull request quality gate #381 SUCCESS;
+- Server and adapter contract tests #1032 SUCCESS.
+
+Next exact task: Task 10 — Coverage priority model.
