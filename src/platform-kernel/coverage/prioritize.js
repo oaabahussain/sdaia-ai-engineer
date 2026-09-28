@@ -63,7 +63,7 @@ export function prioritizeCoverageGaps(gaps, context = {}) {
         throw new Error('CoverageGapV1 with requested_count is required');
       }
 
-      const sourceReady = context.sourceReadiness?.[gap.gap_id] !== false;
+      const sourceReady = context.sourceReadiness?.[gap.gap_id] === true;
       const riskClass = riskFrom(context.riskClass, gap.gap_id);
       const duplicatePressure = numberFrom(
         context.duplicatePressure,
