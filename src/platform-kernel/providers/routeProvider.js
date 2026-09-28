@@ -15,6 +15,22 @@ function statusEligible(candidateStatus, requiredStatus) {
   return false;
 }
 
+function withinRouteBounds(candidate, route) {
+  if (Number.isFinite(route.max_latency_ms)) {
+    if (
+      !Number.isFinite(candidate?.metrics?.latency_ms) ||
+      candidate.metrics.latency_ms > route.max_latency_ms
+    ) return false;
+  }
+  if (Number.isFinite(route.max_cost)) {
+    if (
+      !Number.isFinite(candidate?.metrics?.cost) ||
+      candidate.metrics.cost > route.max_cost
+    ) return false;
+  }
+  return true;
+}
+
 function fallbackDecision(fallback) {
   if (!fallback || typeof fallback.mode !== 'string') {
     throw new Error('Provider routing policy requires fallback');
@@ -77,7 +93,8 @@ export function routeProvider({
         statusEligible(
           candidate.evaluation_status,
           route.required_evaluation_status
-        )
+        ) &&
+        withinRouteBounds(candidate, route)
       ) {
         return {
           mode: 'PROVIDER',
