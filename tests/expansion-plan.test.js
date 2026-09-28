@@ -72,3 +72,19 @@ test('buildExpansionPlan rejects count-only expansion input', async () => {
     /CoverageGapV1|gap_id/i
   );
 });
+
+
+test('expansion plan identity changes when immutable planning inputs change', async () => {
+  const { buildExpansionPlan } = await import(moduleUrl);
+  const base={
+    trackId:'sdaia-ai-engineer',
+    gaps:[gap('gap:a',5)],
+    context:{createdAt:'2026-09-28T00:00:00Z',sourceReadiness:{'gap:a':true}},
+    policyVersions
+  };
+  const first=buildExpansionPlan(base);
+  const changedCount=buildExpansionPlan({...base,gaps:[gap('gap:a',6)]});
+  const changedTime=buildExpansionPlan({...base,context:{...base.context,createdAt:'2026-09-28T01:00:00Z'}});
+  assert.notEqual(first.plan_id,changedCount.plan_id);
+  assert.notEqual(first.plan_id,changedTime.plan_id);
+});
