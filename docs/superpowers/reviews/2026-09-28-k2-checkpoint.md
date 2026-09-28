@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** H — Activation evidence, CANARY and rollback
-**Status:** EXECUTING — Checkpoints A–G complete
+**Checkpoint:** I — Measurement/event governance and improvement contracts
+**Status:** EXECUTING — Checkpoints A–H complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 30 — Release lifecycle integration.
+Task 37 — Factory metric events.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 30: write RED release-lifecycle tests proving K2 CANARY→ACTIVE requires ActivationEvidenceV1 PROMOTE, preserve explicit grandfathered K1 behavior only where identified, then verify exact-head quality and server/adapter gates.
+Task 37: write RED factory-signal tests that prove private prompt/source/reviewer text cannot be exported; emit only governed aggregate identifiers/counts/rates through EventDefinition/privacy/registry boundaries.
 
 ## Checkpoint A completion evidence
 
@@ -174,3 +174,28 @@ Completed:
 - Task 29 activation evidence evaluator — GREEN quality #452 / server #1182.
 
 Next: Task 30 — Release lifecycle integration.
+
+
+## Checkpoint H completion evidence
+
+Completed:
+- Task 28 ActivationEvidenceV1;
+- Task 29 activation evidence evaluator;
+- Task 30 governed release lifecycle integration;
+- Task 31 insufficient observation-volume HOLD;
+- Task 32 immutable quarantine helpers.
+
+Latest H evidence:
+- Task 30 GREEN quality #456 / server #1191;
+- Task 31 GREEN quality #461 / server #1203;
+- Task 32 GREEN quality #464 / server #1209.
+
+## Checkpoint I progress
+
+Completed:
+- Task 33 EventDefinitionV1 — GREEN quality #466 / server #1214;
+- Task 34 event registry — GREEN quality #468 / server #1219;
+- Task 35 privacy enforcement — GREEN quality #470 / server #1224;
+- Task 36 observability ports — GREEN quality #472 / server #1229.
+
+Next: Task 37 — Factory metric events.
