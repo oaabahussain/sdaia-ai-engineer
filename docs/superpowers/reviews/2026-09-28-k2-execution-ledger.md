@@ -932,3 +932,22 @@ Behavior:
 
 Task 39: complete.
 Next exact task: Task 40 — ExperimentRecordV1 schema.
+
+
+### Task 40 — ExperimentRecordV1 schema
+
+Status: COMPLETE
+RED commit: `bffbe0b88492676bfe22090ce0c533719af0aa3f`
+RED evidence: Pull request quality gate #481 — Node tests FAILED after setup/validation passed.
+GREEN commit: `6d9500a873f986540daadcb99df8524541a78421`
+GREEN evidence:
+- Pull request quality gate #482 — SUCCESS;
+- Server and adapter contract tests #1253 — SUCCESS.
+Contract outcome:
+- hypothesis/finding/cohort/assignment references explicit;
+- primary metric and at least one guardrail required;
+- lifecycle limited to DRAFT/RUNNING/COMPLETED/STOPPED;
+- result and rollout decision are durable evidence fields, not inferred from status.
+
+Task 40: complete.
+Next exact task: Task 41 — File-store support for K2 artifacts.
