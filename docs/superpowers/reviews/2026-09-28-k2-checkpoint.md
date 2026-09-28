@@ -16,11 +16,11 @@
 - Native execution method approved.
 - Isolated implementation branch created.
 - Fresh pre-execution CI evidence captured.
-- Task 1 baseline artifacts prepared.
+- Task 1 baseline artifacts committed and exact-head CI verified.
 
 ## Active task
 
-Task 1 — create execution baseline / ledger / checkpoint.
+Task 2 — add K2 acceptance-test shell and prove intended RED.
 
 ## Verification evidence
 
@@ -48,4 +48,4 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Finish Task 1 by recording the baseline commit SHA, then begin Task 2 acceptance-test shell. Do not begin Task 3 until Task 2 has a proven RED and a green end state.
+Task 2: commit acceptance shell, verify intended RED on exact-head CI, then gate future assertions to restore GREEN. Do not begin Task 3 until Task 2 has a proven RED and green end state.
