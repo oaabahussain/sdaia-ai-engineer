@@ -83,6 +83,14 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "max_latency_ms": {
+            "type": "number",
+            "minimum": 0
+          },
+          "max_cost": {
+            "type": "number",
+            "minimum": 0
           }
         }
       }
