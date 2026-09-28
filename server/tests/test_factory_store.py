@@ -64,3 +64,13 @@ def test_k2_governance_records_are_immutable_and_queryable(tmp_path):
         put_k2_governance_record(db_url,'expansion','expansion:1',{**record,'track_id':'changed'})
     with pytest.raises(ValueError, match='kind'):
         put_k2_governance_record(db_url,'unknown','x',{})
+
+
+def test_sqlite_k2_store_preserves_shared_parity_fixture(tmp_path):
+    from pathlib import Path
+    from app.factory_store import put_k2_governance_record, get_k2_governance_record
+    fixture=json.loads((Path(__file__).resolve().parents[2] / 'tests' / 'fixtures' / 'k2' / 'store-parity.json').read_text())
+    db_url=f"sqlite:///{tmp_path / 'k2-parity.db'}"
+    init_db(db_url)
+    put_k2_governance_record(db_url,fixture['kind'],fixture['artifact_id'],fixture['record'])
+    assert get_k2_governance_record(db_url,fixture['kind'],fixture['artifact_id']) == fixture['record']
