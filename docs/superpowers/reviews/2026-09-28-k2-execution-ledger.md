@@ -795,3 +795,26 @@ Contract outcome:
 
 Task 33: complete.
 Next exact task: Task 34 — Event registry runtime.
+
+
+### Task 34 — Event registry runtime
+
+Status: COMPLETE
+RED commit: `7080fc62d0b2f4925ce0722b636ff765f26926cd`
+RED evidence: Pull request quality gate #467 — Node tests FAILED after setup/validation passed.
+GREEN commit: `3119fdbe11648a166dff74091791b07c17b3a5b9`
+GREEN evidence:
+- Pull request quality gate #468 — SUCCESS;
+- Server and adapter contract tests #1219 — SUCCESS.
+Behavior:
+- definitions are schema-validated and keyed by exact name@version;
+- registered versions are immutable;
+- unknown/unversioned definitions are rejected;
+- required/unknown/property-type checks run before canonicalization;
+- validated events are frozen canonical envelopes;
+- validated envelopes receive an internal WeakSet trust marker for downstream adapter guards.
+
+Ruling: validated-event trust uses an in-memory WeakSet rather than a serializable boolean — a caller must revalidate deserialized events instead of forging a `validated:true` field — cost if wrong: cross-process adapters require validation at their boundary, which is intentionally safer but slightly more work.
+
+Task 34: complete.
+Next exact task: Task 35 — Privacy classification enforcement.
