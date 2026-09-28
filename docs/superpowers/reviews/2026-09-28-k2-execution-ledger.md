@@ -1050,3 +1050,47 @@ Behavior:
 
 Task 45: complete.
 Next exact task: Task 46 — Public artifact privacy guard.
+
+
+### Task 46 — Public artifact privacy guard
+
+Status: COMPLETE
+RED commit: `ca716add6e30383f8560429af199d8ef63eafa5c`
+RED evidence: Pull request quality gate #496 — Node tests FAILED; probe proved Pages copied `src/platform-kernel` into the public artifact.
+Privacy-boundary implementation head: `540ed347cbec78083a782707ad92f31b809dd120`.
+Debugging:
+- quality #497 failed because an older K1 regression regex treated the new absence assertion `test ! -e _site/data/factory` as a leak;
+- K1 guard narrowed in `4da247bc0ae317a535d42968a7b8e25850d66303`;
+- quality #498 exposed the same over-broad pattern in release-contract.test.js;
+- second guard corrected in `d8cab521fa7d35c27006a446b3bc1e4378e3490c`.
+Final GREEN evidence:
+- Pull request quality gate #499 — SUCCESS;
+- Server and adapter contract tests #1294 — SUCCESS.
+Behavior:
+- public assembly removes `_site/src/platform-kernel` after copying runtime src;
+- public assembly explicitly asserts absence of `_site/data/factory` and `_site/src/platform-kernel`;
+- app.js has no runtime import from private platform-kernel;
+- existing public Pages/runtime verification remains green.
+
+Ruling: `src/platform-kernel` is treated as private execution/governance infrastructure for Pages even though it is source code rather than data — the browser application has no dependency on it, and publishing it adds unnecessary factory/telemetry/review implementation exposure — cost if wrong: a future public runtime import from platform-kernel must either be deliberately promoted into a public-safe module or the boundary revisited with an explicit design decision.
+
+Task 46: complete.
+
+## Execution batch result — Tasks 37–46
+
+Status: COMPLETE.
+- Task 37: governed aggregate factory signals;
+- Task 38: ImprovementFindingV1 contract;
+- Task 39: validated-signal improvement finding builder;
+- Task 40: ExperimentRecordV1 contract;
+- Task 41: immutable K2 file governance store;
+- Task 42: SQLite K2 governance persistence;
+- Task 43: shared file/SQLite parity fixture;
+- Task 44: K2 read/plan/run/status/resume CLI;
+- Task 45: optional K2 governance validator integration;
+- Task 46: public artifact privacy boundary.
+
+Checkpoint I Tasks 37–40: COMPLETE.
+Checkpoint J Tasks 41–44: COMPLETE.
+Checkpoint K Tasks 45–46: COMPLETE SO FAR.
+Next exact task: Task 47 — Current runtime regression gate.
