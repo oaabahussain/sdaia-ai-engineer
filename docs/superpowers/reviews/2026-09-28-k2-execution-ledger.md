@@ -774,3 +774,24 @@ Behavior:
 Task 32: complete.
 Checkpoint H Tasks 28–32 are complete.
 Next exact task: Task 33 — EventDefinitionV1 schema.
+
+
+### Task 33 — EventDefinitionV1 schema
+
+Status: COMPLETE
+RED commit: `390ff2f810ddf66968534f279769a60c6afc2f19`
+RED evidence: Pull request quality gate #465 — Node tests FAILED after setup/validation passed.
+GREEN commit: `bc7861f25c759ff4a538ab209d71ec845c56506b`
+GREEN evidence:
+- Pull request quality gate #466 — SUCCESS;
+- Server and adapter contract tests #1214 — SUCCESS.
+Contract outcome:
+- stable dotted event name + integer version;
+- purpose, owner and trigger semantics required;
+- each property declares type, required flag, privacy class and export action;
+- top-level privacy classification and retention policy class required;
+- compatibility/migration strategy required;
+- no hard-coded retention durations.
+
+Task 33: complete.
+Next exact task: Task 34 — Event registry runtime.
