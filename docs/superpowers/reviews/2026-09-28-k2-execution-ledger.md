@@ -60,6 +60,19 @@ Task 1: complete (baseline/ledger/checkpoint persisted; exact-head CI green).
 
 ### Task 2 — Add K2 acceptance test shell
 
-Status: RED_PENDING
+Status: COMPLETE
 
-Next: commit an assertion-based acceptance shell that fails only because the approved K2 contracts/modules do not yet exist.
+RED commit: `a58acf8811086fc61943ad40b784685e46ea00e0`.
+RED evidence: Pull request quality gate #359 failed specifically at the Node-test step after setup/validation passed. The previous approved-plan head was green and the GREEN revision changed only the acceptance-shell gating, so the differential establishes the intended future-contract assertion as the failure source; the GitHub connector does not expose raw job logs/annotations.
+GREEN commit: `f440a4d3d165be8e793b1cce3183eb40d47596dd`.
+GREEN evidence:
+- Pull request quality gate #360 — SUCCESS;
+- Server and adapter contract tests #987 — SUCCESS.
+Ruling: preserve future K2 acceptance behaviors as `test.todo` until their owning tasks implement them, while keeping a live shell-surface test — this gives Task 2 a green endpoint without pretending future behavior already exists — cost if wrong: a future task could forget to enable its acceptance assertion, mitigated by Task 49 requiring all TODO gates removed.
+
+Task 2: complete (RED #359 → GREEN #360/#987).
+
+## Checkpoint A result
+
+Status: COMPLETE.
+Next exact task: Task 3 — ExpansionPlanV1 schema.
