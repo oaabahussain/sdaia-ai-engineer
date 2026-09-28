@@ -217,3 +217,23 @@ Fresh checkpoint verification on `05bce1aa3e1d0c22346292247277666b7894e539`:
 - Server and adapter contract tests #1032 SUCCESS.
 
 Next exact task: Task 10 — Coverage priority model.
+
+
+### Task 10 — Coverage priority model
+
+Status: COMPLETE
+RED commit: `f92703a49b0e4f1753649b9c12680fb52e2ed8e1`
+RED evidence: Pull request quality gate #385 — Node tests FAILED after setup/validation passed.
+GREEN commit: `71d564b9cfbe388e56e52050e9eddea52b8a9b86`
+GREEN evidence:
+- Pull request quality gate #386 — SUCCESS;
+- Server and adapter contract tests #1043 — SUCCESS.
+Ruling: use a lexicographic priority vector instead of an opaque aggregate score — this preserves explainability and prevents one factor from silently compensating for another — cost if wrong: scheduling preferences may need policy refinement, but content-quality gates remain unaffected.
+Behavior:
+- source-unready gaps are blocked behind ready gaps;
+- larger deficits rank first among equally eligible gaps;
+- risk/duplicate pressure/review capacity/bilingual/accessibility complexity remain visible fields;
+- stable gap_id breaks exact ties deterministically.
+
+Task 10: complete.
+Next exact task: Task 11 — Expansion plan builder.
