@@ -838,3 +838,37 @@ Behavior:
 
 Task 35: complete.
 Next exact task: Task 36 — Export adapter port.
+
+
+### Task 36 — Export adapter port
+
+Status: COMPLETE
+RED commit: `c8ec4073a40ec39582a10d0b63f1ea0fffe19043`
+RED evidence: Pull request quality gate #471 — Node tests FAILED after setup/validation passed.
+GREEN commit: `ba6de3332f2defe6c347085e5619d8d35a601f51`
+GREEN evidence:
+- Pull request quality gate #472 — SUCCESS;
+- Server and adapter contract tests #1229 — SUCCESS.
+Behavior:
+- AnalyticsSink/TelemetrySink/FeatureFlagPort shapes are explicit;
+- no vendor SDK dependency is introduced;
+- guarded AnalyticsSink refuses any event not actually validated by EventRegistry;
+- an object that merely copies the canonical event fields cannot forge registry trust;
+- validated events are passed through unchanged to the adapter.
+
+Task 36: complete.
+
+## Execution batch result — Tasks 30–36
+
+Status: COMPLETE.
+- Task 30: governed K2 CANARY→ACTIVE lifecycle with explicit grandfathered legacy boundary;
+- Task 31: observation-volume insufficiency yields HOLD from versioned policy/evidence;
+- Task 32: immutable release/tranche/family/item-version quarantine operations;
+- Task 33: EventDefinitionV1 governance contract;
+- Task 34: schema-backed exact-version event registry;
+- Task 35: deterministic privacy/data-minimization enforcement;
+- Task 36: vendor-neutral observability ports with validated-event export guard.
+
+Checkpoint H is complete.
+Checkpoint I is active.
+Next exact task: Task 37 — Factory metric events.
