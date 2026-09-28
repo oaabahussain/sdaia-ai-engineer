@@ -282,3 +282,19 @@ Task 12: complete.
 Ruling: ExpansionPlanV1 must carry each prioritized gap's `requested_count` alongside gap_id/rank/reason before TranchePlan construction — the approved spec requires bounded coverage-driven tranche requests, but the original Task 3/11 interface retained only gap IDs and therefore could not allocate a tranche without guessing per-gap deficit — cost if wrong: one additive K2-only field is introduced before any public K2 release; omitting it would allow overfilling gaps or require hidden state.
 
 Next: prove this interface correction RED→GREEN, then implement Task 13.
+
+
+### Task 13 prerequisite interface correction
+
+Status: COMPLETE
+RED commit: `985bf8d974ea82d9b642f62ae971e929b3d56bc2`
+RED evidence: Pull request quality gate #394 — Node tests FAILED after setup/validation passed.
+GREEN commit: `08e4f942e6684dde1e7a707ef9be82bce76c2077`
+GREEN evidence:
+- Pull request quality gate #395 — SUCCESS;
+- Server and adapter contract tests #1061 — SUCCESS.
+Outcome: ExpansionPlanV1 priority entries now preserve each gap's positive `requested_count`, and buildExpansionPlan carries that deficit forward.
+
+Ruling: Task 13 treats `trancheDecision` as a planning decision envelope: the Task 12 decision fields plus the risk/capacity/timestamp evidence captured by the caller from the same scheduling pass — this keeps Task 12's pure decision API small while preventing TranchePlan from fabricating operational evidence — cost if wrong: the future orchestrator must assemble one explicit envelope before calling buildTranchePlan.
+
+Next exact task: Task 13 — Tranche plan builder.
