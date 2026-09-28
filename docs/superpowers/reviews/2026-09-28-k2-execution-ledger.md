@@ -754,3 +754,23 @@ Ruling: Task 31 extends CanaryPolicyV1 and ActivationEvidenceV1 schemas although
 
 Task 31: complete.
 Next exact task: Task 32 — Family/item quarantine helpers.
+
+
+### Task 32 — Family/item quarantine helpers
+
+Status: COMPLETE
+RED commit: `2fee38c5c9b666d29205e45bb4fe3d68da17f820`
+RED evidence: Pull request quality gate #463 — Node tests FAILED after setup/validation passed.
+GREEN commit: `b31b2f7fcc7a38930f4e2cd411ff3e2f608fb05e`
+GREEN evidence:
+- Pull request quality gate #464 — SUCCESS;
+- Server and adapter contract tests #1209 — SUCCESS.
+Behavior:
+- quarantine supports release/tranche/family/item-version scopes;
+- events record from/to target, reason, actor, timestamp, triggering evidence and follow-up requirement;
+- original historical objects/selections are never mutated;
+- selection helper returns a new immutable selection with only the scoped target excluded.
+
+Task 32: complete.
+Checkpoint H Tasks 28–32 are complete.
+Next exact task: Task 33 — EventDefinitionV1 schema.
