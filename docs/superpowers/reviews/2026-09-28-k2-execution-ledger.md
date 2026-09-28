@@ -298,3 +298,22 @@ Outcome: ExpansionPlanV1 priority entries now preserve each gap's positive `requ
 Ruling: Task 13 treats `trancheDecision` as a planning decision envelope: the Task 12 decision fields plus the risk/capacity/timestamp evidence captured by the caller from the same scheduling pass — this keeps Task 12's pure decision API small while preventing TranchePlan from fabricating operational evidence — cost if wrong: the future orchestrator must assemble one explicit envelope before calling buildTranchePlan.
 
 Next exact task: Task 13 — Tranche plan builder.
+
+
+### Task 7 — ReviewCalibrationPolicyV1 schema
+
+Status: COMPLETE
+RED commit: `2a6ab0af8403b89eea5d04615c7cef460068b306`
+RED evidence: Pull request quality gate #374 — Node tests FAILED after setup/validation passed.
+GREEN commit: `8409e03768c2753d6320de4c7145ddff1314ddb2`
+GREEN evidence:
+- Pull request quality gate #375 — SUCCESS;
+- Server and adapter contract tests #1020 — SUCCESS.
+Contract outcome:
+- review policy requires scope and evidence basis;
+- sampled review requires explicit sampling rate;
+- escalation triggers are mandatory;
+- bare sampling percentages are invalid.
+
+Task 7: complete.
+Next exact task: Task 8 — DedupCalibrationPolicyV1 schema.
