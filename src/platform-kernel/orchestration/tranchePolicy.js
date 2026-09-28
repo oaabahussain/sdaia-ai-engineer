@@ -1,3 +1,5 @@
+import { summarizeTrancheMetrics } from './trancheMetrics.js';
+
 function finite(value) {
   return Number.isFinite(value);
 }
@@ -106,4 +108,18 @@ export function decideNextTranche(policy, metrics = {}, demand = {}) {
     requestedCount: current,
     reason: 'within_guardrails'
   };
+}
+
+
+export function decideNextTrancheFromEvidence(
+  policy,
+  trancheResult,
+  operationalInputs = {},
+  demand = {}
+) {
+  const metrics = summarizeTrancheMetrics(
+    trancheResult,
+    operationalInputs
+  );
+  return decideNextTranche(policy, metrics, demand);
 }
