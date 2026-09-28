@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "track_id",
+    "coverage_gap_ids",
+    "priorities",
+    "tranche_refs",
+    "policy_versions",
+    "status",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "coverage_gap_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "priorities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gap_id",
+          "rank",
+          "reason"
+        ],
+        "properties": {
+          "gap_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "tranche_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "policy_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_policy_version",
+        "quality_policy_version",
+        "review_policy_version",
+        "tranche_calibration_policy_version"
+      ],
+      "properties": {
+        "source_policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quality_policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tranche_calibration_policy_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PLANNED",
+        "ACTIVE",
+        "PAUSED",
+        "COMPLETED",
+        "CANCELLED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
