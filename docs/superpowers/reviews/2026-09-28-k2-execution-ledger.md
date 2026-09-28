@@ -1031,3 +1031,22 @@ Ruling: CLI aggregate status is derived from immutable TranchePlan + durable Fac
 
 Task 44: complete.
 Next exact task: Task 45 — K2 validator integration.
+
+
+### Task 45 — K2 validator integration
+
+Status: COMPLETE
+RED commit: `41a06aeb745eb1c44154f6d94d82564112fbc6c9`
+RED evidence: Pull request quality gate #494 — Node tests FAILED after setup/validation passed.
+GREEN commit: `846f0c9a7d021e1bfa62bdd785682cc3b3eb1fd4`
+GREEN evidence:
+- Pull request quality gate #495 — SUCCESS;
+- Server and adapter contract tests #1284 — SUCCESS.
+Behavior:
+- optional K2 governance directories are discovered under data/factory/k2;
+- expansion/tranche/activation/improvement/experiment/event-definition and K2 policy artifacts map to explicit schemas;
+- absent optional directories preserve K1 behavior;
+- malformed present artifacts fail validation.
+
+Task 45: complete.
+Next exact task: Task 46 — Public artifact privacy guard.
