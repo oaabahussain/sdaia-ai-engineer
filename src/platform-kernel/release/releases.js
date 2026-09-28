@@ -1,6 +1,5 @@
-import { isTrustedActivationEvaluation } from './activationEvidence.js';
-import crypto from 'node:crypto';
 import { isEvaluatedActivationDecision } from './activationEvidence.js';
+import crypto from 'node:crypto';
 function canonical(value){if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';if(value&&typeof value==='object'){return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}'}return JSON.stringify(value)}
 export function contentHash(value){return crypto.createHash('sha256').update(canonical(value)).digest('hex')}
 export function assertImmutableVersion(oldVersion,newVersion){if(oldVersion?.item_version_id!==newVersion?.item_version_id)return true;const oldHash=oldVersion.content_hash||contentHash(oldVersion.content);const newHash=newVersion.content_hash||contentHash(newVersion.content);if(oldHash!==newHash||contentHash(oldVersion.content)!==contentHash(newVersion.content))throw new Error('Released item version is immutable; create a new ItemVersion');return true}
@@ -24,7 +23,7 @@ function assertActivationEvidence(release,evidence,evaluation){
   ){
     throw new Error('Valid ActivationEvidenceV1 for this release is required');
   }
-  if(!isEvaluatedActivationDecision(evaluation)){
+  if(!isEvaluatedActivationDecision(evaluation,evidence)){
     throw new Error('Trusted activation evaluation is required');
   }
   if(evidence.decision!==evaluation.decision){
