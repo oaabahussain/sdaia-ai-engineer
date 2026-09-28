@@ -41,8 +41,9 @@ test('builder requires registry-validated signal and preserves observation/hypot
 test('correlation input cannot produce causal finding',async()=>{
  if(!moduleExists())return;
  const {createImprovementFinding}=await import(moduleUrl);
+ const validatedSignal=await signal();
  assert.throws(()=>createImprovementFinding({
-  findingId:'finding:bad',signal:await signal(),signalType:'quality_drift',summary:'regression',
+  findingId:'finding:bad',signal:validatedSignal,signalType:'quality_drift',summary:'regression',
   evidenceRefs:['event:1'],scope:{kind:'tranche',ref:'t1'},
   uncertainty:{confidence:'LOW',limitations:['correlation only']},
   hypothesis:{statement:'provider caused regression',evidence_class:'CORRELATION',causal:true},
