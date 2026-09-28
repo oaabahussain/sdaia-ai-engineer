@@ -243,3 +243,22 @@ test('partial tranche failure records the exact failed stage while preserving su
   assert.equal(result.failed[0].stage, 'evidence');
   assert.match(result.failed[0].error, /evidence mismatch/);
 });
+
+
+test('tranche failure preserves explicit non-retryable classification', async () => {
+  const { runTranche } = await import(moduleUrl);
+  const runner = {
+    async runCandidate(request) {
+      if (request.run_id === 'run:gap:a:0') {
+        const error = new Error('permanent validation failure');
+        error.factory_stage = 'validate';
+        error.retryable = false;
+        throw error;
+      }
+      return { run_id: request.run_id, status: 'completed' };
+    }
+  };
+  const result = await runTranche(tranchePlan, runner, { approved:true, buildRequest });
+  const failed = result.failed.find(item => item.run_id === 'run:gap:a:0');
+  assert.equal(failed.retryable, false);
+});
