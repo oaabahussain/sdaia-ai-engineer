@@ -1,199 +1,151 @@
-# CURRENT AUTHORITATIVE HANDOFF — K2 Execution
+# CURRENT AUTHORITATIVE HANDOFF — K3 Design Gate
 
-**Date:** 2026-09-27  
+**Date:** 2026-09-28  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**K1 product merge baseline:** `d6576a8d2f4f98d2310174f633622c0b96017eb3`  
-**Post-K1 documentation main observed before this audit:** `134313a49514e02209954002c9af8de0a704535b`  
-**Session rule:** always resolve live `main` first; documentation-only merges may advance it without changing the product baseline.  
-**Current gate:** `K2_EXECUTING`
+**K2 product merge baseline:** `dced183980199ca8b7e359b48ddc7fd61f29488f`  
+**Session rule:** always resolve live `main` first; documentation-only commits may advance it without changing the K2 product baseline.  
+**Current gate:** `K3_DESIGN`
 
-## Completed foundation
+## Completed programmes
 
-The following programmes are merged and post-merge verified:
-
+Merged and post-merge verified:
 - Programme A
 - B0
 - B1
 - B2
 - B3
-- **K1 — Content Factory & Governance Core**
+- K1 — Content Factory & Governance Core
+- **K2 — Coverage Expansion & Controlled Release**
 
-K1 PR #15 merged at:
-`d6576a8d2f4f98d2310174f633622c0b96017eb3`
+## K2 integration authority
 
-Post-merge verification:
-- Server/Adapter #932: SUCCESS
-- GitHub Pages #23: SUCCESS
-- Pages deploy + live release verification: SUCCESS
+PR #20:
+- reviewed head: `919ed987c9d78d61fc1811d70fd00566735b0354`;
+- merge SHA: `dced183980199ca8b7e359b48ddc7fd61f29488f`.
 
-Durable K1 evidence:
-- `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
-- `docs/superpowers/reviews/2026-09-27-k1-reverification.md`
+Pre-merge exact-head:
+- Pull request quality gate #536 — SUCCESS;
+- Server and adapter contract tests #1374 — SUCCESS.
 
-Comprehensive continuation:
-- `docs/superpowers/reviews/2026-09-27-comprehensive-handoff-v2.md` — final full recovery artifact including constitution-update protocol and fresh post-audit main verification.
-- `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`
-- `docs/superpowers/OPERATING_PLAYBOOK.md`
+Post-merge on the product merge SHA:
+- Server and adapter contract tests #1375 — SUCCESS;
+- GitHub Pages #27 — SUCCESS;
+- deploy — SUCCESS;
+- live release verification — SUCCESS;
+- Node 351/351 PASS;
+- Python 22 PASS;
+- SQLite/browser/API contracts PASS;
+- browser smoke PASS.
 
-## Current verified architecture
+Authoritative K2 records:
+- `docs/superpowers/reviews/2026-09-28-k2-post-merge-verification.md`
+- `docs/superpowers/reviews/2026-09-28-k2-final-review.md`
+- `docs/superpowers/reviews/2026-09-28-k2-execution-ledger.md`
+- `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`
+- `docs/superpowers/plans/2026-09-28-k2-coverage-expansion-controlled-release.md`
 
-Existing public/runtime contracts remain active:
+## Current learner-visible state
 
-- TrackRegistryV1
-- TrackManifestV1
-- TrackPresentationV1
-- DomainCatalogV2
-- ExamProfileV2
-- RenderedQuestionV2
-- RuntimeBundleV3
-- StateV2
+K2 did not silently mass-generate or promote content.
 
-K1 governance/kernel foundations now also exist:
+Current visible baseline remains:
+- **1,120 questions**
+- **200-question** full exam
+- weighted allocation **36 / 35 / 33 / 29 / 28 / 25 / 14**
+- Arabic/English + RTL/LTR verified
+- browser/API parity verified
+- offline/service-worker verified
+- payload digest:
+  `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`
 
-- LearningObjectiveV1
-- EvidenceSourceV1
-- QuestionFamilyV2
-- ItemVersionV1
-- QualityReportV1
-- ProvenanceRecordV1
-- ReviewDecisionV1
-- SourcePolicyV1
-- QualityPolicyV1
-- ReviewPolicyV1
-- FactoryRunV1
-- ProviderResultV1
-- ProviderEvaluationV1
-- CoverageGapV1
-- ContentReleaseManifestV1
-- AssessmentFormSnapshotV1
-- LearnerEventV1
-- provider/persistence/orchestration/interoperability ports
-- local deterministic/no-AI execution
-- resumable/retryable LocalRunner
-- file/JSONL/SQLite adapters
-- governed quality pipeline
-- Coverage Engine
-- immutable release/CANARY/rollback boundary
-
-## Current content state
-
-Learner-visible runtime remains unchanged:
-
-- generated bank: **1,120 questions**
-- full exam: **200 questions**
-- weighted allocation: **36 / 35 / 33 / 29 / 28 / 25 / 14**
-- Arabic/English + RTL/LTR: verified
-- browser/API parity: verified
-- offline/service worker: verified
-- GitHub Pages live release: verified
-
-Governed lineage now exists in parallel:
-
-- 1,120 governed QuestionFamily records
-- 1,120 governed ItemVersion records
+Governed baseline:
+- 1,120 QuestionFamily records
+- 1,120 ItemVersion records
 - 140 provisional migration-derived LearningObjective records
-- bootstrap release: `sdaia-ai-engineer.bootstrap.v1`
-- bootstrap status: `REVIEW`
-- origin: `migrated-grandfathered`
-- historical quality PASS records were **not invented**
-- approved source registry starts empty where historical evidence provenance was unavailable
+- bootstrap release `sdaia-ai-engineer.bootstrap.v1`
 
-Preserved visible payload digest:
-`5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`
+K2 scale references (~3k / ~6k / ~10k / 14k+) remain capacity checkpoints, not release claims.
+
+## K2 merged capabilities
+
+K2 now provides:
+- coverage-driven ExpansionPlanV1;
+- source-readiness fail-closed scheduling;
+- adaptive TranchePlanV1 sizing and evidence;
+- provider routing/evaluation with deterministic/manual/abstain fallback;
+- optional cost/latency route guardrails;
+- structural + calibrated semantic/cross-language dedup;
+- BilingualEquivalenceReportV1;
+- automation-first risk/drift review calibration;
+- resumable/retryable/PARTIAL tranche execution;
+- explicit retry eligibility;
+- ActivationEvidenceV1 and CanaryPolicyV1;
+- evidence-bound CANARY→ACTIVE decision trust;
+- immutable rollback/quarantine;
+- EventDefinitionV1 + registry privacy enforcement;
+- vendor-neutral observability ports;
+- aggregate factory signals;
+- ImprovementFindingV1 + ExperimentRecordV1 foundations;
+- immutable file + SQLite K2 governance persistence parity;
+- K2 CLI/reference orchestration;
+- validator integration;
+- explicit private/public Pages boundary.
+
+Whole-plan review fixed:
+- 1 Critical;
+- 7 Important findings/refinements;
+- 0 open Critical/Important findings at merge.
+
+## Deliberately deferred K2 calibration
+
+Do not invent values for:
+- tranche numeric sizes;
+- review sample percentages;
+- semantic duplicate thresholds;
+- bilingual supporting thresholds;
+- CANARY exposure/duration/minimum observations;
+- anomaly/alert thresholds;
+- analytics retention;
+- final analytics/observability vendor;
+- source-class approvals for future content.
+
+Use versioned policy + observed evidence later.
 
 ## Current programme
 
-**K2 — Coverage Expansion & Controlled Release**
+**K3 — Learner Evidence Engine**
 
 Status:
-`EXECUTING`
+- design: NOT STARTED;
+- written spec: NOT CREATED;
+- implementation plan: NOT CREATED;
+- implementation: NOT STARTED;
+- branch: NONE.
 
-K2 purpose:
+K3 is unlocked for **design only** because K2 is merged + post-merge verified.
 
-Expand content through measured CoverageGap requests and the K1 governed factory rather than raw-count generation.
+Do not start K3 implementation until:
+1. K3 architectural design is approved;
+2. K3 written spec is created and explicitly approved;
+3. K3 implementation plan is created and explicitly approved;
+4. execution method is approved.
 
-Canonical direction:
+## Recovery sequence for a new chat
 
-`Coverage Gap → Candidate Families → Factory Quality Pipeline → Risk-based Review → CANARY → Promote → Observe`
-
-Potential capacity milestones may be approximately:
-
-`1,120 → 3,000 → 6,000 → 10,000 → 14,000+`
-
-but **count is not an acceptance metric**. Promotion must be governed by coverage, correctness, evidence, bilingual quality, duplicate controls, review policy and release gates.
-
-## K2 constraints already inherited from K1
-
-K2 must:
-
-- use K1 contracts/state machine rather than bypass them;
-- preserve stable family/item identity and version lineage;
-- avoid superficial paraphrase multiplication;
-- maintain Arabic/English equivalence;
-- preserve source/evidence/provenance;
-- use ContentRelease manifests;
-- use CANARY before ACTIVE;
-- expand through structured coverage gaps;
-- keep `data/factory/` private from the public Pages artifact;
-- make no psychometric/calibrated difficulty claims without sufficient learner-response evidence;
-- not silently rewrite historical learner progress;
-- not replace the deterministic/manual path with mandatory AI.
-
-## K2 has NOT started
-
-There is currently:
-
-- no K2 implementation branch;
-- K2 written spec created at `docs/superpowers/specs/2026-09-28-k2-coverage-expansion-controlled-release-design.md`; awaiting explicit user approval;
-- no K2 implementation plan;
-- no K2 product mutation.
-
-K2 conceptual design, written spec, implementation plan and Native execution method are approved. Execution is active on `impl/k2-coverage-expansion-controlled-release`. Checkpoints A–B are complete; current execution checkpoint: C — coverage prioritization and adaptive tranche planning. Resume from the durable K2 ledger/checkpoint; do not reconstruct from chat.
-
-## Governing authority for K2
-
-Read in this order:
-
-1. `docs/superpowers/specs/2026-09-23-learning-platform-vnext-design.md`
-2. `docs/superpowers/specs/2026-09-26-learning-platform-research-amendment.md`
-3. `docs/superpowers/specs/2026-09-27-content-factory-governance-core-design.md`
-4. `docs/superpowers/reviews/2026-09-27-k1-post-merge-verification.md`
-5. future approved K2 written spec
-6. future approved K2 implementation plan
-7. active K2 execution ledger/checkpoint once execution starts
-
-Current programme tracker:
-`docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md`
-
-Current forward roadmap:
-`docs/superpowers/plans/2026-09-27-post-b3-platform-kernel-roadmap.md`
-
-## New-chat recovery sequence
-
-A new chat must:
-
-1. read this HANDOFF;
-2. resolve live `main` SHA;
-3. read `docs/superpowers/reviews/2026-09-27-comprehensive-handoff.md`;
-4. read `docs/superpowers/OPERATING_PLAYBOOK.md`;
-5. read the programme tracker;
-6. read K1 post-merge verification + fresh reverification;
-7. inspect current main architecture and K1 factory artifacts;
-8. if K2 design/spec/plan artifacts later exist, read them directly;
-9. inspect branch/main diff before any mutation;
-10. resume the earliest incomplete K2 gate only.
-
-Do not reconstruct Programme A/B0/B1/B2/B3/K1 from conversation memory.
+1. resolve live `main`;
+2. read this current top section of `HANDOFF.md`;
+3. read `docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md`;
+4. read `docs/superpowers/reviews/2026-09-28-k2-post-merge-verification.md`;
+5. read K2 final review only if implementation/review detail is needed;
+6. read architecture constitution and Research Amendment;
+7. begin K3 architectural design from the merged K1/K2 contracts;
+8. do not reconstruct completed K2 tasks from conversation memory.
 
 ## Exact next action
 
-Begin **K2 architectural design** from the verified post-K1 baseline.
+Begin **K3 — Learner Evidence Engine architectural design** using the existing research/reverse-engineering method and Superpowers brainstorming/design process.
 
-Do **not** start K2 product code until:
-1. K2 design is approved;
-2. written K2 spec is created and explicitly approved;
-3. written K2 implementation plan is created and explicitly approved;
-4. execution method is selected.
+Do **not** write K3 product code until its design/spec/plan approval gates are complete.
 
 Everything below this line is historical evidence and cannot override this section.
 
