@@ -510,3 +510,12 @@ Ruling: `INCREASE_SAMPLING` escalation without an explicit target rate is conser
 
 Task 21: complete.
 Next exact task: Task 22 — Review stage integration.
+
+
+## Approved execution amendment — 2026-09-28
+
+Ruling: K2 review governance is Automation-first — the user explicitly approved materially reducing routine human dependence; low/medium-risk mature content may be AUTO_ELIGIBLE only after independent deterministic, evidence/correctness, dedup, bilingual and provider-evaluation gates agree; humans are escalation-only for high/critical risk, ambiguity/conflict, uncalibrated provider/domain combinations, drift, quarantine/recovery or critical source conflicts — cost if wrong: automation could admit defects, mitigated by independent gates, exception sampling, canary evidence, drift escalation and rollback.
+
+Ruling: execution reports are grouped in batches of three completed Tasks — the user explicitly requested three full tasks per update — cost if wrong: progress visibility is less granular, mitigated by per-task durable ledger and exact-head CI evidence.
+
+Current execution batch: Tasks 22–24.
