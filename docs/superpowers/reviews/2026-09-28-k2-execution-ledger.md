@@ -349,3 +349,22 @@ Behavior:
 
 Task 14: complete.
 Next exact task: Task 15 — Provider evaluation v2 metrics.
+
+
+### Task 15 — Provider evaluation v2 metrics
+
+Status: COMPLETE
+RED commit: `8108e2167d1084b2d798d14f26799300897c5670`
+RED evidence: Pull request quality gate #404 — Node tests FAILED after setup/validation passed.
+GREEN commit: `fcf48c7176afbbb4a18333363f95fd37e6344690`
+GREEN evidence:
+- Pull request quality gate #405 — SUCCESS;
+- Server and adapter contract tests #1083 — SUCCESS.
+Behavior:
+- existing `evaluateProvider()` V1 output shape remains unchanged;
+- new `evaluateProviderV2()` adds evidence fidelity, hallucination-free, ambiguity control, bilingual equivalence and cognitive alignment while retaining correctness/distractor/format/latency/cost dimensions;
+- thresholds remain policy-driven;
+- weak mandatory K2 dimensions cause FAIL.
+
+Task 15: complete.
+Next exact task: Task 16 — production-failure eval ingestion seam.
