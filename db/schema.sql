@@ -82,3 +82,13 @@ CREATE TABLE IF NOT EXISTS learner_events (
 
 CREATE INDEX IF NOT EXISTS idx_learner_events_track_time ON learner_events(track_id, shown_at);
 CREATE INDEX IF NOT EXISTS idx_learner_events_item_time ON learner_events(item_version_id, shown_at);
+
+
+CREATE TABLE IF NOT EXISTS k2_governance_records (
+  kind TEXT NOT NULL CHECK (kind IN ('expansion','tranche','activation','improvement')),
+  artifact_id TEXT NOT NULL,
+  body_json TEXT NOT NULL,
+  PRIMARY KEY (kind, artifact_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_k2_governance_kind ON k2_governance_records(kind, artifact_id);
