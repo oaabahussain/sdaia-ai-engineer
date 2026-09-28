@@ -891,3 +891,23 @@ Behavior:
 
 Task 37: complete.
 Next exact task: Task 38 — ImprovementFindingV1 schema.
+
+
+### Task 38 — ImprovementFindingV1 schema
+
+Status: COMPLETE
+RED commit: `fd70e12267ad222b5256d2f4e1e39ec4188a6d8f`
+RED evidence: Pull request quality gate #476 — Node tests FAILED after setup/validation passed.
+GREEN commit: `c61f22d60e21572a01188c0c3482239858f89b46`
+GREEN evidence:
+- Pull request quality gate #477 — SUCCESS;
+- Server and adapter contract tests #1241 — SUCCESS.
+Contract outcome:
+- observation, evidence, uncertainty, hypothesis and counter-evidence are separate fields;
+- top-level cause is forbidden;
+- hypothesis.causal is fixed to false in K2;
+- recommended investigation/experiment and expected impact are explicit;
+- findings start as evidence-bounded workflow records, not causal truth.
+
+Task 38: complete.
+Next exact task: Task 39 — Improvement finding builder.
