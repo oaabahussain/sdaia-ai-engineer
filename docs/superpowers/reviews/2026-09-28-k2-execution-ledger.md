@@ -1171,3 +1171,34 @@ Minor / deferred:
 2. WeakSet trust markers intentionally require revalidation after serialization/process boundaries; this is already an explicit Task 34 ruling.
 
 Fix-pass rule: every Critical/Important finding above requires a dedicated RED assertion before its production change; one full-suite verification follows the bounded fix pass.
+
+
+### Task 50 — Whole-plan requirement audit
+
+Status: COMPLETE
+
+Review artifact:
+`docs/superpowers/reviews/2026-09-28-k2-final-review.md`
+
+Reviewed product head:
+`80431fae4f846a6aea53040b22aad86dea5d4c00`
+
+Review findings:
+- 1 Critical found and fixed;
+- 7 Important found/refined and fixed;
+- no open Critical/Important findings remain;
+- non-blocking notes and deferred calibration values are recorded in the final review.
+
+RED review evidence:
+- quality #508 — activation-evidence trust boundary;
+- quality #524 — 8 assertions covering privacy, source-blocking, dedup calibration, retry classification, provider budgets and ExpansionPlan identity;
+- quality #531 — 3 refinement assertions covering fail-closed source readiness, canonical identity and unknown provider cost.
+
+GREEN product-head evidence:
+- quality #534 — SUCCESS, Node 351/351 PASS;
+- server/adapter #1369 — SUCCESS, Python 22 PASS plus SQLite/browser/API;
+- factory import digest remains `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`;
+- Pages/live verifier/browser smoke PASS.
+
+Task 50: complete.
+Next exact task: Task 51 — Exact-head CI gate on final review/checkpoint documentation head.
