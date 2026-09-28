@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
+import { expandConceptBank } from '../src/logic/questionBank.js';
+import { loadTrack, loadTrackRegistry } from '../scripts/load_track.js';
 
 const exists = path => fs.existsSync(new URL('../' + path, import.meta.url));
 
@@ -39,4 +42,34 @@ test.todo('K2 insufficient CANARY evidence yields HOLD');
 test.todo('K2 rollback and quarantine preserve immutable release history');
 test.todo('K2 event definitions require versioned privacy classified contracts');
 test.todo('K2 improvement findings separate observations from causal hypotheses');
-test.todo('K2 current learner visible runtime remains unchanged before promotion');
+test('K2 current learner visible runtime remains unchanged before promotion', () => {
+  const root = new URL('..', import.meta.url).pathname;
+  const trackId = loadTrackRegistry(root).default_track_id;
+  const bundle = loadTrack(root, trackId);
+  const questions = expandConceptBank(bundle.concepts, {
+    trackId,
+    domainCatalog: bundle.domains
+  });
+  const legacy = item => ({
+    domain: bundle.domains.domains.find(d => d.id === item.domain_id)?.legacy_keys?.[0] || item.domain_id,
+    topic: item.topic,
+    question: item.question,
+    question_en: item.question_en,
+    options: item.options,
+    options_en: item.options_en,
+    answer: item.answer,
+    explanation: item.explanation,
+    explanation_en: item.explanation_en,
+    difficulty: item.difficulty
+  });
+  const digest = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(questions.map(legacy)))
+    .digest('hex');
+
+  assert.equal(questions.length, 1120);
+  assert.equal(bundle.examProfile.question_count, 200);
+  assert.equal(digest, '5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9');
+  assert.equal(bundle.manifest.capabilities.includes('content-model-v2'), true);
+  assert.equal(bundle.examProfile.schema_version, 2);
+});
