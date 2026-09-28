@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-28
 **Programme:** K2
-**Checkpoint:** I — Measurement/event governance and improvement contracts
-**Status:** EXECUTING — Checkpoints A–H complete
+**Checkpoint:** K — Integration, regression and private/public boundaries
+**Status:** EXECUTING — Checkpoints A–J complete; K Tasks 45–46 complete
 **Branch:** `impl/k2-coverage-expansion-controlled-release`
 **Branch base:** `9b9d416e9c025563c299d54347984954ccdb0455`
 **Current main at start:** `6eb108338857dec9471f441a37d1819b98045cbb`
@@ -20,7 +20,7 @@
 
 ## Active task
 
-Task 37 — Factory metric events.
+Task 47 — Current runtime regression gate.
 
 ## Verification evidence
 
@@ -48,7 +48,7 @@ Do not reconstruct K2 from chat. Read:
 
 ## Next exact task
 
-Task 37: write RED factory-signal tests that prove private prompt/source/reviewer text cannot be exported; emit only governed aggregate identifiers/counts/rates through EventDefinition/privacy/registry boundaries.
+Task 47: lock the unchanged 1,120-bank/runtime digest/profile/bilingual/offline/browser/API compatibility baseline before any intentional K2 release promotion.
 
 ## Checkpoint A completion evidence
 
@@ -199,3 +199,26 @@ Completed:
 - Task 36 observability ports — GREEN quality #472 / server #1229.
 
 Next: Task 37 — Factory metric events.
+
+
+## Checkpoints I–J completion evidence
+
+Checkpoint I:
+- Task 37 GREEN quality #475 / server #1236;
+- Task 38 GREEN quality #477 / server #1241;
+- Task 39 GREEN quality #480 / server job #1248 all steps successful;
+- Task 40 GREEN quality #482 / server #1253.
+
+Checkpoint J:
+- Task 41 GREEN quality #484 / server #1258;
+- Task 42 GREEN quality #488 / server #1266;
+- Task 43 GREEN quality #491 / server #1274;
+- Task 44 GREEN quality #493 / server #1279.
+
+## Checkpoint K progress
+
+Completed:
+- Task 45 GREEN quality #495 / server #1284;
+- Task 46 GREEN quality #499 / server #1294.
+
+Next: Task 47 — Current runtime regression gate.
