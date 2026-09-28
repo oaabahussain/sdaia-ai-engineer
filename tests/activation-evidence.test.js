@@ -178,3 +178,35 @@ test('evaluateActivationEvidence blocks failed critical summaries', async () => 
     }
   );
 });
+
+
+test('evaluateActivationEvidence holds when CANARY observation volume is below calibrated minimum', async () => {
+  const { evaluateActivationEvidence } = await import(moduleUrl);
+
+  const calibratedPolicy = {
+    ...policy,
+    minimum_observation_count: 100
+  };
+
+  const lowVolume = evidence({
+    canary_observation: {
+      evidence_classes: [
+        'runtime_compatibility',
+        'quality',
+        'review'
+      ],
+      observation_ref: 'canary:obs:low-volume',
+      observation_count: 99
+    }
+  });
+
+  assert.deepEqual(
+    evaluateActivationEvidence(lowVolume, calibratedPolicy),
+    {
+      decision: 'HOLD',
+      reason: 'insufficient_observation_volume',
+      missingEvidenceClasses: [],
+      blockers: []
+    }
+  );
+});
