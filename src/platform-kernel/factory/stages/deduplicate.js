@@ -102,7 +102,7 @@ function validateCalibrationPolicy(policy) {
 export function createDeduplicateStage({
   inventory = [],
   embeddingProvider = null,
-  threshold = 0.95,
+  threshold = null,
   structuralPolicy = { on_match: 'DUPLICATE' },
   calibrationPolicy = null
 } = {}) {
@@ -111,6 +111,12 @@ export function createDeduplicateStage({
     throw new Error('Unsupported structural duplicate policy');
   }
   validateCalibrationPolicy(calibrationPolicy);
+  if (
+    threshold !== null &&
+    (!Number.isFinite(threshold) || threshold < 0 || threshold > 1)
+  ) {
+    throw new Error('Explicit semantic threshold must be in [0,1]');
+  }
 
   return {
     name: 'deduplicate',
@@ -170,8 +176,12 @@ export function createDeduplicateStage({
               continue;
             }
 
-            if (similarity >= threshold) {
-              throw new Error('Near-duplicate candidate detected');
+            if (Number.isFinite(threshold)) {
+              if (similarity >= threshold) {
+                throw new Error('Near-duplicate candidate detected');
+              }
+            } else {
+              result = 'REVIEW_REQUIRED';
             }
           }
         }
