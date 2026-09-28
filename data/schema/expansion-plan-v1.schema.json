@@ -43,7 +43,8 @@
         "required": [
           "gap_id",
           "rank",
-          "reason"
+          "reason",
+          "requested_count"
         ],
         "properties": {
           "gap_id": {
@@ -57,6 +58,10 @@
           "reason": {
             "type": "string",
             "minLength": 1
+          },
+          "requested_count": {
+            "type": "integer",
+            "minimum": 1
           }
         }
       }

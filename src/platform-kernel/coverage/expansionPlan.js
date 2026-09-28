@@ -53,7 +53,8 @@ export function buildExpansionPlan({
     priorities: prioritized.map((item, index) => ({
       gap_id: item.gap_id,
       rank: index + 1,
-      reason: item.priority_reasons.join(',')
+      reason: item.priority_reasons.join(','),
+      requested_count: item.requested_count
     })),
     tranche_refs: [],
     policy_versions: { ...policyVersions },
