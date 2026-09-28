@@ -818,3 +818,23 @@ Ruling: validated-event trust uses an in-memory WeakSet rather than a serializab
 
 Task 34: complete.
 Next exact task: Task 35 — Privacy classification enforcement.
+
+
+### Task 35 — Privacy classification enforcement
+
+Status: COMPLETE
+RED commit: `67de191735590b888697c839a2d311d7054cfd29`
+RED evidence: Pull request quality gate #469 — Node tests FAILED after setup/validation passed.
+GREEN commit: `6f17947874131d468d0d3e3f8491c3662439154c`
+GREEN evidence:
+- Pull request quality gate #470 — SUCCESS;
+- Server and adapter contract tests #1224 — SUCCESS.
+Behavior:
+- undeclared payload properties are rejected before export;
+- properties marked REDACT are removed deterministically;
+- properties marked REJECT block the event;
+- minimal governed payloads pass unchanged;
+- privacy behavior is driven by the EventDefinition property policy, not inferred from field names.
+
+Task 35: complete.
+Next exact task: Task 36 — Export adapter port.
