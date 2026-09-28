@@ -565,3 +565,32 @@ Behavior:
 
 Task 23: complete.
 Next exact task: Task 24 — Tranche resume/retry.
+
+
+### Task 24 — Tranche resume/retry
+
+Status: COMPLETE
+RED commit: `06ba13fca52105a52c9335b91efb5fcb3b41edfe`
+RED evidence: Pull request quality gate #434 — Node tests FAILED after setup/validation passed.
+GREEN commit: `734b1ed100f7f1ef2e02018b5f87bcdfd13133b8`
+GREEN evidence:
+- Pull request quality gate #435 — SUCCESS;
+- Server and adapter contract tests #1146 — SUCCESS on the same SHA.
+Behavior:
+- resumeTranche preserves durable successful siblings without rerunning them;
+- previously failed FactoryRuns resume through runner.resumeRun(), reusing durable stage outputs;
+- missing/not-yet-attempted siblings start through runCandidate();
+- retryFailedTrancheItems touches only failed items;
+- retryStage(run_id, stage) is used when exact failed-stage evidence exists; otherwise resumeRun() is the conservative recovery path;
+- completed siblings remain durable across retry/resume.
+
+Task 24: complete.
+
+## Execution batch result — Tasks 22–24
+
+Status: COMPLETE.
+- Task 22: automation-first calibrated review integration;
+- Task 23: governed tranche execution envelope;
+- Task 24: durable tranche resume/retry.
+
+Next exact task: Task 25 — Tranche metrics summarizer.
