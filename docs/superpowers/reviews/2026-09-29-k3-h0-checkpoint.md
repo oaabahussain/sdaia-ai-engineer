@@ -58,3 +58,17 @@ The current ChatGPT harness cannot populate a local Git worktree because direct 
 ## Next
 
 Task 9 — whole-branch review and one Critical/Important fix pass. Integration is not authorized by this checkpoint.
+
+
+## Whole-branch review addendum
+
+Review record: `docs/superpowers/reviews/2026-09-29-k3-h0-whole-branch-review.md`.
+
+Post-fix verified head: `832e98d9bffbe4224f453a44807b7feabf793db3`.
+
+- quality-gate `36631493416`: SUCCESS, Node 442/442, all release/browser checks PASS.
+- server-adapter-gate `36631493627`: SUCCESS, pytest 22 passed, SQLite/browser/API PASS.
+- Critical findings: 0.
+- Important findings: 2 found, 2 fixed, 0 open.
+- Minor findings: 1 deferred.
+- Final review: self-review (no subagent tool).
