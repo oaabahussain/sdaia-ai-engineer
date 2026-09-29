@@ -57,6 +57,12 @@ function context(overrides = {}) {
     planBlobSha: PLAN_SHA,
     ledgerText: 'Task 1 — RETROSPECTIVE VERIFIED\nTask 2 — RETROSPECTIVE VERIFIED\nTask 3 — RETROSPECTIVE VERIFIED\nTask 4 — RETROSPECTIVE VERIFIED\n',
     minimumStateRevision: 1,
+    existingPaths: [
+      'docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md',
+      'docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md',
+      'docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md',
+      'docs/superpowers/reviews/2026-09-29-k3-h0-checkpoint.md'
+    ],
     ...overrides
   };
 }
@@ -138,4 +144,14 @@ test('rejects unapproved execution branch name', () => {
   const result = validateCurrentState(state({ execution_branch: 'impl/other' }), context());
   assert.equal(result.ok, false);
   assert.equal(result.code, 'EXECUTION_BRANCH_INVALID');
+});
+
+test('rejects a missing referenced execution artifact', () => {
+  const result = validateCurrentState(state(), context({ existingPaths: [
+    'docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md',
+    'docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md',
+    'docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md'
+  ] }));
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'STATE_REFERENCE_MISSING');
 });
