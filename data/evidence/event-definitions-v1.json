@@ -1,0 +1,491 @@
+[
+  {
+    "schema_version": 2,
+    "event_name": "learner.activity.started",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.activity.started",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.activity.started is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "learner_id",
+      "track_id",
+      "content_release_id",
+      "mode",
+      "locale"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/activity-started-v1.schema.json",
+    "properties": {
+      "source": {
+        "type": "string",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.activity.completed",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.activity.completed",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.activity.completed is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "learner_id",
+      "track_id",
+      "content_release_id",
+      "mode",
+      "locale"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/activity-completed-v1.schema.json",
+    "properties": {
+      "completion_kind": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.assessment.submitted",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.assessment.submitted",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.assessment.submitted is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "assessment_attempt_id",
+      "form_id",
+      "learner_id",
+      "track_id",
+      "content_release_id",
+      "mode",
+      "locale"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/assessment-submitted-v1.schema.json",
+    "properties": {
+      "exam_profile_ref": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "scoring_policy_ref": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.item.presented",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.item.presented",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.item.presented is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "question_family_id",
+      "item_version_id",
+      "objective_id",
+      "domain_id",
+      "content_release_id",
+      "locale"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/item-presented-v1.schema.json",
+    "properties": {
+      "presentation_kind": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.item.skipped",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.item.skipped",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.item.skipped is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "item_version_id"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/item-skipped-v1.schema.json",
+    "properties": {
+      "reason_code": {
+        "type": "string",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.response.recorded",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.response.recorded",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.response.recorded is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "item_version_id"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/response-recorded-v1.schema.json",
+    "properties": {
+      "response_kind": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "response": {
+        "type": "object",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.confidence.recorded",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.confidence.recorded",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.confidence.recorded is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "item_version_id"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/confidence-recorded-v1.schema.json",
+    "properties": {
+      "confidence": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.hint.requested",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.hint.requested",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.hint.requested is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "item_version_id"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/hint-requested-v1.schema.json",
+    "properties": {
+      "hint_ref": {
+        "type": "string",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.explanation.opened",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.explanation.opened",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.explanation.opened is explicitly observed under the K3 contract",
+    "actor_kind": "LEARNER",
+    "producer": "web-client",
+    "required_context_fields": [
+      "activity_id",
+      "item_interaction_id",
+      "item_version_id"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/explanation-opened-v1.schema.json",
+    "properties": {
+      "explanation_ref": {
+        "type": "string",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.response.evaluated",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.response.evaluated",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.response.evaluated is explicitly observed under the K3 contract",
+    "actor_kind": "SYSTEM",
+    "producer": "learning-platform",
+    "required_context_fields": [
+      "activity_id",
+      "item_version_id",
+      "authority_ref"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/response-evaluated-v1.schema.json",
+    "properties": {
+      "response_event_id": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "scoring_policy_ref": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "evaluation_status": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "correct": {
+        "type": "boolean",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "score": {
+        "type": "number",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.assessment.mutation.resolved",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.assessment.mutation.resolved",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.assessment.mutation.resolved is explicitly observed under the K3 contract",
+    "actor_kind": "SYSTEM",
+    "producer": "learning-platform",
+    "required_context_fields": [
+      "activity_id",
+      "assessment_attempt_id",
+      "authority_ref"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/assessment-mutation-resolved-v1.schema.json",
+    "properties": {
+      "candidate_event_id": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "assessment_attempt_id": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "base_attempt_revision": {
+        "type": "integer",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "authoritative_revision_before": {
+        "type": "integer",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "decision": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "authoritative_revision_after": {
+        "type": "integer",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "reason_code": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  },
+  {
+    "schema_version": 2,
+    "event_name": "learner.evidence.correction.recorded",
+    "event_version": 1,
+    "plane": "LEARNER_EVIDENCE",
+    "purpose": "Canonical K3 evidence for learner.evidence.correction.recorded",
+    "owner": "learning-platform",
+    "trigger_semantics": "Emit only when learner.evidence.correction.recorded is explicitly observed under the K3 contract",
+    "actor_kind": "ADMINISTRATIVE",
+    "producer": "learning-platform",
+    "required_context_fields": [
+      "activity_id",
+      "authority_ref"
+    ],
+    "payload_schema_ref": "data/evidence/payload-schemas/evidence-correction-recorded-v1.schema.json",
+    "properties": {
+      "target_event_id": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "action": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "reason_code": {
+        "type": "string",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
+      "superseding_event_id": {
+        "type": "string",
+        "required": false,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      }
+    },
+    "privacy_class": "PSEUDONYMOUS",
+    "retention_class": "STANDARD",
+    "compatibility": {
+      "strategy": "NEW_EVENT",
+      "previous_versions": []
+    },
+    "created_at": "2026-09-29T00:00:00Z"
+  }
+]
