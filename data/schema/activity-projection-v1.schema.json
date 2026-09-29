@@ -12,7 +12,8 @@
     "activity_id",
     "learner_id",
     "mode",
-    "content_release_id"
+    "content_release_id",
+    "unresolved_reference_count"
   ],
   "properties": {
     "schema_version": {

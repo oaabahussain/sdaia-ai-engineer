@@ -11,7 +11,11 @@
     "generated_at",
     "assessment_attempt_id",
     "form_id",
-    "authoritative_revision"
+    "authoritative_revision",
+    "content_release_id",
+    "exam_profile_ref",
+    "scoring_policy_ref",
+    "unresolved_reference_count"
   ],
   "properties": {
     "schema_version": {
@@ -61,6 +65,22 @@
     "unresolved_reference_count": {
       "type": "integer",
       "minimum": 0
+    },
+    "content_release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exam_profile_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scoring_policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity_resolution_version": {
+      "type": "string",
+      "minLength": 1
     }
   }
 }

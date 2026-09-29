@@ -53,14 +53,7 @@
       "locale"
     ],
     "payload_schema_ref": "data/evidence/payload-schemas/activity-completed-v1.schema.json",
-    "properties": {
-      "completion_kind": {
-        "type": "string",
-        "required": true,
-        "privacy_class": "PSEUDONYMOUS",
-        "export": "ALLOW"
-      }
-    },
+    "properties": {},
     "privacy_class": "PSEUDONYMOUS",
     "retention_class": "STANDARD",
     "compatibility": {
@@ -133,14 +126,7 @@
       "locale"
     ],
     "payload_schema_ref": "data/evidence/payload-schemas/item-presented-v1.schema.json",
-    "properties": {
-      "presentation_kind": {
-        "type": "string",
-        "required": true,
-        "privacy_class": "PSEUDONYMOUS",
-        "export": "ALLOW"
-      }
-    },
+    "properties": {},
     "privacy_class": "PSEUDONYMOUS",
     "retention_class": "STANDARD",
     "compatibility": {
@@ -198,6 +184,12 @@
     ],
     "payload_schema_ref": "data/evidence/payload-schemas/response-recorded-v1.schema.json",
     "properties": {
+      "response_version": {
+        "type": "integer",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
       "response_kind": {
         "type": "string",
         "required": true,

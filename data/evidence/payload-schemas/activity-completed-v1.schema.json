@@ -2,12 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "completion_kind"
-  ],
-  "properties": {
-    "completion_kind": {
-      "type": "string"
-    }
-  }
+  "required": [],
+  "properties": {}
 }

@@ -30,6 +30,44 @@ function definitionId(definition) {
   return `${definition.event_name}@${definition.event_version}`;
 }
 
+function payloadSchemaFor(definition) {
+  try {
+    return JSON.parse(
+      fs.readFileSync(
+        new URL('../../../' + definition.payload_schema_ref, import.meta.url),
+        'utf8'
+      )
+    );
+  } catch (error) {
+    throw new Error(
+      `Invalid EventDefinitionV2 payload_schema_ref: ${definition.payload_schema_ref}: ${error.message}`
+    );
+  }
+}
+
+function validatePayloadGovernance(definition) {
+  if (definition.schema_version !== 2) return;
+
+  const payloadSchema = payloadSchemaFor(definition);
+  const governed = definition.properties ?? {};
+  const schemaProperties = payloadSchema.properties ?? {};
+  const governedNames = Object.keys(governed).sort();
+  const schemaNames = Object.keys(schemaProperties).sort();
+
+  if (JSON.stringify(governedNames) !== JSON.stringify(schemaNames)) {
+    throw new Error('EventDefinitionV2 properties must match payload schema property names');
+  }
+
+  for (const name of governedNames) {
+    if (schemaProperties[name]?.type !== governed[name].type) {
+      throw new Error(
+        `EventDefinitionV2 property type mismatch for ${name}: ` +
+        `${governed[name].type} != ${schemaProperties[name]?.type ?? 'undefined'}`
+      );
+    }
+  }
+}
+
 function typeMatches(value, type) {
   if (type === 'array') return Array.isArray(value);
   if (type === 'object') {
@@ -50,6 +88,8 @@ export function registerEventDefinition(definition) {
       JSON.stringify(errors)
     );
   }
+
+  validatePayloadGovernance(definition);
 
   const id = definitionId(definition);
   const existing = definitions.get(id);

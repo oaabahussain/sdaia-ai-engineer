@@ -7,8 +7,8 @@ const v2 = {
   plane:'LEARNER_EVIDENCE',purpose:'Preserve response evidence',owner:'learning-platform',
   trigger_semantics:'After local durable response commit',actor_kind:'LEARNER',producer:'web-client',
   required_context_fields:['track_id','content_release_id','activity_id','item_id'],
-  payload_schema_ref:'data/evidence/payload-schemas/learner-response-recorded-v1.schema.json',
-  properties:{response_kind:{type:'string',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'}},
+  payload_schema_ref:'data/evidence/payload-schemas/response-recorded-v1.schema.json',
+  properties:{response_version:{type:'integer',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'},response_kind:{type:'string',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'},response:{type:'object',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'}},
   privacy_class:'PSEUDONYMOUS',retention_class:'STANDARD',
   compatibility:{strategy:'NEW_EVENT',previous_versions:[]},created_at:'2026-09-29T00:00:00Z'
 };
