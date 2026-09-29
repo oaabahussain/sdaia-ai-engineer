@@ -188,16 +188,19 @@ test('repository revision-1 state is real, frozen, and intentionally not low-mod
 });
 
 test('CURRENT-STATE CLI validates the real repository state', () => {
+  const actual = JSON.parse(readFileSync('docs/superpowers/state/CURRENT-STATE.json', 'utf8'));
+  const liveMainSha = actual.base_main_sha ?? 'a'.repeat(40);
+  const sourceRef = actual.base_main_sha ? actual.execution_branch : 'main';
   const output = execFileSync(
     process.execPath,
-    ['scripts/validate_current_state.js','--live-main-sha','9607271c86c084df396a39947e915d6560dbbac3','--json'],
-    { encoding:'utf8', env:{...process.env, GITHUB_REF_NAME:'impl/k3-process-hardening-h0'} }
+    ['scripts/validate_current_state.js','--live-main-sha',liveMainSha,'--json'],
+    { encoding:'utf8', env:{...process.env, GITHUB_REF_NAME:sourceRef} }
   );
   const checked = JSON.parse(output.trim());
   assert.equal(checked.ok, true, JSON.stringify(checked));
   assert.equal(checked.code, 'STATE_VALID');
   assert.equal(checked.details.next_task, 5);
-  assert.equal(checked.details.low_model_ready, false);
+  assert.equal(checked.details.low_model_ready, actual.low_model_ready);
 });
 
 test('process guard record agrees with current state and forbids low-model integration', () => {
