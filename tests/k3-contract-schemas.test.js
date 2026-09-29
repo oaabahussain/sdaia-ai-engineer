@@ -7,6 +7,7 @@ const load=n=>JSON.parse(fs.readFileSync(new URL('../data/schema/'+n,import.meta
 const validate=n=>{ const schema=load(n); const ajv=new Ajv({strict:false,allErrors:true,formats:{'date-time':true}}); if(n==='evidence-batch-result-v1.schema.json') ajv.addSchema(load('evidence-storage-receipt-v1.schema.json'),'evidence-storage-receipt-v1.schema.json'); return ajv.compile(schema); };
 const uuid='123e4567-e89b-42d3-a456-426614174000';
 const uuid2='223e4567-e89b-42d3-a456-426614174001';
+const uuid3='323e4567-e89b-42d3-a456-426614174002';
 
 test('LearnerEvidenceEventV2 accepts canonical raw evidence and rejects derived truth',()=>{
  const v=validate('learner-evidence-event-v2.schema.json');
@@ -25,7 +26,7 @@ test('support contracts enforce dispositions, outbox states and lifecycle enums'
  assert.equal(outbox({schema_version:1,event_id:uuid,state:'PENDING',attempt_count:0}),true,JSON.stringify(outbox.errors));
  assert.equal(outbox({schema_version:1,event_id:uuid,state:'DROPPED',attempt_count:0}),false);
  const link=validate('learner-identity-link-record-v1.schema.json');
- assert.equal(link({schema_version:1,identity_link_record_id:uuid,link_id:uuid,action:'LINK',source_learner_id:'learner:a',target_learner_id:'learner:b',effective_at:'2026-09-29T00:00:00Z',authority_ref:'auth:1',reason_code:'ACCOUNT_LINK',created_at:'2026-09-29T00:00:00Z'}),true,JSON.stringify(link.errors));
+ assert.equal(link({schema_version:1,identity_link_record_id:uuid2,link_id:uuid3,action:'LINK',source_learner_id:'learner:a',target_learner_id:'learner:b',effective_at:'2026-09-29T00:00:00Z',authority_ref:'auth:1',reason_code:'ACCOUNT_LINK',created_at:'2026-09-29T00:00:00Z'}),true,JSON.stringify(link.errors));
  const exp=validate('evidence-export-record-v1.schema.json');
  assert.equal(exp({schema_version:1,export_record_id:uuid,event_id:uuid,adapter_id:'xapi',adapter_version:'1',destination_class:'LRS',mapping_version:'1',action:'DELETE_REQUESTED',occurred_at:'2026-09-29T00:00:00Z',privacy_disposition:'ALLOW'}),true,JSON.stringify(exp.errors));
 });
