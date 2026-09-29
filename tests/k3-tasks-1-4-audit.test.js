@@ -85,6 +85,14 @@ test('events with no spec-required payload do not invent required completion/pre
   }
 });
 
+test('ActivityProjectionV1 always records resolution status metadata', () => {
+  const schema = readJson('data/schema/activity-projection-v1.schema.json');
+  for (const field of ['identity_resolution_version','unresolved_reference_count']) {
+    assert.ok(schema.properties[field], 'missing property ' + field);
+    assert.ok(schema.required.includes(field), 'field must be required: ' + field);
+  }
+});
+
 test('AttemptProjectionV1 retains applicable release, scoring and resolution metadata', () => {
   const schema = readJson('data/schema/attempt-projection-v1.schema.json');
   for (const field of [
