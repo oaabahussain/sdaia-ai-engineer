@@ -15,7 +15,9 @@
     "landscape": "docs/superpowers/research/2026-09-29-k3-learner-evidence-landscape.md",
     "latest_landscape_commit": "931db742933bda79e22c39ecbec0e81d36943312",
     "conceptual_architecture": "docs/superpowers/research/2026-09-29-k3-conceptual-architecture-proposal.md",
-    "conceptual_architecture_commit": "576dcc35599b8e58ace524a883aa61e90b7d501a"
+    "conceptual_architecture_commit": "576dcc35599b8e58ace524a883aa61e90b7d501a",
+    "checkpoint": "docs/superpowers/reviews/2026-09-29-k3-research-conceptual-checkpoint.md",
+    "checkpoint_commit": "86f422aafb8a7bcb5c90cadea9a6d472581c98e1"
   },
   "completed_phases": [
     "FRAME",
