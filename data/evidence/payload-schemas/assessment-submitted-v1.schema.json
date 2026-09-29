@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exam_profile_ref",
+    "scoring_policy_ref"
+  ],
+  "properties": {
+    "exam_profile_ref": {
+      "type": "string"
+    },
+    "scoring_policy_ref": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-bundle-v4.schema.json",
+  "title": "RuntimeBundleV4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "track",
+    "exam_profile",
+    "concepts",
+    "learn",
+    "cases",
+    "domains",
+    "evidence"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 4
+    },
+    "track": {
+      "$ref": "track-manifest.schema.json"
+    },
+    "exam_profile": {
+      "$ref": "exam-profile-v2.schema.json"
+    },
+    "concepts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array"
+      }
+    },
+    "learn": {
+      "type": "object"
+    },
+    "cases": {
+      "type": "array"
+    },
+    "domains": {
+      "$ref": "domain-catalog-v2.schema.json"
+    },
+    "evidence": {
+      "$ref": "runtime-evidence-context-v1.schema.json"
+    }
+  }
+}

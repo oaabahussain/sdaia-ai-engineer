@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projection_type",
+    "store_id",
+    "through_store_seq",
+    "policy_version",
+    "generated_at",
+    "activity_id",
+    "learner_id",
+    "mode",
+    "content_release_id"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "projection_type": {
+      "const": "ACTIVITY"
+    },
+    "store_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "through_store_seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "activity_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "learner_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "learn",
+        "practice",
+        "check",
+        "section",
+        "mock"
+      ]
+    },
+    "content_release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "item_interactions": {
+      "type": "array"
+    },
+    "unresolved_reference_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "identity_resolution_version": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

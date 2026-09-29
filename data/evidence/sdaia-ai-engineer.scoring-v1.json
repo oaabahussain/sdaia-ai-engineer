@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "id": "sdaia-ai-engineer.scoring.v1",
+  "version": "1",
+  "correctness_rule": "selected_option_index_equals_item_answer_index",
+  "percent_rule": "round(correct / total * 1000) / 10",
+  "unanswered_rule": "total - answered"
+}

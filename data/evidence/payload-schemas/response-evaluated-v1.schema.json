@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "response_event_id",
+    "scoring_policy_ref",
+    "evaluation_status"
+  ],
+  "properties": {
+    "response_event_id": {
+      "type": "string"
+    },
+    "scoring_policy_ref": {
+      "type": "string"
+    },
+    "evaluation_status": {
+      "type": "string",
+      "enum": [
+        "GRADED",
+        "UNGRADABLE",
+        "INVALIDATED"
+      ]
+    },
+    "correct": {
+      "type": "boolean"
+    },
+    "score": {
+      "type": "number"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "store_id",
+    "event_id",
+    "event_fingerprint",
+    "disposition",
+    "accepted_at",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "store_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "event_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "disposition": {
+      "enum": [
+        "ACCEPTED",
+        "DUPLICATE",
+        "CONFLICT",
+        "REJECTED"
+      ]
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "store_seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

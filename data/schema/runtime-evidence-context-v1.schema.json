@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-evidence-context-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "content_release_id",
+    "question_payload_sha256",
+    "scoring_policy_ref",
+    "scoring_policy_path",
+    "event_definitions_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "content_release_id": {
+      "type": "string"
+    },
+    "question_payload_sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "scoring_policy_ref": {
+      "type": "string"
+    },
+    "scoring_policy_path": {
+      "type": "string"
+    },
+    "event_definitions_ref": {
+      "type": "string"
+    }
+  }
+}

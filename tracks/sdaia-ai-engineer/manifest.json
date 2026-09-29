@@ -16,7 +16,8 @@
     "bilingual",
     "foundation-generated-bank",
     "exam-profile-v1",
-    "content-model-v2"
+    "content-model-v2",
+    "learner-evidence-v2"
   ],
   "content": {
     "concept_files": [
@@ -34,5 +35,6 @@
   "exam_profiles": [
     "tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json"
   ],
-  "default_exam_profile": "sdaia-ai-engineer.project-reference.v1"
+  "default_exam_profile": "sdaia-ai-engineer.project-reference.v1",
+  "evidence": "data/evidence/sdaia-ai-engineer.runtime-v1.json"
 }

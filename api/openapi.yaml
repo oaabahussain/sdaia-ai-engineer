@@ -52,10 +52,10 @@ paths:
       summary: Load the public runtime bundle
       responses:
         '200':
-          description: Canonical public RuntimeBundleV2
+          description: Canonical public runtime bundle; the active SDAIA track returns RuntimeBundleV4 with K3 evidence context
           content:
             application/json:
-              schema: { $ref: ../data/schema/runtime-bundle.schema.json }
+              schema: { $ref: ../data/schema/runtime-bundle-v4.schema.json }
   /progress/{anon_id}:
     parameters:
       - { $ref: '#/components/parameters/AnonPath' }
