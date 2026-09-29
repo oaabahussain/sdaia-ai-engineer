@@ -28,4 +28,31 @@
 - systematic-debugging root cause: execution annotation syntax mismatch, not product behavior.
 - `c653e281176354d6231741f70f20053ad6fa8964` — align task briefs with explicit `Run:` syntax.
 
-**Task 1 status:** GREEN verification pending on `c653e281176354d6231741f70f20053ad6fa8964`.
+### Final Task 1 verification
+- Regression RED for stale execution-authority metadata: run `36615418885` failed at `h0-contract-freeze.test.js` on the stale "does not authorize implementation" text.
+- Fix: `3a6cbf2f07005bdfc89a8b8dd0d45bc5ee1a6a44` normalized execution authority without changing K3 product semantics.
+- Final frozen K3 plan blob: `06e271fcacb9a3c526c1c610c66dfd26b60aa5db`.
+- Final frozen K3 spec blob: `2ccb4c5c1d01b668c14dce6b97608d4eff04d57d`.
+- Final exact-head verification including later Task 2 validator changes: quality run `36615953977` SUCCESS; server/adapter run `36615954029` SUCCESS.
+
+**Task 1: complete.**
+
+## Task 2 — Current-state schema and deterministic validator
+
+**BASE:** `968040e88f2facb41ebd10a1c88d3b3aa01a9811`
+
+### RED evidence
+- `c96b2841361a8547efde574b8abfe94fd5a87c6c` added fail-closed state tests.
+- Quality run `36615134457`, job `109566097407`: `ERR_MODULE_NOT_FOUND` for `scripts/validate_current_state.js`, matching planned RED.
+- `ae2cc643285d93a7a51b8ada9d5f63f1045ff8a2` added missing-reference coverage.
+- Quality run `36615825769`: RED on `rejects a missing referenced execution artifact`.
+
+### GREEN evidence
+- `588975e20fffb5c014d80d3c56f74960517d2b5d` — current-state schema.
+- `e22ee000d99daa30bea4c062cb2351c757e5ac63` — pure validator/CLI.
+- `c3bb6b189a8189c03ef3821415fc201874c992d4` — `validate:state` package command.
+- `45d4f5990f157154b0f1474d6eb63a25d8329393` — fail closed on missing referenced artifacts.
+- Final quality run `36615953977`: SUCCESS (Node, validate, factory import, SW, Pages, browser smoke).
+- Final server/adapter run `36615954029`: SUCCESS.
+
+**Task 2: complete.**
