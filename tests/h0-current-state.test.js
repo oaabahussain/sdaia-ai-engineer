@@ -155,3 +155,32 @@ test('rejects a missing referenced execution artifact', () => {
   assert.equal(result.ok, false);
   assert.equal(result.code, 'STATE_REFERENCE_MISSING');
 });
+
+
+test('repository revision-1 state is real, frozen, and intentionally not low-model ready', () => {
+  const statePath = 'docs/superpowers/state/CURRENT-STATE.json';
+  const ledgerPath = 'docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md';
+  assert.equal(existsSync(statePath), true, 'CURRENT-STATE.json must exist');
+  assert.equal(existsSync(ledgerPath), true, 'durable K3 ledger must exist');
+  const actual = JSON.parse(readFileSync(statePath, 'utf8'));
+  const ledger = readFileSync(ledgerPath, 'utf8');
+  const existingPaths = [actual.spec_path, actual.plan_path, actual.ledger_path, actual.checkpoint_path]
+    .filter((p) => existsSync(p));
+  const blob = (p) => execFileSync('git', ['rev-parse', 'HEAD:' + p], { encoding: 'utf8' }).trim();
+  const checked = validateCurrentState(actual, {
+    liveMainSha: SHA_A,
+    sourceRef: 'main',
+    specBlobSha: blob(actual.spec_path),
+    planBlobSha: blob(actual.plan_path),
+    ledgerText: ledger,
+    existingPaths,
+    minimumStateRevision: 1
+  });
+  assert.equal(checked.ok, true, JSON.stringify(checked));
+  assert.equal(actual.state_revision, 1);
+  assert.equal(actual.completed_through_task, 4);
+  assert.equal(actual.next_task, 5);
+  assert.equal(actual.low_model_ready, false);
+  assert.equal(actual.gates.K3_TASK_BRIEFS_SELF_CONTAINED, 'PASS');
+  assert.equal(actual.gates.TASKS_1_4_DURABLY_VERIFIED, 'PASS');
+});
