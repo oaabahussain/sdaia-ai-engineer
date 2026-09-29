@@ -112,6 +112,7 @@ Required fields:
 - `last_verified_scope`
 - `gates`
 - `low_model_ready`
+- `merge_guard_mode`
 - `updated_at`
 
 Allowed `status` values:
@@ -148,6 +149,8 @@ K3 H0 uses two state revisions around integration:
 - low_model_ready: `true`
 
 `low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, and live `main` equals the execution branch state's non-null `base_main_sha`.
+
+`merge_guard_mode` is one of `RULESET` or `HIGH_REASONING_MERGE_GATE`. `RULESET` is preferred. If the current integration cannot administer repository rulesets, H0 may use `HIGH_REASONING_MERGE_GATE`: the low-reasoning executor may commit/push only to the approved execution branch and MUST STOP before creating/merging an integration PR or changing `main`. A high-reasoning session performs whole-branch review, exact-head verification, and merge. This compensating control must be recorded explicitly; it is not described as branch protection.
 
 ### 4.2 `docs/superpowers/state/CURRENT-STATE.json`
 
@@ -387,9 +390,9 @@ Rename ambiguous job IDs/names so required checks are unambiguous, e.g.:
 
 Do this before branch protection/ruleset enforcement.
 
-### 10.2 Main ruleset
+### 10.2 Main ruleset / compensating merge gate
 
-Add a repository ruleset for `main` that, where supported by the repository plan/settings:
+Add a repository ruleset for `main` when the active integration exposes repository-administration mutation. The preferred ruleset:
 
 - requires pull requests;
 - requires the selected unique CI checks;
@@ -399,6 +402,16 @@ Add a repository ruleset for `main` that, where supported by the repository plan
 - requires conversation resolution where applicable.
 
 Do not require one human approval unless an actual independent human-review workflow exists.
+
+If ruleset mutation is unavailable in the active runtime, record `merge_guard_mode=HIGH_REASONING_MERGE_GATE` and enforce these compensating controls:
+
+- low-reasoning execution is limited to `impl/k3-learner-evidence-engine`;
+- the low-reasoning executor never pushes directly to `main`;
+- it stops before PR merge/integration;
+- whole-branch review + exact-head required checks are performed by a high-reasoning session;
+- post-merge verification remains mandatory.
+
+Under this fallback, `PROCESS_GUARDS_READY` may be `PASS` only when the compensating merge gate is documented and verified; the record must also state that GitHub itself is not enforcing branch protection.
 
 ### 10.3 CI efficiency
 
@@ -485,7 +498,7 @@ Only when every applicable gate is PASS may execution publish:
 
 At that point `low_model_ready` MUST be `true`. Any later `MAIN_DRIFT`, hash mismatch, blocked gate, or Critical/Important finding forces it back to `false`.
 
-If a platform capability such as repository rulesets cannot be configured, the gate is not silently marked PASS. Record the limitation and the smallest safe compensating control.
+If a platform capability such as repository rulesets cannot be configured, the gate is not silently treated as native protection. Record the limitation, set `merge_guard_mode=HIGH_REASONING_MERGE_GATE`, verify the compensating controls above, and only then may `PROCESS_GUARDS_READY=PASS`.
 
 ## 14. Non-goals
 
