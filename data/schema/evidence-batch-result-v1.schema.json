@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "receipts": {
+      "type": "array",
+      "items": {
+        "$ref": "evidence-storage-receipt-v1.schema.json"
+      }
+    }
+  }
+}
