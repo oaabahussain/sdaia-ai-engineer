@@ -16,8 +16,9 @@ const valid = {
   actor_kind: 'LEARNER',
   producer: 'web-client',
   required_context_fields: ['track_id','content_release_id','activity_id','item_id'],
-  payload_schema_ref: 'data/evidence/payload-schemas/learner-response-recorded-v1.schema.json',
+  payload_schema_ref: 'data/evidence/payload-schemas/response-recorded-v1.schema.json',
   properties: {
+    response_version: {type:'integer',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'},
     response_kind: {type:'string',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'},
     response: {type:'object',required:true,privacy_class:'PSEUDONYMOUS',export:'ALLOW'}
   },
