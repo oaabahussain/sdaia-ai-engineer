@@ -1,11 +1,13 @@
 # K3 — Learner Evidence Engine — Normative Design Specification
 
 **Date:** 2026-09-29  
-**Status:** DRAFT FOR EXPLICIT WRITTEN-SPEC APPROVAL  
+**Status:** APPROVED — ACTIVE IMPLEMENTATION CONTRACT  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Design branch:** `design/k3-learner-evidence-engine`  
 **Authoritative base:** `main@3c296632a54f68f0ecc7ad122298d9661706cb2b`  
 **Programme:** K3 — Learner Evidence Engine
+
+**Execution state:** Tasks 1-4 are merged, independently audited, corrected, and verified; Task 5 is next. Execution progress is carried by SDD + durable ledger + CURRENT-STATE. This specification's semantic contract is frozen except through an explicit approved amendment.
 
 > This document is the normative K3 design/specification. It does not authorize implementation. An implementation plan may be written only after this spec is explicitly approved.
 
