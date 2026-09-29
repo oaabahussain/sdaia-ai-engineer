@@ -37,5 +37,24 @@
     "reason_code": {
       "type": "string"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "APPLIED"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "required": [
+          "authoritative_revision_after"
+        ]
+      }
+    }
+  ]
 }
