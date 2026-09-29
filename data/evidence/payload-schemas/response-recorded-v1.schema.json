@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "response_kind",
+    "response"
+  ],
+  "properties": {
+    "response_kind": {
+      "type": "string",
+      "enum": [
+        "OPTION",
+        "MULTI_OPTION",
+        "BOOLEAN",
+        "NUMBER",
+        "TEXT",
+        "STRUCTURED"
+      ]
+    },
+    "response": {
+      "type": "object"
+    }
+  }
+}
