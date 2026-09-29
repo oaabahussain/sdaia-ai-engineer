@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_event_id",
+    "action",
+    "reason_code"
+  ],
+  "properties": {
+    "target_event_id": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "VOID",
+        "SUPERSEDE"
+      ]
+    },
+    "reason_code": {
+      "type": "string"
+    },
+    "superseding_event_id": {
+      "type": "string"
+    }
+  }
+}
