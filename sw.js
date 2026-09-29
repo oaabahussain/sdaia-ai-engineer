@@ -32,7 +32,6 @@ const ASSETS = [
   './tracks/sdaia-ai-engineer/presentation.json',
   './tracks/sdaia-ai-engineer/domains.json',
   './tracks/sdaia-ai-engineer/exam-profiles/project-reference-v1.json',
-  './data/evidence/sdaia-ai-engineer.runtime-v1.json',
   './data/evidence/sdaia-ai-engineer.scoring-v1.json',
   './data/evidence/event-definitions-v1.json'
 ];
