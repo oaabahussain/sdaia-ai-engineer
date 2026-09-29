@@ -16,7 +16,7 @@ test('SDAIA track declares K3 capability and stable evidence context',async()=>{
  assert.equal(bundle.evidence.content_release_id,'sdaia-ai-engineer.bootstrap.v1');
  assert.equal(bundle.evidence.scoring_policy_ref,'sdaia-ai-engineer.scoring.v1');
  assert.equal(bundle.evidence.event_definitions_ref,'data/evidence/event-definitions-v1.json');
- assert.equal(bundle.exam_profile.total_questions,200);
+ assert.equal(bundle.exam_profile.question_count,200);
 });
 
 test('RuntimeBundleV4 validates and carries the protected payload digest',async()=>{
