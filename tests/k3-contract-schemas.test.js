@@ -11,7 +11,7 @@ const uuid3='323e4567-e89b-42d3-a456-426614174002';
 
 test('LearnerEvidenceEventV2 accepts canonical raw evidence and rejects derived truth',()=>{
  const v=validate('learner-evidence-event-v2.schema.json');
- const e={schema_version:2,event_id:uuid,definition_id:'learner.response.recorded@1',learner_id:'learner:p1',origin_id:uuid2,origin_seq:1,activity_id:uuid,track_id:'sdaia-ai-engineer',content_release_id:'sdaia-ai-engineer.bootstrap.v1',mode:'mock',locale:'ar',occurred_at:'2026-09-29T00:00:00Z',payload:{response_kind:'OPTION',response:1}};
+ const e={schema_version:2,event_id:uuid,definition_id:'learner.response.recorded@1',learner_id:'learner:p1',origin_id:uuid2,origin_seq:1,activity_id:uuid3,track_id:'sdaia-ai-engineer',content_release_id:'sdaia-ai-engineer.bootstrap.v1',mode:'mock',locale:'ar',occurred_at:'2026-09-29T00:00:00Z',payload:{response_kind:'OPTION',response:1}};
  assert.equal(v(e),true,JSON.stringify(v.errors));
  assert.equal(v({...e,mastery:0.9}),false);
  assert.equal(v({...e,origin_seq:0}),false);
