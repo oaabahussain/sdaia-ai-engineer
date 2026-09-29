@@ -61,6 +61,7 @@ Frozen K3 contracts:
 - modify metadata/progress-control text only in `docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md`
 - modify metadata/progress-control text only in `docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md`
 - create `tests/h0-contract-freeze.test.js`
+- create `tests/h0-k3-task-briefs.test.js`
 
 Pages/CI:
 - create `scripts/build_pages_artifact.js`
@@ -81,48 +82,68 @@ Project bootstrap deliverable:
 
 # Phase H0-A — Freeze contracts and establish machine-valid state
 
-### Task 1: Normalize and freeze the active K3 contract metadata
+### Task 1: Normalize K3 metadata, make Tasks 5-41 self-contained, then freeze
 
 **Files:**
 - Modify: `docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md`
 - Modify: `docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md`
 - Create: `tests/h0-contract-freeze.test.js`
+- Create: `tests/h0-k3-task-briefs.test.js`
 
 **Interfaces:**
 - Produces: frozen active K3 spec/plan whose product semantics are unchanged.
 - Produces: explicit marker `Execution progress source: SDD + durable ledger + CURRENT-STATE`.
 - Produces: explicit marker that Tasks 1-4 are historical completed checkboxes and Task 5 is next; future progress does not mutate plan checkboxes.
+- Produces: every Task 5-41 section is independently executable after `task-start` extracts only that task section.
 
-- [ ] **Step 1: Write the failing contract-freeze test**
+- [ ] **Step 1: Write failing contract-freeze and task-brief tests**
 
-Create tests that read both files and assert:
+`h0-contract-freeze.test.js` reads both files and asserts:
 - K3 spec no longer says `DRAFT FOR EXPLICIT WRITTEN-SPEC APPROVAL`;
 - spec says Tasks 1-4 merged/corrected and Task 5 next;
 - plan contains the exact progress-source marker;
 - plan says semantic content is frozen for execution except approved amendment;
 - Task 5 remains unchecked.
 
+`h0-k3-task-briefs.test.js` parses every Task 5-41 section and asserts each section contains:
+- exact RED command text, not bare `Run RED`;
+- `Expected RED:` describing an intended assertion/behavior failure and rejecting setup/import/path-only failures unless file/module absence is itself the intended assertion;
+- exact GREEN command text, not bare `Run GREEN`;
+- `Expected GREEN:` requiring zero failures for the listed task tests;
+- an affected-regression command or explicit `Affected regression: none beyond task GREEN`;
+- `**Stop conditions:**` covering spec/plan conflict -> Ruling, unexpected failure -> systematic-debugging, and no main integration/merge for a low-reasoning executor.
+
+The test also rejects any Task 5-41 section containing shorthand-only `Run RED.` or `Run GREEN.`.
+
 - [ ] **Step 2: Run RED**
 
-Run: `node --test tests/h0-contract-freeze.test.js`
+Run: `node --test tests/h0-contract-freeze.test.js tests/h0-k3-task-briefs.test.js`
 
-Expected: FAIL because the freeze/progress markers are absent or stale.
+Expected: FAIL because freeze/progress markers are stale and the existing K3 plan has shorthand RED/GREEN steps with no per-task Expected/stop contract.
 
-- [ ] **Step 3: Normalize metadata only**
+- [ ] **Step 3: Normalize metadata and mechanically harden Task 5-41 execution text**
 
-Update header/status/progress-control prose. Do not alter K3 event contracts, schemas, interfaces, dependency choices, or Task 5-41 semantics.
+Update header/status/progress-control prose. Then edit every Task 5-41 section so its extracted brief is self-contained:
+- expand each RED shorthand into the exact command already determined by that task's listed test files and the existing Node/Python command convention;
+- add `Expected RED:` immediately after the RED command;
+- expand each GREEN shorthand into the exact command for that task;
+- add `Expected GREEN:` immediately after the GREEN command;
+- state the affected-regression command explicitly;
+- append the same concise `**Stop conditions:**` contract to the task section.
+
+Do not alter K3 event contracts, schemas, interfaces, dependencies, task order, or acceptance semantics. These edits are execution annotations only.
 
 - [ ] **Step 4: Run GREEN**
 
-Run: `node --test tests/h0-contract-freeze.test.js`
+Run: `node --test tests/h0-contract-freeze.test.js tests/h0-k3-task-briefs.test.js`
 
-Expected: PASS.
+Expected: PASS for all Tasks 5-41.
 
 - [ ] **Step 5: Verify no accidental product-semantic diff**
 
 Run: `git diff --word-diff=porcelain <BASE> -- docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md`
 
-Expected: only metadata/progress-control wording changed; no interface/task-body semantic change.
+Expected: only metadata/progress-control wording plus execution annotations changed; no product interface, dependency, task-order, or acceptance-semantic change.
 
 - [ ] **Step 6: Commit**
 
@@ -665,15 +686,16 @@ Do not merge it. Task 5 begins from this branch in the lower-reasoning session.
 Do **not** tell the user to switch to the lower-reasoning model until all of these are simultaneously true:
 
 1. live main is the verified H0-integrated SHA;
-2. `impl/k3-learner-evidence-engine` exists from that exact main;
-3. revision-3 state validates;
-4. `low_model_ready=true`;
-5. `next_task=5`;
-6. all H0 execution-readiness gates PASS;
-7. no open Critical/Important findings;
-8. Project bootstrap revision is current;
-9. official K3 SDD workspace initializes successfully;
-10. lower-model merge authority is explicitly absent under `HIGH_REASONING_MERGE_GATE` fallback.
+2. `K3_TASK_BRIEFS_SELF_CONTAINED=PASS` for every Task 5-41;
+3. `impl/k3-learner-evidence-engine` exists from that exact main;
+4. revision-3 state validates;
+5. `low_model_ready=true`;
+6. `next_task=5`;
+7. all H0 execution-readiness gates PASS;
+8. no open Critical/Important findings;
+9. Project bootstrap revision is current;
+10. official K3 SDD workspace initializes successfully;
+11. lower-model merge authority is explicitly absent under `HIGH_REASONING_MERGE_GATE` fallback.
 
 At that point the lower-reasoning model receives only:
 
