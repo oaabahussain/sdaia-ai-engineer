@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import Ajv from 'ajv';
 import { registerEventDefinition } from '../src/platform-kernel/observability/eventRegistry.js';
+import { loadRuntimeBundle } from '../src/content/runtimeBundle.js';
 
 const readJson = p => JSON.parse(fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8'));
 const ajvFor = () => new Ajv({ strict:false, allErrors:true, formats:{'date-time':true} });
@@ -108,4 +109,41 @@ test('AttemptProjectionV1 retains applicable release, scoring and resolution met
 test('runtime evidence context constrains question payload digest to lowercase SHA-256 hex', () => {
   const schema = readJson('data/schema/runtime-evidence-context-v1.schema.json');
   assert.equal(schema.properties.question_payload_sha256.pattern, '^[0-9a-f]{64}$');
+});
+
+
+test('all 12 governed K3 definitions compile and register against their payload schemas', () => {
+  const defs = readJson('data/evidence/event-definitions-v1.json');
+  assert.equal(defs.length, 12);
+  for (const definition of defs) {
+    const payloadSchema = readJson(definition.payload_schema_ref);
+    ajvFor().compile(payloadSchema);
+    assert.equal(
+      registerEventDefinition(definition),
+      definition.event_name + '@' + definition.event_version
+    );
+  }
+});
+
+test('the live SDAIA RuntimeBundleV4 validates against the complete referenced schema graph', async () => {
+  const ajv = ajvFor();
+  for (const name of [
+    'track-manifest.schema.json',
+    'exam-profile-v2.schema.json',
+    'domain-catalog-v2.schema.json',
+    'runtime-evidence-context-v1.schema.json'
+  ]) {
+    const schema = readJson('data/schema/' + name);
+    ajv.addSchema(schema, schema.$id || name);
+  }
+  const root = readJson('data/schema/runtime-bundle-v4.schema.json');
+  const validate = ajv.compile(root);
+  const fetchJson = async p => readJson(p.replace(/^\.\//, ''));
+  const bundle = await loadRuntimeBundle(fetchJson, 'sdaia-ai-engineer');
+  assert.equal(validate(bundle), true, JSON.stringify(validate.errors));
+  assert.equal(bundle.contract_version, 4);
+  assert.equal(
+    bundle.evidence.question_payload_sha256,
+    '5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9'
+  );
 });
