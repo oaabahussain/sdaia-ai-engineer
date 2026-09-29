@@ -7,6 +7,10 @@ const plan = readFileSync('docs/superpowers/plans/2026-09-29-k3-learner-evidence
 
 test('K3 execution contracts are normalized and frozen for ledger/state progress', () => {
   assert.doesNotMatch(spec, /DRAFT FOR EXPLICIT WRITTEN-SPEC APPROVAL/);
+  assert.doesNotMatch(spec, /does not authorize implementation/i);
+  assert.doesNotMatch(spec, /current authoritative programme tracker/i);
+  assert.match(spec, /Execution authority:.*CURRENT-STATE/i);
+  assert.match(spec, /Historical design base:/i);
   assert.match(spec, /Tasks 1-4/i);
   assert.match(spec, /Task 5/i);
   assert.match(plan, /Execution progress source: SDD \+ durable ledger \+ CURRENT-STATE/);
