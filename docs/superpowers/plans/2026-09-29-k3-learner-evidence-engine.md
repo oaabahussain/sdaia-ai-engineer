@@ -180,9 +180,9 @@ Tests:
 
 
 - [ ] Write failing port/receipt-shape tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement assertion + reusable conformance harness.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `test: define K3 evidence store conformance contract`.
 
 ### Task 8: JSONL EvidenceStoreV2
@@ -202,7 +202,7 @@ Tests:
 
 
 - [ ] Write failing tests for ACCEPTED/DUPLICATE/CONFLICT, origin-seq conflict, store_seq, filtering, malformed file.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement append-only events + sidecar index; no update/delete.
 - [ ] Run GREEN + shared harness.
 - [ ] Commit `feat: add JSONL K3 evidence store`.
@@ -248,7 +248,7 @@ Tests:
 
 
 - [ ] Write failing tests using `fake-indexeddb/auto` for exact retry, conflicts, indexes, store_seq, close/reopen recovery.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement IndexedDB event/receipt/index stores with atomic acceptance.
 - [ ] Run GREEN + shared conformance harness.
 - [ ] Commit `feat: add IndexedDB K3 evidence store`.
@@ -271,7 +271,7 @@ Tests:
 
 
 - [ ] Write failing tests for stable random origin ID, atomic origin_seq allocation, blocked localStorage, local-store failure, persistence grant/denial.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement local-first capture; no network call may occur before local ACCEPTED/DUPLICATE receipt.
 - [ ] Run GREEN and prove a durability failure is surfaced instead of reported as recorded.
 - [ ] Commit `feat: add durable local K3 capture`.
@@ -294,9 +294,9 @@ Tests:
 
 
 - [ ] Write failing transition, retry, restart, and no-body-mutation tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement mutable transport metadata separately from immutable event bytes.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 evidence outbox`.
 
 ### Task 13: Cross-adapter store conformance
@@ -346,9 +346,9 @@ Tests:
 
 
 - [ ] Write failing tests proving `learner_id` and current `X-Anon-Id` alone never grant learner-evidence read/write.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement the port, default fail-closed resolver, and deterministic test resolver.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add fail-closed K3 learner authorization`.
 
 ### Task 15: Authorized batch-push API
@@ -369,9 +369,9 @@ Tests:
 
 
 - [ ] Write failing tests for ACCEPTED, DUPLICATE, CONFLICT, REJECTED, partial batch, and cross-user rejection.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement endpoint over `evidence_store.py` + auth port.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 evidence batch API`.
 
 ### Task 16: Authorized cursor-based pull API
@@ -392,9 +392,9 @@ Tests:
 
 
 - [ ] Write failing cursor/replay/cross-user/bounded-limit tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement repeatable store_seq-ordered pull; limit comes from injected/configured policy, not hidden architecture constant.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 evidence pull API`.
 
 ### Task 17: EvidenceSync port and coordinator
@@ -415,9 +415,9 @@ Tests:
 
 
 - [ ] Write failing lost-ACK, duplicate retry, partial batch, network failure, restart, and resumable-pull tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement at-least-once coordinator preserving original event IDs/bodies.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 evidence synchronization`.
 
 **Phase C checkpoint:** record exact HEAD and prove local-only mode remains functional when authorization/sync is unavailable.
@@ -444,7 +444,7 @@ Tests:
 
 
 - [ ] Write failing single-origin chain and two-device same-base branch tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement revision resolver; client `occurred_at` must never choose a winner.
 - [ ] Run GREEN, then swap client timestamps and prove decision is unchanged.
 - [ ] Commit `feat: add K3 strict assessment revision authority`.
@@ -467,9 +467,9 @@ Tests:
 
 
 - [ ] Write failing tests for VOID, SUPERSEDE, correction-before-target, competing supersession, cycles, unauthorized authority.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement deterministic correction resolution without mutating target bytes.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 correction resolution`.
 
 ### Task 20: ActivityProjectionV1
@@ -490,7 +490,7 @@ Tests:
 
 
 - [ ] Write failing start/completion/item/response/hint/explanation/late/correction tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement correction-aware deterministic projection; incomplete references remain explicit.
 - [ ] Run GREEN and verify no mastery/readiness/abandonment field is emitted.
 - [ ] Commit `feat: add K3 activity projection`.
@@ -513,7 +513,7 @@ Tests:
 
 
 - [ ] Write failing tests for A->B->C answer changes, APPLIED/STALE device branches, unanswered-at-submit derivation, evaluation/regrade references, VOID/SUPERSEDE.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement current authoritative response selection only from accepted revision history.
 - [ ] Run GREEN; verify underlying response history references remain.
 - [ ] Commit `feat: add K3 attempt projection`.
@@ -536,9 +536,9 @@ Tests:
 
 
 - [ ] Write failing watermark, late-event rebuild, orphan-target, sequence reuse, and clock-divergence-warning tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement deterministic failures separately from warnings; do not invent numeric anomaly thresholds.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 replay and integrity kernel`.
 
 **Phase D checkpoint:** record exact HEAD and the strict multi-device falsification scenarios from the spec.
@@ -565,9 +565,9 @@ Tests:
 
 
 - [ ] Write failing LINK, UNLINK, chain, cycle, and conflicting-link tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement JS/file/SQLite parity without rewriting raw event learner IDs.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 learner identity links`.
 
 ### Task 24: Honest LearnerEventV1 compatibility reader
@@ -588,7 +588,7 @@ Tests:
 
 
 - [ ] Write failing fixtures reproducing JSON Schema/JS/Python V1 drift.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement read-only compatibility preserving missing `answer`/`confidence` as missing.
 - [ ] Run GREEN plus all existing V1 tests.
 - [ ] Commit `feat: add honest K3 legacy evidence reader`.
@@ -611,9 +611,9 @@ Tests:
 
 
 - [ ] Write failing tests proving ordinary store has no update/delete API and privacy actions invalidate learner-linkable receipts/fingerprints/projection caches according to policy.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement privileged lifecycle + append-only export actions.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 privacy lifecycle governance`.
 
 ### Task 26: StateV2 transition compatibility
@@ -634,7 +634,7 @@ Tests:
 
 
 - [ ] Write failing fixtures for pre-K3 active exam and legacy exam_history.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement only the minimal marker/transition needed; do not synthesize item-presented/response timestamps.
 - [ ] Run GREEN plus existing state migration tests.
 - [ ] Commit `feat: preserve StateV2 through K3 transition`.
@@ -663,7 +663,7 @@ Tests:
 
 
 - [ ] Write failing browser-context tests; current UI `full` maps to evidence mode `mock` without changing labels.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Move/re-export shared snapshot implementation and attach it to newly created exams.
 - [ ] Run GREEN + current exam tests.
 - [ ] Commit `refactor: expose frozen assessment context to browser`.
@@ -686,9 +686,9 @@ Tests:
 
 
 - [ ] Write failing ordered-event tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement recorder entirely over already-tested local capture/store primitives.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add K3 browser evidence recorder`.
 
 ### Task 29: Instrument current full/section assessment interactions
@@ -709,7 +709,7 @@ Tests:
 
 
 - [ ] Write failing app sequence tests around existing `createExam/selectAnswer/setConfidence/move/jump/submitExam`.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Add instrumentation without changing scoring, selection, rendering, keyboard controls, or StateV2 UI behavior.
 - [ ] Run GREEN + full Node suite + browser smoke.
 - [ ] Commit `feat: record assessment learner evidence`.
@@ -732,9 +732,9 @@ Tests:
 
 
 - [ ] Write failing fail-closed and injected-authorized-sync tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Wire optional sync capability; no silent fallback from authorized learner sync to X-Anon-Id.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: wire optional K3 evidence sync`.
 
 **Phase F checkpoint:** verify learner-visible bank digest, scoring results, AR/EN/RTL/LTR, and offline shell behavior are unchanged.
@@ -761,9 +761,9 @@ Tests:
 
 
 - [ ] Write failing result-contract tests while preserving existing port adapters.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Extend assertion/helper contract compatibly.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: harden learning event exchange port`.
 
 ### Task 32: xAPI 2.0 adapter
@@ -784,9 +784,9 @@ Tests:
 
 
 - [ ] Write failing response/evaluation/attempt/timestamp/lossiness/PII/import-abstention tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement only supported deterministic mappings; actor identity remains pseudonymous.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add xAPI K3 adapter`.
 
 ### Task 33: Caliper 1.2 adapter
@@ -807,9 +807,9 @@ Tests:
 
 
 - [ ] Write failing skip-not-attempt and response/attempt mapping tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement supported deterministic mapping; unsupported semantics return declared omissions/rejections.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Commit `feat: add Caliper K3 adapter`.
 
 ### Task 34: Sanitized Product Analytics bridge and telemetry boundary
@@ -830,7 +830,7 @@ Tests:
 
 
 - [ ] Write failing tests proving learner payload is not passed directly to AnalyticsSink/TelemetrySink.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Implement governed bridge over existing EventRegistry and analytics privacy policy.
 - [ ] Run GREEN + existing observability tests.
 - [ ] Commit `feat: bridge K3 evidence to governed analytics`.
@@ -859,7 +859,7 @@ Tests:
 
 
 - [ ] Write failing artifact-boundary and CI-contract tests.
-- [ ] Run RED.
+- [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED.
 - [ ] Update validation/workflows/service-worker asset list.
 - [ ] Run GREEN and assemble/verify the Pages artifact locally.
 - [ ] Commit `ci: add K3 evidence release gates`.
@@ -906,7 +906,7 @@ Tests:
 
 - [ ] Add/adjust documentation-contract tests and run RED.
 - [ ] Update durable docs; remove stale K3 "not started" statements only when implementation evidence supports the change.
-- [ ] Run GREEN.
+- [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN.
 - [ ] Verify no tribal-knowledge-only operational step remains.
 - [ ] Commit `docs: record K3 learner evidence implementation`.
 
