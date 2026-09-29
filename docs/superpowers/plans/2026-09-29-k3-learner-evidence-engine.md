@@ -76,7 +76,9 @@ Tests:
 - [ ] Commit `feat: add K3 event definition governance`.
 
 ### Task 2: LearnerEvidenceEventV2 and support schemas
-**Files:** create `learner-evidence-event-v2.schema.json`, receipt/batch/outbox/activity/attempt/identity/export schemas; test `tests/k3-contract-schemas.test.js`.
+**Files:** create `data/schema/learner-evidence-event-v2.schema.json`, `data/schema/evidence-storage-receipt-v1.schema.json`, `data/schema/evidence-batch-result-v1.schema.json`, `data/schema/evidence-outbox-record-v1.schema.json`, `data/schema/activity-projection-v1.schema.json`, `data/schema/attempt-projection-v1.schema.json`, `data/schema/learner-identity-link-record-v1.schema.json`, `data/schema/evidence-export-record-v1.schema.json`; test `tests/k3-contract-schemas.test.js`.
+
+**Interfaces:** exact contracts `LearnerEvidenceEventV2`, `EvidenceStorageReceiptV1`, `EvidenceBatchResultV1`, `EvidenceOutboxRecordV1`, `ActivityProjectionV1`, `AttemptProjectionV1`, `LearnerIdentityLinkRecordV1`, and `EvidenceExportRecordV1`.
 
 - [ ] Write failing Ajv fixtures for UUIDs, origin_seq, modes, optional context, dispositions, outbox states, LINK/UNLINK, export lifecycle, forbidden derived fields.
 - [ ] Run RED: `node --test tests/k3-contract-schemas.test.js`.
@@ -95,8 +97,8 @@ Tests:
 - [ ] Run GREEN.
 - [ ] Commit `feat: define K3 learner evidence vocabulary`.
 
-### Task 4: Scoring policy and runtime evidence context
-**Files:** create scoring/runtime-context schemas and `data/evidence/sdaia-ai-engineer.scoring-v1.json`, `sdaia-ai-engineer.runtime-v1.json`; modify track manifest, runtime-bundle schema/loader, server bundle loader; test `tests/k3-runtime-evidence-context.test.js` and server bank tests.
+### Task 4: Scoring policy and RuntimeBundleV4 evidence context
+**Files:** create `data/schema/scoring-policy-v1.schema.json`, `data/schema/runtime-evidence-context-v1.schema.json`, `data/schema/runtime-bundle-v4.schema.json`, `data/evidence/sdaia-ai-engineer.scoring-v1.json`, `data/evidence/sdaia-ai-engineer.runtime-v1.json`; modify `data/schema/track-manifest.schema.json`, `tracks/sdaia-ai-engineer/manifest.json`, `src/content/runtimeBundle.js`, `server/app/main.py`, `api/openapi.yaml`; test `tests/k3-runtime-evidence-context.test.js` and server bank tests.
 
 **Interfaces:** introduce versioned `RuntimeBundleV4` with additive `evidence` context for tracks declaring `learner-evidence-v2`; reuse `content_release_id="sdaia-ai-engineer.bootstrap.v1"` as the immutable grandfathered baseline reference without relabeling its K2 lifecycle state; scoring policy documents current `scoreExam` semantics without behavior change.
 
@@ -137,7 +139,7 @@ Tests:
 ### Task 7: EvidenceStore port/conformance harness
 **Files:** create `src/evidence/storePort.js`, `tests/fixtures/k3/store-conformance.json`, `tests/helpers/k3StoreConformance.js`, `tests/k3-store-port.test.js`.
 
-**Interfaces:** store requires `accept`, `acceptBatch`, `getById`, `read`.
+**Interfaces:** `EvidenceStore` requires `accept`, `acceptBatch`, `getById`, `read`; every accept path returns `EvidenceStorageReceiptV1`, and every batch path returns `EvidenceBatchResultV1`.
 
 - [ ] Write failing port/receipt-shape tests.
 - [ ] Run RED.
@@ -342,7 +344,7 @@ Tests:
 
 # Phase E — Identity, privacy lifecycle, legacy compatibility
 
-### Task 23: Append-only learner identity links
+### Task 23: Append-only LearnerIdentityLinkRecordV1
 
 **Files:** create `src/platform-kernel/evidence/identityLinks.js`, `scripts/platform-kernel/adapters/jsonlIdentityLinkStore.js`; modify `db/schema.sql`, `server/app/evidence_store.py`; test `tests/k3-identity-links.test.js`, `server/tests/test_k3_identity_links.py`.
 
@@ -366,7 +368,7 @@ Tests:
 - [ ] Run GREEN plus all existing V1 tests.
 - [ ] Commit `feat: add honest K3 legacy evidence reader`.
 
-### Task 25: Privacy lifecycle and append-only export ledger
+### Task 25: Privacy lifecycle and append-only EvidenceExportRecordV1 ledger
 
 **Files:** create `src/platform-kernel/evidence/privacyLifecycle.js`, `src/platform-kernel/evidence/exportLedger.js`; modify `db/schema.sql`, `server/app/evidence_store.py`; test `tests/k3-privacy-lifecycle.test.js`, `server/tests/test_k3_privacy.py`.
 
