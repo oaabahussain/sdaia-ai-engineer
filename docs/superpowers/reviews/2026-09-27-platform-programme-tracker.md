@@ -1,9 +1,12 @@
-# Learning Platform — Authoritative Programme Tracker
+# Learning Platform — Historical Programme Tracker / Index
 
 **Date:** 2026-09-28  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
+**Live execution state:** `docs/superpowers/state/CURRENT-STATE.json` — use this manifest for current programme/task/ref state.  
 **Current verified product baseline:** `main@dced183980199ca8b7e359b48ddc7fd61f29488f`  
-**Tracker status:** authoritative current programme index
+**Tracker status:** historical/index-only; not authoritative for live execution state
+
+> This document preserves historical programme context. It must not override `CURRENT-STATE.json`, the approved active spec/plan, or the durable execution ledger.
 
 ## Completed programmes
 
