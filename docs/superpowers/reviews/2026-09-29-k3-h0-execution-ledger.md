@@ -56,3 +56,16 @@
 - Final server/adapter run `36615954029`: SUCCESS.
 
 **Task 2: complete.**
+
+
+## Task 3 — Durable K3 ledger and revision-1 state
+
+**RED:** `d6bb459c6d7fcff5f92d7223245c6c778a1fe4e8` added a real-repository state test. Run `36616187749`, job `109569661136`, failed because the durable state files did not exist. The first attempt exposed a test-harness ReferenceError; `c9501ac7de6dcf4e30e1e3e633fb5ed28a7d1d3e` repaired the harness rather than accepting that error as RED.
+
+**Implementation:**
+- `de3444bf6ac9b5f18329707a2455f3ff8cac527b` — retrospective Tasks 1-4 durable K3 ledger.
+- `c2786ba432c5a1c6b609a917b830d51684fd4ea0` — revision-1 CURRENT-STATE with Task 4 complete, Task 5 next, unfinished H0 gates FAIL, and `low_model_ready=false`.
+
+**GREEN:** exact branch state after harness repair `c9501ac7de6dcf4e30e1e3e633fb5ed28a7d1d3e`; quality run `36616898184` SUCCESS and server/adapter run `36616898247` SUCCESS. The real-repository test verifies frozen spec/plan blobs, retrospective ledger coverage, Task 5 next, and intentionally false low-model readiness.
+
+**Task 3: complete.**
