@@ -78,7 +78,7 @@ If two artifacts disagree, lower levels never override higher levels.
 
 It MUST NOT contain the SHA of the commit that contains itself. The startup procedure resolves the live Git ref first and then reads `CURRENT-STATE.json` from that exact ref.
 
-It MAY contain immutable blob SHAs for referenced spec/plan files so startup validation can detect drift.
+It contains immutable blob SHAs for the approved active spec and implementation plan so startup validation can detect contract drift. After approval, those contract files are frozen for execution: task completion is recorded in the SDD ledger, durable execution ledger, and current-state manifest rather than by continuing to edit plan checkboxes. Any semantic spec/plan change requires an explicit amendment/new approved revision and corresponding state update.
 
 ## 4. New repository artifacts
 
@@ -126,7 +126,7 @@ K3 H0 initial state after implementation:
 
 ### 4.2 `docs/superpowers/state/CURRENT-STATE.json`
 
-The only mutable state manifest.
+The only mutable **current-status summary**. Other execution evidence such as the append-oriented durable ledger may grow, but no other file independently summarizes the live current state.
 
 It MUST remain compact and machine-validatable.
 
@@ -156,6 +156,17 @@ Package script:
 `npm run validate:state`
 
 No production/browser dependency may be added for this validator.
+
+### 4.3.1 Frozen contract rule
+
+Once the K3 product spec and K3 implementation plan are approved for execution, their semantic content is immutable during ordinary task execution.
+
+- Do not mark additional plan checkboxes as the progress mechanism after H0.
+- SDD `task-done`, the durable ledger, and `CURRENT-STATE.json` carry progress.
+- A required semantic change creates an explicit amendment or replacement revision, receives the appropriate approval gate, and updates the stored blob SHA.
+- A blob mismatch without such an amendment is `PLAN_SPEC_HASH_MISMATCH` and blocks execution.
+
+This keeps blob validation useful instead of turning normal progress bookkeeping into contract drift.
 
 ### 4.4 K3 durable execution ledger
 
@@ -401,7 +412,7 @@ H0 is complete only when all of the following are implemented and verified:
 
 1. current-state schema exists;
 2. current-state manifest exists and validates;
-3. spec/plan blob-drift validation works;
+3. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
 4. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
 5. HANDOFF current section is converted to static pointer form;
 6. static Project bootstrap/index files exist;
