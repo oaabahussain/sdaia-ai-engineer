@@ -69,3 +69,11 @@
 **GREEN:** exact branch state after harness repair `c9501ac7de6dcf4e30e1e3e633fb5ed28a7d1d3e`; quality run `36616898184` SUCCESS and server/adapter run `36616898247` SUCCESS. The real-repository test verifies frozen spec/plan blobs, retrospective ledger coverage, Task 5 next, and intentionally false low-model readiness.
 
 **Task 3: complete.**
+
+
+## Task 4 — Static bootstrap and recovery pointers
+
+- RED head: `3e7b84c0b93c62e3da180d32cb11fb3fa6475eb5`; run `36617110396` demonstrated the missing/stale bootstrap contract.
+- Implementation heads: `aaca307754d3193e78c55ccc23c72a19b169d0b8`, `ca4a630f115405e12a81bb2c760d2fb092288b2c`, `25e1bcc739e17420c09dec866d4f66fe41b193a3`, `9d71687ab39802ea683a39be2acae7ce35901cda`, `a4b91df1677bfd4b683dae02d6de24b17511e26b`.
+- GREEN: quality `36617310992` SUCCESS; server/adapter `36617311916` SUCCESS on exact head `a4b91df1677bfd4b683dae02d6de24b17511e26b`.
+- Task 4: complete.
