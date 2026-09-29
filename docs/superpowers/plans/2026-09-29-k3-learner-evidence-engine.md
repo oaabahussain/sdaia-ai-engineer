@@ -97,11 +97,11 @@ Tests:
 ### Task 4: Scoring policy and runtime evidence context
 **Files:** create scoring/runtime-context schemas and `data/evidence/sdaia-ai-engineer.scoring-v1.json`, `sdaia-ai-engineer.runtime-v1.json`; modify track manifest, runtime-bundle schema/loader, server bundle loader; test `tests/k3-runtime-evidence-context.test.js` and server bank tests.
 
-**Interfaces:** additive `RuntimeBundleV3.evidence`; reuse `content_release_id="sdaia-ai-engineer.bootstrap.v1"`; scoring policy documents current `scoreExam` semantics without behavior change.
+**Interfaces:** introduce versioned `RuntimeBundleV4` with additive `evidence` context for tracks declaring `learner-evidence-v2`; reuse `content_release_id="sdaia-ai-engineer.bootstrap.v1"` as the immutable grandfathered baseline reference without relabeling its K2 lifecycle state; scoring policy documents current `scoreExam` semantics without behavior change.
 
 - [ ] Write failing tests for release/hash/scoring/definitions and unchanged bank/profile.
 - [ ] Run RED: Node focused test + `PYTHONPATH=server pytest -q server/tests/test_api.py::test_bank`.
-- [ ] Implement additive evidence context.
+- [ ] Implement RuntimeBundleV4 evidence context while keeping V2/V3 readers compatible for tracks that do not declare the new capability.
 - [ ] Run GREEN plus `node --test tests/track-contract.test.js`.
 - [ ] Commit `feat: expose stable K3 evidence context`.
 
