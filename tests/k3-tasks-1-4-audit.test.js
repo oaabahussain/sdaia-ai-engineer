@@ -86,23 +86,22 @@ test('events with no spec-required payload do not invent required completion/pre
   }
 });
 
-test('ActivityProjectionV1 always records resolution status metadata', () => {
+test('ActivityProjectionV1 records unresolved status but keeps identity resolution conditional', () => {
   const schema = readJson('data/schema/activity-projection-v1.schema.json');
-  for (const field of ['identity_resolution_version','unresolved_reference_count']) {
-    assert.ok(schema.properties[field], 'missing property ' + field);
-    assert.ok(schema.required.includes(field), 'field must be required: ' + field);
-  }
+  assert.ok(schema.properties.unresolved_reference_count);
+  assert.ok(schema.required.includes('unresolved_reference_count'));
+  assert.ok(schema.properties.identity_resolution_version);
+  assert.equal(schema.required.includes('identity_resolution_version'), false);
 });
 
 test('AttemptProjectionV1 retains applicable release, scoring and resolution metadata', () => {
   const schema = readJson('data/schema/attempt-projection-v1.schema.json');
-  for (const field of [
-    'content_release_id','scoring_policy_ref',
-    'identity_resolution_version','unresolved_reference_count'
-  ]) {
+  for (const field of ['content_release_id','scoring_policy_ref','unresolved_reference_count']) {
     assert.ok(schema.properties[field], 'missing property ' + field);
     assert.ok(schema.required.includes(field), 'field must be required: ' + field);
   }
+  assert.ok(schema.properties.identity_resolution_version);
+  assert.equal(schema.required.includes('identity_resolution_version'), false);
 });
 
 
