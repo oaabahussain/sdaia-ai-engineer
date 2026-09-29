@@ -174,3 +174,20 @@
 - Review record: `docs/superpowers/reviews/2026-09-29-k3-h0-whole-branch-review.md`.
 
 **Task 9: complete; exact-head PR verification remains.**
+
+
+## Task 10 — PR exact-head verification
+
+**PR:** #23 (opened early as Draft to obtain executable RED/GREEN evidence in the connector-only environment).
+
+### Reviewed head before this ledger-only record
+- HEAD: `65f5a9f03ff0339c020bed88755cddfc648578cb`.
+- quality-gate `36631793370`: SUCCESS.
+- server-adapter-gate `36631793377`: SUCCESS.
+- whole-branch review: complete; 0 open Critical/Important.
+- PR boundary check: no K3 Task 5 implementation files and no runtime product files changed.
+
+### Final exact-head rule
+This Task 10 ledger append is documentation-only and does not change product/control behavior. The resulting ledger commit must itself receive fresh `quality-gate` + `server-adapter-gate` SUCCESS before PR #23 is marked Ready for Review. Those final run IDs are recorded in durable PR metadata to avoid an infinite self-referential verification-commit loop.
+
+**Merge remains prohibited until explicit high-reasoning integration authorization.**
