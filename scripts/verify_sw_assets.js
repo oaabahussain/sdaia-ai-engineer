@@ -61,6 +61,36 @@ for (const manifestAsset of manifestAssets) {
         `Learner evidence runtime context is not pre-cached: ${evidenceAsset}`
       );
     }
+    const evidenceContext = JSON.parse(
+      fs.readFileSync(path.join(root, manifest.evidence.replace(/^\.\//, '')), 'utf8')
+    );
+    for (const ref of [
+      evidenceContext.scoring_policy_path,
+      evidenceContext.event_definitions_ref
+    ]) {
+      if (typeof ref !== 'string' || !ref) {
+        throw new Error(`Invalid learner evidence runtime reference for ${manifest.id}`);
+      }
+      const asset = `./${ref.replace(/^\.\//, '')}`;
+      if (!assets.includes(asset)) {
+        throw new Error(`K3 runtime evidence asset is not pre-cached: ${asset}`);
+      }
+    }
+    const definitions = JSON.parse(
+      fs.readFileSync(
+        path.join(root, evidenceContext.event_definitions_ref.replace(/^\.\//, '')),
+        'utf8'
+      )
+    );
+    if (!Array.isArray(definitions) || !definitions.length) {
+      throw new Error(`Invalid learner evidence definitions for ${manifest.id}`);
+    }
+    for (const definition of definitions) {
+      const payloadPath = definition.payload_schema_ref?.replace(/^\.\//, '');
+      if (!payloadPath || !fs.existsSync(path.join(root, payloadPath))) {
+        throw new Error(`Missing public K3 payload schema: ${definition.payload_schema_ref}`);
+      }
+    }
     evidenceContextCount += 1;
   }
 
