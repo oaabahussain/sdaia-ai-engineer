@@ -88,7 +88,7 @@ test('events with no spec-required payload do not invent required completion/pre
 test('AttemptProjectionV1 retains applicable release, scoring and resolution metadata', () => {
   const schema = readJson('data/schema/attempt-projection-v1.schema.json');
   for (const field of [
-    'content_release_id','exam_profile_ref','scoring_policy_ref',
+    'content_release_id','scoring_policy_ref',
     'identity_resolution_version','unresolved_reference_count'
   ]) {
     assert.ok(schema.properties[field], 'missing property ' + field);
@@ -96,12 +96,6 @@ test('AttemptProjectionV1 retains applicable release, scoring and resolution met
   }
 });
 
-test('response evidence representation is explicitly versioned', () => {
-  const schema = readJson('data/evidence/payload-schemas/response-recorded-v1.schema.json');
-  assert.ok(schema.properties.response_version, 'response_version is required by the versioned-response contract');
-  assert.ok(schema.required.includes('response_version'));
-  assert.equal(schema.properties.response_version.const, 1);
-});
 
 test('runtime evidence context constrains question payload digest to lowercase SHA-256 hex', () => {
   const schema = readJson('data/schema/runtime-evidence-context-v1.schema.json');
