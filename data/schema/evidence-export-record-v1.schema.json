@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "export_record_id",
+    "event_id",
+    "adapter_id",
+    "adapter_version",
+    "destination_class",
+    "mapping_version",
+    "action",
+    "occurred_at",
+    "privacy_disposition"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "export_record_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "adapter_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "destination_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mapping_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action": {
+      "enum": [
+        "EXPORTED",
+        "DELETE_REQUESTED",
+        "DELETED",
+        "DELETION_UNSUPPORTED",
+        "DELETION_FAILED"
+      ]
+    },
+    "external_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "privacy_disposition": {
+      "enum": [
+        "ALLOW",
+        "REDACT",
+        "REJECT"
+      ]
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "predecessor_record_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    }
+  }
+}
