@@ -70,44 +70,44 @@ Tests:
 
 **Interfaces:** existing `registerEventDefinition(definition)` supports V1/V2; V1 `validateEvent` stays analytics-only; V2 adds `plane`, `actor_kind`, `required_context_fields`, `payload_schema_ref`.
 
-- [ ] Write failing tests: V1 compatibility, V2 registration, immutability, analytics validator refusal for learner-evidence definitions.
-- [ ] Run RED: `node --test tests/k3-event-definition-v2.test.js tests/event-registry-v2.test.js`.
-- [ ] Implement minimal V2 schema/registry support.
-- [ ] Run GREEN plus `node --test tests/observability-ports.test.js`.
-- [ ] Commit `feat: add K3 event definition governance`.
+- [x] Write failing tests: V1 compatibility, V2 registration, immutability, analytics validator refusal for learner-evidence definitions.
+- [x] Run RED: `node --test tests/k3-event-definition-v2.test.js tests/event-registry-v2.test.js`.
+- [x] Implement minimal V2 schema/registry support.
+- [x] Run GREEN plus `node --test tests/observability-ports.test.js`.
+- [x] Commit `feat: add K3 event definition governance`.
 
 ### Task 2: LearnerEvidenceEventV2 and support schemas
 **Files:** create `data/schema/learner-evidence-event-v2.schema.json`, `data/schema/evidence-storage-receipt-v1.schema.json`, `data/schema/evidence-batch-result-v1.schema.json`, `data/schema/evidence-outbox-record-v1.schema.json`, `data/schema/activity-projection-v1.schema.json`, `data/schema/attempt-projection-v1.schema.json`, `data/schema/learner-identity-link-record-v1.schema.json`, `data/schema/evidence-export-record-v1.schema.json`; test `tests/k3-contract-schemas.test.js`.
 
 **Interfaces:** exact contracts `LearnerEvidenceEventV2`, `EvidenceStorageReceiptV1`, `EvidenceBatchResultV1`, `EvidenceOutboxRecordV1`, `ActivityProjectionV1`, `AttemptProjectionV1`, `LearnerIdentityLinkRecordV1`, and `EvidenceExportRecordV1`.
 
-- [ ] Write failing Ajv fixtures for UUIDs, origin_seq, modes, optional context, dispositions, outbox states, LINK/UNLINK, export lifecycle, forbidden derived fields.
-- [ ] Run RED: `node --test tests/k3-contract-schemas.test.js`.
-- [ ] Add minimal schemas with closed fields where normative.
-- [ ] Run GREEN.
-- [ ] Commit `feat: add K3 evidence contract schemas`.
+- [x] Write failing Ajv fixtures for UUIDs, origin_seq, modes, optional context, dispositions, outbox states, LINK/UNLINK, export lifecycle, forbidden derived fields.
+- [x] Run RED: `node --test tests/k3-contract-schemas.test.js`.
+- [x] Add minimal schemas with closed fields where normative.
+- [x] Run GREEN.
+- [x] Commit `feat: add K3 evidence contract schemas`.
 
 ### Task 3: Governed event vocabulary
 **Files:** create `data/evidence/event-definitions-v1.json`, `data/evidence/payload-schemas/*.schema.json`; test `tests/k3-event-vocabulary.test.js`.
 
 **Interfaces:** definitions for the 12 required spec events; no generic pause/resume in v1.
 
-- [ ] Write failing tests for all event names, LEARNER_EVIDENCE plane, actor/authority rules, privacy/export metadata, payload/property agreement.
-- [ ] Run RED.
-- [ ] Add definitions + payload schemas.
-- [ ] Run GREEN.
-- [ ] Commit `feat: define K3 learner evidence vocabulary`.
+- [x] Write failing tests for all event names, LEARNER_EVIDENCE plane, actor/authority rules, privacy/export metadata, payload/property agreement.
+- [x] Run RED.
+- [x] Add definitions + payload schemas.
+- [x] Run GREEN.
+- [x] Commit `feat: define K3 learner evidence vocabulary`.
 
 ### Task 4: Scoring policy and RuntimeBundleV4 evidence context
 **Files:** create `data/schema/scoring-policy-v1.schema.json`, `data/schema/runtime-evidence-context-v1.schema.json`, `data/schema/runtime-bundle-v4.schema.json`, `data/evidence/sdaia-ai-engineer.scoring-v1.json`, `data/evidence/sdaia-ai-engineer.runtime-v1.json`; modify `data/schema/track-manifest.schema.json`, `tracks/sdaia-ai-engineer/manifest.json`, `src/content/runtimeBundle.js`, `server/app/main.py`, `api/openapi.yaml`; test `tests/k3-runtime-evidence-context.test.js` and server bank tests.
 
 **Interfaces:** introduce versioned `RuntimeBundleV4` with additive `evidence` context for tracks declaring `learner-evidence-v2`; reuse `content_release_id="sdaia-ai-engineer.bootstrap.v1"` as the immutable grandfathered baseline reference without relabeling its K2 lifecycle state; scoring policy documents current `scoreExam` semantics without behavior change.
 
-- [ ] Write failing tests for release/hash/scoring/definitions and unchanged bank/profile.
-- [ ] Run RED: Node focused test + `PYTHONPATH=server pytest -q server/tests/test_api.py::test_bank`.
-- [ ] Implement RuntimeBundleV4 evidence context while keeping V2/V3 readers compatible for tracks that do not declare the new capability.
-- [ ] Run GREEN plus `node --test tests/track-contract.test.js`.
-- [ ] Commit `feat: expose stable K3 evidence context`.
+- [x] Write failing tests for release/hash/scoring/definitions and unchanged bank/profile.
+- [x] Run RED: Node focused test + `PYTHONPATH=server pytest -q server/tests/test_api.py::test_bank`.
+- [x] Implement RuntimeBundleV4 evidence context while keeping V2/V3 readers compatible for tracks that do not declare the new capability.
+- [x] Run GREEN plus `node --test tests/track-contract.test.js`.
+- [x] Commit `feat: expose stable K3 evidence context`.
 
 ### Task 5: Schema-derived browser validators and event constructor
 **Files:** create `scripts/generate_k3_validators.js`, `src/evidence/generatedValidators.js`, `src/evidence/ids.js`, `src/evidence/contract.js`; modify `package.json`; test `tests/k3-generated-validators.test.js`, `tests/k3-evidence-contract-runtime.test.js`.
