@@ -41,6 +41,9 @@ jobs:
           mkdir -p _site/data
           cp -R data/concepts data/migrations _site/data/
           cp data/learn.json data/cases.json _site/data/
+          mkdir -p _site/data/evidence/payload-schemas
+          cp data/evidence/sdaia-ai-engineer.runtime-v1.json data/evidence/sdaia-ai-engineer.scoring-v1.json data/evidence/event-definitions-v1.json _site/data/evidence/
+          cp data/evidence/payload-schemas/*.schema.json _site/data/evidence/payload-schemas/
           test ! -e _site/data/legacy
           test ! -e _site/data/factory
           test ! -e _site/src/platform-kernel
