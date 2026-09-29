@@ -585,3 +585,611 @@ Continue the K3 matrix on:
 11. full 50-point coverage audit and falsification pass.
 
 No production code, implementation plan, or final K3 spec should be created before conceptual approval.
+
+
+## 22. Sessions, interruptions, and abandonment
+
+### Evidence
+
+Browser lifecycle does not provide a reliable universal "session ended" signal. MDN documents `visibilitychange` to hidden as the last reliably observable transition in many cases, while unload/beforeunload are unreliable, especially on mobile. Analytics systems commonly apply configurable inactivity sessionization rules rather than discovering one objective natural session boundary.
+
+### Research recommendation
+
+K3 should distinguish:
+
+- **explicit activity/attempt scope** — a durable application-minted ID when the product actually starts a learning or assessment workflow;
+- **observed lifecycle evidence** — start, pause/resume, submit/complete where the application genuinely observes them;
+- **sessionization projection** — an algorithm/version that groups evidence for analysis;
+- **abandonment projection** — a derived interpretation when expected terminal evidence is absent.
+
+Do not store "abandoned" as raw truth merely because no later event arrived.
+
+Do not hard-code a universal inactivity timeout. If a derived sessionization policy uses a timeout, its policy/version must be recorded with the projection.
+
+Sources:
+- MDN Page Visibility API: https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
+- MDN beforeunload: https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+- Snowplow session tracking: https://docs.snowplow.io/docs/sources/trackers/web-trackers/tracking-events/session-tracking/
+
+Confidence: **High**.
+
+## 23. Strict assessment multi-device concurrency
+
+### Production evidence
+
+Moodle's offline quiz design:
+- creates an attempt before offline work;
+- prevents starting another offline attempt while a prior offline attempt is unsynchronized;
+- marks offline-finished work distinctly from server-submitted work;
+- synchronizes question-by-question;
+- uses sequence checks and last-action metadata for conflicts;
+- warns when the same attempt may have unsaved work on another device.
+
+Canvas also models a quiz submission with a stable submission/attempt identity and explicit attempt count rather than reducing the assessment to independent page events.
+
+General concurrency systems use conditional writes/version checks to reject stale mutable updates rather than silently overwriting current state.
+
+Sources:
+- Moodle mobile quiz offline design: https://docs.moodle.org/dev/Quiz_support_in_the_Mobile_app
+- Moodle offline attempt behavior: https://docs.moodle.org/35/en/Moodle_Mobile_quiz_offline_attempts
+- Canvas Quiz Submissions API: https://developerdocs.instructure.com/services/canvas/resources/quiz_submissions
+- AWS optimistic locking: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_OptimisticLocking.html
+- xAPI 2.0 mutable State/Profile concurrency uses ETag/If-Match: https://lms.technology/for/xapi/2.0/standards/interactive/9274.1.1%20xAPI%20Base%20Standard%20for%20Content.html
+
+### K3 design direction
+
+Do not conflate two responsibilities:
+
+1. **Evidence preservation:** preserve every valid immutable event from every origin.
+2. **Assessment-state authority:** decide which writes count toward the authoritative frozen attempt using explicit assessment concurrency rules.
+
+For practice/learning, two devices may legitimately create two distinct exposures/responses.
+
+For a strict frozen assessment attempt:
+- mint a stable `attempt_id`;
+- mutations of the authoritative attempt projection use an explicit revision/sequence precondition;
+- stale/conflicting client work is never silently applied by last timestamp;
+- if a conflict arrives later, preserve the raw learner action plus an authoritative resolution/rejection/supersession record rather than deleting evidence;
+- device handoff should become explicit when strict assessment integrity requires it.
+
+Whether the final K3/K8 contract uses `attempt_revision`, a writer epoch/lease, or question-level sequence tokens remains **open**. The evidence supports explicit concurrency control but does not establish one universally best mechanism for every mode.
+
+Confidence: **High** on the boundary; **Medium** on the final mechanism.
+
+## 24. Attempt identity versus attempt number
+
+Current `LearnerEventV1.attempt_number` is a count, not a robust identity.
+
+Late-arriving and multi-device evidence can change the ordering from which a count would be derived.
+
+### Research recommendation
+
+Canonical raw evidence should reference a stable `attempt_id` (and, where useful, an item-level interaction/attempt ID). Human-readable `attempt_number` should be a projection or assessment-engine attribute under a specific policy.
+
+Caliper's Attempt entity and Canvas submission IDs provide production/standard precedent for identity separate from count.
+
+Sources:
+- Caliper Assessment Profile: https://www.imsglobal.org/spec/caliper/v1p2
+- Canvas Quiz Submissions: https://developerdocs.instructure.com/services/canvas/resources/quiz_submissions
+
+Confidence: **High**.
+
+## 25. Learn / practice / check / section / mock semantics
+
+The mode is **context**, not an event type.
+
+The same learner action (for example, response submitted) may happen under different mode policies.
+
+K3 should preserve the mode/policy context needed to interpret the event later but must not duplicate a separate event taxonomy for each mode.
+
+Inherited product semantics matter:
+- learn/practice may provide immediate feedback;
+- check may delay feedback according to policy;
+- mock/strict assessment hides coaching until submission;
+- section/mock may be bound to a frozen AssessmentFormSnapshot.
+
+### Research recommendation
+
+A raw event should carry or resolve through references to:
+- `mode`;
+- applicable activity/assessment policy version;
+- exact form/snapshot when one exists.
+
+Do not require `form_id` for an ad-hoc learn/practice interaction that was never part of a frozen form.
+
+Confidence: **High**.
+
+## 26. Answer changes and response identity
+
+The current runtime stores a canonical option index, while `AssessmentFormSnapshotV1` freezes option ordering.
+
+This is reconstructable for today's multiple-choice contract but `LearnerEventV1` collapses changes into one final answer.
+
+Research on answer changing does not justify assuming either the first or final answer is inherently the only meaningful evidence.
+
+### Research recommendation
+
+- preserve each committed response change as ordered evidence;
+- bind each response to the exact item version and presentation/form snapshot;
+- preserve the final accepted response as a projection/assessment state, not by destroying earlier responses;
+- avoid copying localized answer text into evidence when a stable response identifier/index plus immutable snapshot is enough;
+- future item types may require a versioned structured response shape.
+
+Source:
+- Coffey et al. answer-changing scoping review: https://doi.org/10.1016/j.nedt.2023.106052
+
+Confidence: **High** on preserving changes; **Medium** on future generalized response encoding.
+
+## 27. Confidence, hints, and explanation exposure
+
+### Confidence
+
+Confidence is metacognitive/self-report evidence. It is not correctness, mastery, or calibrated ability.
+
+If confidence can be changed independently after a response, record it as its own event; if product semantics guarantee it is captured atomically with a response, it may be an optional field on that response evidence. The architecture should not force one UI interaction shape.
+
+### Hints
+
+A boolean `hint_used` loses which hint, when it was requested, and whether multiple hints were used.
+
+Prefer explicit hint-requested / hint-presented evidence only when the learning mode actually exposes hints.
+
+### Explanations
+
+`explanation_opened: true` loses ordering and repetition. Explanation exposure is useful context for later analyses but does not itself prove learning.
+
+Evidence:
+- Fleming 2024 confidence/metacognition review: https://doi.org/10.1146/annurev-psych-022423-032425
+- Cai et al. 2023 feedback meta-analysis: https://doi.org/10.1016/j.edurev.2023.100521
+- Current hint-generation review/search evidence indicates benefits are context-dependent and evaluation remains nontrivial.
+
+Confidence: **High** on evidence semantics; **Medium** on final event granularity.
+
+## 28. Timing and latency semantics
+
+Current `latency_ms` is ambiguous if derived only from wall-clock `shown_at` and `answered_at`.
+
+### Research recommendation
+
+Separate:
+- source wall-clock occurrence time;
+- trusted ingestion time;
+- per-origin sequence;
+- monotonic elapsed duration measured locally for response timing.
+
+`performance.now()` provides a monotonic clock appropriate for elapsed measurement and is not affected by system-clock changes.
+
+Do not classify fast responses as rapid guessing inside K3. Response-time thresholds are model/calibration choices and can materially affect conclusions.
+
+Sources:
+- MDN performance.now: https://developer.mozilla.org/en-US/docs/Web/API/Performance/now
+- OpenTelemetry Logs Data Model: https://opentelemetry.io/docs/specs/otel/logs/data-model/
+- Snowplow event timestamps: https://docs.snowplow.io/docs/events/timestamps/
+- Rios & Deng rapid-guessing threshold meta-analysis: https://doi.org/10.1186/s40536-021-00110-8
+
+Confidence: **High**.
+
+## 29. Anonymous, pseudonymous, authenticated, and multi-device identity
+
+### Separation of concerns
+
+- `learner_id`: pseudonymous platform learner principal used by the evidence domain;
+- `origin_id`: random application installation/browser-profile origin, not a hardware/browser fingerprint;
+- `activity_id` / `attempt_id`: scoped workflow identity;
+- authentication/account identifiers and direct PII: separate identity/account layer.
+
+### Anonymous → authenticated transition
+
+Do not rewrite old raw events to replace the old identity value.
+
+Use an explicit, governed identity-link record outside the raw event body so projections can resolve multiple historical pseudonymous/origin identities into an authenticated learner when the product has a lawful and intentional linking action.
+
+This preserves auditability and enables unlinking/deletion without mutating event semantics.
+
+### Multi-device
+
+A learner principal may have many origins. `origin_id` exists for synchronization/order/provenance, not personalization or device fingerprinting.
+
+PostHog's documented cross-device identity duplication is useful failure evidence for why implicit identity merging is unsafe.
+
+Source:
+- PostHog persons/identity: https://posthog.com/docs/data/persons
+
+Confidence: **High** on separation; **Medium** on exact identity-link contract.
+
+## 30. Privacy lifecycle versus logical immutability
+
+Logical append-only/audit immutability must not be misread as "retain personal data forever."
+
+Saudi PDPL and its Implementing Regulation establish purpose limitation/minimization and destruction obligations/rights subject to applicable exceptions.
+
+### Research recommendation
+
+Separate:
+- **evidence integrity policy** — ordinary application code cannot rewrite accepted evidence;
+- **privacy lifecycle policy** — authorized deletion/anonymization/de-linking under legal/account lifecycle rules;
+- **backup lifecycle** — documented separately;
+- **derived projection invalidation/rebuild** after privacy actions where required.
+
+Keep direct personal identifiers out of immutable evidence wherever practical so deletion can often be achieved by removing identity links rather than rewriting pedagogical events.
+
+Retention is versioned policy/configuration. Do not embed guessed numbers.
+
+Primary sources:
+- Saudi PDPL / Implementing Regulation: https://dgp.sdaia.gov.sa/wps/portal/pdp/knowledgecenter/details/PDPL2/
+- Saudi data minimization/privacy guidance: https://dgp.sdaia.gov.sa/
+
+Confidence: **High** on architecture principle; legal deployment details remain external policy/legal review.
+
+## 31. Cross-language evidence
+
+Arabic and English are sibling presentations of a pedagogical family, not interchangeable event identities.
+
+### Research recommendation
+
+Every exposure/response preserves:
+- actual locale/presentation language;
+- exact `item_version_id`;
+- exact rendered/form snapshot;
+- shared `question_family_id`.
+
+Two responses to AR and EN variants remain separate evidence even if they share a family.
+
+Later models may use family-level cross-language evidence under a versioned policy; K3 must not merge it automatically.
+
+QTI language support and the existing bilingual item/family model support this separation.
+
+Sources:
+- QTI 3 specification index: https://www.1edtech.org/standards/qti/index
+- Existing K1/K2 bilingual family/item contracts in this repository.
+
+Confidence: **High**.
+
+## 32. Event provenance and asserting authority
+
+Not every event is a learner action.
+
+Examples:
+- learner submitted response;
+- client observed exposure;
+- server evaluated response;
+- moderator/system corrected an erroneous record;
+- migration imported a legacy aggregate.
+
+### Research recommendation
+
+Canonical envelope/type semantics should distinguish:
+- **actor/subject** — whose learning the evidence concerns;
+- **producer/origin** — software component that emitted it;
+- **authority** — trusted service/role asserting evaluation/correction where applicable;
+- provenance references for migration/system-generated events.
+
+xAPI's actor/authority distinction and CloudEvents' source/type/id concepts are useful patterns. W3C PROV is richer than needed for every event; reuse the repository's existing provenance conventions instead of embedding a general provenance graph.
+
+Sources:
+- xAPI 2.0 interactive standard: https://lms.technology/for/xapi/2.0/standards/interactive/9274.1.1%20xAPI%20Base%20Standard%20for%20Content.html
+- CloudEvents specification: https://github.com/cloudevents/spec
+- W3C PROV overview: https://www.w3.org/TR/prov-overview/
+
+Confidence: **High** on semantic separation; **Medium** on exact envelope fields.
+
+## 33. Experiment and cohort linkage
+
+K2 already owns `ExperimentRecordV1`; K3 must not invent a second experiment system.
+
+### Research recommendation
+
+- feature-flag evaluation and product exposure remain in Product Analytics/Telemetry;
+- when an experiment assignment is necessary to interpret a learner interaction, raw evidence may reference a stable internal experiment assignment/record ID;
+- do not copy vendor-specific flag payloads into canonical learner evidence;
+- dynamic cohorts are derived/mutable definitions and should not be stored as immutable learner truth;
+- causal conclusions remain outside K3.
+
+Modern experimentation platforms distinguish assignment/exposure from downstream events; K3 should retain that conceptual boundary while using internal vendor-neutral IDs.
+
+Sources:
+- PostHog experiments: https://posthog.com/docs/experiments
+- Statsig exposure concepts: https://docs.statsig.com/experiments
+- OpenFeature evaluation context: https://openfeature.dev/specification/sections/evaluation-context/
+
+Confidence: **High**.
+
+## 34. Schema evolution and replay
+
+### Research recommendation
+
+Each raw event must have explicit type/schema versioning.
+
+Reader behavior:
+- additive compatible fields may be tolerated according to contract;
+- semantic breaking change requires a new event type/version;
+- old durable event bodies are not destructively rewritten during normal migrations;
+- deterministic upcasters/read adapters may expose a current in-memory representation.
+
+Derived projections should record:
+- projection type;
+- projection/algorithm version;
+- input watermark (for example trusted `ingest_seq` through which it was built);
+- relevant policy/content/scoring references.
+
+This enables K4/K5/K6/K8 to explain and rebuild derived state from the same evidence under newer algorithms.
+
+If privacy lifecycle lawfully removes or de-links evidence, recomputability is bounded by the remaining lawful dataset; do not claim perfect replay after erasure.
+
+Sources:
+- Microsoft Event Sourcing pattern: https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing
+- Open edX event versioning/architecture: https://docs.openedx.org/projects/openedx-events/en/latest/
+- Axon event upcasting pattern: https://docs.axoniq.io/axon-framework-reference/4.12/events/event-versioning/
+
+Confidence: **High**.
+
+## 35. Migration honesty for LearnerEventV1 and StateV2
+
+K3 must not fabricate fine-grained history that was never observed.
+
+### Research recommendation
+
+For historical `LearnerEventV1`:
+- preserve original aggregate payload and original ID;
+- either keep it readable as a supported legacy evidence type or import it into an explicitly labeled coarse aggregate/migration event;
+- record migration provenance and source schema;
+- never synthesize fake `hint_requested`, `question_exposed`, answer-change order, or server ingestion times.
+
+For historical StateV2 exam history:
+- migrate only facts that are actually present;
+- preserve the original attempt/result snapshot or hash/reference;
+- mark migrated granularity/limitations explicitly.
+
+This follows the repository's existing migration-honesty rule used for K1 content lineage.
+
+Confidence: **High**.
+
+## 36. Export adapters — xAPI and Caliper
+
+K3 canonical records remain internal. Export is a deterministic adapter/projection.
+
+### xAPI adapter
+
+Possible mapping:
+- K3 learner principal -> xAPI Actor using deployment-specific pseudonymous account mapping;
+- K3 event type -> governed xAPI Verb;
+- item/activity -> xAPI Object Activity;
+- `attempt_id` / activity scope -> xAPI registration/context;
+- response/evaluation -> xAPI Result where semantically appropriate;
+- K3 `occurred_at` -> xAPI timestamp;
+- LRS-assigned stored remains the LRS's responsibility.
+
+Do not leak internal direct PII into xAPI actor IFIs.
+
+### Caliper adapter
+
+Assessment-scoped mapping:
+- activity/assessment start/pause/resume/submit -> AssessmentEvent;
+- item started/skipped/completed -> AssessmentItemEvent;
+- attempt -> Caliper Attempt;
+- completed response -> Caliper Response;
+- session reference only when the K3 activity/session semantics actually match.
+
+Caliper explicitly distinguishes Skipped from Started/Completed and does not increment Attempt count on Skip.
+
+### Rule
+
+Adapters may be lossy where a standard has no exact construct. They must declare mapping version and omitted/extension fields.
+
+Sources:
+- IEEE/xAPI current standard status: https://standards.ieee.org/ieee/9274.1.1/7321/
+- xAPI 2.0 interactive standard: https://lms.technology/for/xapi/2.0/standards/interactive/9274.1.1%20xAPI%20Base%20Standard%20for%20Content.html
+- Caliper 1.2 Assessment Profile: https://www.imsglobal.org/spec/caliper/v1p2
+
+Confidence: **High** on adapter role; **Medium** on final verb/profile mapping until an explicit K3 export profile is written.
+
+## 37. Data-quality monitoring
+
+### Deterministic integrity checks
+
+K3 can validate without guessed thresholds:
+- unknown event type/schema;
+- malformed required IDs;
+- same `event_id` with non-identical canonical body;
+- duplicate/impossible `origin_seq` for one origin;
+- broken content/release/form/attempt references;
+- orphan correction/supersession target;
+- illegal correction authority;
+- invalid mode/policy relation;
+- accepted assessment mutation against a stale revision;
+- privacy classification/export violation;
+- projection watermark regression.
+
+### Observational quality flags
+
+May be recorded without declaring invalidity:
+- late arrival;
+- client clock substantially divergent from ingestion time;
+- unusually long/short elapsed duration;
+- duplicate-looking but distinct events;
+- incomplete terminal lifecycle.
+
+Thresholds for "substantially" or "unusual" remain versioned policy/calibration inputs.
+
+Confidence: **High**.
+
+## 38. Browser / file / SQLite / API conformance
+
+The inherited LearnerEventV1 validator drift proves that schema parity cannot rely on duplicated handwritten validation logic.
+
+### Research recommendation
+
+K3 should define one canonical contract and a portable conformance corpus containing:
+- valid event sequences;
+- invalid events;
+- exact idempotent retries;
+- same-ID/different-body conflicts;
+- out-of-order arrival;
+- late events;
+- corrections;
+- offline replay;
+- multi-device distinct events;
+- strict-assessment stale-write conflicts;
+- legacy migration examples.
+
+Every adapter — browser IndexedDB, JSONL/file, SQLite, API, future Postgres — runs the same corpus and must produce equivalent logical dispositions/projections.
+
+This is stronger than testing each adapter independently.
+
+Confidence: **High**.
+
+## 39. Response evaluation is separate evidence
+
+The current `correct` boolean combines learner action and system judgment.
+
+### Research recommendation
+
+Separate:
+- learner response evidence;
+- evaluator/scoring evidence tied to exact `item_version_id`, scoring policy/version, and response event.
+
+This permits:
+- scoring correction without rewriting learner behavior;
+- future rescoring;
+- preserving ungraded or partially graded responses;
+- explaining why an historical result differed after policy/model changes.
+
+QTI's separation of response variables and response processing, plus Canvas/Open edX regrade/version concepts, supports this direction.
+
+Sources:
+- QTI 3 specification: https://www.1edtech.org/standards/qti/index
+- Canvas Quiz Submission fields include score before regrade: https://developerdocs.instructure.com/services/canvas/resources/quiz_submissions
+
+Confidence: **High**.
+
+## 40. Event identifier choice
+
+UUIDv4 is sufficient for uniqueness.
+
+UUIDv7 provides sortable, time-embedded IDs and can improve database locality, but the timestamp component is derived from wall-clock time.
+
+### Research position
+
+**Do not choose yet.**
+
+Regardless of format:
+- `event_id` is identity/idempotency, not causal ordering;
+- ordering semantics remain explicit through origin/server sequence fields;
+- UUIDv7 must never become a hidden substitute for trusted occurrence order.
+
+Source:
+- RFC 9562: https://www.rfc-editor.org/rfc/rfc9562.html
+
+Confidence: **High** on the rule; ID format remains **Open**.
+
+## 41. Expanded K3 research matrix status
+
+Status meanings:
+- **READY** — evidence is strong enough to carry into conceptual architecture.
+- **PROVISIONAL** — direction is supported but exact contract remains open.
+- **OPEN** — additional bounded research/design is still required.
+
+| # | Question | Status | Current research conclusion |
+|---:|---|---|---|
+| 1 | event/evidence model | READY | Fine-grained immutable raw event stream + rebuildable projections. |
+| 2 | attempt vs exposure | READY | Stable attempt IDs; exposure is distinct; counts are not identity. |
+| 3 | unanswered/skipped | READY | Explicit skip/observed exposure; absence remains absence; skip != attempt. |
+| 4 | answer changes | READY | Preserve ordered response changes. |
+| 5 | multiple attempts | READY | Stable attempt IDs; attempt number derived/policy-scoped. |
+| 6 | timing/latency | READY | Multi-clock model + monotonic elapsed duration. |
+| 7 | confidence | READY | Optional metacognitive evidence, never mastery truth. |
+| 8 | hints | PROVISIONAL | Prefer explicit events; final UI/event vocabulary open. |
+| 9 | explanation exposure | PROVISIONAL | Explicit exposure event where material; no learning inference. |
+| 10 | mode semantics | READY | Mode/policy is context, not parallel event taxonomy. |
+| 11 | session boundaries | READY | Explicit activity scope + derived sessionization policy. |
+| 12 | interruption/abandonment | READY | Observable transitions raw; abandonment derived. |
+| 13 | offline events | READY | Local durable write first. |
+| 14 | offline→online sync | READY | Durable outbox + at-least-once upload + idempotent ack. |
+| 15 | idempotency | READY | Same ID/same body ack; same ID/different body conflict. |
+| 16 | duplicate prevention | READY | Identity-based exact dedup; no heuristic event deletion. |
+| 17 | out-of-order events | READY | Accept/preserve; use explicit origin/ingest ordering. |
+| 18 | clock skew | READY | Client clock untrusted; no fixed threshold yet. |
+| 19 | late-arriving evidence | READY | Valid and observable; do not rewrite time. |
+| 20 | event correction | READY | Explicit correction/supersession/void evidence. |
+| 21 | tombstones/supersession | READY | Logical correction separate from privacy erasure. |
+| 22 | immutable raw history | READY | Application-level immutable; authorized privacy lifecycle separate. |
+| 23 | learner identity | PROVISIONAL | Pseudonymous principal + separate identity mapping. |
+| 24 | anonymous/pseudonymous | READY | Direct PII kept outside raw evidence when practical. |
+| 25 | multi-device identity | READY | Many origins per learner; origin is not fingerprint. |
+| 26 | privacy/minimization | READY | Purpose/classification/minimization first. |
+| 27 | retention | PROVISIONAL | Policy/versioned, deployment/legal inputs remain open. |
+| 28 | form/snapshot linkage | READY | Exact frozen assessment/render context. |
+| 29 | release linkage | READY | Existing immutable release IDs reused. |
+| 30 | QuestionFamily linkage | READY | Reuse existing family ID; never parallel family identity. |
+| 31 | ItemVersion linkage | READY | Exact immutable item version required. |
+| 32 | objective/domain linkage | READY | Reuse existing stable IDs. |
+| 33 | cross-language | READY | Actual locale/item variant preserved; family-level merge deferred to models. |
+| 34 | event provenance | PROVISIONAL | actor/producer/authority separation; exact envelope open. |
+| 35 | browser/API parity | READY | Shared conformance corpus required. |
+| 36 | local/file/SQLite persistence | READY | Same logical store contract, adapter-specific implementation. |
+| 37 | query/index architecture | PROVISIONAL | Envelope indexes known; final indexes need workload evidence. |
+| 38 | data-quality monitoring | READY | Deterministic integrity + configured anomaly flags. |
+| 39 | schema/version migration | READY | Versioned events + read-time upcasting; no destructive rewrite. |
+| 40 | replay/rebuild derived models | READY | Versioned projections + input watermark. |
+| 41 | auditability | READY | Raw + corrections + authority + deterministic projection. |
+| 42 | export adapters | PROVISIONAL | xAPI/Caliper mappings supported; exact profile/verbs open. |
+| 43 | interoperability standards | READY | Adapters only; canonical model stays internal/vendor-neutral. |
+| 44 | xAPI relevance | READY | Strong semantic/export reference; not canonical K3 schema. |
+| 45 | Caliper relevance | READY | Strong assessment/event mapping; not canonical K3 schema. |
+| 46 | event-store/event sourcing | READY | Use principles only; no dedicated event-store infrastructure yet. |
+| 47 | OpenTelemetry relationship | READY | System telemetry plane; timestamp concepts reusable only. |
+| 48 | product analytics vs evidence | READY | Separate planes with governed bridges/correlation IDs. |
+| 49 | experiment/cohort linkage | READY | Explicit experiment assignment ref; cohort remains derived. |
+| 50 | K4/K5/K6/K8 compatibility | READY | Later models consume replayable raw evidence; no derived truth in K3. |
+| 51 | response vs evaluation | READY | Separate learner action from scoring/evaluator evidence. |
+| 52 | strict assessment multi-device authority | PROVISIONAL | Explicit revision/sequence resolution; exact mechanism open. |
+| 53 | transport state vs evidence | READY | Mutable outbox/ack state separate from immutable event payload. |
+| 54 | event ID format | OPEN | v4/v7/equivalent; never encode ordering semantics implicitly. |
+| 55 | privacy erasure vs immutability | READY | Separate authorized privacy lifecycle from application corrections. |
+| 56 | legacy migration granularity | READY | Preserve/coarsely import known facts; never fabricate event sequences. |
+
+## 42. Strongest counter-evidence / architecture falsifiers so far
+
+1. **Fine-grained events are not free.** They increase storage, schema surface, query complexity, and privacy risk. This is why K3 should use a bounded education-specific vocabulary, not record every UI gesture.
+2. **Event sourcing is not universally appropriate.** Microsoft explicitly warns about complexity. K3 should use event-sourcing principles for learner evidence only, not re-platform the application.
+3. **Caliper/xAPI do not solve offline synchronization.** They help semantics/interchange; K3 still needs local durability/idempotency/replay rules.
+4. **Offline-first document sync products are mature but solve a broader mutable-state problem.** Adopting one as canonical infrastructure today would add coupling without proving a need.
+5. **Client timestamps are sometimes the best representation of when an offline action occurred.** Therefore K3 should retain them; the rule is not "ignore client time" but "do not treat it as trusted global order."
+6. **Privacy erasure can intentionally break complete replay.** Auditability must not override lawful privacy lifecycle.
+7. **Sessionization is useful even though it is derived.** The correct response is versioned projections, not banning sessions.
+8. **Strict assessment may need stronger coordination than practice.** One global multi-device policy would overconstrain ordinary learning or underprotect assessment.
+
+## 43. Decision-gate update
+
+The foundational landscape is now close to conceptual-design readiness.
+
+### Strongly supported
+
+- hybrid raw-event + projection architecture;
+- immutable/idempotent raw evidence;
+- explicit correction;
+- local-first durable event creation;
+- at-least-once sync;
+- client occurrence + per-origin sequence + server ingestion order;
+- exact snapshot/release/item linkage;
+- separate response vs scoring evidence;
+- explicit pseudonymous identity/origin separation;
+- privacy lifecycle separate from correction semantics;
+- three distinct planes: learner evidence / product analytics / system telemetry;
+- vendor-neutral canonical model with xAPI/Caliper export adapters;
+- shared cross-adapter conformance corpus;
+- no dedicated event database, Kafka, CRDT stack, or generic sync engine without measured need.
+
+### Remaining design decisions before conceptual approval
+
+1. exact bounded K3 event vocabulary and event envelope fields;
+2. exact `attempt_id` / activity / item-interaction hierarchy;
+3. strict assessment concurrency mechanism (revision tokens vs writer epoch/lease vs question sequence);
+4. event identifier format;
+5. exact legacy `LearnerEventV1` compatibility/migration representation;
+6. exact privacy identity-link/deletion mechanism;
+7. exact xAPI/Caliper export profile mappings;
+8. exact projection/store interface and minimum query indexes;
+9. final falsification pass against the complete proposed architecture.
+
+The research is **not yet declared complete**.
