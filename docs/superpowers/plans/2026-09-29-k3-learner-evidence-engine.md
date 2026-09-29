@@ -22,6 +22,7 @@
 - No guessed session/retention/skew/batch/retry/quota/anomaly/rate thresholds in core logic.
 - Add `fake-indexeddb@6.2.5` dev-only for Node IndexedDB tests.
 - Add `rfc8785==0.1.4` to server requirements for authoritative Python JCS.
+- Reuse the reviewed `canonicalize@5.1.0` RFC 8785 implementation for browser/Node through a checked-in compatibility module with required attribution; do not hand-roll JCS.
 - Keep static Pages bundle-free; do not add a browser runtime package/bundler only for JCS.
 - Each phase ends with a durable checkpoint, exact HEAD, focused verification, and cleanup.
 - Whole-plan review, exact-head verification, finishing-development-branch, and post-merge verification are mandatory.
