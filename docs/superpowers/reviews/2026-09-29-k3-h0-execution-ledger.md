@@ -77,3 +77,19 @@
 - Implementation heads: `aaca307754d3193e78c55ccc23c72a19b169d0b8`, `ca4a630f115405e12a81bb2c760d2fb092288b2c`, `25e1bcc739e17420c09dec866d4f66fe41b193a3`, `9d71687ab39802ea683a39be2acae7ce35901cda`, `a4b91df1677bfd4b683dae02d6de24b17511e26b`.
 - GREEN: quality `36617310992` SUCCESS; server/adapter `36617311916` SUCCESS on exact head `a4b91df1677bfd4b683dae02d6de24b17511e26b`.
 - Task 4: complete.
+
+
+## Task 5 — Single-source deterministic Pages artifact builder
+
+**BASE:** `403685f7a31143f15aec25b434d4a93ce5b982fd`
+
+### RED evidence
+- `8ede10b66ddf937fdd9081d501244aa55805e3c2` — deterministic Pages builder test added.
+- Quality run `36617627282`: FAIL at `h0-pages-artifact.test.js` because `scripts/build_pages_artifact.js` did not exist.
+
+### GREEN evidence
+- `20e0b30f41eeb563b69462487cd41e7d80eed888` — single-source Pages artifact builder implementing the existing governed public boundary.
+- Quality run `36629283216`: SUCCESS including Node tests, validate, factory import, service-worker verification, Pages artifact verification, and browser smoke.
+- Server/adapter run `36629283180`: SUCCESS.
+
+**Task 5: complete.**
