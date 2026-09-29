@@ -152,8 +152,10 @@ The approved spec defines the triggers/context but does not require these payloa
 ### A6 — Projection contracts omitted replay/audit metadata required by the design
 
 **Fixes:**
-- `ActivityProjectionV1` requires `identity_resolution_version` and `unresolved_reference_count`.
-- `AttemptProjectionV1` retains/requires content release, scoring reference, identity resolution version, and unresolved-reference count. The implementation also records an exam-profile reference for the strict-assessment case.
+- `ActivityProjectionV1` records `unresolved_reference_count` and exposes `identity_resolution_version`; the identity-resolution field remains optional at schema level because the spec says it is retained **where applicable**.
+- `AttemptProjectionV1` retains/requires content release, scoring reference, and unresolved-reference count; it exposes `identity_resolution_version` conditionally and also records an exam-profile reference for the strict-assessment case.
+
+The audit initially over-corrected identity-resolution metadata by making it universally mandatory. A second RED→GREEN pass removed that over-constraint.
 
 ### A7 — Runtime question digest schema accepted any 64-character string
 
@@ -167,6 +169,19 @@ The spec requires a versioned response representation. The correction branch add
 
 This is a compatible concrete implementation choice, not a claim that the spec mandated that exact field name.
 
+### A9 — RuntimeBundleV4 public evidence references were not actually guaranteed in the Pages artifact
+
+**Merged behavior:** Task 4 made the browser RuntimeBundleV4 fetch a public `manifest.evidence` context, and that context referenced scoring and event-definition files. The original Pages/PR artifact assembly did not copy those K3 evidence files, the service worker did not reliably pre-cache the runtime evidence context, and the live-release verifier did not traverse the K3 evidence reference graph.
+
+This meant the original source-tree/browser tests could be green while the deployed artifact boundary did not guarantee that every public RuntimeBundleV4 reference resolved.
+
+**Fix:**
+- Pages and PR assembly use an explicit allowlist for the three public K3 runtime evidence metadata files plus the referenced payload-schema directory;
+- private `data/factory`, legacy data, and platform-kernel artifacts remain excluded;
+- service-worker shell pre-caches the runtime evidence context, scoring policy, and governed event definitions;
+- service-worker verification confirms the public evidence context and referenced payload schemas exist;
+- live-release verification now follows `manifest.evidence`, validates SHA-256/scoring references, loads all governed definitions, and verifies every published payload-schema reference.
+
 ## 5. Audit TDD evidence
 
 Audit branch started from merged main.
@@ -177,27 +192,26 @@ Initial RED test commit:
 
 The audit tests themselves were narrowed before production fixes when they were found to over-specify the design. Final RED assertions were limited to explicit spec requirements before the relevant fixes were accepted.
 
-Corrective product/test head before the audit report:
+Additional falsification passes after the initial report:
 
-- `e3f059ddf2b09461878c5e6869f7f468461b0015`
-  - strengthened the audit by registering all 12 governed definitions against their payload schemas;
-  - validated the live SDAIA RuntimeBundleV4 against its complete referenced schema graph.
+- `675538442fbb60795c5dc8ac72b0a4f6f649cb1d` — RED proved the audit had over-constrained `identity_resolution_version`; the production schemas were corrected to preserve the spec's “where applicable” semantics.
+- `d5fa7073df8fc30850a9a8bbdb95ee2fd3b1878d` — RED pinned the missing Pages/offline K3 public-evidence boundary.
 
-Final audit-report head:
+Final corrective product/test head before this report update:
 
-- `301a43c7c1a0987b2ec9cffc5491e47dff9313b8`
+- `44f6bdd89f1ca91f03577a56314db19a59f96b4f`
 
-Verification on that exact final audit head:
+Verification on that head:
 
-- PR quality run `36578743261` — PASS
+- PR quality run `36580268666` — PASS
   - canonical track validation PASS
-  - Node **376/376 PASS**
+  - Node **377/377 PASS**
   - governed current-bank migration PASS
   - application parse PASS
   - service-worker verification PASS
   - Pages artifact assembly PASS
   - browser smoke PASS
-- server/adapter run `36578743230` — PASS
+- server/adapter run `36580268901` — PASS
   - server tests PASS
   - SQLite schema smoke PASS
   - browser adapter contract PASS
