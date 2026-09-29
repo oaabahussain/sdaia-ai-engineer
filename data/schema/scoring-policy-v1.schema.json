@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "correctness_rule",
+    "percent_rule",
+    "unanswered_rule"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "correctness_rule": {
+      "type": "string"
+    },
+    "percent_rule": {
+      "type": "string"
+    },
+    "unanswered_rule": {
+      "type": "string"
+    }
+  }
+}
