@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -45,6 +45,15 @@ export function validateCurrentState(state, context = {}) {
       state_revision: state.state_revision,
       minimum_state_revision: minimumStateRevision
     });
+  }
+
+  if (Array.isArray(context.existingPaths)) {
+    const existing = new Set(context.existingPaths);
+    for (const referencedPath of [state.spec_path, state.plan_path, state.ledger_path, state.checkpoint_path]) {
+      if (!existing.has(referencedPath)) {
+        return result(false, 'STATE_REFERENCE_MISSING', { path: referencedPath });
+      }
+    }
   }
 
   if (context.specBlobSha && state.spec_blob_sha !== context.specBlobSha) {
@@ -129,13 +138,16 @@ function main() {
 
   const statePath = path.join(repoRoot, 'docs/superpowers/state/CURRENT-STATE.json');
   const state = JSON.parse(readFileSync(statePath, 'utf8'));
-  const ledgerText = readFileSync(path.join(repoRoot, state.ledger_path), 'utf8');
+  const referencedPaths = [state.spec_path, state.plan_path, state.ledger_path, state.checkpoint_path];
+  const existingPaths = referencedPaths.filter((p) => existsSync(path.join(repoRoot, p)));
+  const ledgerExists = existingPaths.includes(state.ledger_path);
   const context = {
     liveMainSha,
     sourceRef: process.env.GITHUB_REF_NAME || execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
-    specBlobSha: gitBlobSha(state.spec_path),
-    planBlobSha: gitBlobSha(state.plan_path),
-    ledgerText,
+    specBlobSha: existingPaths.includes(state.spec_path) ? gitBlobSha(state.spec_path) : null,
+    planBlobSha: existingPaths.includes(state.plan_path) ? gitBlobSha(state.plan_path) : null,
+    ledgerText: ledgerExists ? readFileSync(path.join(repoRoot, state.ledger_path), 'utf8') : '',
+    existingPaths,
     minimumStateRevision: Number(process.env.MINIMUM_STATE_REVISION || 1)
   };
   const checked = validateCurrentState(state, context);
