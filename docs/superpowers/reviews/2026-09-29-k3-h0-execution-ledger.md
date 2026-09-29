@@ -93,3 +93,5 @@
 - Server/adapter run `36629283180`: SUCCESS.
 
 **Task 5: complete.**
+
+- **Task 6 Ruling:** extracting Pages assembly into `scripts/build_pages_artifact.js` invalidated six older tests that asserted inline YAML shell commands rather than the artifact contract. Updated those tests to assert the shared builder plus workflow invocation. **Why:** preserves the same public/private release boundary while enforcing the H0 single-source design. **Cost if wrong:** a builder regression could escape if both builder and tests share the same mistaken allowlist; `h0-pages-artifact.test.js`, service-worker verification, and live-release verification remain independent runtime checks.
