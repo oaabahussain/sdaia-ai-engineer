@@ -17,10 +17,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: '22'
+          cache: npm
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Validate canonical track contracts
@@ -33,34 +34,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf _site
-          mkdir _site
-          cp index.html feedback.html manifest.webmanifest sw.js icon.svg icon-180.png icon-192.png icon-512.png _site/
-          cp -R src tracks _site/
-          rm -rf _site/src/platform-kernel
-          mkdir -p _site/data
-          cp -R data/concepts data/migrations _site/data/
-          cp data/learn.json data/cases.json _site/data/
-          mkdir -p _site/data/evidence
-          cp data/evidence/sdaia-ai-engineer.runtime-v1.json data/evidence/sdaia-ai-engineer.scoring-v1.json data/evidence/event-definitions-v1.json _site/data/evidence/
-          cp -R data/evidence/payload-schemas _site/data/evidence/
-          test ! -e _site/data/legacy
-          test ! -e _site/data/factory
-          test ! -e _site/src/platform-kernel
-          test -f _site/tracks/registry.json
-          touch _site/.nojekyll
+          node scripts/build_pages_artifact.js _site
           node --check _site/src/app.js
           node scripts/verify_html.js _site/index.html
           node scripts/verify_sw_assets.js _site
           source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           echo "SOURCE_INDEX_SHA256=$source_sha"
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: _site
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
       - name: Verify live release
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
