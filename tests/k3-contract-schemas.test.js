@@ -12,7 +12,7 @@ const uuid3='323e4567-e89b-42d3-a456-426614174002';
 test('LearnerEvidenceEventV2 accepts canonical raw evidence and rejects derived truth',()=>{
  const v=validate('learner-evidence-event-v2.schema.json');
  const e={schema_version:2,event_id:uuid,definition_id:'learner.response.recorded@1',learner_id:'learner:p1',origin_id:uuid2,origin_seq:1,activity_id:uuid,track_id:'sdaia-ai-engineer',content_release_id:'sdaia-ai-engineer.bootstrap.v1',mode:'mock',locale:'ar',occurred_at:'2026-09-29T00:00:00Z',payload:{response_kind:'OPTION',response:1}};
- assert.equal(v(e),true,JSON.stringify(v.errors));
+ assert.equal(v(e),true,'LearnerEvidenceEventV2 '+JSON.stringify(v.errors));
  assert.equal(v({...e,mastery:0.9}),false);
  assert.equal(v({...e,origin_seq:0}),false);
  assert.equal(v({...e,event_id:'not-a-uuid'}),false);
@@ -26,9 +26,9 @@ test('support contracts enforce dispositions, outbox states and lifecycle enums'
  assert.equal(outbox({schema_version:1,event_id:uuid,state:'PENDING',attempt_count:0}),true,JSON.stringify(outbox.errors));
  assert.equal(outbox({schema_version:1,event_id:uuid,state:'DROPPED',attempt_count:0}),false);
  const link=validate('learner-identity-link-record-v1.schema.json');
- assert.equal(link({schema_version:1,identity_link_record_id:uuid2,link_id:uuid3,action:'LINK',source_learner_id:'learner:a',target_learner_id:'learner:b',effective_at:'2026-09-29T00:00:00Z',authority_ref:'auth:1',reason_code:'ACCOUNT_LINK',created_at:'2026-09-29T00:00:00Z'}),true,JSON.stringify(link.errors));
+ assert.equal(link({schema_version:1,identity_link_record_id:uuid2,link_id:uuid3,action:'LINK',source_learner_id:'learner:a',target_learner_id:'learner:b',effective_at:'2026-09-29T00:00:00Z',authority_ref:'auth:1',reason_code:'ACCOUNT_LINK',created_at:'2026-09-29T00:00:00Z'}),true,'IdentityLink '+JSON.stringify(link.errors));
  const exp=validate('evidence-export-record-v1.schema.json');
- assert.equal(exp({schema_version:1,export_record_id:uuid3,event_id:uuid,adapter_id:'xapi',adapter_version:'1',destination_class:'LRS',mapping_version:'1',action:'DELETE_REQUESTED',occurred_at:'2026-09-29T00:00:00Z',privacy_disposition:'ALLOW'}),true,JSON.stringify(exp.errors));
+ assert.equal(exp({schema_version:1,export_record_id:uuid3,event_id:uuid,adapter_id:'xapi',adapter_version:'1',destination_class:'LRS',mapping_version:'1',action:'DELETE_REQUESTED',occurred_at:'2026-09-29T00:00:00Z',privacy_disposition:'ALLOW'}),true,'ExportRecord '+JSON.stringify(exp.errors));
 });
 
 test('batch and projection schemas are versioned and closed',()=>{
