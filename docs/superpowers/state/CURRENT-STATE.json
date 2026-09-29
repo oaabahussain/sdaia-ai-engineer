@@ -16,7 +16,7 @@
   "checkpoint_path": "docs/superpowers/reviews/2026-09-29-k3-h0-checkpoint.md",
   "open_critical_findings": 0,
   "open_important_findings": 0,
-  "last_verified_scope": "H0_REVIEW_FIX_PENDING",
+  "last_verified_scope": "H0_WHOLE_BRANCH_REVIEW_FIXED_832E98D9",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
@@ -24,7 +24,7 @@
     "TASKS_1_4_DURABLY_VERIFIED": "PASS",
     "PROCESS_GUARDS_READY": "PASS",
     "ISOLATED_WORKSPACE_READY": "FAIL",
-    "BASELINE_GREEN": "FAIL",
+    "BASELINE_GREEN": "PASS",
     "ACTIVE_REF_RESOLUTION_VALID": "FAIL",
     "K3_TASK_BRIEFS_SELF_CONTAINED": "PASS",
     "PROJECT_BOOTSTRAP_CURRENT": "FAIL"
@@ -32,5 +32,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": null,
-  "updated_at": "2026-09-29T21:10:00Z"
+  "updated_at": "2026-09-29T21:12:00Z"
 }
