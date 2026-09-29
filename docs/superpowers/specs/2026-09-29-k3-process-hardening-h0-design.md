@@ -125,20 +125,29 @@ Allowed `status` values:
 - `POST_MERGE_VERIFY`
 - `COMPLETE`
 
-K3 H0 initial state after implementation and merge:
+K3 H0 uses two state revisions around integration:
 
-- state_revision: `1`
+**Merged main state (revision 1):**
 - programme: `K3`
 - phase: `A`
 - status: `EXECUTING`
 - execution_branch: `impl/k3-learner-evidence-engine`
-- base_main_sha: the exact H0 merge SHA on `main`
+- base_main_sha: `null`
 - completed_through_task: `4`
 - next_task: `5`
-- every H0 acceptance gate: `PASS`
+- low_model_ready: `false`
+
+`base_main_sha=null` is allowed only before the execution branch is initialized and only while `low_model_ready=false`.
+
+**Initialized execution-branch state (revision 2):**
+- branch: `impl/k3-learner-evidence-engine`, created from the exact live H0-integrated `main`
+- base_main_sha: that exact live `main` SHA
+- completed_through_task: `4`
+- next_task: `5`
+- every execution-readiness gate: `PASS`
 - low_model_ready: `true`
 
-`low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, and live `main` equals `base_main_sha` for an active execution branch.
+`low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, and live `main` equals the execution branch state's non-null `base_main_sha`.
 
 ### 4.2 `docs/superpowers/state/CURRENT-STATE.json`
 
@@ -164,11 +173,12 @@ Deterministic validator that:
 3. verifies the referenced spec/plan blob SHAs against the checked-out tree;
 4. verifies `next_task = completed_through_task + 1` while normal sequential execution applies;
 5. verifies `state_revision` is a positive integer and never regresses when comparing main versus branch state;
-6. verifies `execution_branch` is exactly the approved programme branch name;
-7. verifies the durable ledger contains completion records for every task through `completed_through_task`;
-8. verifies `low_model_ready=true` only when every applicable gate is `PASS` and no Critical/Important finding is open;
-9. fails closed on missing or contradictory state;
-10. emits one compact machine-readable result line.
+6. permits `base_main_sha=null` only when `low_model_ready=false`; a branch state with `low_model_ready=true` requires a full 40-hex `base_main_sha` equal to live `main`;
+7. verifies `execution_branch` is exactly the approved programme branch name;
+8. verifies the durable ledger contains completion records for every task through `completed_through_task`;
+9. verifies `low_model_ready=true` only when every applicable gate is `PASS` and no Critical/Important finding is open;
+10. fails closed on missing or contradictory state;
+11. emits one compact machine-readable result line.
 
 Package script:
 
@@ -454,7 +464,7 @@ H0 is complete only when all of the following are implemented and verified:
 14. official SDD workspace is initialized for the K3 plan;
 15. isolated worktree/branch requirement is satisfied;
 16. baseline verification is green;
-17. state records `next_task = 5`, `execution_branch = impl/k3-learner-evidence-engine`, all execution-readiness gates PASS, and `low_model_ready = true`.
+17. H0 is merged to `main`; `impl/k3-learner-evidence-engine` is then created from that exact integrated main; its revision-2 state records `base_main_sha = live main`, `next_task = 5`, all execution-readiness gates PASS, and `low_model_ready = true`.
 
 ## 13. H0 acceptance gates
 
