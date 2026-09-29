@@ -3,10 +3,15 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "response_version",
     "response_kind",
     "response"
   ],
   "properties": {
+    "response_version": {
+      "type": "integer",
+      "const": 1
+    },
     "response_kind": {
       "type": "string",
       "enum": [
