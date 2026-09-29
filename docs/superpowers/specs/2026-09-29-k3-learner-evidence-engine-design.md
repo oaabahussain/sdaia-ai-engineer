@@ -232,6 +232,10 @@ Each payload property must retain K2-style governance:
 
 For `LEARNER_EVIDENCE`, the export decision controls external/analytics export. It must not cause the canonical evidence store to redact a field that the learner-evidence definition itself requires.
 
+`payload_schema_ref` is authoritative for nested payload structure and constraints. The EventDefinition `properties` map is authoritative for required/optional governance, privacy classification, and export disposition. The two definitions must agree on property names and top-level types; a registration-time mismatch is invalid.
+
+Unknown payload properties are rejected unless the referenced payload schema explicitly permits them and the EventDefinition also contains governance metadata for them.
+
 The learner-evidence validation path therefore must not reuse the current AnalyticsSink sanitization path as its canonical constructor.
 
 ### 7.4 Definition immutability
@@ -408,6 +412,8 @@ Trigger:
 - only when the application explicitly observes successful completion of the activity.
 
 It must not be emitted merely because the browser page is hidden or closed.
+
+For strict section/mock flows, `learner.assessment.submitted` is the authoritative learner submission event. `learner.activity.completed` is optional unless the product has a distinct post-submission completion state. AttemptProjection must not require both events to consider a submitted attempt submitted.
 
 ### 10.3 learner.assessment.submitted
 
@@ -990,6 +996,8 @@ After lawful deletion/de-linking, the system must not claim complete historical 
 
 Derived models must be invalidated or rebuilt from the lawful remaining evidence set.
 
+Privacy lifecycle handling must also cover associated learner-linkable fingerprints, receipts, export-ledger records, and projection caches according to the active policy; retaining a hash or receipt must not become an undocumented substitute for retaining deleted learner data.
+
 ---
 
 ## 24. Product analytics boundary
@@ -1214,7 +1222,13 @@ AttemptProjectionV1 may summarize:
 
 It must never destroy the underlying response history.
 
-### 29.4 Session/abandonment
+### 29.4 Correction-aware projection
+
+All current-valid projections must resolve applicable VOID/SUPERSEDE chains before selecting current evidence.
+
+Unresolved, cyclic, or unauthorized correction chains must make the affected projection incomplete/conflicted rather than silently choosing a value.
+
+### 29.5 Session/abandonment
 
 K3 does not define a raw session-end or abandonment event.
 
@@ -1396,11 +1410,13 @@ Imported xAPI/Caliper evidence must:
 
 Imported external records are not automatically equivalent to first-party learner evidence merely because they conform to a standard.
 
+When an imported standard record does not contain native K3 `origin_id/origin_seq`, the import adapter may assign a dedicated importer origin and importer sequence representing **import processing order only**. It must retain the external statement/event identifier and original occurrence timestamp in provenance. The importer sequence must never be presented as the source system's original causal order.
+
 ---
 
 ## 36. Export ledger
 
-K3 introduces a governed export record equivalent to **EvidenceExportRecordV1** for learner-evidence exports that leave the canonical store.
+K3 introduces a governed append-only record equivalent to **EvidenceExportRecordV1** for learner-evidence exports that leave the canonical store.
 
 Logical fields:
 
@@ -1411,16 +1427,30 @@ Logical fields:
 - `adapter_version`;
 - `destination_class`;
 - `mapping_version`;
+- `action`;
 - `external_ref`, when available;
-- `exported_at`;
+- `occurred_at`;
 - `privacy_disposition`;
-- `deletion_status`.
+- `reason_code`, when applicable;
+- `predecessor_record_id`, when applicable.
+
+Allowed lifecycle actions must include:
+
+- `EXPORTED`;
+- `DELETE_REQUESTED`;
+- `DELETED`;
+- `DELETION_UNSUPPORTED`;
+- `DELETION_FAILED`.
+
+A deletion request or outcome is a new lifecycle record; it does not overwrite the original export record.
 
 Purpose:
 
 - audit which learner evidence left the canonical plane;
 - support privacy deletion propagation;
 - separate canonical evidence identity from external vendor IDs.
+
+Before learner-linked export is enabled for a destination, the deployment must know whether the destination supports deletion/de-identification. If it does not, that limitation must be recorded and surfaced in deployment/privacy policy rather than silently assumed away.
 
 This record is governance metadata, not learner mastery evidence.
 
