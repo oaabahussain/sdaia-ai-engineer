@@ -177,21 +177,27 @@ Initial RED test commit:
 
 The audit tests themselves were narrowed before production fixes when they were found to over-specify the design. Final RED assertions were limited to explicit spec requirements before the relevant fixes were accepted.
 
-Final corrective head before this report:
+Corrective product/test head before the audit report:
 
-- `5797428f099a1d317d126a1f82b6d8c8a60fbe3c`
+- `e3f059ddf2b09461878c5e6869f7f468461b0015`
+  - strengthened the audit by registering all 12 governed definitions against their payload schemas;
+  - validated the live SDAIA RuntimeBundleV4 against its complete referenced schema graph.
 
-Verification on that head:
+Final audit-report head:
 
-- PR quality run `36578082204` — PASS
+- `301a43c7c1a0987b2ec9cffc5491e47dff9313b8`
+
+Verification on that exact final audit head:
+
+- PR quality run `36578743261` — PASS
   - canonical track validation PASS
-  - Node **374/374 PASS**
+  - Node **376/376 PASS**
   - governed current-bank migration PASS
   - application parse PASS
   - service-worker verification PASS
   - Pages artifact assembly PASS
   - browser smoke PASS
-- server/adapter run `36578082303` — PASS
+- server/adapter run `36578743230` — PASS
   - server tests PASS
   - SQLite schema smoke PASS
   - browser adapter contract PASS
