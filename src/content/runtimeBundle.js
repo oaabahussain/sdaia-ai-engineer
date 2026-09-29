@@ -4,7 +4,7 @@ export async function loadRuntimeBundle(fetchJson,trackId){
  const v2=manifest.capabilities?.includes('content-model-v2');
  const evidenceV2=manifest.capabilities?.includes('learner-evidence-v2');
  const domains=v2?await fetchJson(`./tracks/${trackId}/domains.json`):null;
- const evidence=evidenceV2?await fetchJson(manifest.evidence):null;
+ const evidence=evidenceV2?await fetchJson(`./${manifest.evidence}`):null;
  const examProfiles=await Promise.all(manifest.exam_profiles.map(fetchJson));
  const examProfile=examProfiles.find(x=>x.id===manifest.default_exam_profile);
  if(!examProfile)throw new Error(`Missing exam profile ${manifest.default_exam_profile}`);
