@@ -118,9 +118,11 @@ Tests:
 
 **Interfaces:** `npm run generate:k3-validators` compiles the approved K3 JSON Schemas with Ajv standalone into a browser-safe ES module; `newUuid()`; `createLearnerEvidenceEvent(input,runtimeContext)`; `validateLearnerEvidenceEvent(event,runtimeContext)`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-generated-validators.test.js tests/k3-evidence-contract-runtime.test.js`
+- RED command:
+  Run: `node --test tests/k3-generated-validators.test.js tests/k3-evidence-contract-runtime.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-generated-validators.test.js tests/k3-evidence-contract-runtime.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-generated-validators.test.js tests/k3-evidence-contract-runtime.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -144,9 +146,11 @@ Tests:
 
 **Interfaces:** `canonicalizeJson(value)->string`; async `fingerprintEvent(event)->hex SHA-256`; Python uses `rfc8785.dumps` + SHA-256.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-jcs.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
+- RED command:
+  Run: `node --test tests/k3-jcs.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-jcs.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
+- GREEN command:
+  Run: `node --test tests/k3-jcs.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -164,9 +168,11 @@ Tests:
 
 **Interfaces:** `EvidenceStore` requires `accept`, `acceptBatch`, `getById`, `read`; every accept path returns `EvidenceStorageReceiptV1`, and every batch path returns `EvidenceBatchResultV1`.
 **Low-model execution contract:**
-- RED command: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-port.test.js`
+- RED command:
+  Run: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-port.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-port.test.js`
+- GREEN command:
+  Run: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-port.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -184,9 +190,11 @@ Tests:
 
 **Interfaces:** `createJsonlEvidenceStore(eventFile,indexFile,{storeId})`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-jsonl-evidence-store.test.js`
+- RED command:
+  Run: `node --test tests/k3-jsonl-evidence-store.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-jsonl-evidence-store.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-jsonl-evidence-store.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -205,9 +213,11 @@ Tests:
 
 **Interfaces:** `accept_evidence(db_url,event)->receipt`; `accept_evidence_batch(db_url,events)->batch result`; `get_evidence(db_url,event_id)`; `read_evidence(db_url,learner_id,after_store_seq=None,filters=None)`.
 **Low-model execution contract:**
-- RED command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
+- RED command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
+- GREEN command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -226,9 +236,11 @@ Tests:
 
 **Interfaces:** `createIndexedDbEvidenceStore({dbName,storeId,indexedDB}) -> EvidenceStore`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-indexeddb-evidence-store.test.js`
+- RED command:
+  Run: `node --test tests/k3-indexeddb-evidence-store.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-indexeddb-evidence-store.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-indexeddb-evidence-store.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -247,9 +259,11 @@ Tests:
 
 **Interfaces:** `getOrCreateEvidenceOriginId(storage)->UUIDv4`; `captureLocalEvidence({store,outbox,eventInput,definition,runtimeContext})->{event,receipt}`; `requestEvidenceStoragePersistence(navigatorLike)->{supported,granted}`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-local-capture.test.js`
+- RED command:
+  Run: `node --test tests/k3-local-capture.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-local-capture.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-local-capture.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -268,9 +282,11 @@ Tests:
 
 **Interfaces:** `enqueue(eventId)`; `markInFlight(eventIds,at)`; `applyReceipt(receipt)`; `listPending(options)`. ACCEPTED/DUPLICATE -> ACKNOWLEDGED; CONFLICT/REJECTED -> BLOCKED.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-evidence-outbox.test.js`
+- RED command:
+  Run: `node --test tests/k3-evidence-outbox.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-evidence-outbox.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-evidence-outbox.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -289,9 +305,11 @@ Tests:
 
 **Interfaces:** one logical fixture drives JSONL, IndexedDB, and SQLite disposition/order expectations.
 **Low-model execution contract:**
-- RED command: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py`
+- RED command:
+  Run: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py`
+- GREEN command:
+  Run: `node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -316,9 +334,11 @@ Tests:
 
 **Interfaces:** `LearnerAuthorizationPort.resolve(request)->AuthorizedLearner`; default implementation denies server sync; tests inject `StaticLearnerAuthorization`; `create_app(db_url=None, learner_auth=None)` uses the fail-closed resolver when `learner_auth` is omitted.
 **Low-model execution contract:**
-- RED command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py`
+- RED command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py`
+- GREEN command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -337,9 +357,11 @@ Tests:
 
 **Interfaces:** `POST /v1/learner-evidence/batch`; request `{events:[...]}`; response `EvidenceBatchResultV1`; authorized principal must match event learner scope.
 **Low-model execution contract:**
-- RED command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
+- RED command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
+- GREEN command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -358,9 +380,11 @@ Tests:
 
 **Interfaces:** `GET /v1/learner-evidence?after_store_seq=<n>&limit=<n>`; auth scope selects learner; response includes ordered events and `next_store_seq`.
 **Low-model execution contract:**
-- RED command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
+- RED command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
+- GREEN command:
+  Run: `PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_api.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -379,9 +403,11 @@ Tests:
 
 **Interfaces:** `assertEvidenceSyncPort(port)` requires `push(events)`, `pull(afterStoreSeq)`; `syncEvidence({store,outbox,syncPort,watermark,policy})`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-evidence-sync.test.js`
+- RED command:
+  Run: `node --test tests/k3-evidence-sync.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-evidence-sync.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-evidence-sync.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -406,9 +432,11 @@ Tests:
 
 **Interfaces:** `resolveAssessmentMutation({candidateEvent,currentRevision,storeSeq,authorityRef})->mutationResolvedEvent`. APPLIED only when `base_attempt_revision===currentRevision`; stale branch remains raw evidence.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-assessment-revision.test.js`
+- RED command:
+  Run: `node --test tests/k3-assessment-revision.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-assessment-revision.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-assessment-revision.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -427,9 +455,11 @@ Tests:
 
 **Interfaces:** `resolveCurrentEvidence(events)->{activeEvents,unresolved,conflicts}`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-evidence-corrections.test.js`
+- RED command:
+  Run: `node --test tests/k3-evidence-corrections.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-evidence-corrections.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-evidence-corrections.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -448,9 +478,11 @@ Tests:
 
 **Interfaces:** `projectActivity(events,{throughStoreSeq,policyVersion,identityResolutionVersion})->ActivityProjectionV1`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-activity-projection.test.js`
+- RED command:
+  Run: `node --test tests/k3-activity-projection.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-activity-projection.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-activity-projection.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -469,9 +501,11 @@ Tests:
 
 **Interfaces:** `projectAttempt(events,{formSnapshot,throughStoreSeq,policyVersion})->AttemptProjectionV1`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-attempt-projection.test.js`
+- RED command:
+  Run: `node --test tests/k3-attempt-projection.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-attempt-projection.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-attempt-projection.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -490,9 +524,11 @@ Tests:
 
 **Interfaces:** `replayEvidence(store,{fromSeq,toSeq,projectors})`; `inspectEvidenceIntegrity(events,context)->findings[]`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js`
+- RED command:
+  Run: `node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -517,9 +553,11 @@ Tests:
 
 **Interfaces:** `resolveLearnerPrincipal(learnerId,records)->{principal,chain,status}`; LINK/UNLINK are append-only.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-identity-links.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_identity_links.py`
+- RED command:
+  Run: `node --test tests/k3-identity-links.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_identity_links.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-identity-links.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_identity_links.py`
+- GREEN command:
+  Run: `node --test tests/k3-identity-links.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_identity_links.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -538,9 +576,11 @@ Tests:
 
 **Interfaces:** `classifyLegacyLearnerEvent(record)->VALID_V1|KNOWN_V1_VARIANT|INVALID_LEGACY_RECORD`; `readLegacyLearnerEvidence(record)->coarse view`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-legacy-learner-event.test.js`
+- RED command:
+  Run: `node --test tests/k3-legacy-learner-event.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-legacy-learner-event.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-legacy-learner-event.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -559,9 +599,11 @@ Tests:
 
 **Interfaces:** privileged lifecycle API is separate from ordinary EvidenceStore; export actions are EXPORTED/DELETE_REQUESTED/DELETED/DELETION_UNSUPPORTED/DELETION_FAILED.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-privacy-lifecycle.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_privacy.py`
+- RED command:
+  Run: `node --test tests/k3-privacy-lifecycle.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_privacy.py`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-privacy-lifecycle.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_privacy.py`
+- GREEN command:
+  Run: `node --test tests/k3-privacy-lifecycle.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_privacy.py`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test && PYTHONPATH=server python3 -m pytest -q server/tests`
 
@@ -580,9 +622,11 @@ Tests:
 
 **Interfaces:** pre-K3 active StateV2 attempt remains resumable without invented K3 history; only activities started after K3 activation enter the new evidence stream.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-state-transition.test.js tests/state-migration.test.js`
+- RED command:
+  Run: `node --test tests/k3-state-transition.test.js tests/state-migration.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-state-transition.test.js tests/state-migration.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-state-transition.test.js tests/state-migration.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -607,9 +651,11 @@ Tests:
 
 **Interfaces:** `createAssessmentFormSnapshot(input)` remains compatible. Browser strict assessments bind exact runtime content release, item IDs, option order, profile, scoring policy, locale.
 **Low-model execution contract:**
-- RED command: `node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js`
+- RED command:
+  Run: `node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js`
+- GREEN command:
+  Run: `node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -628,9 +674,11 @@ Tests:
 
 **Interfaces:** `createEvidenceRecorder({store,outbox,runtimeContext,clock,crypto})`; methods `startActivity`, `presentItem`, `recordResponse`, `recordConfidence`, `requestHint`, `openExplanation`, `submitAssessment`, `recordEvaluation`.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-evidence-recorder.test.js`
+- RED command:
+  Run: `node --test tests/k3-evidence-recorder.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-evidence-recorder.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-evidence-recorder.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -649,9 +697,11 @@ Tests:
 
 **Interfaces:** pure bridge functions `beginExamEvidence(recorder,exam,context)`, `presentExamItemEvidence(recorder,exam,question,context)`, `recordExamAnswerEvidence(recorder,exam,question,answer,context)`, `recordExamConfidenceEvidence(recorder,exam,question,confidence,context)`, and `submitExamEvidence(recorder,exam,result,questions,context)` keep evidence orchestration testable outside the DOM. New exam emits activity.started; first view of each interaction emits item.presented; each committed answer change emits response.recorded; confidence changes emit confidence.recorded; submit emits assessment.submitted and evaluation events using existing scorer/scoring-policy reference.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-app-evidence-integration.test.js tests/k1-current-runtime-regression.test.js`
+- RED command:
+  Run: `node --test tests/k3-app-evidence-integration.test.js tests/k1-current-runtime-regression.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-app-evidence-integration.test.js tests/k1-current-runtime-regression.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-app-evidence-integration.test.js tests/k1-current-runtime-regression.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -670,9 +720,11 @@ Tests:
 
 **Interfaces:** local evidence always works; sync is enabled only when an explicit EvidenceSync authorization provider/config is present. Existing X-Anon-Id progress API remains unchanged.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-storage-sync-capability.test.js tests/storage.api.test.js`
+- RED command:
+  Run: `node --test tests/k3-storage-sync-capability.test.js tests/storage.api.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-storage-sync-capability.test.js tests/storage.api.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-storage-sync-capability.test.js tests/storage.api.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -697,9 +749,11 @@ Tests:
 
 **Interfaces:** preserve `exportEvents`/`importEvents`; result contract reports mapping version, mapped IDs, omissions/rejections, and provenance.
 **Low-model execution contract:**
-- RED command: `node --test tests/interoperability-ports.test.js tests/k3-learning-event-exchange.test.js`
+- RED command:
+  Run: `node --test tests/interoperability-ports.test.js tests/k3-learning-event-exchange.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/interoperability-ports.test.js tests/k3-learning-event-exchange.test.js`
+- GREEN command:
+  Run: `node --test tests/interoperability-ports.test.js tests/k3-learning-event-exchange.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -718,9 +772,11 @@ Tests:
 
 **Interfaces:** export returns xAPI statements + mapping report; import either maps with exact required K3 context, stages, or rejects. Never implement an LRS.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-xapi-adapter.test.js`
+- RED command:
+  Run: `node --test tests/k3-xapi-adapter.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-xapi-adapter.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-xapi-adapter.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -739,9 +795,11 @@ Tests:
 
 **Interfaces:** preserve AssessmentEvent/AssessmentItemEvent/Attempt/Response and Started/Skipped/Completed/Submitted distinctions.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-caliper-adapter.test.js`
+- RED command:
+  Run: `node --test tests/k3-caliper-adapter.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-caliper-adapter.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-caliper-adapter.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -760,9 +818,11 @@ Tests:
 
 **Interfaces:** `toAnalyticsEvent(evidenceEvent,definition,mapping)->validated analytics event|null`; apply ALLOW/REDACT/REJECT; analytics event gets a separate identity.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-analytics-bridge.test.js`
+- RED command:
+  Run: `node --test tests/k3-analytics-bridge.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-analytics-bridge.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-analytics-bridge.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -787,9 +847,11 @@ Tests:
 
 **Interfaces:** validate K3 schemas/definitions/mappings; CI runs Node + Python + browser smoke; Pages includes only browser-required evidence modules/context and excludes private evidence/factory/admin data.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-release-boundary.test.js tests/release-contract.test.js tests/service-worker-contract.test.js`
+- RED command:
+  Run: `node --test tests/k3-release-boundary.test.js tests/release-contract.test.js tests/service-worker-contract.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-release-boundary.test.js tests/release-contract.test.js tests/service-worker-contract.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-release-boundary.test.js tests/release-contract.test.js tests/service-worker-contract.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -808,9 +870,11 @@ Tests:
 
 **Interfaces:** spec §47 is covered one-for-one; protected question payload digest remains exact.
 **Low-model execution contract:**
-- RED command: `node --test tests/k3-learner-evidence-acceptance.test.js`
+- RED command:
+  Run: `node --test tests/k3-learner-evidence-acceptance.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/k3-learner-evidence-acceptance.test.js`
+- GREEN command:
+  Run: `node --test tests/k3-learner-evidence-acceptance.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -829,9 +893,11 @@ Tests:
 
 **Interfaces:** document contracts, store semantics, fail-closed sync, privacy lifecycle, legacy handling, replay, and K4+ boundary with exact implementation HEAD/test evidence.
 **Low-model execution contract:**
-- RED command: `node --test tests/documentation-contract.test.js`
+- RED command:
+  Run: `node --test tests/documentation-contract.test.js`
 - Expected RED: FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.
-- GREEN command: `node --test tests/documentation-contract.test.js`
+- GREEN command:
+  Run: `node --test tests/documentation-contract.test.js`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -850,9 +916,11 @@ Tests:
 
 **Interfaces:** classify Critical/Important/Minor; zero open Critical/Important before integration.
 **Low-model execution contract:**
-- RED command: `test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md`
+- RED command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md`
 - Expected RED: FAIL (non-zero) because the whole-plan review artifact does not yet exist or is empty.
-- GREEN command: `test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md`
+- GREEN command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -871,9 +939,11 @@ Tests:
 
 **Interfaces:** the record names the exact tested product-code HEAD and the later documentation-only verification commit. No product/code change is allowed after the tested product HEAD without restarting this task.
 **Low-model execution contract:**
-- RED command: `test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md`
+- RED command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md`
 - Expected RED: FAIL (non-zero) because the exact-head verification artifact does not yet exist or is empty.
-- GREEN command: `test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md`
+- GREEN command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
@@ -892,9 +962,11 @@ Tests:
 
 **Interfaces:** use `superpowers:finishing-a-development-branch`; merge only the exact reviewed implementation head (allowing explicitly identified documentation-only verification commit if review covers it).
 **Low-model execution contract:**
-- RED command: `test "$(git branch --show-current)" = "main"`
+- RED command:
+  Run: `test "$(git branch --show-current)" = "main"`
 - Expected RED: FAIL because execution is still on the implementation branch before the high-reasoning integration gate.
-- GREEN command: `test "$(git branch --show-current)" = "main"`
+- GREEN command:
+  Run: `test "$(git branch --show-current)" = "main"`
 - Expected GREEN: PASS only in the authorized high-reasoning integration session after exact-head review and merge; a low-reasoning executor stops before this step.
 - Affected regression: `npm test`
 
@@ -913,9 +985,11 @@ Tests:
 
 **Interfaces:** K3 becomes COMPLETE only after merged `main` passes runtime/server/release verification.
 **Low-model execution contract:**
-- RED command: `test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md`
+- RED command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md`
 - Expected RED: FAIL (non-zero) because post-merge verification has not yet been recorded.
-- GREEN command: `test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md`
+- GREEN command:
+  Run: `test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md`
 - Expected GREEN: PASS with zero failures for the exact task verification command.
 - Affected regression: `npm test`
 
