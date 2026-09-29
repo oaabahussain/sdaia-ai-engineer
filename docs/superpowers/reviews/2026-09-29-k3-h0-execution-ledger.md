@@ -113,3 +113,39 @@
 - Concurrency behavior was observed cancelling superseded PR runs.
 
 **Task 6: complete.**
+
+
+## Task 7 — Process guard and merge authority
+
+### RED
+- `0f6adafaee5d9ade37c1e4238005aef6fb8ead0f` added the process-guard contract.
+- Quality run `36630061699`: FAIL because the durable process guard did not exist.
+
+### Live protection evidence
+- live `main` remained `9607271c86c084df396a39947e915d6560dbbac3`;
+- `protected=false`;
+- required status-check enforcement off;
+- rulesets `[]`.
+
+### GREEN
+- `ba99bec55e60a8b5dcd1a93e480dd713e89232f6` — durable HIGH_REASONING_MERGE_GATE record.
+- `55340d1450002443e894f53a84443c7f9fe20140` — state process gate PASS, low-model readiness still false.
+- First GREEN attempt failed only because the guard text did not include the exact contract phrase `exact-head`; root cause was wording/test-contract mismatch.
+- `c826c1050f4dcdfe312ad32aad4a560d3fe9e528` — explicit exact-head merge control.
+- `63711114c9410851481c71a770886c39d9cb1b14` — real CURRENT-STATE CLI regression.
+- Final quality `36630643654`: SUCCESS.
+- Final server/adapter `36630643670`: SUCCESS.
+
+**Task 7: complete.**
+
+## Task 8 — Full H0 pre-integration verification
+
+- **Ruling:** local command execution is unavailable because the harness cannot populate the repository worktree; exact-head PR Actions run the same required Node/Python/DB/adapter/Pages/browser commands and are the executable verification environment. **Cost if wrong:** a local-only environment discrepancy could remain; H0 does not claim a local worktree is ready, and `ISOLATED_WORKSPACE_READY` remains FAIL.
+- Verified head: `63711114c9410851481c71a770886c39d9cb1b14`.
+- Quality run `36630643654`: 440/440 Node PASS plus validate/factory/SW/Pages/browser smoke.
+- Server/adapter run `36630643670`: 22 pytest PASS plus SQLite/browser/API contracts.
+- Checkpoint: `docs/superpowers/reviews/2026-09-29-k3-h0-checkpoint.md`.
+- Remaining gates intentionally FAIL: isolated K3 workspace, active-ref initialization, Project bootstrap.
+- `low_model_ready=false`.
+
+**Task 8: complete.**
