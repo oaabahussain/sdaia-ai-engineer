@@ -333,7 +333,9 @@ The authoritative store:
 - must not infer missing evidence merely from a gap;
 - must detect reuse of the same `origin_id + origin_seq` for a different event ID as an integrity conflict.
 
-### 8.7 Timestamp
+### 8.7 Locale and timestamp
+
+`locale` must be one of the locales declared by the applicable TrackManifest/content contract. K3 core must not hard-code the platform permanently to Arabic/English merely because the current track supports `ar` and `en`.
 
 `occurred_at` is source occurrence time.
 
@@ -503,8 +505,9 @@ Payload must include:
 - `response_event_id`;
 - scoring policy ID/version or equivalent stable reference;
 - evaluation status;
-- evaluator authority reference;
 - score/correctness only when the item/scoring contract defines them.
+
+`authority_ref` is required in the event envelope for this authority-sensitive event and must not be duplicated as a second independently mutable payload value.
 
 Allowed evaluation status must include at least:
 
@@ -530,8 +533,9 @@ Payload must include:
 - authoritative revision before resolution;
 - decision;
 - authoritative revision after resolution when applied;
-- reason code;
-- authority reference.
+- reason code.
+
+`authority_ref` is required in the event envelope.
 
 Allowed decisions:
 
@@ -550,8 +554,9 @@ Payload must include:
 
 - `target_event_id`;
 - `action`;
-- `reason_code`;
-- `authority_ref`.
+- `reason_code`.
+
+`authority_ref` is required in the event envelope.
 
 Allowed actions:
 
@@ -687,6 +692,10 @@ Rules:
 
 The source event is never mutated to add receipt metadata.
 
+For a DUPLICATE exact retry, the receipt must return the original stored event's `event_fingerprint`, `accepted_at`, and `store_seq`. The retry observation time is transport/telemetry metadata and must not replace the original acceptance time.
+
+`accepted_at` is store-reported wall-clock time. Ordering authority comes from `store_seq`, not from comparing `accepted_at` across stores.
+
 ---
 
 ## 15. Store-local ordering
@@ -785,7 +794,7 @@ The UI must not claim an interaction is durably recorded before local persistenc
 
 ### 17.3 Storage durability
 
-The browser adapter should request persistent storage where supported and appropriate.
+When the browser is retaining unsynchronized learner evidence and the Storage API is available, the adapter must attempt to request persistent storage unless an explicit deployment/privacy policy disables that request. A browser denial is not fatal, but the reduced durability capability must be observable.
 
 It must monitor storage/quota risk when practical.
 
@@ -1410,7 +1419,9 @@ Imported xAPI/Caliper evidence must:
 
 Imported external records are not automatically equivalent to first-party learner evidence merely because they conform to a standard.
 
-When an imported standard record does not contain native K3 `origin_id/origin_seq`, the import adapter may assign a dedicated importer origin and importer sequence representing **import processing order only**. It must retain the external statement/event identifier and original occurrence timestamp in provenance. The importer sequence must never be presented as the source system's original causal order.
+Canonical import is allowed only when the external record can be mapped without invention to the required K3 learner/activity/track/release/content context. If exact required K3 context is unavailable, the adapter must reject/abstain from canonical import or retain the record in a separate external-evidence staging area; it must not fabricate a local activity, release, item, or objective identity.
+
+When a canonically importable standard record does not contain native K3 `origin_id/origin_seq`, the import adapter may assign a dedicated importer origin and importer sequence representing **import processing order only**. It must retain the external statement/event identifier and original occurrence timestamp in provenance. The importer sequence must never be presented as the source system's original causal order.
 
 ---
 
