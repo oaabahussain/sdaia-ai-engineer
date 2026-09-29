@@ -3,13 +3,14 @@
 **Date:** 2026-09-29  
 **Status:** APPROVED — ACTIVE IMPLEMENTATION CONTRACT  
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
-**Design branch:** `design/k3-learner-evidence-engine`  
-**Authoritative base:** `main@3c296632a54f68f0ecc7ad122298d9661706cb2b`  
+**Historical design branch:** `design/k3-learner-evidence-engine`  
+**Historical design base:** `main@3c296632a54f68f0ecc7ad122298d9661706cb2b`  
 **Programme:** K3 — Learner Evidence Engine
 
-**Execution state:** Tasks 1-4 are merged, independently audited, corrected, and verified; Task 5 is next. Execution progress is carried by SDD + durable ledger + CURRENT-STATE. This specification's semantic contract is frozen except through an explicit approved amendment.
+**Execution state:** Tasks 1-4 are merged, independently audited, corrected, and verified; Task 5 is next. Execution progress is carried by SDD + durable ledger + CURRENT-STATE. This specification's semantic contract is frozen except through an explicit approved amendment.  
+**Execution authority:** live `main` plus `docs/superpowers/state/CURRENT-STATE.json` determine execution position and active ref; neither may override this specification's semantic contract.
 
-> This document is the normative K3 design/specification. It does not authorize implementation. An implementation plan may be written only after this spec is explicitly approved.
+> This document is the approved normative K3 design/specification. Implementation is authorized only through the approved K3 implementation plan and validated CURRENT-STATE execution gates.
 
 ---
 
@@ -20,9 +21,9 @@ K3 must follow this precedence when sources conflict:
 1. live repository `main`;
 2. the accepted Learning Platform architecture constitution;
 3. the 2026-09-26 Research Amendment;
-4. the current authoritative programme tracker;
+4. `docs/superpowers/state/CURRENT-STATE.json` for execution navigation only;
 5. merged K1/K2 contracts and K2 post-merge verification;
-6. this K3 specification after explicit approval;
+6. this approved K3 specification;
 7. later approved K3 implementation plan;
 8. historical plans/checkpoints/chat context.
 
