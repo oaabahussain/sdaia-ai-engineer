@@ -70,11 +70,14 @@ def load_runtime_bundle(track_id=None):
         raise RuntimeError(f"Missing default exam profile {manifest['default_exam_profile']}")
     concept_docs = [json.loads((ROOT / ref).read_text(encoding='utf-8')) for ref in manifest['content']['concept_files']]
     content_v2 = 'content-model-v2' in manifest.get('capabilities', [])
+    evidence_v2 = 'learner-evidence-v2' in manifest.get('capabilities', [])
     domains = json.loads((ROOT / 'tracks' / track_id / 'domains.json').read_text(encoding='utf-8')) if content_v2 else None
+    evidence = json.loads((ROOT / manifest['evidence']).read_text(encoding='utf-8')) if evidence_v2 else None
     return {
-        'contract_version': 3 if content_v2 else 2,
+        'contract_version': 4 if evidence_v2 else (3 if content_v2 else 2),
         'track': manifest,
         **({'domains': domains} if content_v2 else {}),
+        **({'evidence': evidence} if evidence_v2 else {}),
         'exam_profile': exam_profile,
         'concepts': {(doc['domain_id'] if content_v2 else doc['domain']): doc['concepts'] for doc in concept_docs},
         'learn': json.loads((ROOT / manifest['content']['learn']).read_text(encoding='utf-8')),
