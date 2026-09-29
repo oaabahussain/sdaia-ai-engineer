@@ -23,7 +23,7 @@ Until a native ruleset is configured:
 2. a low-reasoning executor **must not merge or push directly to `main`**;
 3. it stops before integration/PR merge;
 4. a high-reasoning session performs the whole-branch review;
-5. the exact reviewed HEAD must have both `quality-gate` and `server-adapter-gate` successful;
+5. that session performs exact-head verification; the exact reviewed HEAD must have both `quality-gate` and `server-adapter-gate` successful;
 6. only that exact reviewed/green HEAD may be integrated;
 7. post-merge verification on the exact resulting `main` SHA remains mandatory.
 
