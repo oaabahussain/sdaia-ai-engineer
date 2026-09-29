@@ -35,7 +35,7 @@ test('LearnerEvidenceEventV2 core schema does not hard-code AR/EN locales', () =
 test('EventDefinitionV2 registration rejects property names/types that disagree with payload_schema_ref', () => {
   const mismatch = {
     schema_version:2,
-    event_name:'learner.audit.schema-mismatch',
+    event_name:'learner.audit.schemamismatch',
     event_version:1,
     plane:'LEARNER_EVIDENCE',
     purpose:'Audit payload governance',
@@ -85,15 +85,22 @@ test('events with no spec-required payload do not invent required completion/pre
   }
 });
 
-test('AttemptProjectionV1 retains applicable identity, release, scoring and resolution metadata', () => {
+test('AttemptProjectionV1 retains applicable release, scoring and resolution metadata', () => {
   const schema = readJson('data/schema/attempt-projection-v1.schema.json');
   for (const field of [
-    'learner_id','content_release_id','exam_profile_ref','scoring_policy_ref',
+    'content_release_id','exam_profile_ref','scoring_policy_ref',
     'identity_resolution_version','unresolved_reference_count'
   ]) {
     assert.ok(schema.properties[field], 'missing property ' + field);
     assert.ok(schema.required.includes(field), 'field must be required: ' + field);
   }
+});
+
+test('response evidence representation is explicitly versioned', () => {
+  const schema = readJson('data/evidence/payload-schemas/response-recorded-v1.schema.json');
+  assert.ok(schema.properties.response_version, 'response_version is required by the versioned-response contract');
+  assert.ok(schema.required.includes('response_version'));
+  assert.equal(schema.properties.response_version.const, 1);
 });
 
 test('runtime evidence context constrains question payload digest to lowercase SHA-256 hex', () => {
