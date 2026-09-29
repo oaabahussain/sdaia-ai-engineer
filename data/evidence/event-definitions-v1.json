@@ -184,6 +184,12 @@
     ],
     "payload_schema_ref": "data/evidence/payload-schemas/response-recorded-v1.schema.json",
     "properties": {
+      "response_version": {
+        "type": "integer",
+        "required": true,
+        "privacy_class": "PSEUDONYMOUS",
+        "export": "ALLOW"
+      },
       "response_kind": {
         "type": "string",
         "required": true,
