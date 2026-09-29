@@ -311,9 +311,11 @@ The durable ledger does not replace `task-start` or `task-done`.
 
 ## 7. Lower-reasoning-model execution contract
 
-The plan produced after this design is approved MUST be executable without architectural invention.
+The H0 plan and the existing K3 product plan MUST be executable without architectural invention.
 
-Each task brief MUST contain:
+Superpowers `task-start`/ `task-brief` extracts only the selected `Task N` section; it does not automatically include the plan's Global Constraints or top-level command convention. Therefore every remaining K3 Task 5-41 must be made self-contained before `low_model_ready=true`.
+
+Each remaining K3 task section, and therefore its extracted task brief, MUST contain:
 
 - exact purpose;
 - exact files allowed to change;
@@ -325,7 +327,9 @@ Each task brief MUST contain:
 - exact GREEN command;
 - exact affected regression command;
 - exact completion evidence;
-- explicit stop conditions.
+- explicit stop conditions;
+- explicit instruction to invoke systematic-debugging on unexpected failure;
+- explicit prohibition on main integration/merge for a low-reasoning executor.
 
 A lower-reasoning executor MUST NOT:
 
@@ -338,6 +342,8 @@ A lower-reasoning executor MUST NOT:
 - proceed through a contradictory state manifest.
 
 Any plan/spec conflict is a `Ruling:` entry, not an invisible improvisation.
+
+Before freezing the K3 plan, H0 performs an execution-annotation pass over Tasks 5-41. This pass may expand shorthand commands, add Expected RED/GREEN results, and add execution stop conditions, but MUST NOT change product semantics, interfaces, dependencies, task order, or acceptance intent. A repository test must reject any remaining Task 5-41 section that still depends on top-level shorthand such as bare `Run RED`/`Run GREEN`.
 
 ## 8. Batch execution model
 
@@ -464,24 +470,25 @@ Never provide the reviewer with accumulated chat history unless specifically req
 
 H0 is complete only when all of the following are implemented and verified:
 
-1. stale execution-status metadata in the active K3 spec/plan is normalized without changing product semantics, then those approved contract files are frozen and their blob SHAs recorded;
-2. current-state schema exists;
-3. current-state manifest exists and validates;
-4. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
-5. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
-6. HANDOFF current section is converted to static pointer form;
-7. the old authoritative programme tracker is demoted to a historical/index role and points to `CURRENT-STATE.json` for live state;
-8. static Project bootstrap/index files exist;
-9. Pages artifact build logic is single-sourced;
-10. CI required-check names are unique;
-11. safe npm/pip caching and PR concurrency are configured;
-12. critical Actions are pinned to immutable SHAs;
-13. main protection/ruleset is configured or an explicit environment limitation plus compensating merge control is recorded;
-14. official SDD workspace is initialized for the K3 plan;
-15. isolated worktree/branch requirement is satisfied;
-16. baseline verification is green;
-17. H0 is merged to `main`; `impl/k3-learner-evidence-engine` is then created from that exact integrated main; its revision-2 state records `base_main_sha = live main` and `next_task = 5`;
-18. a versioned Project bootstrap upload pack is produced, the active ChatGPT Project is refreshed once, `PROJECT_BOOTSTRAP_CURRENT=PASS` is verified, and only then the execution-branch state advances to the next revision with all execution-readiness gates PASS and `low_model_ready = true`.
+1. stale execution-status metadata in the active K3 spec/plan is normalized without changing product semantics;
+2. every K3 Task 5-41 section is made self-contained for `task-start` extraction, with exact RED/GREEN commands, Expected outcomes, and stop conditions, then the approved contract files are frozen and their blob SHAs recorded;
+3. current-state schema exists;
+4. current-state manifest exists and validates;
+5. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
+6. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
+7. HANDOFF current section is converted to static pointer form;
+8. the old authoritative programme tracker is demoted to a historical/index role and points to `CURRENT-STATE.json` for live state;
+9. static Project bootstrap/index files exist;
+10. Pages artifact build logic is single-sourced;
+11. CI required-check names are unique;
+12. safe npm/pip caching and PR concurrency are configured;
+13. critical Actions are pinned to immutable SHAs;
+14. main protection/ruleset is configured or an explicit environment limitation plus compensating merge control is recorded;
+15. official SDD workspace is initialized for the K3 plan;
+16. isolated worktree/branch requirement is satisfied;
+17. baseline verification is green;
+18. H0 is merged to `main`; `impl/k3-learner-evidence-engine` is then created from that exact integrated main; its revision-2 state records `base_main_sha = live main` and `next_task = 5`;
+19. a versioned Project bootstrap upload pack is produced, the active ChatGPT Project is refreshed once, `PROJECT_BOOTSTRAP_CURRENT=PASS` is verified, and only then the execution-branch state advances to the next revision with all execution-readiness gates PASS and `low_model_ready = true`.
 
 ## 13. H0 acceptance gates
 
@@ -495,6 +502,7 @@ H0 produces these gates:
 - `ISOLATED_WORKSPACE_READY`
 - `BASELINE_GREEN`
 - `ACTIVE_REF_RESOLUTION_VALID`
+- `K3_TASK_BRIEFS_SELF_CONTAINED`
 - `PROJECT_BOOTSTRAP_CURRENT`
 
 Only when every applicable gate is PASS may execution publish:
