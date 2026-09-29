@@ -29,11 +29,11 @@
 
 ## Review Focus
 
-1. Crash/storage pressure before acknowledgement -> Tasks 11-13 test recovery and observable durability risk.
-2. Retry versus collision -> Tasks 6-10 enforce identical dispositions across stores.
-3. Two devices mutate one strict mock -> Tasks 20 and 29 preserve raw actions and use revision authority, never timestamp LWW.
-4. Privacy erasure after export/projection -> Tasks 21-23 cover links, receipts/fingerprints, exports, and projection invalidation.
-5. Legacy/import missing K3 context -> Tasks 24-26 reject/abstain rather than fabricate history/IDs.
+1. Crash/storage pressure before acknowledgement -> Tasks 10-13 test IndexedDB recovery, durable local capture, outbox state, and observable durability risk.
+2. Retry versus collision -> Tasks 6-13 enforce identical fingerprints/dispositions across stores.
+3. Two devices mutate one strict mock -> Tasks 18, 21, and 29 preserve raw actions, resolve authority by revision, and prove timestamps never implement LWW.
+4. Privacy erasure after export/projection -> Tasks 20-25 cover correction-aware projections, identity links, receipts/fingerprints, export lifecycle, and projection invalidation.
+5. Legacy/import missing K3 context -> Tasks 24, 26, 32, and 33 preserve legacy granularity and reject/stage standards imports instead of fabricating K3 context.
 
 ## File Structure Map
 
