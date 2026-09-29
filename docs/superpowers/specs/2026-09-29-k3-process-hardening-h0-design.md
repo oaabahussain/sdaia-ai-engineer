@@ -4,7 +4,7 @@
 **Repository:** `oaabahussain/sdaia-ai-engineer`  
 **Baseline:** `main@9607271c86c084df396a39947e915d6560dbbac3`  
 **Scope:** Process/control-plane hardening only. No K3 product behavior changes.  
-**Status:** DESIGN — awaiting explicit written-spec approval before implementation planning.
+**Status:** APPROVED FOR IMPLEMENTATION PLANNING — execution remains gated on implementation-plan approval.
 
 ## 1. Purpose
 
@@ -438,22 +438,23 @@ Never provide the reviewer with accumulated chat history unless specifically req
 
 H0 is complete only when all of the following are implemented and verified:
 
-1. current-state schema exists;
-2. current-state manifest exists and validates;
-3. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
-4. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
-5. HANDOFF current section is converted to static pointer form;
-6. the old authoritative programme tracker is demoted to a historical/index role and points to `CURRENT-STATE.json` for live state;
-7. static Project bootstrap/index files exist;
-8. Pages artifact build logic is single-sourced;
-9. CI required-check names are unique;
-10. safe npm/pip caching and PR concurrency are configured;
-11. critical Actions are pinned to immutable SHAs;
-12. main protection/ruleset is configured or an explicit environment limitation is recorded;
-13. official SDD workspace is initialized for the K3 plan;
-14. isolated worktree/branch requirement is satisfied;
-15. baseline verification is green;
-16. state records `next_task = 5`, `execution_branch = impl/k3-learner-evidence-engine`, all H0 gates PASS, and `low_model_ready = true`.
+1. stale execution-status metadata in the active K3 spec/plan is normalized without changing product semantics, then those approved contract files are frozen and their blob SHAs recorded;
+2. current-state schema exists;
+3. current-state manifest exists and validates;
+4. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
+5. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
+6. HANDOFF current section is converted to static pointer form;
+7. the old authoritative programme tracker is demoted to a historical/index role and points to `CURRENT-STATE.json` for live state;
+8. static Project bootstrap/index files exist;
+9. Pages artifact build logic is single-sourced;
+10. CI required-check names are unique;
+11. safe npm/pip caching and PR concurrency are configured;
+12. critical Actions are pinned to immutable SHAs;
+13. main protection/ruleset is configured or an explicit environment limitation plus compensating merge control is recorded;
+14. official SDD workspace is initialized for the K3 plan;
+15. isolated worktree/branch requirement is satisfied;
+16. baseline verification is green;
+17. state records `next_task = 5`, `execution_branch = impl/k3-learner-evidence-engine`, all execution-readiness gates PASS, and `low_model_ready = true`.
 
 ## 13. H0 acceptance gates
 
