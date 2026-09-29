@@ -153,15 +153,17 @@ test('Pages artifact publishes and verifies the public K3 runtime evidence conte
   const pages = fs.readFileSync(new URL('../.github/workflows/pages.yml', import.meta.url), 'utf8');
   const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
   const live = fs.readFileSync(new URL('../scripts/verify_live_release.js', import.meta.url), 'utf8');
+  const builder = fs.readFileSync(new URL('../scripts/build_pages_artifact.js', import.meta.url), 'utf8');
 
   for (const workflow of [ci, pages]) {
-    assert.match(workflow, /mkdir -p _site\/data\/evidence/);
-    assert.match(workflow, /sdaia-ai-engineer\.runtime-v1\.json/);
-    assert.match(workflow, /sdaia-ai-engineer\.scoring-v1\.json/);
-    assert.match(workflow, /event-definitions-v1\.json/);
-    assert.match(workflow, /cp -R data\/evidence\/payload-schemas _site\/data\/evidence\//);
+    assert.match(workflow, /node scripts\/build_pages_artifact\.js _site/);
     assert.doesNotMatch(workflow, /cp -R data\/evidence _site\/data\//);
   }
+  assert.match(builder, /sdaia-ai-engineer\.runtime-v1\.json/);
+  assert.match(builder, /sdaia-ai-engineer\.scoring-v1\.json/);
+  assert.match(builder, /event-definitions-v1\.json/);
+  assert.match(builder, /data\/evidence\/payload-schemas/);
+  assert.doesNotMatch(builder, /copyFile\(['\"]data\/evidence['\"]\)/);
 
   for (const asset of [
     './data/evidence/sdaia-ai-engineer.runtime-v1.json',
