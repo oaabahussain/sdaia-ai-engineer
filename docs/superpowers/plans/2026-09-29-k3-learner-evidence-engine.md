@@ -228,7 +228,7 @@ Tests:
 
 **Files:** create `server/app/evidence_auth.py`; test `server/tests/test_k3_evidence_auth.py`.
 
-**Interfaces:** `LearnerAuthorizationPort.resolve(request)->AuthorizedLearner`; default implementation denies server sync; tests inject `StaticLearnerAuthorization`.
+**Interfaces:** `LearnerAuthorizationPort.resolve(request)->AuthorizedLearner`; default implementation denies server sync; tests inject `StaticLearnerAuthorization`; `create_app(db_url=None, learner_auth=None)` uses the fail-closed resolver when `learner_auth` is omitted.
 
 - [ ] Write failing tests proving `learner_id` and current `X-Anon-Id` alone never grant learner-evidence read/write.
 - [ ] Run RED.
@@ -424,9 +424,9 @@ Tests:
 
 ### Task 29: Instrument current full/section assessment interactions
 
-**Files:** modify `src/app.js`; test `tests/k3-app-evidence-integration.test.js`, `tests/k1-current-runtime-regression.test.js`.
+**Files:** create `src/evidence/appBridge.js`; modify `src/app.js`; test `tests/k3-app-evidence-integration.test.js`, `tests/k1-current-runtime-regression.test.js`.
 
-**Interfaces:** new exam emits activity.started; first view of each interaction emits item.presented; each committed answer change emits response.recorded; confidence changes emit confidence.recorded; submit emits assessment.submitted and evaluation events using existing scorer/scoring-policy reference.
+**Interfaces:** pure bridge functions `beginExamEvidence(recorder,exam,context)`, `presentExamItemEvidence(recorder,exam,question,context)`, `recordExamAnswerEvidence(recorder,exam,question,answer,context)`, `recordExamConfidenceEvidence(recorder,exam,question,confidence,context)`, and `submitExamEvidence(recorder,exam,result,questions,context)` keep evidence orchestration testable outside the DOM. New exam emits activity.started; first view of each interaction emits item.presented; each committed answer change emits response.recorded; confidence changes emit confidence.recorded; submit emits assessment.submitted and evaluation events using existing scorer/scoring-policy reference.
 
 - [ ] Write failing app sequence tests around existing `createExam/selectAnswer/setConfidence/move/jump/submitExam`.
 - [ ] Run RED.
