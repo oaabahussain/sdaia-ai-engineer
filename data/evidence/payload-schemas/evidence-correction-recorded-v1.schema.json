@@ -24,5 +24,24 @@
     "superseding_event_id": {
       "type": "string"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "SUPERSEDE"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "then": {
+        "required": [
+          "superseding_event_id"
+        ]
+      }
+    }
+  ]
 }
