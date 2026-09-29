@@ -13,7 +13,6 @@
     "learner_id",
     "mode",
     "content_release_id",
-    "identity_resolution_version",
     "unresolved_reference_count"
   ],
   "properties": {
