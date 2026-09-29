@@ -6,7 +6,7 @@ import Ajv from 'ajv';
 const load=n=>JSON.parse(fs.readFileSync(new URL('../data/schema/'+n,import.meta.url),'utf8'));
 const validate=n=>{ const schema=load(n); const ajv=new Ajv({strict:false,allErrors:true,formats:{'date-time':true}}); if(n==='evidence-batch-result-v1.schema.json') ajv.addSchema(load('evidence-storage-receipt-v1.schema.json'),'evidence-storage-receipt-v1.schema.json'); return ajv.compile(schema); };
 const uuid='123e4567-e89b-42d3-a456-426614174000';
-const uuid2='123e4567-e89b-42d3-a456-426614174001';
+const uuid2='223e4567-e89b-42d3-a456-426614174001';
 
 test('LearnerEvidenceEventV2 accepts canonical raw evidence and rejects derived truth',()=>{
  const v=validate('learner-evidence-event-v2.schema.json');
