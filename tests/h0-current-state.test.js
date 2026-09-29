@@ -213,3 +213,11 @@ test('process guard record agrees with current state and forbids low-model integ
   assert.equal(current.gates.PROCESS_GUARDS_READY, 'PASS');
   assert.equal(current.low_model_ready, false);
 });
+
+test('CURRENT-STATE CLI regression is not pinned to a historical main SHA', () => {
+  const source = readFileSync(new URL('./h0-current-state.test.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(
+    source,
+    /\['scripts\/validate_current_state\.js','--live-main-sha','[0-9a-f]{40}','--json'\]/
+  );
+});
