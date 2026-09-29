@@ -149,3 +149,28 @@
 - `low_model_ready=false`.
 
 **Task 8: complete.**
+
+
+## Task 9 — Whole-branch review and one fix pass
+
+**Review range:** `9607271c86c084df396a39947e915d6560dbbac3..832e98d9bffbe4224f453a44807b7feabf793db3`
+
+**Final review:** self-review (no subagent tool).
+
+### Findings
+- Critical: 0.
+- Important: 2.
+  1. residual shorthand-only RED/GREEN checklist steps in K3 Tasks 5-41;
+  2. real CURRENT-STATE CLI regression pinned the historical pre-H0 main SHA.
+- Minor: 1 deferred — POSIX-oriented file-URL path derivation in Pages builder.
+
+### One fix pass
+- RED test commits: `b43a683abe776fa3575532a41cd83289714d03ac`, `f859539d57d95e1d9f718510bc971b88be63843e`.
+- RED quality run: `36631335053` — both Important findings reproduced.
+- Fixes: `74feea3cf35014b3da3d77f0c5f98c31865ed9ad`, `d0ec50323d389ccd8e509da8f9275cace13c8e48`, state blob pointer update `832e98d9bffbe4224f453a44807b7feabf793db3`.
+- GREEN quality: `36631493416` SUCCESS, 442/442 Node.
+- GREEN server/adapter: `36631493627` SUCCESS, 22 pytest + SQLite/browser/API.
+- Open Critical/Important: 0.
+- Review record: `docs/superpowers/reviews/2026-09-29-k3-h0-whole-branch-review.md`.
+
+**Task 9: complete; exact-head PR verification remains.**
