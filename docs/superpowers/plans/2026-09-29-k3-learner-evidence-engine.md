@@ -124,14 +124,14 @@ Tests:
 # Phase B — Fingerprint and durable reference stores
 
 ### Task 6: RFC 8785 canonicalization and fingerprints
-**Files:** create `src/evidence/jcs.js`, `tests/fixtures/k3/jcs-vectors.json`, `tests/k3-jcs.test.js`; modify `server/requirements.txt`, `server/tests/test_k3_evidence_store.py`.
+**Files:** create `src/vendor/rfc8785.js`, `src/vendor/LICENSE-canonicalize.txt`, `src/evidence/jcs.js`, `tests/fixtures/k3/jcs-vectors.json`, `tests/k3-jcs.test.js`; create or modify `THIRD_PARTY_NOTICES.md`; modify `server/requirements.txt`, `server/tests/test_k3_evidence_store.py`.
 
 **Interfaces:** `canonicalizeJson(value)->string`; async `fingerprintEvent(event)->hex SHA-256`; Python uses `rfc8785.dumps` + SHA-256.
 
-- [ ] Write failing RFC vectors + JS/Python hash parity fixture; pin `rfc8785==0.1.4`.
+- [ ] Write failing RFC vectors + JS/Python hash parity fixture; pin `rfc8785==0.1.4` and assert attribution files exist.
 - [ ] Run RED Node/Python fingerprint tests.
-- [ ] Implement browser-safe JCS + crypto helper.
-- [ ] Run GREEN and cross-language parity.
+- [ ] Reuse `canonicalize@5.1.0` in the checked-in compatibility module and wrap it with Web Crypto SHA-256; do not rewrite the canonicalization algorithm.
+- [ ] Run GREEN and cross-language parity against shared vectors.
 - [ ] Commit `feat: add canonical K3 event fingerprints`.
 
 ### Task 7: EvidenceStore port/conformance harness
