@@ -2,8 +2,8 @@
   "schema_version": 1,
   "mode": "BUILD",
   "depth": "Deep",
-  "phase": "LANDSCAPE",
-  "phase_status": "IN_PROGRESS",
+  "phase": "DECISION",
+  "phase_status": "PASS",
   "validator_mode": "SCHEMA",
   "state_persistence": "DURABLE",
   "decision_question": "What vendor-neutral K3 learner-evidence architecture can preserve trustworthy raw learning and assessment evidence across offline, multi-device, correction, privacy, and replay requirements without importing mastery/readiness/psychometrics into K3?",
@@ -13,11 +13,19 @@
     "base_main": "3c296632a54f68f0ecc7ad122298d9661706cb2b",
     "research_branch": "research/k3-learner-evidence-landscape",
     "landscape": "docs/superpowers/research/2026-09-29-k3-learner-evidence-landscape.md",
-    "latest_landscape_commit": "27d7374ccd80181e8acc5cabf383329d12d43a3c"
+    "latest_landscape_commit": "931db742933bda79e22c39ecbec0e81d36943312",
+    "conceptual_architecture": "docs/superpowers/research/2026-09-29-k3-conceptual-architecture-proposal.md",
+    "conceptual_architecture_commit": "576dcc35599b8e58ace524a883aa61e90b7d501a"
   },
   "completed_phases": [
     "FRAME",
-    "SOURCE_MAP"
+    "SOURCE_MAP",
+    "LANDSCAPE",
+    "FAILURE_MINING",
+    "REVERSE_ENGINEERING",
+    "GAP_MAP",
+    "FALSIFICATION",
+    "DECISION"
   ],
   "phase_records": {
     "FRAME": {
@@ -36,25 +44,58 @@
       ]
     },
     "LANDSCAPE": {
-      "status": "IN_PROGRESS",
+      "status": "PASS",
       "notes": [
-        "Foundational 50-point matrix substantially researched.",
-        "Hybrid immutable event stream + rebuildable projections is strongly supported.",
-        "Strict assessment concurrency, exact event vocabulary, event ID choice, identity-link deletion mechanics, and export profile details remain open."
+        "Completed expanded 56-point K3 research matrix with standards, mature implementations, failure signals, peer-reviewed evidence, and repository gap audit.",
+        "Fine-grained immutable raw evidence + rebuildable projections is the supported topology."
+      ]
+    },
+    "FAILURE_MINING": {
+      "status": "PASS",
+      "notes": [
+        "Covered lost progress/overwrite, duplicate events, session fragmentation, offline conflict, identity duplication, browser durability and parity drift.",
+        "Community reports were treated as failure signals, not prevalence evidence."
+      ]
+    },
+    "REVERSE_ENGINEERING": {
+      "status": "PASS",
+      "notes": [
+        "Compared xAPI/Caliper/QTI, Open edX/Canvas/Moodle, OTel/Snowplow, IndexedDB/offline sync, event stores, LRS options, and current repository implementation.",
+        "Reuse-before-build decision: do not build a custom LRS; use standards/export adapters and external LRS only when deployment requires it."
+      ]
+    },
+    "GAP_MAP": {
+      "status": "PASS",
+      "notes": [
+        "Mapped current LearnerEventV1 aggregate limitations, validator parity drift, missing idempotent retry semantics, missing multi-clock/order/provenance, and storage/query gaps.",
+        "Mapped K2 EventDefinition governance as reusable while keeping learner evidence storage separate from AnalyticsSink."
+      ]
+    },
+    "FALSIFICATION": {
+      "status": "PASS",
+      "notes": [
+        "Architecture-level scenario simulation covered lost acknowledgements, event-ID conflicts, offline/multi-device, strict mock concurrency, clock skew, answer changes, unanswered navigation, browser crash/eviction, regrade, privacy deletion, legacy migration, export lossiness, schema replay and late evidence.",
+        "No scenario required Kafka, CRDT, a dedicated event store, or an LRS as the canonical store.",
+        "Strict frozen-assessment authority requires an explicit versioned concurrency policy but does not change the K3 topology."
+      ]
+    },
+    "DECISION": {
+      "status": "PASS",
+      "notes": [
+        "Critical claims triangulated across independent evidence families and current repository inspection.",
+        "No unresolved contradiction materially changes the recommended topology.",
+        "Conceptual architecture proposal written and is ready for explicit user approval."
       ]
     }
   },
   "open_uncertainties": [
-    "Exact bounded K3 event vocabulary and event envelope fields.",
-    "Exact activity/attempt/item-interaction identity hierarchy.",
-    "Strict frozen-assessment multi-device concurrency mechanism.",
-    "UUIDv4 vs UUIDv7 or equivalent event ID format.",
-    "Exact LearnerEventV1 and StateV2 migration/compatibility representation.",
-    "Exact identity-link and privacy erasure mechanism.",
-    "Exact xAPI/Caliper export profile mappings.",
-    "Minimum query/index contract based on expected workloads.",
-    "Final architecture falsification and decision gate."
+    "Exact strict-assessment concurrency token mechanism.",
+    "Whether activity pause/resume are first-class K3 v1 events.",
+    "Exact canonical envelope field names and correction event family shape.",
+    "Exact IdentityLink contract and deployment retention policy identifiers.",
+    "Exact xAPI Profile/Caliper mapping tables.",
+    "Minimum initial SQL indexes after expected-query analysis."
   ],
   "blocked_reasons": [],
-  "next_action": "Complete reverse-engineering/falsification for the remaining open foundational decisions, then present a decision-ready conceptual K3 architecture for explicit approval. Do not write the K3 production spec or implementation plan before that approval."
+  "next_action": "Obtain explicit conceptual approval for docs/superpowers/research/2026-09-29-k3-conceptual-architecture-proposal.md. After approval only, write the normative K3 spec and self-review it; do not create an implementation plan until the written spec is explicitly approved."
 }
