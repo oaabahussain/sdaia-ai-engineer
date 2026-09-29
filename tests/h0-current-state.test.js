@@ -186,3 +186,17 @@ test('repository revision-1 state is real, frozen, and intentionally not low-mod
   assert.equal(actual.gates.K3_TASK_BRIEFS_SELF_CONTAINED, 'PASS');
   assert.equal(actual.gates.TASKS_1_4_DURABLY_VERIFIED, 'PASS');
 });
+
+test('process guard record agrees with current state and forbids low-model integration', () => {
+  const guardPath = new URL('../docs/superpowers/reviews/2026-09-29-k3-h0-process-guard.md', import.meta.url);
+  assert.equal(existsSync(guardPath), true, 'process guard record must exist');
+  const guard = readFileSync(guardPath, 'utf8');
+  const current = JSON.parse(readFileSync(new URL('../docs/superpowers/state/CURRENT-STATE.json', import.meta.url), 'utf8'));
+  assert.equal(current.merge_guard_mode, 'HIGH_REASONING_MERGE_GATE');
+  assert.match(guard, /HIGH_REASONING_MERGE_GATE/);
+  assert.match(guard, /must not.*(?:merge|push).*main/i);
+  assert.match(guard, /whole-branch review/i);
+  assert.match(guard, /exact-head/i);
+  assert.equal(current.gates.PROCESS_GUARDS_READY, 'PASS');
+  assert.equal(current.low_model_ready, false);
+});
