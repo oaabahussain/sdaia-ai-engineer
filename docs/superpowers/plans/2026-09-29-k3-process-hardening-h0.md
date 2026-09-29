@@ -407,12 +407,30 @@ Expected: PASS.
 
 - [ ] **Step 5: Run workflow-adjacent regressions locally**
 
-Run:
-`npm ci --ignore-scripts && npm run validate && npm run verify:factory-import && npm run verify:sw && node scripts/build_pages_artifact.js _site && node scripts/verify_live_release.js file://$(pwd)/_site`
+Run the existing local HTTP-server path explicitly:
 
-If `verify_live_release.js` does not support `file://`, record a Ruling and use the existing local HTTP server procedure from `ci.yml`; do not change the verifier merely to accept `file://`.
+```bash
+set -euo pipefail
+npm ci --ignore-scripts
+npm run validate
+npm run verify:factory-import
+npm run verify:sw
+rm -rf _site
+node scripts/build_pages_artifact.js _site
+python3 -m http.server 4174 --bind 127.0.0.1 --directory _site > /tmp/h0-pages-preview.log 2>&1 &
+pid=$!
+trap 'kill "$pid"' EXIT
+for attempt in $(seq 1 20); do
+  if curl --fail --silent http://127.0.0.1:4174/index.html >/dev/null; then break; fi
+  if [ "$attempt" -eq 20 ]; then cat /tmp/h0-pages-preview.log; exit 1; fi
+  sleep 1
+done
+node scripts/verify_live_release.js http://127.0.0.1:4174
+kill "$pid"
+trap - EXIT
+```
 
-Expected: all applicable checks PASS.
+Expected: every command exits 0; live-release verifier PASS.
 
 - [ ] **Step 6: Commit**
 
@@ -476,7 +494,7 @@ Commit: `docs: record K3 high-reasoning merge gate`
 - [ ] **Step 1: Run focused H0 suite**
 
 Run:
-`node --test tests/h0-contract-freeze.test.js tests/h0-current-state.test.js tests/h0-bootstrap-contract.test.js tests/h0-pages-artifact.test.js tests/h0-workflow-contract.test.js`
+`node --test tests/h0-contract-freeze.test.js tests/h0-k3-task-briefs.test.js tests/h0-current-state.test.js tests/h0-bootstrap-contract.test.js tests/h0-pages-artifact.test.js tests/h0-workflow-contract.test.js`
 
 Expected: PASS.
 
@@ -626,8 +644,17 @@ Commit: `chore: initialize durable K3 execution branch`
 - GitHub remains the live execution source of truth.
 
 - [ ] **Step 1: Extend bootstrap tests for the upload pack**
+
+Add assertions for all five pack files, revision `k3-h0-v1`, absence of mutable SHA/task status, and README replacement instructions for the four stale Project files.
+
 - [ ] **Step 2: Run RED**
+
+Run: `node --test tests/h0-bootstrap-contract.test.js`
+
+Expected: FAIL because the versioned upload-pack files/revision are missing.
+
 - [ ] **Step 3: Create the pack from canonical repository bootstrap content**
+
 - [ ] **Step 4: Run GREEN**
 
 Run: `node --test tests/h0-bootstrap-contract.test.js`
