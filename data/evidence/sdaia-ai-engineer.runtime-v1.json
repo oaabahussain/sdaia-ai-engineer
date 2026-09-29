@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "content_release_id": "sdaia-ai-engineer.bootstrap.v1",
+  "question_payload_sha256": "5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9",
+  "scoring_policy_ref": "sdaia-ai-engineer.scoring.v1",
+  "scoring_policy_path": "data/evidence/sdaia-ai-engineer.scoring-v1.json",
+  "event_definitions_ref": "data/evidence/event-definitions-v1.json"
+}
