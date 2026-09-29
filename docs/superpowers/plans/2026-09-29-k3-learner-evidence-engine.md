@@ -108,16 +108,16 @@ Tests:
 - [ ] Run GREEN plus `node --test tests/track-contract.test.js`.
 - [ ] Commit `feat: expose stable K3 evidence context`.
 
-### Task 5: Browser event constructor
-**Files:** create `src/evidence/ids.js`, `src/evidence/contract.js`; test `tests/k3-evidence-contract-runtime.test.js`.
+### Task 5: Schema-derived browser validators and event constructor
+**Files:** create `scripts/generate_k3_validators.js`, `src/evidence/generatedValidators.js`, `src/evidence/ids.js`, `src/evidence/contract.js`; modify `package.json`; test `tests/k3-generated-validators.test.js`, `tests/k3-evidence-contract-runtime.test.js`.
 
-**Interfaces:** `newUuid()`; `createLearnerEvidenceEvent(input,runtimeContext)`; `validateLearnerEvidenceEvent(event,runtimeContext)`.
+**Interfaces:** `npm run generate:k3-validators` compiles the approved K3 JSON Schemas with Ajv standalone into a browser-safe ES module; `newUuid()`; `createLearnerEvidenceEvent(input,runtimeContext)`; `validateLearnerEvidenceEvent(event,runtimeContext)`.
 
-- [ ] Write failing tests for UUIDv4, track locale validation, required context, authority, forbidden PII/derived fields, UTC normalization.
-- [ ] Run RED.
-- [ ] Implement constructor/validator over governed definitions.
-- [ ] Run GREEN plus Tasks 1/3 tests.
-- [ ] Commit `feat: construct governed learner evidence events`.
+- [ ] Write failing tests for generator determinism/freshness plus UUIDv4, track locale validation, required context, authority, forbidden PII/derived fields, and UTC normalization.
+- [ ] Run RED: `node --test tests/k3-generated-validators.test.js tests/k3-evidence-contract-runtime.test.js`.
+- [ ] Generate browser validators from the canonical schemas, route payload validation by `payload_schema_ref`, and implement the event constructor around generated validators; do not duplicate payload rules manually.
+- [ ] Run GREEN, regenerate once more and assert zero diff, then run Tasks 1/3 tests.
+- [ ] Commit `feat: add schema-derived K3 browser validation`.
 
 **Phase A checkpoint:** write a review artifact with exact HEAD and focused test output.
 
