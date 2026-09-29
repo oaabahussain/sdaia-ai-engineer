@@ -1193,3 +1193,407 @@ The foundational landscape is now close to conceptual-design readiness.
 9. final falsification pass against the complete proposed architecture.
 
 The research is **not yet declared complete**.
+
+
+## 44. Reuse-before-build decision — Learning Record Stores
+
+### What mature systems already solve
+
+xAPI Learning Record Stores already solve a mature interoperability problem:
+- accepting/querying xAPI Statements;
+- stable statement identifiers;
+- immutable statement semantics and voiding;
+- xAPI storage/query protocol;
+- standards conformance testing.
+
+ADL maintains an xAPI 2.0 conformance suite, and multiple open-source LRS implementations exist. ADL's reference LRS is explicitly a small-user proof of concept rather than a production-scale default.
+
+### K3 decision
+
+**Do not build our own LRS. Do not make an LRS the K3 canonical store.**
+
+If a future deployment needs xAPI/LRS interoperability, use the existing `LearningEventExchangePort` to export into a conformant external LRS.
+
+Reason:
+1. xAPI solves interchange/LRS semantics, not K3's complete offline-first evidence capture and product-specific integrity model.
+2. Making xAPI the internal canonical model would couple K3 to an external standard vocabulary and make internal education-specific evolution harder.
+3. An LRS does not remove the browser-local durability/idempotency problem.
+4. K3 already has file/SQLite/browser/API persistence seams and should preserve those.
+5. xAPI export can be validated independently with ADL's conformance tooling.
+
+### Deliberate reuse
+
+- reuse xAPI statement semantics and conformance tooling;
+- reuse an external LRS when a deployment requires one;
+- do **not** reimplement generic LRS query/protocol behavior inside K3.
+
+Sources:
+- ADL xAPI LRS conformance suite: https://github.com/adlnet/lrs-conformance-test-suite
+- ADL LRS reference implementation: https://github.com/adlnet/ADL_LRS
+- IEEE xAPI standard: https://standards.ieee.org/ieee/9274.1.1/7321/
+
+Confidence: **High**.
+
+## 45. Browser durability beyond IndexedDB
+
+IndexedDB provides structured persistent browser storage, but default site storage can remain best-effort and may be evicted under storage pressure.
+
+### K3 decision direction
+
+For critical unsynchronized learner evidence:
+- persist to IndexedDB before network send;
+- use the Storage API to inspect quota/usage where supported;
+- request persistent storage with `navigator.storage.persist()` where appropriate;
+- never silently discard unacknowledged evidence using an arbitrary age limit;
+- surface a recoverable storage-risk condition when quota/durability cannot be maintained;
+- keep transport queue metadata separate from immutable event bodies.
+
+Background Sync/Workbox may retry network delivery but remain optional transport conveniences, not correctness dependencies.
+
+Sources:
+- MDN storage quotas/eviction: https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria
+- MDN StorageManager.persist: https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist
+- MDN Background Sync: https://developer.mozilla.org/en-US/docs/Web/API/Background_Synchronization_API
+
+Confidence: **High**.
+
+## 46. One governed event-definition system, multiple planes
+
+K2 already has `EventDefinitionV1`, `EventRegistry`, property privacy classification, retention classification, and analytics-export guards.
+
+Repository inspection shows the current `validateEvent()` implementation:
+- validates against a registered definition;
+- applies privacy export decisions;
+- returns an analytics-oriented sanitized envelope;
+- marks that envelope for the guarded `AnalyticsSink`.
+
+That implementation is appropriate for Product Analytics but cannot be the durable K3 evidence constructor because learner evidence must preserve its governed canonical payload before optional export redaction.
+
+### K3 architecture decision direction
+
+**Keep one governed event-definition vocabulary. Do not create a second independent event registry.**
+
+Likely evolution:
+- extend/version EventDefinition with an explicit event plane or purpose class;
+- preserve existing V1 product analytics definitions as backward compatible;
+- learner-evidence definitions use the same owner/trigger/property/privacy/retention/compatibility governance;
+- learner evidence is validated then persisted to a dedicated evidence store;
+- analytics exports are separate projections/adapters that apply ALLOW/REDACT/REJECT rules;
+- system telemetry remains under `TelemetrySink`, not the learner event registry.
+
+This reuses K2 governance without conflating storage semantics.
+
+Confidence: **High** on reuse; **Medium** on whether the version is literally named `EventDefinitionV2` until conceptual approval.
+
+## 47. Source event versus storage receipt
+
+A major design refinement is to avoid mutating a client/source-created event merely to attach trusted server metadata.
+
+### Proposed separation
+
+```
+LearnerEvidenceEvent
+  immutable source-created fact
+        |
+        v
+EvidenceStore.accept()
+        |
+        +--> EvidenceStorageReceipt
+             - store_id
+             - event_id
+             - event_fingerprint
+             - accepted_at / stored_at
+             - opaque monotonic store_cursor
+             - disposition
+```
+
+Benefits:
+- preserves the exact source event;
+- cleanly distinguishes occurrence time from trusted storage time;
+- works in browser, file, SQLite, and future server stores;
+- avoids assuming one globally meaningful numeric sequence across disconnected stores;
+- projections can checkpoint on `store_id + store_cursor`;
+- synchronization can exchange immutable events plus acknowledgements without rewriting them.
+
+CloudEvents' sequence extension supports the underlying principle that ordering is meaningful within a source scope and is not automatically comparable across different sources.
+
+Source:
+- CloudEvents Sequence extension: https://github.com/cloudevents/spec/blob/main/cloudevents/extensions/sequence.md
+
+Confidence: **High**.
+
+## 48. Deterministic event fingerprint
+
+Idempotency needs a stable way to distinguish:
+- exact retry of the same immutable event;
+- reuse of an event ID with different content.
+
+### K3 decision direction
+
+Calculate a trusted `event_fingerprint` at the accepting store using:
+1. RFC 8785 JSON Canonicalization Scheme (JCS);
+2. SHA-256 of the canonical event body.
+
+Rules:
+- the event ID remains the idempotency identity;
+- fingerprint is an integrity comparison aid, not authentication;
+- do not trust a client-provided hash as authority;
+- do not use hash equality as heuristic dedup across different event IDs;
+- privacy deletion policy applies to retained fingerprints too where they remain linkable to deleted learner data.
+
+RFC 8785 exists specifically to create an invariant JSON representation suitable for repeatable hashing.
+
+Source:
+- RFC 8785 JSON Canonicalization Scheme: https://www.rfc-editor.org/rfc/rfc8785.html
+
+Confidence: **High**.
+
+## 49. Event identifier decision
+
+### Options reviewed
+
+- UUIDv4: random, browser-native, no ordering semantics.
+- UUIDv7: time-sortable and good database locality, but embeds wall-clock time and risks being mistaken for causal/occurrence ordering.
+- custom structured IDs: unnecessary complexity and more room for semantic leakage.
+
+### Recommendation
+
+Use **opaque UUIDv4 for K3 v1 event identity**.
+
+Why:
+- browser-native `crypto.randomUUID()` uses a cryptographically secure UUIDv4 generator;
+- broadly available across modern browsers and workers;
+- offline generation requires no coordination;
+- event ordering remains explicit in `origin_seq` / store cursor instead of being hidden inside the identifier.
+
+Schema/consumers should treat the ID as opaque identity, so a later implementation could change generation strategy through a versioned migration without changing ordering semantics.
+
+Source:
+- MDN `Crypto.randomUUID()`: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
+
+Confidence: **High**.
+
+## 50. Bounded learner-evidence vocabulary
+
+The evidence stream must be fine-grained enough for audit/replay without becoming clickstream telemetry.
+
+### Proposed learner interaction events
+
+Exact names remain conceptual until approval, but the bounded semantic set is:
+
+1. `learner.activity.started`
+2. `learner.activity.paused` — only when explicitly observed/represented
+3. `learner.activity.resumed` — only when explicitly observed/represented
+4. `learner.activity.completed`
+5. `learner.assessment.submitted`
+6. `learner.item.presented` — once per item interaction/presentation lifecycle, not every DOM render
+7. `learner.item.skipped` — only explicit/system-confirmed skip
+8. `learner.response.recorded` — emitted for each committed response/change
+9. `learner.confidence.recorded` — when independently elicited
+10. `learner.hint.requested`
+11. `learner.explanation.opened` or semantically equivalent exposure event
+
+### Proposed system/governance evidence
+
+12. `learner.response.evaluated` — references a response event and exact scoring/item policy
+13. a correction/supersession/void event — references the target evidence and authority
+
+### Deliberate exclusions
+
+Do not put these in the Learner Evidence plane:
+- page viewed;
+- menu opened;
+- feature clicked;
+- generic navigation;
+- session replay;
+- performance trace/log;
+- marketing/product funnel events.
+
+Do not create these as raw truths:
+- `learner.abandoned` when inferred only from silence;
+- `learner.unanswered` when it merely means no response existed at submission;
+- mastery/readiness/weak-topic/next-action;
+- rapid-guessing classification;
+- psychometric ability/difficulty.
+
+Those are projections/derived interpretations.
+
+Confidence: **High** on the bounded structure; **Medium** on exact event names and whether pause/resume need first-class events in v1.
+
+## 51. Candidate identity hierarchy
+
+To keep identity precise without overcollection:
+
+```
+learner_id
+  pseudonymous learner principal
+      |
+      +-- origin_id
+      |     random app/browser-profile origin
+      |
+      +-- activity_id
+            one explicit learning/practice/check/section/mock workflow
+                |
+                +-- assessment_attempt_id (when applicable)
+                |
+                +-- item_interaction_id
+                       one item presentation/interaction lifecycle
+                           |
+                           +-- event_id
+```
+
+Notes:
+- `session_id` is not required as canonical evidence truth; sessionization can be projected.
+- `assessment_attempt_id` is required only for an actual attempt concept.
+- `attempt_number` is derived/policy-scoped.
+- `origin_id` is provenance/synchronization identity, not authentication or fingerprinting.
+- authenticated account mapping remains outside raw event bodies.
+
+Confidence: **High** on hierarchy; exact optionality is conceptual-design work.
+
+## 52. Batch ingestion disposition contract
+
+At-least-once synchronization is only safe if the client knows the fate of each event in a partial batch.
+
+### Proposed dispositions
+
+- `ACCEPTED` — new immutable event persisted.
+- `DUPLICATE` — same `event_id` and identical trusted fingerprint already exists; safe acknowledgement.
+- `CONFLICT` — same `event_id`, different body/fingerprint; integrity failure requiring intervention.
+- `REJECTED` — schema/privacy/reference/authorization failure.
+
+Rules:
+- client may mark transport complete on ACCEPTED or DUPLICATE;
+- CONFLICT/REJECTED remain locally recoverable and visible to diagnostics;
+- one bad event must not force safe already-accepted siblings to be retransmitted forever;
+- retries preserve the same `event_id`.
+
+Confidence: **High**.
+
+## 53. Falsification / scenario POC
+
+This is an architecture-level contract simulation, not production code.
+
+| Scenario | Expected architecture behavior | Pass? |
+|---|---|---|
+| Server stores event, HTTP response is lost, client retries | Same ID + same fingerprint returns DUPLICATE/ack; no second evidence fact | PASS |
+| Same event ID is accidentally reused with changed answer | Store returns CONFLICT; historical event is not overwritten | PASS |
+| Device A is offline; Device B practices same item online | Distinct event IDs/origins are both retained as valid evidence | PASS |
+| Devices A and B both modify the same frozen mock attempt | Raw actions survive; authoritative attempt state uses explicit revision/sequence policy, not wall-clock LWW | PASS with policy mechanism still to be selected |
+| Client clock is +12 hours | occurred_at retained as source evidence; origin_seq/store receipt controls ordering; quality flag may note skew | PASS |
+| Learner changes answer A→B→C | Three response events retain order within origin/item interaction; final response projection is C | PASS |
+| Learner sees item then navigates away without answer | presentation event remains; no fabricated response; unanswered can be projected at submission | PASS |
+| Browser crashes after local event commit before network send | event survives in local durable store/outbox and retries later | PASS, subject to browser storage durability limits |
+| Browser storage is under eviction pressure | persistent-storage request/quota handling surfaces risk; unacked evidence is not intentionally purged | PASS with residual browser/platform risk |
+| Answer key/scoring policy is corrected later | original response retained; new evaluation/correction evidence can create revised result without rewriting learner action | PASS |
+| Learner invokes account deletion/privacy erasure | authorized privacy lifecycle deletes/de-links data per policy; ordinary correction rules are not abused as legal deletion | PASS conceptually; deployment/legal policy remains external |
+| Historical LearnerEventV1 is migrated | retain coarse original facts + provenance; do not fabricate granular events | PASS |
+| Export to xAPI/Caliper cannot represent all internal fields | deterministic adapter declares mapping/version/extensions/omissions; canonical K3 record unchanged | PASS |
+| K5 mastery algorithm changes | rebuild projection from same K3 evidence using new algorithm version/watermark | PASS |
+| An event arrives weeks late after projection built | raw event accepted if valid; projection watermark/rebuild incrementally incorporates it | PASS |
+| A correction arrives before its target due to sync reordering | store can retain/pending-resolve reference or reject with retryable reference condition; must not silently drop correction | PASS conceptually; exact reference policy remains to specify |
+| Privacy deletion removes some historical evidence | derived models are invalidated/rebuilt from lawful remaining dataset; system does not claim perfect replay | PASS |
+
+### Falsification outcome
+
+No scenario above forces:
+- a generic distributed event bus;
+- CRDT state;
+- Kafka;
+- KurrentDB;
+- a dedicated vector database;
+- an LRS as canonical storage;
+- globally synchronized clocks.
+
+The hardest residual case is **simultaneous multi-device mutation of one strict frozen assessment attempt**. Evidence preservation is solved, but the exact authority mechanism belongs to the assessment concurrency policy and must be specified before implementation.
+
+## 54. What we deliberately will not copy
+
+### Reject as canonical architecture
+
+- **One aggregate completed-attempt record only** — loses partial/order/change evidence.
+- **Every UI click as learner evidence** — creates noise/privacy risk and confuses product analytics with learning evidence.
+- **Latest timestamp wins** — unsafe across offline/multi-device and skewed clocks.
+- **Whole-state overwrite for learner history** — can destroy valid concurrent evidence.
+- **Analytics-platform event ID as learner identity** — external vendor semantics are not canonical.
+- **xAPI/Caliper as the internal database schema** — useful interoperability models, not our full internal semantics.
+- **LRS as mandatory runtime dependency** — does not solve local offline capture and adds unnecessary coupling.
+- **Generic CRDT/document-sync platform by default** — broader than the append-only evidence problem.
+- **Kafka/event-store infrastructure by default** — no measured scale requirement.
+- **Browser Background Sync as a correctness requirement** — availability is not universal.
+- **UUID timestamp ordering** — IDs remain identity only.
+- **Hard-coded session/clock-skew/dedup/offline retention thresholds** — calibration/configuration concerns.
+- **Permanent PII inside immutable events** — makes privacy lifecycle harder without pedagogical value.
+
+## 55. Architecture decision classification
+
+| Area | Decision | Reason |
+|---|---|---|
+| Existing stable content/release/form IDs | KEEP | Already versioned/immutable and needed for interpretation. |
+| EventDefinition governance | EXTEND | Reuse K2 registry/privacy/compatibility; add learner-evidence plane semantics. |
+| LearnerEventV1 | REPLACE WITH VERSIONED SUCCESSOR + MIGRATION | Aggregate-only and validator drift are insufficient for K3. |
+| JSONL learner store | HARDEN AS REFERENCE ADAPTER | Useful deterministic append/export path; current full scan not production-scalable. |
+| SQLite learner store | HARDEN | Appropriate local/reference store; add canonical envelope/index/idempotency semantics. |
+| Browser persistence | NEW CORE ADAPTER | IndexedDB durable local evidence/outbox is required for offline-first. |
+| Server evidence ingestion | NEW CORE | Idempotent per-event/batch acceptance + receipts required. |
+| Attempt projection | NEW CORE DERIVED VIEW | Needed for queries without becoming source of truth. |
+| Identity-link resolver | NEW CORE GOVERNANCE | Needed for anonymous/authenticated/multi-device history without rewriting events. |
+| xAPI adapter | EXTEND existing interoperability port | Reuse standards/LRS ecosystem without canonical lock-in. |
+| Caliper adapter | EXTEND existing interoperability port | Useful assessment/event interoperability. |
+| Product Analytics bridge | HARDEN/SEPARATE | Export only sanitized/approved derived events; never source of truth. |
+| OTel | KEEP system telemetry only | Operational telemetry is a separate plane. |
+| Generic LRS | OPTIONAL EXTERNAL ADAPTER | Reuse if deployment needs it; do not rebuild. |
+| Generic sync engine / CRDT | MONITOR | No demonstrated requirement. |
+| Kafka / KurrentDB | REJECT FOR K3 v1 | Complexity without measured need. |
+
+## 56. Research verification gate
+
+### Critical claims
+
+1. Raw learner evidence must be preservable independently of derived models — supported by repository constitution, event-sourcing practice, xAPI immutability, and future K4/K5/K6 replay need.
+2. Offline/multi-device cannot rely on last-write-wins — supported by repository constitution, Moodle offline attempt mechanics, sync failure evidence, and distributed concurrency practice.
+3. Client wall-clock timestamps cannot establish global order — supported by OTel/Snowplow time models and per-source sequence patterns.
+4. Idempotent retries need stable event identity and immutable-body conflict semantics — supported by xAPI/KurrentDB/event ingestion patterns.
+5. Product analytics and system telemetry cannot substitute for learner evidence — supported by repository architecture and mature education/telemetry separation.
+6. Privacy lifecycle must remain separable from logical immutability — supported by Saudi PDPL minimization/destruction requirements and event-sourcing privacy limitations.
+7. xAPI/Caliper/LRS are interoperability/reuse layers, not sufficient canonical K3 architecture — supported by their documented scope and K3's offline/internal requirements.
+
+### Independence
+
+Evidence spans independent standards bodies, education platforms, telemetry/event systems, browser standards, privacy regulation, peer-reviewed research, and user/developer failure reports.
+
+### Contradiction status
+
+No material source found that supports:
+- blind last-write-wins for durable learner history;
+- inferring mastery/readiness directly inside raw evidence;
+- mandatory use of an LRS/Caliper/xAPI as the internal canonical store;
+- relying on Background Sync for guaranteed delivery.
+
+Counter-evidence mainly concerns complexity/storage/privacy cost of fine-grained event sourcing; the bounded vocabulary + projections + no infrastructure overbuild directly addresses it.
+
+### Reproduction
+
+Repository behavior was directly inspected from current live main, including:
+- LearnerEventV1 schema/runtime/store;
+- JSONL duplicate behavior;
+- SQLite learner_events schema;
+- StateV2 replacement API;
+- EventDefinitionV1/EventRegistry/privacy/AnalyticsSink;
+- LearningEventExchangePort;
+- current exam-state answer/option-order semantics.
+
+External service behavior was not reproduced in production deployments; for architectural direction, primary documentation plus multiple independent implementation families is sufficient. Vendor-specific performance/scale claims are not used as acceptance criteria.
+
+### Verification outcome
+
+**Foundational landscape research: Decision-ready for conceptual architecture.**
+
+Residual uncertainties are implementation-detail or policy choices that can remain explicit in the conceptual architecture:
+- exact strict-assessment concurrency token mechanism;
+- exact optional activity pause/resume events;
+- deployment retention durations;
+- exact SQL index set after workload measurement;
+- exact xAPI Profile / Caliper mapping vocabulary.
+
+No residual uncertainty changes the recommended K3 architecture topology.
