@@ -113,6 +113,7 @@ Required fields:
 - `gates`
 - `low_model_ready`
 - `merge_guard_mode`
+- `project_bootstrap_revision`
 - `updated_at`
 
 Allowed `status` values:
@@ -148,7 +149,7 @@ K3 H0 uses two state revisions around integration:
 - every execution-readiness gate: `PASS`
 - low_model_ready: `true`
 
-`low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, and live `main` equals the execution branch state's non-null `base_main_sha`.
+`low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, live `main` equals the execution branch state's non-null `base_main_sha`, and the active ChatGPT Project bootstrap has been verified at the named `project_bootstrap_revision`.
 
 `merge_guard_mode` is one of `RULESET` or `HIGH_REASONING_MERGE_GATE`. `RULESET` is preferred. If the current integration cannot administer repository rulesets, H0 may use `HIGH_REASONING_MERGE_GATE`: the low-reasoning executor may commit/push only to the approved execution branch and MUST STOP before creating/merging an integration PR or changing `main`. A high-reasoning session performs whole-branch review, exact-head verification, and merge. This compensating control must be recorded explicitly; it is not described as branch protection.
 
@@ -235,6 +236,8 @@ Create compact repository-owned versions suitable for ChatGPT Project upload/syn
 - `DURABLE-FILE-MAP.md`
 
 These files are intentionally mostly static.
+
+The current tool runtime can read Project-backed files but cannot replace Project membership/content directly. H0 therefore produces the canonical bootstrap files plus a single upload pack. `PROJECT_BOOTSTRAP_CURRENT` remains FAIL until the user replaces the stale Project files and a high-reasoning session verifies the active Project contains the expected bootstrap revision.
 
 They MUST point to `CURRENT-STATE.json` for live state and MUST NOT embed:
 
@@ -477,7 +480,8 @@ H0 is complete only when all of the following are implemented and verified:
 14. official SDD workspace is initialized for the K3 plan;
 15. isolated worktree/branch requirement is satisfied;
 16. baseline verification is green;
-17. H0 is merged to `main`; `impl/k3-learner-evidence-engine` is then created from that exact integrated main; its revision-2 state records `base_main_sha = live main`, `next_task = 5`, all execution-readiness gates PASS, and `low_model_ready = true`.
+17. H0 is merged to `main`; `impl/k3-learner-evidence-engine` is then created from that exact integrated main; its revision-2 state records `base_main_sha = live main` and `next_task = 5`;
+18. a versioned Project bootstrap upload pack is produced, the active ChatGPT Project is refreshed once, `PROJECT_BOOTSTRAP_CURRENT=PASS` is verified, and only then the execution-branch state advances to the next revision with all execution-readiness gates PASS and `low_model_ready = true`.
 
 ## 13. H0 acceptance gates
 
@@ -491,10 +495,13 @@ H0 produces these gates:
 - `ISOLATED_WORKSPACE_READY`
 - `BASELINE_GREEN`
 - `ACTIVE_REF_RESOLUTION_VALID`
+- `PROJECT_BOOTSTRAP_CURRENT`
 
 Only when every applicable gate is PASS may execution publish:
 
 `TASK_5_EXECUTION_READY`
+
+`PROJECT_BOOTSTRAP_CURRENT` is an external Project-surface gate: it is PASS only after the active ChatGPT Project contains the expected static bootstrap revision and stale K2 startup files are no longer authoritative.
 
 At that point `low_model_ready` MUST be `true`. Any later `MAIN_DRIFT`, hash mismatch, blocked gate, or Critical/Important finding forces it back to `false`.
 
