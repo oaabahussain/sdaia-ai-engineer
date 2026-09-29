@@ -22,6 +22,7 @@ test('SDAIA track declares K3 capability and stable evidence context',async()=>{
 test('RuntimeBundleV4 validates and carries the protected payload digest',async()=>{
  const schema=read('data/schema/runtime-bundle-v4.schema.json');
  const ajv=new Ajv({strict:false,allErrors:true});
+ delete schema.$id;
  for(const name of ['track-manifest.schema.json','exam-profile-v2.schema.json','domain-catalog-v2.schema.json','runtime-evidence-context-v1.schema.json']){
    const s=read('data/schema/'+name); ajv.addSchema(s,name);
  }
