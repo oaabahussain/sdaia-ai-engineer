@@ -40,10 +40,10 @@ The problem is not lack of documentation. It is too many independently editable 
 Use four layers with one direction of authority:
 
 ```text
-Git commit / tree / tests / CI
+Git live main + active execution branch
         |
         v
-CURRENT-STATE.json          small mutable control manifest
+CURRENT-STATE.json          small mutable control manifest on the authoritative ref
         |
         +--> active spec
         +--> active plan
@@ -57,11 +57,13 @@ task brief + touched files  current-session working set
 ChatGPT conversation        disposable working memory
 ```
 
+`main` is the integration authority. During unmerged execution, the fixed programme execution branch may be the newer execution-state authority. Startup never guesses which one: it validates both refs under the rules below.
+
 ### 3.1 Authority law
 
 The authority order is:
 
-1. Git object graph and exact live ref;
+1. Git object graph, exact live `main`, and a validated active execution branch when one exists;
 2. approved active spec;
 3. approved active implementation plan;
 4. durable execution ledger and rulings;
@@ -80,6 +82,8 @@ It MUST NOT contain the SHA of the commit that contains itself. The startup proc
 
 It contains immutable blob SHAs for the approved active spec and implementation plan so startup validation can detect contract drift. After approval, those contract files are frozen for execution: task completion is recorded in the SDD ledger, durable execution ledger, and current-state manifest rather than by continuing to edit plan checkboxes. Any semantic spec/plan change requires an explicit amendment/new approved revision and corresponding state update.
 
+For K3, the execution branch name is stable for the programme: `impl/k3-learner-evidence-engine`. The main-state manifest names that branch. During execution, the branch carries its own newer copy of `CURRENT-STATE.json` and the durable ledger. A session may prefer branch state only when its `base_main_sha` exactly matches live `main`; otherwise startup fails closed with `MAIN_DRIFT` and requires reconciliation before task execution.
+
 ## 4. New repository artifacts
 
 ### 4.1 `docs/superpowers/state/current-state.schema.json`
@@ -89,9 +93,12 @@ JSON Schema for the control manifest.
 Required fields:
 
 - `schema_version`
+- `state_revision`
 - `programme`
 - `phase`
 - `status`
+- `execution_branch`
+- `base_main_sha`
 - `completed_through_task`
 - `next_task`
 - `spec_path`
@@ -103,6 +110,8 @@ Required fields:
 - `open_critical_findings`
 - `open_important_findings`
 - `last_verified_scope`
+- `gates`
+- `low_model_ready`
 - `updated_at`
 
 Allowed `status` values:
@@ -116,13 +125,20 @@ Allowed `status` values:
 - `POST_MERGE_VERIFY`
 - `COMPLETE`
 
-K3 H0 initial state after implementation:
+K3 H0 initial state after implementation and merge:
 
+- state_revision: `1`
 - programme: `K3`
 - phase: `A`
 - status: `EXECUTING`
+- execution_branch: `impl/k3-learner-evidence-engine`
+- base_main_sha: the exact H0 merge SHA on `main`
 - completed_through_task: `4`
 - next_task: `5`
+- every H0 acceptance gate: `PASS`
+- low_model_ready: `true`
+
+`low_model_ready` is derived: it may be `true` only when every applicable H0 gate is `PASS`, there are no open Critical/Important findings, spec/plan hashes match, and live `main` equals `base_main_sha` for an active execution branch.
 
 ### 4.2 `docs/superpowers/state/CURRENT-STATE.json`
 
@@ -147,9 +163,12 @@ Deterministic validator that:
 2. verifies referenced files exist;
 3. verifies the referenced spec/plan blob SHAs against the checked-out tree;
 4. verifies `next_task = completed_through_task + 1` while normal sequential execution applies;
-5. verifies the durable ledger contains completion records for every task through `completed_through_task`;
-6. fails closed on missing or contradictory state;
-7. emits one compact machine-readable result line.
+5. verifies `state_revision` is a positive integer and never regresses when comparing main versus branch state;
+6. verifies `execution_branch` is exactly the approved programme branch name;
+7. verifies the durable ledger contains completion records for every task through `completed_through_task`;
+8. verifies `low_model_ready=true` only when every applicable gate is `PASS` and no Critical/Important finding is open;
+9. fails closed on missing or contradictory state;
+10. emits one compact machine-readable result line.
 
 Package script:
 
@@ -234,13 +253,17 @@ Every new execution session follows this fixed sequence:
 
 1. invoke the required process skills;
 2. resolve live `main` from GitHub;
-3. read `CURRENT-STATE.json` from that exact ref;
-4. run/verify `npm run validate:state`;
-5. read the active task brief only;
-6. read only the relevant spec sections and touched source files;
-7. confirm isolated branch/worktree;
-8. confirm clean baseline for the affected scope;
-9. execute the task.
+3. read and validate `CURRENT-STATE.json` from live `main`;
+4. read `execution_branch` from that manifest and probe that exact branch;
+5. if the execution branch exists, read its `CURRENT-STATE.json` and accept it only when `base_main_sha == live main`, its `state_revision` is greater than or equal to main's, its spec/plan blobs match, and its durable ledger is consistent;
+6. choose the valid manifest with the highest `state_revision`; ties prefer the execution branch only when its ledger proves the same or later completed task;
+7. run/verify `npm run validate:state` on the chosen ref/worktree;
+8. require `low_model_ready=true`; otherwise a low-reasoning executor MUST STOP and hand off to a higher-reasoning recovery pass;
+9. read the active task brief only;
+10. read only the relevant spec sections and touched source files;
+11. confirm isolated branch/worktree;
+12. confirm clean baseline for the affected scope;
+13. execute the task.
 
 Do not read the entire historical handoff, full programme history, or all previous ledgers unless a conflict requires it.
 
@@ -250,7 +273,8 @@ After compaction/session loss:
 
 - trust durable Git/ledger evidence over conversation memory;
 - resume from the first task not proven complete;
-- never repeat a completed task merely because the current conversation does not remember it.
+- never repeat a completed task merely because the current conversation does not remember it;
+- if live `main` differs from the chosen branch state's `base_main_sha`, stop with `MAIN_DRIFT` rather than silently rebasing or merging.
 
 ## 6. Superpowers SDD integration
 
@@ -317,7 +341,11 @@ Every task still receives its own:
 - RED;
 - GREEN;
 - regression;
+- implementation commit;
+- durable checkpoint commit that advances the ledger/state revision;
 - completion record.
+
+The durable checkpoint commit may refer to the preceding implementation commit SHA. It never attempts to embed its own SHA inside itself.
 
 Default batch size is not hard-coded. Increase batch size only when the previous batch completed without unresolved process or correctness findings.
 
@@ -415,16 +443,17 @@ H0 is complete only when all of the following are implemented and verified:
 3. approved K3 spec/plan artifacts are frozen and blob-drift validation works;
 4. K3 durable execution ledger exists with retrospective Tasks 1-4 evidence;
 5. HANDOFF current section is converted to static pointer form;
-6. static Project bootstrap/index files exist;
-7. Pages artifact build logic is single-sourced;
-8. CI required-check names are unique;
-9. safe npm/pip caching and PR concurrency are configured;
-10. critical Actions are pinned to immutable SHAs;
-11. main protection/ruleset is configured or an explicit environment limitation is recorded;
-12. official SDD workspace is initialized for the K3 plan;
-13. isolated worktree/branch requirement is satisfied;
-14. baseline verification is green;
-15. state records `next_task = 5`.
+6. the old authoritative programme tracker is demoted to a historical/index role and points to `CURRENT-STATE.json` for live state;
+7. static Project bootstrap/index files exist;
+8. Pages artifact build logic is single-sourced;
+9. CI required-check names are unique;
+10. safe npm/pip caching and PR concurrency are configured;
+11. critical Actions are pinned to immutable SHAs;
+12. main protection/ruleset is configured or an explicit environment limitation is recorded;
+13. official SDD workspace is initialized for the K3 plan;
+14. isolated worktree/branch requirement is satisfied;
+15. baseline verification is green;
+16. state records `next_task = 5`, `execution_branch = impl/k3-learner-evidence-engine`, all H0 gates PASS, and `low_model_ready = true`.
 
 ## 13. H0 acceptance gates
 
@@ -437,10 +466,13 @@ H0 produces these gates:
 - `PROCESS_GUARDS_READY`
 - `ISOLATED_WORKSPACE_READY`
 - `BASELINE_GREEN`
+- `ACTIVE_REF_RESOLUTION_VALID`
 
 Only when every applicable gate is PASS may execution publish:
 
 `TASK_5_EXECUTION_READY`
+
+At that point `low_model_ready` MUST be `true`. Any later `MAIN_DRIFT`, hash mismatch, blocked gate, or Critical/Important finding forces it back to `false`.
 
 If a platform capability such as repository rulesets cannot be configured, the gate is not silently marked PASS. Record the limitation and the smallest safe compensating control.
 
@@ -465,10 +497,11 @@ A fresh execution session should be able to start with:
 
 1. static Project bootstrap;
 2. live `main`;
-3. `CURRENT-STATE.json`;
-4. state validator result;
-5. Task 5 brief;
-6. only Task 5-relevant spec/code.
+3. validated main state + optional validated `impl/k3-learner-evidence-engine` state;
+4. chosen authoritative `CURRENT-STATE.json`;
+5. state validator result with `low_model_ready=true`;
+6. Task 5 brief;
+7. only Task 5-relevant spec/code.
 
 No reconstruction of K1/K2 or K3 Tasks 1-4 from conversation history is required.
 
