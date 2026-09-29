@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version","event_name","event_version","plane","purpose","owner",
+    "trigger_semantics","actor_kind","producer","required_context_fields",
+    "payload_schema_ref","properties","privacy_class","retention_class",
+    "compatibility","created_at"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "event_name": {"type":"string","pattern":"^[a-z0-9]+(?:\\.[a-z0-9]+)+$"},
+    "event_version": {"type":"integer","minimum":1},
+    "plane": {"type":"string","enum":["PRODUCT_ANALYTICS","LEARNER_EVIDENCE"]},
+    "purpose": {"type":"string","minLength":1},
+    "owner": {"type":"string","minLength":1},
+    "trigger_semantics": {"type":"string","minLength":1},
+    "actor_kind": {"type":"string","enum":["LEARNER","SYSTEM","MIGRATION","ADMINISTRATIVE"]},
+    "producer": {"type":"string","minLength":1},
+    "required_context_fields": {
+      "type":"array","uniqueItems":true,
+      "items":{"type":"string","minLength":1}
+    },
+    "payload_schema_ref": {"type":"string","minLength":1},
+    "properties": {
+      "type":"object",
+      "additionalProperties": {
+        "type":"object","additionalProperties":false,
+        "required":["type","required","privacy_class","export"],
+        "properties":{
+          "type":{"type":"string","enum":["string","number","integer","boolean","array","object"]},
+          "required":{"type":"boolean"},
+          "privacy_class":{"type":"string","enum":["ANONYMOUS","PSEUDONYMOUS","PERSONAL","SENSITIVE"]},
+          "export":{"type":"string","enum":["ALLOW","REDACT","REJECT"]}
+        }
+      }
+    },
+    "privacy_class":{"type":"string","enum":["ANONYMOUS","PSEUDONYMOUS","PERSONAL","SENSITIVE"]},
+    "retention_class":{"type":"string","enum":["EPHEMERAL","SHORT","STANDARD","REGULATED"]},
+    "compatibility":{
+      "type":"object","additionalProperties":false,
+      "required":["strategy","previous_versions"],
+      "properties":{
+        "strategy":{"type":"string","enum":["BACKWARD_COMPATIBLE","BREAKING_WITH_MIGRATION","NEW_EVENT"]},
+        "previous_versions":{"type":"array","uniqueItems":true,"items":{"type":"integer","minimum":1}}
+      }
+    },
+    "created_at":{"type":"string","format":"date-time"}
+  }
+}
