@@ -26,6 +26,7 @@
 - Keep static Pages bundle-free; do not add a browser runtime package/bundler only for JCS.
 - Each phase ends with a durable checkpoint, exact HEAD, focused verification, and cleanup.
 - Whole-plan review, exact-head verification, finishing-development-branch, and post-merge verification are mandatory.
+- Command convention: when a task says "Run RED" or "Run GREEN" without repeating a command, run `node --test <that task's listed JS test files>` for Node tests, `PYTHONPATH=server python3 -m pytest <that task's listed Python test files> -q` for Python tests, and both commands for mixed tasks. RED means at least one intended new assertion fails for the expected missing behavior; GREEN means zero failures.
 
 ## Review Focus
 
@@ -558,13 +559,13 @@ Tests:
 
 **Files:** create `docs/superpowers/reviews/2026-09-29-k3-final-verification.md`.
 
-**Interfaces:** verification is against one exact implementation HEAD; no code changes are allowed after the recorded verification without invalidating the record.
+**Interfaces:** the record names the exact tested product-code HEAD and the later documentation-only verification commit. No product/code change is allowed after the tested product HEAD without restarting this task.
 
-- [ ] Record exact HEAD SHA and clean working-tree status.
-- [ ] Run `npm ci --ignore-scripts`, `npm run validate`, `npm test`, `npm run verify:sw`.
-- [ ] Run `PYTHONPATH=server python3 -m pytest server/tests -q` and `python3 scripts/browser_smoke.py`.
-- [ ] Assemble the public Pages artifact exactly as CI does, serve it locally, run `verify_live_release.js`, and verify learner payload SHA-256 remains `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`.
-- [ ] Commit only the verification record if doing so does not change the verified code; then re-record the final documentation-only HEAD relationship explicitly.
+- [ ] Record exact product-code HEAD SHA and clean working-tree status.
+- [ ] Run `npm ci --ignore-scripts && npm run validate && npm test && npm run verify:sw`; expected exit 0 with zero test failures.
+- [ ] Run `PYTHONPATH=server python3 -m pytest server/tests -q && python3 scripts/browser_smoke.py`; expected exit 0.
+- [ ] Assemble the public Pages artifact exactly as CI does, serve it locally, run `verify_live_release.js`, verify learner payload SHA-256 remains `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`, write the verification record naming that tested product HEAD, and commit it as `docs: record K3 exact-head verification`.
+- [ ] Push the resulting final branch HEAD and require all configured CI/status checks to succeed on that exact HEAD; make no further branch changes before Task 40.
 
 ### Task 40: Finish and integrate the development branch
 
