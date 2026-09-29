@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "definition_id",
+    "learner_id",
+    "origin_id",
+    "origin_seq",
+    "activity_id",
+    "track_id",
+    "content_release_id",
+    "mode",
+    "locale",
+    "occurred_at",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "definition_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:\\.[a-z0-9]+)+@[1-9][0-9]*$"
+    },
+    "learner_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "origin_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "origin_seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "activity_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "track_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "content_release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "learn",
+        "practice",
+        "check",
+        "section",
+        "mock"
+      ]
+    },
+    "locale": {
+      "enum": [
+        "ar",
+        "en"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "assessment_attempt_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "form_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item_interaction_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "question_family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objective_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "elapsed_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "experiment_assignment_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "base_attempt_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "proposed_attempt_revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}
