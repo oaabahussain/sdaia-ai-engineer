@@ -15,7 +15,6 @@
     "content_release_id",
     "exam_profile_ref",
     "scoring_policy_ref",
-    "identity_resolution_version",
     "unresolved_reference_count"
   ],
   "properties": {
