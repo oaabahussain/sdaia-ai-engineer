@@ -159,10 +159,18 @@ test('Pages artifact publishes and verifies the public K3 runtime evidence conte
     assert.match(workflow, /sdaia-ai-engineer\.runtime-v1\.json/);
     assert.match(workflow, /sdaia-ai-engineer\.scoring-v1\.json/);
     assert.match(workflow, /event-definitions-v1\.json/);
+    assert.match(workflow, /cp -R data\/evidence\/payload-schemas _site\/data\/evidence\//);
+    assert.doesNotMatch(workflow, /cp -R data\/evidence _site\/data\//);
   }
 
-  assert.match(sw, /\.\/data\/evidence\/sdaia-ai-engineer\.runtime-v1\.json/);
+  for (const asset of [
+    './data/evidence/sdaia-ai-engineer.runtime-v1.json',
+    './data/evidence/sdaia-ai-engineer.scoring-v1.json',
+    './data/evidence/event-definitions-v1.json'
+  ]) assert.ok(sw.includes(asset), asset);
+
   assert.match(live, /manifest\.evidence/);
   assert.match(live, /scoring_policy_path/);
   assert.match(live, /event_definitions_ref/);
+  assert.match(live, /payload_schema_ref/);
 });
