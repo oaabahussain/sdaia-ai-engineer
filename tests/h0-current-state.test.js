@@ -187,6 +187,19 @@ test('repository revision-1 state is real, frozen, and intentionally not low-mod
   assert.equal(actual.gates.TASKS_1_4_DURABLY_VERIFIED, 'PASS');
 });
 
+test('CURRENT-STATE CLI validates the real repository state', () => {
+  const output = execFileSync(
+    process.execPath,
+    ['scripts/validate_current_state.js','--live-main-sha','9607271c86c084df396a39947e915d6560dbbac3','--json'],
+    { encoding:'utf8', env:{...process.env, GITHUB_REF_NAME:'impl/k3-process-hardening-h0'} }
+  );
+  const checked = JSON.parse(output.trim());
+  assert.equal(checked.ok, true, JSON.stringify(checked));
+  assert.equal(checked.code, 'STATE_VALID');
+  assert.equal(checked.details.next_task, 5);
+  assert.equal(checked.details.low_model_ready, false);
+});
+
 test('process guard record agrees with current state and forbids low-model integration', () => {
   const guardPath = new URL('../docs/superpowers/reviews/2026-09-29-k3-h0-process-guard.md', import.meta.url);
   assert.equal(existsSync(guardPath), true, 'process guard record must exist');
