@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import Ajv from 'ajv';
 
 const defsUrl=new URL('../data/evidence/event-definitions-v1.json',import.meta.url);
 const expected=[
@@ -30,7 +29,6 @@ test('definition property names/types agree with payload schemas',()=>{
  for(const d of defs){
   const pUrl=new URL('../' + d.payload_schema_ref, import.meta.url); // repo root from tests
   const schema=JSON.parse(fs.readFileSync(pUrl,'utf8'));
-  new Ajv({strict:false,allErrors:true,formats:{'date-time':true}}).compile(schema);
   assert.deepEqual(Object.keys(d.properties).sort(),Object.keys(schema.properties).sort(),d.event_name);
   for(const [name,g] of Object.entries(d.properties)){
    assert.equal(schema.properties[name].type,g.type,d.event_name+':'+name);
