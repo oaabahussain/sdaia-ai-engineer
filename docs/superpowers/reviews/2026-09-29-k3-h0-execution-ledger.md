@@ -95,3 +95,21 @@
 **Task 5: complete.**
 
 - **Task 6 Ruling:** extracting Pages assembly into `scripts/build_pages_artifact.js` invalidated six older tests that asserted inline YAML shell commands rather than the artifact contract. Updated those tests to assert the shared builder plus workflow invocation. **Why:** preserves the same public/private release boundary while enforcing the H0 single-source design. **Cost if wrong:** a builder regression could escape if both builder and tests share the same mistaken allowlist; `h0-pages-artifact.test.js`, service-worker verification, and live-release verification remain independent runtime checks.
+
+
+## Task 6 — CI identity, caching, concurrency, shared builder, and Action pinning
+
+### RED evidence
+- `bae72df5cc72cd4cbdc93a43ccd38caf2d81f78c` — workflow contract RED.
+- Quality run `36629439683`: FAIL on unique check IDs, concurrency, caches, shared builder invocation, and immutable Action pins.
+
+### Implementation and debugging
+- `1dd83ef207df33315d93bab0aa70c0927dd0c8e5`, `e90efe1ee14ff9acea318ca9ef5ed3a7990d9397`, `f5def6a22d2aca1422a27c9a40ae80eca49aecee` — workflow hardening.
+- First GREEN attempt exposed six older release-boundary tests coupled to inline YAML copy commands rather than the public artifact contract.
+- Ruling above updated those tests to assert the shared builder and runtime boundary checks rather than reverting single-sourcing.
+- Final head `a0822be07756d780ed5331c2fce2d17135f1821a`.
+- PR server/adapter run `36629878406`: SUCCESS as `server-adapter-gate`.
+- PR quality run `36629878391`: SUCCESS as `quality-gate`, including Node tests, validate, factory import, SW, shared Pages artifact verification, and browser smoke.
+- Concurrency behavior was observed cancelling superseded PR runs.
+
+**Task 6: complete.**
