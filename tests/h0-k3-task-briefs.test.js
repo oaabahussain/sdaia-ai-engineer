@@ -24,3 +24,14 @@ for (let n = 5; n <= 41; n += 1) {
     assert.match(section, /must not merge|do not merge|no main integration/i);
   });
 }
+
+test('Tasks 5-41 contain no shorthand-only RED/GREEN checklist step', () => {
+  for (let n = 5; n <= 41; n += 1) {
+    const section = taskSection(n);
+    assert.doesNotMatch(
+      section,
+      /^- \[[ x]\] Run (?:RED|GREEN)\.?\s*$/m,
+      'Task ' + n + ' still contains shorthand-only RED/GREEN'
+    );
+  }
+});
