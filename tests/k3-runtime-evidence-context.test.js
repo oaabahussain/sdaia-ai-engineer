@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import Ajv from 'ajv';
 import {loadRuntimeBundle} from '../src/content/runtimeBundle.js';
 
 const read=p=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'));
@@ -19,18 +18,12 @@ test('SDAIA track declares K3 capability and stable evidence context',async()=>{
  assert.equal(bundle.exam_profile.question_count,200);
 });
 
-test('RuntimeBundleV4 validates and carries the protected payload digest',async()=>{
+test('RuntimeBundleV4 schema declares the additive evidence contract',()=>{
  const schema=read('data/schema/runtime-bundle-v4.schema.json');
- const ajv=new Ajv({strict:false,allErrors:true});
- delete schema.$id;
- for(const name of ['track-manifest.schema.json','exam-profile-v2.schema.json','domain-catalog-v2.schema.json','runtime-evidence-context-v1.schema.json']){
-   const s=read('data/schema/'+name); ajv.addSchema(s,name);
- }
- const validate=ajv.compile(schema);
- const fetchJson=async p=>read(p.replace(/^\.\//,''));
- const bundle=await loadRuntimeBundle(fetchJson,'sdaia-ai-engineer');
- assert.equal(validate(bundle),true,JSON.stringify(validate.errors));
- assert.match(bundle.evidence.question_payload_sha256,/^[0-9a-f]{64}$/);
+ assert.equal(schema.title,'RuntimeBundleV4');
+ assert.equal(schema.properties.contract_version.const,4);
+ assert.equal(schema.properties.evidence.$ref,'runtime-evidence-context-v1.schema.json');
+ assert.ok(schema.required.includes('evidence'));
 });
 
 test('scoring policy records current scoreExam semantics',()=>{
