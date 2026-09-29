@@ -2,18 +2,18 @@ import fs from 'node:fs';
 import Ajv from 'ajv';
 import { evaluateEventPrivacy } from './privacyPolicy.js';
 
-const definitionSchema = JSON.parse(
-  fs.readFileSync(
-    new URL('../../../data/schema/event-definition-v1.schema.json', import.meta.url),
-    'utf8'
-  )
+const loadSchema = name => JSON.parse(
+  fs.readFileSync(new URL('../../../data/schema/' + name, import.meta.url), 'utf8')
 );
-
-const validateDefinitionSchema = new Ajv({
+const ajv = new Ajv({
   strict: false,
   allErrors: true,
   formats: { 'date-time': true }
-}).compile(definitionSchema);
+});
+const definitionValidators = new Map([
+  [1, ajv.compile(loadSchema('event-definition-v1.schema.json'))],
+  [2, ajv.compile(loadSchema('event-definition-v2.schema.json'))]
+]);
 
 const definitions = new Map();
 const validatedEvents = new WeakSet();
@@ -41,10 +41,13 @@ function typeMatches(value, type) {
 }
 
 export function registerEventDefinition(definition) {
-  if (!validateDefinitionSchema(definition)) {
+  const schemaVersion = definition?.schema_version;
+  const validateDefinitionSchema = definitionValidators.get(schemaVersion);
+  if (!validateDefinitionSchema || !validateDefinitionSchema(definition)) {
+    const errors = validateDefinitionSchema?.errors ?? [{message:'unsupported schema_version'}];
     throw new Error(
-      'Invalid EventDefinitionV1: ' +
-      JSON.stringify(validateDefinitionSchema.errors)
+      `Invalid EventDefinitionV${schemaVersion ?? 'unknown'}: ` +
+      JSON.stringify(errors)
     );
   }
 
@@ -69,6 +72,9 @@ export function validateEvent(id, event = {}) {
 
   const definition = definitions.get(id);
   if (!definition) throw new Error('Unknown event definition');
+  if (definition.schema_version === 2 && definition.plane === 'LEARNER_EVIDENCE') {
+    throw new Error('Learner-evidence definitions cannot use the analytics validateEvent path');
+  }
 
   if (
     typeof event.occurred_at !== 'string' ||
