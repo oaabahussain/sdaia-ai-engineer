@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "mode": "BUILD",
+  "depth": "Deep",
+  "phase": "LANDSCAPE",
+  "phase_status": "IN_PROGRESS",
+  "validator_mode": "SCHEMA",
+  "state_persistence": "DURABLE",
+  "decision_question": "What vendor-neutral K3 learner-evidence architecture can preserve trustworthy raw learning and assessment evidence across offline, multi-device, correction, privacy, and replay requirements without importing mastery/readiness/psychometrics into K3?",
+  "risk_if_wrong": "High: lost or duplicated learner history, unreproducible later K4/K5/K6/K8 models, privacy overcollection, cross-device corruption, and permanent ambiguity between raw evidence and derived truth.",
+  "artifacts": {
+    "repository": "oaabahussain/sdaia-ai-engineer",
+    "base_main": "3c296632a54f68f0ecc7ad122298d9661706cb2b",
+    "research_branch": "research/k3-learner-evidence-landscape",
+    "landscape": "docs/superpowers/research/2026-09-29-k3-learner-evidence-landscape.md",
+    "latest_landscape_commit": "27d7374ccd80181e8acc5cabf383329d12d43a3c"
+  },
+  "completed_phases": [
+    "FRAME",
+    "SOURCE_MAP"
+  ],
+  "phase_records": {
+    "FRAME": {
+      "status": "PASS",
+      "notes": [
+        "K3 classified Architectural.",
+        "Research/design only; no production code, spec, implementation plan, or TDD execution authorized.",
+        "Raw evidence != derived truth; mastery/readiness/NBA/psychometrics/CAT remain out of scope."
+      ]
+    },
+    "SOURCE_MAP": {
+      "status": "PASS",
+      "notes": [
+        "Triangulated standards, mature education implementations, event/telemetry systems, offline-sync systems, privacy guidance, peer-reviewed research, and community failure signals.",
+        "Current repository contracts and implementations inspected from live main rather than reconstructed from chat memory."
+      ]
+    },
+    "LANDSCAPE": {
+      "status": "IN_PROGRESS",
+      "notes": [
+        "Foundational 50-point matrix substantially researched.",
+        "Hybrid immutable event stream + rebuildable projections is strongly supported.",
+        "Strict assessment concurrency, exact event vocabulary, event ID choice, identity-link deletion mechanics, and export profile details remain open."
+      ]
+    }
+  },
+  "open_uncertainties": [
+    "Exact bounded K3 event vocabulary and event envelope fields.",
+    "Exact activity/attempt/item-interaction identity hierarchy.",
+    "Strict frozen-assessment multi-device concurrency mechanism.",
+    "UUIDv4 vs UUIDv7 or equivalent event ID format.",
+    "Exact LearnerEventV1 and StateV2 migration/compatibility representation.",
+    "Exact identity-link and privacy erasure mechanism.",
+    "Exact xAPI/Caliper export profile mappings.",
+    "Minimum query/index contract based on expected workloads.",
+    "Final architecture falsification and decision gate."
+  ],
+  "blocked_reasons": [],
+  "next_action": "Complete reverse-engineering/falsification for the remaining open foundational decisions, then present a decision-ready conceptual K3 architecture for explicit approval. Do not write the K3 production spec or implementation plan before that approval."
+}
