@@ -29,7 +29,7 @@ test('K3 v1 vocabulary contains exactly the 12 required governed definitions',()
 test('definition property names/types agree with payload schemas',()=>{
  const defs=JSON.parse(fs.readFileSync(defsUrl,'utf8'));
  for(const d of defs){
-  const pUrl=new URL('../'+d.payload_schema_ref,import.meta.url);
+  const pUrl=new URL('../' + d.payload_schema_ref, import.meta.url); // repo root from tests
   const schema=JSON.parse(fs.readFileSync(pUrl,'utf8'));
   ajv.compile(schema);
   assert.deepEqual(Object.keys(d.properties).sort(),Object.keys(schema.properties).sort(),d.event_name);
