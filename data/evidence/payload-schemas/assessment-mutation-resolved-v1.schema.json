@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidate_event_id",
+    "assessment_attempt_id",
+    "base_attempt_revision",
+    "authoritative_revision_before",
+    "decision",
+    "reason_code"
+  ],
+  "properties": {
+    "candidate_event_id": {
+      "type": "string"
+    },
+    "assessment_attempt_id": {
+      "type": "string"
+    },
+    "base_attempt_revision": {
+      "type": "integer"
+    },
+    "authoritative_revision_before": {
+      "type": "integer"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "APPLIED",
+        "STALE",
+        "REJECTED"
+      ]
+    },
+    "authoritative_revision_after": {
+      "type": "integer"
+    },
+    "reason_code": {
+      "type": "string"
+    }
+  }
+}
