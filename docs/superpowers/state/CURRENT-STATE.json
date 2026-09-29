@@ -16,13 +16,13 @@
   "checkpoint_path": "docs/superpowers/reviews/2026-09-29-k3-tasks-1-4-verification.md",
   "open_critical_findings": 0,
   "open_important_findings": 0,
-  "last_verified_scope": "K3_TASKS_1_4_H0_TASKS_1_2",
+  "last_verified_scope": "K3_TASKS_1_4_H0_TASKS_1_7",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
     "PLAN_SPEC_HASH_MATCH": "PASS",
     "TASKS_1_4_DURABLY_VERIFIED": "PASS",
-    "PROCESS_GUARDS_READY": "FAIL",
+    "PROCESS_GUARDS_READY": "PASS",
     "ISOLATED_WORKSPACE_READY": "FAIL",
     "BASELINE_GREEN": "FAIL",
     "ACTIVE_REF_RESOLUTION_VALID": "FAIL",
@@ -32,5 +32,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": null,
-  "updated_at": "2026-09-29T19:03:00Z"
+  "updated_at": "2026-09-29T20:59:00Z"
 }
