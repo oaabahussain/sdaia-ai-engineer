@@ -146,3 +146,23 @@ test('the live SDAIA RuntimeBundleV4 validates against the complete referenced s
     '5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9'
   );
 });
+
+
+test('Pages artifact publishes and verifies the public K3 runtime evidence context', () => {
+  const ci = fs.readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const pages = fs.readFileSync(new URL('../.github/workflows/pages.yml', import.meta.url), 'utf8');
+  const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  const live = fs.readFileSync(new URL('../scripts/verify_live_release.js', import.meta.url), 'utf8');
+
+  for (const workflow of [ci, pages]) {
+    assert.match(workflow, /mkdir -p _site\/data\/evidence/);
+    assert.match(workflow, /sdaia-ai-engineer\.runtime-v1\.json/);
+    assert.match(workflow, /sdaia-ai-engineer\.scoring-v1\.json/);
+    assert.match(workflow, /event-definitions-v1\.json/);
+  }
+
+  assert.match(sw, /\.\/data\/evidence\/sdaia-ai-engineer\.runtime-v1\.json/);
+  assert.match(live, /manifest\.evidence/);
+  assert.match(live, /scoring_policy_path/);
+  assert.match(live, /event_definitions_ref/);
+});
