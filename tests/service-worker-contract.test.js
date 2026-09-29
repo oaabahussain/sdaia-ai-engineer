@@ -29,10 +29,13 @@ test('release verification does not pin the retired v8 cache name', () => {
 
 test('pages artifact copies canonical track configuration without publishing legacy data', () => {
   const pages = read('../.github/workflows/pages.yml');
-  assert.match(pages, /cp -R src tracks _site\//);
-  assert.match(pages, /cp -R data\/concepts data\/migrations _site\/data\//);
-  assert.match(pages, /test ! -e _site\/data\/legacy/);
-  assert.doesNotMatch(pages, /cp -R src data tracks _site\//);
+  const builder = read('../scripts/build_pages_artifact.js');
+  assert.match(pages, /node scripts\/build_pages_artifact\.js _site/);
+  assert.ok(builder.includes("'tracks'"));
+  assert.ok(builder.includes("'data/concepts'"));
+  assert.ok(builder.includes("'data/migrations'"));
+  assert.match(builder, /data\/legacy/);
+  assert.match(builder, /Forbidden Pages artifact path/);
 });
 
 
