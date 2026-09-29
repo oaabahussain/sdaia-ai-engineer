@@ -28,7 +28,7 @@ test('support contracts enforce dispositions, outbox states and lifecycle enums'
  const link=validate('learner-identity-link-record-v1.schema.json');
  assert.equal(link({schema_version:1,identity_link_record_id:uuid2,link_id:uuid3,action:'LINK',source_learner_id:'learner:a',target_learner_id:'learner:b',effective_at:'2026-09-29T00:00:00Z',authority_ref:'auth:1',reason_code:'ACCOUNT_LINK',created_at:'2026-09-29T00:00:00Z'}),true,JSON.stringify(link.errors));
  const exp=validate('evidence-export-record-v1.schema.json');
- assert.equal(exp({schema_version:1,export_record_id:uuid,event_id:uuid,adapter_id:'xapi',adapter_version:'1',destination_class:'LRS',mapping_version:'1',action:'DELETE_REQUESTED',occurred_at:'2026-09-29T00:00:00Z',privacy_disposition:'ALLOW'}),true,JSON.stringify(exp.errors));
+ assert.equal(exp({schema_version:1,export_record_id:uuid2,event_id:uuid,adapter_id:'xapi',adapter_version:'1',destination_class:'LRS',mapping_version:'1',action:'DELETE_REQUESTED',occurred_at:'2026-09-29T00:00:00Z',privacy_disposition:'ALLOW'}),true,JSON.stringify(exp.errors));
 });
 
 test('batch and projection schemas are versioned and closed',()=>{
