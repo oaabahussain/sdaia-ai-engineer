@@ -1,5 +1,7 @@
 # H0-R2 Deterministic Low-Model Execution Layer — Implementation Plan
 
+**Status:** AWAITING EXPLICIT IMPLEMENTATION-PLAN APPROVAL
+
 > **Execution mode:** Use the authoritative Superpowers execution workflow available in the active runtime. This plan is intentionally self-contained for inline execution and lower-reasoning handoff. Do not implement K3 Task 5 product behavior while executing H0-R2.
 
 **Goal:** Convert the approved H0-R2 design into a deterministic execution-control layer that compiles K3 Tasks 5-41 into static task-definition packets, binds the current task to live state/runtime through an execution envelope, fails closed on known process failure families, integrates with Superpowers task-start/task-done, and certifies lower-reasoning execution only after post-merge/runtime/Project gates are proven.
