@@ -1,3 +1,37 @@
+# HANDOFF — Static Recovery Pointer
+
+This file is a compatibility/bootstrap pointer. It is **not** the live execution-state authority.
+
+## Live state
+
+Always resolve live GitHub refs first, then read:
+
+`docs/superpowers/state/CURRENT-STATE.json`
+
+Use that manifest to locate the approved specification, implementation plan, durable execution ledger, checkpoint, and `execution_branch`.
+
+## Startup sequence
+
+1. invoke required process skills;
+2. resolve live `main`;
+3. read and validate `docs/superpowers/state/CURRENT-STATE.json` from that ref;
+4. probe the manifest's `execution_branch`;
+5. choose only a state whose branch/base/hash/ledger checks validate;
+6. stop on `MAIN_DRIFT`, `PLAN_SPEC_HASH_MISMATCH`, missing evidence, or blocked readiness gates;
+7. load only the current task brief, relevant spec sections, and touched files.
+
+For the exact fail-closed algorithm, read `RECOVERY-PROTOCOL.md`.
+
+For durable paths, read `DURABLE-FILE-MAP.md`.
+
+Do not reconstruct progress from chat memory or from the historical snapshot below.
+
+---
+
+## Historical snapshot — retained for audit only
+
+The content below is historical and non-authoritative. It may describe programme states that have since advanced.
+
 # CURRENT AUTHORITATIVE HANDOFF — K3 Design Gate
 
 **Date:** 2026-09-28  

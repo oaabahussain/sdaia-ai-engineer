@@ -7,6 +7,7 @@ const pkg = JSON.parse(read('../package.json'));
 const ci = read('../.github/workflows/ci.yml');
 const pages = read('../.github/workflows/pages.yml');
 const swVerifier = read('../scripts/verify_sw_assets.js');
+const pagesBuilder = read('../scripts/build_pages_artifact.js');
 
 test('package exposes named repeatable validation scripts without replacing the test command', () => {
   assert.equal(pkg.scripts.test, 'node --test tests/*.test.js');
@@ -21,12 +22,13 @@ test('PR quality gate uses named package scripts', () => {
 });
 
 test('Pages artifact copies only current public data and explicitly excludes legacy data', () => {
-  assert.match(pages, /cp -R src tracks _site\//);
-  assert.match(pages, /mkdir -p _site\/data/);
-  assert.match(pages, /cp -R data\/concepts data\/migrations _site\/data\//);
-  assert.match(pages, /cp data\/learn\.json data\/cases\.json _site\/data\//);
-  assert.match(pages, /test ! -e _site\/data\/legacy/);
-  assert.doesNotMatch(pages, /cp -R src data tracks _site\//);
+  assert.match(pages, /node scripts\/build_pages_artifact\.js _site/);
+  for (const path of ['src','tracks','data/concepts','data/migrations','data/learn.json','data/cases.json']) {
+    assert.ok(pagesBuilder.includes(`'${path}'`), path);
+  }
+  assert.match(pagesBuilder, /data\/legacy/);
+  assert.match(pagesBuilder, /Forbidden Pages artifact path/);
+  assert.doesNotMatch(pagesBuilder, /copyFile\(['\"]data['\"]\)/);
 });
 
 test('Pages live release verification delegates canonical manifest checks without duplicated bank arithmetic', () => {
@@ -59,10 +61,9 @@ test('service-worker asset verifier derives the default profile path from the ma
 
 test('PR gate assembles and verifies the same public Pages artifact boundary', () => {
   assert.match(ci, /Verify Pages artifact assembly/);
-  assert.match(ci, /cp -R src tracks _site\//);
-  assert.match(ci, /cp -R data\/concepts data\/migrations _site\/data\//);
-  assert.match(ci, /test ! -e _site\/data\/legacy/);
+  assert.match(ci, /node scripts\/build_pages_artifact\.js _site/);
   assert.match(ci, /node scripts\/verify_sw_assets\.js _site/);
+  assert.match(pages, /node scripts\/build_pages_artifact\.js _site/);
 });
 
 
@@ -83,8 +84,10 @@ test('live release verifier validates active track presentation contract', () =>
 
 
 test('Pages and PR artifact gates explicitly verify active presentation is assembled', () => {
+  assert.match(pagesBuilder, /tracks\/registry\.json/);
+  assert.ok(pagesBuilder.includes("'tracks'"));
   for (const workflow of [pages, ci]) {
-    assert.match(workflow, /test -f _site\/tracks\/registry\.json/);
+    assert.match(workflow, /node scripts\/build_pages_artifact\.js _site/);
     assert.doesNotMatch(workflow, /cp .*presentation\.json/);
   }
 });
