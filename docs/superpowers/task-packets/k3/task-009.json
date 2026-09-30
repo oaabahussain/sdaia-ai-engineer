@@ -1,0 +1,74 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "1636dea8e6bcdff49c5414732bb48df14d81021ed10be848f7d4173933ce5689"
+  },
+  "commit": {
+    "message": "feat: add SQLite K3 evidence store"
+  },
+  "dependencies": [
+    8
+  ],
+  "green": {
+    "command": "PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Add K3 tables/indexes without deleting or redefining legacy `learner_events`.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`accept_evidence(db_url,event)->receipt`; `accept_evidence_batch(db_url,events)->batch result`; `get_evidence(db_url,event_id)`; `read_evidence(db_url,learner_id,after_store_seq=None,filters=None)`."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "B — Fingerprint and durable reference stores",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 9: SQLite EvidenceStoreV2",
+  "red": {
+    "command": "PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_store.py",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test && PYTHONPATH=server python3 -m pytest -q server/tests",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "server/app/evidence_store.py",
+      "server/tests/test_k3_evidence_store.py"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [
+      "db/schema.sql"
+    ],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_9"
+  },
+  "source_contract_digest": "3be1de716129efa58cae0df82ac757902678cdff4527514e717bba6d4d5a4fce",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing tests for schema/indexes, exact retry, same-ID conflict, origin-seq conflict, monotonically increasing store_seq, direct lookup, learner/activity/attempt/item/release/type queries. - [ ] Run RED: `PYTHONPATH=server python3 -m pytest server/tests/test_k3_evidence_store.py -q`. - [ ] Add K3 tables/indexes without deleting or redefining legacy `learner_events`. - [ ] Run GREEN plus repeated `init_db` to prove idempotent schema application. - [ ] Commit `feat: add SQLite K3 evidence store`."
+  ],
+  "task_id": 9,
+  "task_title": "SQLite EvidenceStoreV2"
+}

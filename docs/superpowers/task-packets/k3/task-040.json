@@ -1,0 +1,69 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "1088663f20ce73c8900fa0c95942610a0587a16db1641c1416e68f249ac01f7e"
+  },
+  "commit": {
+    "message": "Finish and integrate the development branch"
+  },
+  "dependencies": [
+    39
+  ],
+  "green": {
+    "command": "test \"$(git branch --show-current)\" = \"main\"",
+    "expected_result": "PASS only in the authorized high-reasoning integration session after exact-head review and merge; a low-reasoning executor stops before this step."
+  },
+  "implementation": {
+    "intent": "Verify branch is based on the intended main and has no unrelated changes.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "use `superpowers:finishing-a-development-branch`; merge only the exact reviewed implementation head (allowing explicitly identified documentation-only verification commit if review covers it)."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "H — Repository gates, acceptance, review, and integration",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 40: Finish and integrate the development branch",
+  "red": {
+    "command": "test \"$(git branch --show-current)\" = \"main\"",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because execution is still on the implementation branch before the high-reasoning integration gate.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_40"
+  },
+  "source_contract_digest": "0bbdfd4d62857f337e8bc46692c344603ee092de33786246807cd550ba1efa6c",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Verify branch is based on the intended main and has no unrelated changes. - [ ] Present the finishing-development-branch integration options required by the skill. - [ ] Execute only the user-approved integration action. - [ ] Record PR/merge SHAs and CI status. - [ ] Do not begin K4."
+  ],
+  "task_id": 40,
+  "task_title": "Finish and integrate the development branch"
+}

@@ -1,0 +1,71 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "9f155d27a3fed4ca4a6613c720441b1a7be0a35a99986b0fef69dbc13843d61a"
+  },
+  "commit": {
+    "message": "Exact-head verification"
+  },
+  "dependencies": [
+    38
+  ],
+  "green": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Record exact product-code HEAD SHA and clean working-tree status.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "the record names the exact tested product-code HEAD and the later documentation-only verification commit. No product/code change is allowed after the tested product HEAD without restarting this task."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "H — Repository gates, acceptance, review, and integration",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 39: Exact-head verification",
+  "red": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-final-verification.md",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL (non-zero) because the exact-head verification artifact does not yet exist or is empty.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "docs/superpowers/reviews/2026-09-29-k3-final-verification.md"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_39"
+  },
+  "source_contract_digest": "c5a8f4d5fea5e9ca4c9cf33d6c569c18bc7b825e3ec7125ebe5bf1f642aada38",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Record exact product-code HEAD SHA and clean working-tree status. - [ ] Run `npm ci --ignore-scripts && npm run validate && npm test && npm run verify:sw`; expected exit 0 with zero test failures. - [ ] Run `PYTHONPATH=server python3 -m pytest server/tests -q && python3 scripts/browser_smoke.py`; expected exit 0. - [ ] Assemble the public Pages artifact exactly as CI does, serve it locally, run `verify_live_release.js`, verify learner payload SHA-256 remains `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`, write the verification record naming that tested product HEAD, and commit it as `docs: record K3 exact-head verification`. - [ ] Push the resulting final branch HEAD and require all configured CI/status checks to succeed on that exact HEAD; make no further branch changes before Task 40."
+  ],
+  "task_id": 39,
+  "task_title": "Exact-head verification"
+}

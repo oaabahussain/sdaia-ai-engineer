@@ -10,6 +10,8 @@ const DEFAULT_PLAN_PATH = 'docs/superpowers/plans/2026-09-29-k3-learner-evidence
 const DEFAULT_SPEC_PATH = 'docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md';
 const DEFAULT_RULES_PATH = 'docs/superpowers/process/process-failure-rules-v1.json';
 const OUTPUT_DIR = 'docs/superpowers/task-packets/k3';
+const APPROVED_SPEC_BLOB_SHA = '2ccb4c5c1d01b668c14dce6b97608d4eff04d57d';
+const APPROVED_PLAN_BLOB_SHA = 'ac158561be17aa8424a71b53d5447ae4a2d375c7';
 
 function fail(field, taskId) {
   throw new Error(`TASK_PACKET_COMPILE_BLOCKED Task ${taskId} missing/ambiguous ${field}`);
