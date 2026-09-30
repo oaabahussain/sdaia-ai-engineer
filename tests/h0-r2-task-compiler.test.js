@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { compileTaskPacket } from '../scripts/process/compile_k3_task_packets.js';
+import { compileAllTaskPackets, compileTaskPacket } from '../scripts/process/compile_k3_task_packets.js';
 import { validateTaskDefinitionPacket } from '../scripts/process/validate_task_packet.js';
 import { extractTask, taskSourceDigest } from '../scripts/process/k3_task_extract.js';
 import { stableJson } from '../scripts/process/stable_json.js';
@@ -77,4 +77,10 @@ test('compiler fails closed when normative task fields are missing', () => {
     () => compileTaskPacket({ taskId: 5, ...ARGS, planText: broken }),
     /TASK_PACKET_COMPILE_BLOCKED.*Files/
   );
+});
+
+test('all approved K3 Tasks 5-41 compile without interpretation gaps', () => {
+  const packets = compileAllTaskPackets({ firstTask: 5, lastTask: 41, ...ARGS });
+  assert.equal(packets.length, 37);
+  assert.deepEqual(packets.map((packet) => packet.task_id), Array.from({ length: 37 }, (_, i) => i + 5));
 });
