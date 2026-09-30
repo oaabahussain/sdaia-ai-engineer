@@ -228,6 +228,7 @@ task_id
 task_packet_digest
 state_revision
 base_main_sha
+task_base_sha
 execution_branch
 project_bootstrap_revision
 runtime_capability_profile_digest
@@ -236,6 +237,8 @@ preflight_gate_set
 ```
 
 The envelope is regenerated for the current task whenever live state changes. It is not precompiled for future tasks.
+
+`task_base_sha` is the exact durable checkpoint HEAD from which this one task begins. Scope/result validation always compares `task_base_sha..task_result_head`, not programme base..HEAD.
 
 ### 5.4 Packet invariants
 
@@ -364,6 +367,7 @@ All must be PASS:
 - `TASK_PACKET_VALID`
 - `TASK_PACKET_FRESH`
 - `TASK_PACKET_DETERMINISTIC`
+- `PROCESS_FAILURE_RULES_MATCH`
 - `TASK_EXECUTION_ENVELOPE_VALID`
 - `TASK_EXECUTION_ENVELOPE_FRESH`
 - `TASK_SCOPE_VALID`
@@ -428,11 +432,34 @@ INVALID_RED
 -> do not implement product code
 ```
 
+### 9.1 Accepted-RED freeze
+
+Once RED is accepted as the intended behavioral failure, persist a compact `AcceptedRedEvidenceV1` record containing:
+
+- task ID;
+- execution-envelope digest;
+- exact RED command;
+- failure class;
+- concise expected-vs-observed assertion evidence;
+- hashes of every test/fixture file participating in the focused RED;
+- accepted-at task HEAD.
+
+From accepted RED until task result validation, those test/fixture hashes are frozen.
+
+A later change to an accepted RED test/fixture is not automatically forbidden, but it requires:
+
+1. `Ruling:` explaining why the original RED contract was invalid or incomplete;
+2. systematic-debugging evidence;
+3. a new accepted RED cycle and new hashes;
+4. high-reasoning authorization when the change weakens or materially changes an assertion.
+
+This prevents a lower-reasoning executor from obtaining GREEN by silently weakening the test.
+
 ## 10. File-scope enforcement
 
 Each packet owns an explicit changed-file policy.
 
-After implementation, the result validator computes the task diff against task BASE.
+After implementation, the result validator computes the task diff against the execution envelope's exact `task_base_sha`.
 
 Every changed path must match:
 
@@ -625,15 +652,17 @@ Required check identities remain unique and stable:
 
 ## 17. Result validator
 
-After GREEN/regression, the result validator checks the task definition packet plus the exact execution envelope that authorized the run:
+After GREEN/regression, the result validator checks the task definition packet, the exact execution envelope that authorized the run, and the accepted RED evidence:
 
 - expected GREEN command passed;
 - affected regression passed;
-- changed-file scope;
+- accepted RED test/fixture hashes are unchanged since accepted RED, unless a valid re-RED Ruling replaced them;
+- changed-file scope is computed from `task_base_sha`;
 - no forbidden file;
 - current live main still equals branch base;
 - packet source hashes still match;
 - envelope `state_revision/base_main_sha/execution_branch` still match current validated state;
+- `task_base_sha` is still the last durably completed task checkpoint;
 - no new Critical/Important process finding;
 - commit message matches packet;
 - task ledger entry contains required evidence fields.
@@ -809,6 +838,7 @@ H0-R2 extends readiness with:
 - `TASK_PACKET_DETERMINISM_VALID`
 - `TASK_SCOPE_GUARD_VALID`
 - `BEHAVIORAL_RED_GUARD_VALID`
+- `ACCEPTED_RED_FREEZE_VALID`
 - `DYNAMIC_REF_GUARD_VALID`
 - `TEST_CONTRACT_GUARD_VALID`
 - `RUNTIME_CAPABILITY_PROFILE_VALID`
@@ -834,6 +864,7 @@ Fixed status codes include:
 - `PLAN_SPEC_HASH_MISMATCH`
 - `RUNTIME_CAPABILITY_BLOCKED`
 - `INVALID_RED`
+- `ACCEPTED_RED_MUTATED`
 - `UNEXPECTED_FAILURE`
 - `SCOPE_EXPANSION_BLOCKED`
 - `TEST_WEAKENING_BLOCKED`
@@ -874,6 +905,7 @@ H0-R2 may create or modify process/control-plane artifacts including:
 - task linter;
 - runtime capability schema/profile;
 - preflight/result validators;
+- accepted-RED evidence schema/validator;
 - CI process checks;
 - static bootstrap pack;
 - process tests.
@@ -927,6 +959,7 @@ After written-spec approval, `writing-plans` will convert this design into small
 - plan/task linter;
 - dynamic-reference guard;
 - behavioral RED guard;
+- accepted-RED freeze guard;
 - test-contract guard;
 - file-scope guard;
 - preflight validator;
