@@ -172,6 +172,7 @@ authority:
   spec_blob_sha
   plan_path
   plan_blob_sha
+  task_source_digest
   process_failure_rules_revision
 
 purpose
@@ -255,6 +256,7 @@ A valid task-definition packet MUST satisfy:
 - explicit stop conditions;
 - `merge_authority=false` for Tasks 5-41 lower-model execution;
 - source hashes equal the approved spec/plan contract revision;
+- `task_source_digest` equals the exact bytes emitted by Superpowers `task-brief` for that task;
 - packet digest reproducible from identical static sources;
 - no live SHA/state revision/runtime observation is embedded;
 - no hidden architecture constant absent from spec/plan.
@@ -263,7 +265,7 @@ A valid task-definition packet MUST satisfy:
 
 ### 6.1 Compiler role
 
-The compiler converts approved task text into `TaskDefinitionPacketV1`. It may normalize syntax; it may not invent semantics.
+The compiler converts the exact Superpowers-extracted task brief into `TaskDefinitionPacketV1`. The task brief remains the execution text required by `executing-plans`; the packet is a validated machine-readable projection of that same brief. It may normalize syntax; it may not invent semantics.
 
 Allowed transformations:
 
@@ -312,7 +314,88 @@ The binder MUST fail if `task_id != next_task`, `base_main_sha` is absent/mismat
 
 Dynamic execution facts belong in the envelope, not the static packet.
 
-## 7. ProcessFailureRuleV1 registry
+## 7. Superpowers execution integration
+
+H0-R2 wraps the authoritative Superpowers execution flow; it does not replace or fork it.
+
+### 7.1 Setup
+
+The high/low-model execution session still follows `superpowers:executing-plans`:
+
+1. isolated workspace/worktree verified through `using-git-worktrees`;
+2. SDD workspace initialized;
+3. plan/spec read;
+4. pre-flight interface scan completed;
+5. TDD skill loaded.
+
+If the active runtime cannot satisfy the required Superpowers workspace/worktree behavior, low-model execution is blocked unless the authoritative Superpowers workflow itself provides an approved equivalent. H0-R2 cannot invent one.
+
+### 7.2 Task start
+
+For task N:
+
+1. run Superpowers `task-start PLAN N`;
+2. obtain the task brief path and BASE SHA;
+3. read the brief as Superpowers requires;
+4. verify brief bytes match `TaskDefinitionPacketV1.task_source_digest`;
+5. set `TaskExecutionEnvelopeV1.task_base_sha = BASE`;
+6. bind current state/runtime into the envelope;
+7. run H0-R2 preflight.
+
+Any brief/packet mismatch returns `TASK_PACKET_STALE`.
+
+### 7.3 Ruling boundary
+
+Superpowers permits ledgered rulings when the plan is wrong. H0-R2 preserves that rule but narrows what a lower-reasoning executor may decide.
+
+A lower-reasoning executor MAY make a **mechanical ruling** only when the approved spec/Interfaces determine one unique answer without product judgment, for example:
+
+- spelling/name mismatch where the producer interface is explicit;
+- stale path alias with one canonical path already specified;
+- command transcription defect where the intended exact command is already present elsewhere in the same task contract.
+
+It MUST record the normal Superpowers `Ruling:` line.
+
+A lower-reasoning executor MUST stop with `PLAN_DECISION_REQUIRED` when resolving the issue would choose among multiple valid product/process semantics, broaden scope, change an interface, choose a dependency, weaken an assertion, or invent a fallback.
+
+### 7.4 RED and implementation
+
+The normal Superpowers/TDD order remains:
+
+```text
+task-start
+-> read brief
+-> packet/envelope preflight
+-> focused RED
+-> accepted-RED freeze
+-> minimal implementation
+-> GREEN
+-> affected regression
+-> H0-R2 result validation
+```
+
+### 7.5 Task done
+
+Only after H0-R2 result validation passes:
+
+1. run Superpowers `task-done PLAN N BASE -- <whole-task test command>`;
+2. the command is the task's approved affected-regression/whole-task verification command;
+3. `task-done` reruns that command freshly and writes the SDD scratch ledger only on success;
+4. then persist the durable K3 ledger entry and advance `CURRENT-STATE`.
+
+If durable checkpoint/state advancement fails after `task-done`, mark recovery as `IMPLEMENTED_NOT_CHECKPOINTED`; do not reimplement the task.
+
+### 7.6 Final review
+
+H0-R2 does not weaken the Superpowers whole-branch review floor:
+
+- use `review-package`;
+- use a real fresh reviewer when available;
+- otherwise explicitly record `Final review: self-review (no subagent tool)`;
+- Critical/Important findings get the one Superpowers RED->GREEN fix pass;
+- integration remains high-reasoning authority.
+
+## 8. ProcessFailureRuleV1 registry
 
 ### 7.1 Purpose
 
@@ -348,7 +431,7 @@ A rule that would change:
 
 requires product-spec amendment rather than a process-rule edit.
 
-## 8. Preflight contract
+## 9. Preflight contract
 
 Before a lower-reasoning model may begin a task, one deterministic command must return:
 
@@ -404,7 +487,7 @@ The lower-reasoning executor MUST NOT infer readiness from:
 
 Only validated preflight output authorizes task execution.
 
-## 9. Behavioral RED contract
+## 10. Behavioral RED contract
 
 RED proves intended missing behavior, not generic failure.
 
@@ -455,7 +538,7 @@ A later change to an accepted RED test/fixture is not automatically forbidden, b
 
 This prevents a lower-reasoning executor from obtaining GREEN by silently weakening the test.
 
-## 10. File-scope enforcement
+## 11. File-scope enforcement
 
 Each packet owns an explicit changed-file policy.
 
@@ -484,7 +567,7 @@ If a legitimate dependency requires another file:
    - plan amendment;
    - separate prerequisite task.
 
-## 11. Test-contract guard
+## 12. Test-contract guard
 
 H0-R2 distinguishes behavioral assertions from implementation coupling.
 
@@ -521,7 +604,7 @@ It enforces known anti-patterns from the failure registry and maintains an expli
 
 A new static pattern is never globally forbidden without a regression/example demonstrating why.
 
-## 12. Dynamic-reference policy
+## 13. Dynamic-reference policy
 
 Execution-state facts are resolved at runtime.
 
@@ -541,7 +624,7 @@ The linter distinguishes:
 - `DYNAMIC_EXECUTION_INPUT` — must be resolved;
 - `IMMUTABLE_CONTRACT_PIN` — allowed, e.g. Action commit SHA or approved spec blob.
 
-## 13. Runtime capability profile
+## 14. Runtime capability profile
 
 ### 13.1 Principle
 
@@ -582,7 +665,7 @@ Never claim:
 - Project files were updated when the runtime cannot mutate them;
 - a ruleset exists when only a process fallback exists.
 
-## 14. Review capability truth
+## 15. Review capability truth
 
 Every review record contains:
 
@@ -599,7 +682,7 @@ A new chat inside the same ChatGPT Project is not automatically independent.
 
 The lower-reasoning executor does not decide review mode.
 
-## 15. Verification evidence without self-reference
+## 16. Verification evidence without self-reference
 
 ### 15.1 Problem
 
@@ -624,7 +707,7 @@ The verified code/control HEAD is not modified merely to record its own run IDs.
 
 This is `EXTERNAL_FINAL_EVIDENCE`.
 
-## 16. CI execution model
+## 17. CI execution model
 
 ### 16.1 Branch verification
 
@@ -650,7 +733,7 @@ Required check identities remain unique and stable:
 - `quality-gate`
 - `server-adapter-gate`
 
-## 17. Result validator
+## 18. Result validator
 
 After GREEN/regression, the result validator checks the task definition packet, the exact execution envelope that authorized the run, and the accepted RED evidence:
 
@@ -675,7 +758,7 @@ TASK_RESULT_ACCEPTED = PASS
 
 and the durable state advance to the next task.
 
-## 18. Task completion atomicity
+## 19. Task completion atomicity
 
 A task is not durably complete merely because implementation commit exists.
 
@@ -699,7 +782,7 @@ IMPLEMENTED_NOT_CHECKPOINTED
 
 as a recovery state.
 
-## 19. Batch execution policy
+## 20. Batch execution policy
 
 Batching is scheduling only. It never merges task contracts.
 
@@ -739,18 +822,19 @@ Each task in a batch retains its own:
 - ledger record;
 - result validation.
 
-## 20. Context budget contract
+## 21. Context budget contract
 
 The lower-reasoning executor receives only:
 
 1. static Project bootstrap;
 2. validated `CURRENT-STATE`;
-3. current `TaskDefinitionPacketV1`;
-4. current `TaskExecutionEnvelopeV1`;
-5. relevant approved spec slice;
-6. files listed in task scope/interfaces;
-7. focused tests;
-8. current SDD/task execution record.
+3. Superpowers current task brief from `task-start`;
+4. matching `TaskDefinitionPacketV1`;
+5. current `TaskExecutionEnvelopeV1`;
+6. relevant approved spec slice;
+7. files listed in task scope/interfaces;
+8. focused tests;
+9. current SDD/task execution record.
 
 It does not receive by default:
 
@@ -765,7 +849,7 @@ Large outputs are persisted to artifacts/logs and summarized with references.
 
 No numeric token-savings guarantee is part of the contract.
 
-## 21. ChatGPT Project bootstrap
+## 22. ChatGPT Project bootstrap
 
 The Project remains static bootstrap/navigation, not live state.
 
@@ -781,7 +865,7 @@ The Project bootstrap tells the model how to locate live Git state. It does not 
 
 `PROJECT_BOOTSTRAP_CURRENT=PASS` requires a high-reasoning verification that the active Project contains the expected bootstrap revision.
 
-## 22. K3 Task 5 dry-run before product execution
+## 23. K3 Task 5 dry-run before product execution
 
 Before a lower-reasoning model may modify K3 Task 5 product files, perform a no-write dry-run using its compiled packet.
 
@@ -802,7 +886,7 @@ The dry-run must not modify product files.
 
 Failure => packet/compiler repair before product execution.
 
-## 23. Adversarial readiness tests
+## 24. Adversarial readiness tests
 
 H0-R2 must include deterministic pressure cases proving fail-closed behavior.
 
@@ -826,7 +910,7 @@ At minimum:
 
 Every case must end in a fixed BLOCKED/FAIL result, never improvisation.
 
-## 24. New execution gates
+## 25. New execution gates
 
 H0-R2 extends readiness with:
 
@@ -849,7 +933,7 @@ H0-R2 extends readiness with:
 
 `low_model_ready=true` requires every applicable H0 and H0-R2 readiness gate to be PASS.
 
-## 25. Error/status vocabulary
+## 26. Error/status vocabulary
 
 Fixed status codes include:
 
@@ -857,6 +941,7 @@ Fixed status codes include:
 - `TASK_PACKET_SCHEMA_INVALID`
 - `TASK_PACKET_STALE`
 - `TASK_PACKET_NONDETERMINISTIC`
+- `PLAN_DECISION_REQUIRED`
 - `TASK_EXECUTION_ENVELOPE_INVALID`
 - `TASK_EXECUTION_ENVELOPE_STALE`
 - `TASK_ID_MISMATCH`
@@ -878,7 +963,7 @@ Fixed status codes include:
 
 The lower-reasoning executor chooses none of these freely; validators emit them.
 
-## 26. What remains high-reasoning work
+## 27. What remains high-reasoning work
 
 Even after H0-R2, these remain outside lower-model authority:
 
@@ -895,7 +980,7 @@ Even after H0-R2, these remain outside lower-model authority:
 - certifying Project bootstrap revision;
 - deciding whether a novel failure requires architecture change.
 
-## 27. H0-R2 implementation boundary
+## 28. H0-R2 implementation boundary
 
 H0-R2 may create or modify process/control-plane artifacts including:
 
@@ -914,7 +999,7 @@ It MUST NOT implement K3 Task 5 product behavior.
 
 No files from the K3 Task 5 product file set may be modified except the K3 implementation plan's execution annotations if an approved plan correction is required before freeze.
 
-## 28. Integration sequence
+## 29. Integration sequence
 
 H0-R2 is not mixed into reviewed PR #23.
 
@@ -938,7 +1023,7 @@ Sequence:
 
 This sequence avoids reopening PR #23 and prevents process hardening from being mixed with K3 product implementation.
 
-## 29. Initial implementation decomposition
+## 30. Initial implementation decomposition
 
 After written-spec approval, `writing-plans` will convert this design into small TDD tasks. The intended decomposition is:
 
@@ -983,7 +1068,7 @@ After written-spec approval, `writing-plans` will convert this design into small
 
 The implementation plan may split these further. It may not combine independent gates merely to reduce task count.
 
-## 30. Acceptance contract
+## 31. Acceptance contract
 
 H0-R2 is complete only when fresh evidence proves:
 
@@ -1010,7 +1095,7 @@ H0-R2 is complete only when fresh evidence proves:
 
 Only then may the user be told to switch execution to the lower-reasoning model.
 
-## 31. Non-goals
+## 32. Non-goals
 
 H0-R2 does not:
 
@@ -1028,7 +1113,7 @@ H0-R2 does not:
 - claim independent review when only self-review occurred;
 - promise a fixed context/token reduction.
 
-## 32. Design decision
+## 33. Design decision
 
 Adopt a deterministic **Task Packet + Preflight + Result Validation** layer as H0-R2 after H0 integration and before K3 Task 5.
 
