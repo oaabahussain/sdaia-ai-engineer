@@ -69,6 +69,59 @@ The executor MUST classify each task before running it. A task is complete only 
 
 For `TDD` tasks, a missing or non-behavioral RED is a plan defect. For non-TDD classes, do not invent a fake RED merely to satisfy form; use the class-specific verification contract.
 
+## Gate and Failure-Code Ownership
+
+Every H0-R2 readiness gate has one primary owning task. A task may prove supporting behavior, but only the owner advances the named gate after fresh verification.
+
+| Gate | Owner | Verification |
+|---|---:|---|
+| `PROCESS_FAILURE_RULES_VALID` | 5 | rules schema/registry validator green |
+| `TASK_PACKET_SCHEMA_VALID` | 6 | packet schema validator green |
+| `TASK_PACKET_COMPILER_VALID` | 8 | compiler contract tests green |
+| `TASK_EXECUTION_BINDER_VALID` | 11 | envelope/binder tests green |
+| `ALL_REMAINING_TASK_PACKETS_VALID` | 9 | 37/37 packets validate |
+| `TASK_PACKET_DETERMINISM_VALID` | 9 | clean regeneration produces zero byte diff |
+| `TASK_SCOPE_GUARD_VALID` | 14 | per-task BASE/scope guard tests green |
+| `BEHAVIORAL_RED_GUARD_VALID` | 13 | intended-vs-invalid RED classification tests green |
+| `ACCEPTED_RED_FREEZE_VALID` | 13 | accepted test/fixture hash mutation is blocked |
+| `DYNAMIC_REF_GUARD_VALID` | 12 | execution-contract lint rejects stale dynamic refs |
+| `TEST_CONTRACT_GUARD_VALID` | 15 | known implementation-coupling regressions blocked |
+| `RUNTIME_CAPABILITY_PROFILE_VALID` | 10 | capability profile tests green |
+| `RESULT_VALIDATOR_VALID` | 17 | result acceptance/rejection tests green |
+| `CI_EXECUTION_MODEL_VALID` | 18 | workflow trigger/check contract tests green |
+| `TASK5_DRY_RUN_PASS` | 28 | no-write Task 5 dry-run passes |
+| `ADVERSARIAL_READINESS_PASS` | 29 | fixture suite + live-runtime adversarial suite both pass |
+
+The following failure/status codes require direct regression coverage or an explicit non-automatable compensating-control test:
+
+| Code | Primary coverage task |
+|---|---:|
+| `TASK_PACKET_COMPILE_BLOCKED` | 7, 8 |
+| `TASK_PACKET_SCHEMA_INVALID` | 6 |
+| `TASK_PACKET_STALE` | 11, 16 |
+| `TASK_PACKET_NONDETERMINISTIC` | 9, 20 |
+| `PLAN_DECISION_REQUIRED` | 12, 16, 20 |
+| `TASK_EXECUTION_ENVELOPE_INVALID` | 11 |
+| `TASK_EXECUTION_ENVELOPE_STALE` | 11, 17 |
+| `TASK_ID_MISMATCH` | 11, 16 |
+| `MAIN_DRIFT` | 11, 16, 20, 29 |
+| `PLAN_SPEC_HASH_MISMATCH` | 11, 16, 20 |
+| `RUNTIME_CAPABILITY_BLOCKED` | 10, 11, 20 |
+| `INVALID_RED` | 13, 20, 29 |
+| `ACCEPTED_RED_MUTATED` | 13, 17, 20 |
+| `UNEXPECTED_FAILURE` | 5 failure rule + execution/systematic-debugging contract |
+| `SCOPE_EXPANSION_BLOCKED` | 14, 20, 29 |
+| `TEST_WEAKENING_BLOCKED` | 13, 17, 20 |
+| `OPEN_FINDING_BLOCKED` | 16, 20 |
+| `PROJECT_BOOTSTRAP_STALE` | 16, 20, 27, 29 |
+| `MERGE_AUTHORITY_BLOCKED` | 16, 20, 29 |
+| `IMPLEMENTED_NOT_CHECKPOINTED` | 17, 20 |
+| `TASK_RESULT_REJECTED` | 17 |
+| `TASK_RESULT_ACCEPTED` | 17 |
+| `TASK_EXECUTION_READY` | 16 |
+
+Task 20 must include a machine-readable coverage assertion that every code in the approved Spec appears in this ownership table and has at least one executable regression or explicitly named compensating-control assertion.
+
 ## Canonical File Layout
 
 ### Schemas / durable process contracts
@@ -756,6 +809,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected RED:** FAIL because adversarial runner absent.
 
 **Must prove all 15 Spec pressure cases end in fixed BLOCKED/FAIL codes, never accepted execution.**
+
+The test also parses the approved Spec error/status vocabulary and fails if any declared code lacks coverage in the plan ownership matrix or the executable adversarial/regression suite.
 
 **GREEN:**
 `node --test tests/h0-r2-adversarial-readiness.test.js && node scripts/process/adversarial_readiness.js`
