@@ -150,7 +150,6 @@ function implementationIntent(section, taskId) {
   );
   const candidate = preferred ?? items.find((item) =>
     !/^Execute\b/i.test(item)
-    && !/^Run\b/i.test(item)
     && !/^Commit\b/i.test(item)
   );
   if (!candidate) fail('implementation intent', taskId);
