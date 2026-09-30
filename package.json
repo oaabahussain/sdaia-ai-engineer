@@ -8,7 +8,14 @@
     "verify:sw": "node scripts/verify_sw_assets.js .",
     "factory": "node scripts/platform-kernel/cli.js",
     "verify:factory-import": "node scripts/platform-kernel/verify_current_import.js",
-    "validate:state": "node scripts/validate_current_state.js"
+    "validate:state": "node scripts/validate_current_state.js",
+    "process:validate-rules": "node scripts/process/validate_failure_rules.js",
+    "process:compile-k3-packets": "node scripts/process/compile_k3_task_packets.js",
+    "process:lint": "node scripts/process/lint_execution_contracts.js",
+    "process:preflight": "node scripts/process/preflight_task.js",
+    "process:validate-result": "node scripts/process/validate_task_result.js",
+    "process:verify": "npm run process:validate-rules && npm run process:compile-k3-packets -- --check --spec-blob-sha 2ccb4c5c1d01b668c14dce6b97608d4eff04d57d --plan-blob-sha ac158561be17aa8424a71b53d5447ae4a2d375c7 && npm run process:lint && node --test tests/h0-r2-*.test.js && npm run process:adversarial",
+    "process:adversarial": "node scripts/process/adversarial_readiness.js"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

@@ -1,0 +1,71 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "75487e5b5d66e2bb8683cf46b07fab7bce66bfb913b81764245d74412f80d42d"
+  },
+  "commit": {
+    "message": "review: close K3 whole-plan findings"
+  },
+  "dependencies": [
+    37
+  ],
+  "green": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Invoke `superpowers:requesting-code-review` when an independent reviewer is available; otherwise perform a fresh-context whole-branch review and record the limitation.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "classify Critical/Important/Minor; zero open Critical/Important before integration."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "H — Repository gates, acceptance, review, and integration",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 38: Whole-plan review and fix pass",
+  "red": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL (non-zero) because the whole-plan review artifact does not yet exist or is empty.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_38"
+  },
+  "source_contract_digest": "959381099c813d005fd568d8722c8770473836edf7a84d17503bfb782419c842",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Invoke `superpowers:requesting-code-review` when an independent reviewer is available; otherwise perform a fresh-context whole-branch review and record the limitation. - [ ] Compare every changed file against the exact approved base/spec/plan. - [ ] Fix every Critical/Important finding using TDD and `systematic-debugging` where applicable. - [ ] Re-run every affected focused test. - [ ] Commit `review: close K3 whole-plan findings`."
+  ],
+  "task_id": 38,
+  "task_title": "Whole-plan review and fix pass"
+}

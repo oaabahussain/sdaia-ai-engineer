@@ -1,0 +1,76 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "32e3f4294c52d793b94f0ad11d2333595fa7ad9e34fdc2b065ba95ca6e3184f2"
+  },
+  "commit": {
+    "message": "refactor: expose frozen assessment context to browser"
+  },
+  "dependencies": [
+    26
+  ],
+  "green": {
+    "command": "node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Move/re-export shared snapshot implementation and attach it to newly created exams.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`createAssessmentFormSnapshot(input)` remains compatible. Browser strict assessments bind exact runtime content release, item IDs, option order, profile, scoring policy, locale."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "F — Browser runtime integration without learner-visible behavior change",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 27: Make AssessmentFormSnapshot browser-safe and release-bound",
+  "red": {
+    "command": "node --test tests/assessment-snapshot.test.js tests/k3-runtime-assessment-context.test.js",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "src/assessment/assessmentSnapshot.js",
+      "tests/assessment-snapshot.test.js",
+      "tests/k3-runtime-assessment-context.test.js"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [
+      "src/platform-kernel/release/assessmentSnapshot.js",
+      "src/app.js"
+    ],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_27"
+  },
+  "source_contract_digest": "ac8f2ef4aebf47bedfaab012343de29243cb3ddd7c6b842fce02cd053dc313d0",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing browser-context tests; current UI `full` maps to evidence mode `mock` without changing labels. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Move/re-export shared snapshot implementation and attach it to newly created exams. - [ ] Run GREEN + current exam tests. - [ ] Commit `refactor: expose frozen assessment context to browser`."
+  ],
+  "task_id": 27,
+  "task_title": "Make AssessmentFormSnapshot browser-safe and release-bound"
+}

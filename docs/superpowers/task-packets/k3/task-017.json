@@ -1,0 +1,74 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "54fa0276b849daf758de7bd3dcb02edcf6ee2230c1ba4720bd54fe7a4ad78397"
+  },
+  "commit": {
+    "message": "feat: add K3 evidence synchronization"
+  },
+  "dependencies": [
+    16
+  ],
+  "green": {
+    "command": "node --test tests/k3-evidence-sync.test.js",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Implement at-least-once coordinator preserving original event IDs/bodies.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`assertEvidenceSyncPort(port)` requires `push(events)`, `pull(afterStoreSeq)`; `syncEvidence({store,outbox,syncPort,watermark,policy})`."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "C — Authorized synchronization and API",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 17: EvidenceSync port and coordinator",
+  "red": {
+    "command": "node --test tests/k3-evidence-sync.test.js",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "src/evidence/syncPort.js",
+      "src/evidence/apiTransport.js",
+      "src/evidence/sync.js",
+      "tests/k3-evidence-sync.test.js"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_17"
+  },
+  "source_contract_digest": "c04945e999c7cdc28482ed1886f547ba8dd171ab90deb7cd8fa822d4c8240215",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing lost-ACK, duplicate retry, partial batch, network failure, restart, and resumable-pull tests. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Implement at-least-once coordinator preserving original event IDs/bodies. - [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN. - [ ] Commit `feat: add K3 evidence synchronization`."
+  ],
+  "task_id": 17,
+  "task_title": "EvidenceSync port and coordinator"
+}

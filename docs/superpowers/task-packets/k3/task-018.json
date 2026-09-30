@@ -1,0 +1,72 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "4d6180ab70a5d3c287ef297710ea8403370b2336f47db716077eaa60cafecb6d"
+  },
+  "commit": {
+    "message": "feat: add K3 strict assessment revision authority"
+  },
+  "dependencies": [
+    17
+  ],
+  "green": {
+    "command": "node --test tests/k3-assessment-revision.test.js",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Implement revision resolver; client `occurred_at` must never choose a winner.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`resolveAssessmentMutation({candidateEvent,currentRevision,storeSeq,authorityRef})->mutationResolvedEvent`. APPLIED only when `base_attempt_revision===currentRevision`; stale branch remains raw evidence."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "D — Strict assessment authority, corrections, and projections",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 18: Strict-assessment optimistic revision resolver",
+  "red": {
+    "command": "node --test tests/k3-assessment-revision.test.js",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "src/evidence/assessmentRevision.js",
+      "tests/k3-assessment-revision.test.js"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_18"
+  },
+  "source_contract_digest": "1f64960251cce67d15826a99d55d798bf4381f7ab2e2314ea0b3f3d180764bdd",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing single-origin chain and two-device same-base branch tests. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Implement revision resolver; client `occurred_at` must never choose a winner. - [ ] Run GREEN, then swap client timestamps and prove decision is unchanged. - [ ] Commit `feat: add K3 strict assessment revision authority`."
+  ],
+  "task_id": 18,
+  "task_title": "Strict-assessment optimistic revision resolver"
+}

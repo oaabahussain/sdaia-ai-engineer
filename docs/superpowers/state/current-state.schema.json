@@ -128,7 +128,23 @@
         "BASELINE_GREEN",
         "ACTIVE_REF_RESOLUTION_VALID",
         "K3_TASK_BRIEFS_SELF_CONTAINED",
-        "PROJECT_BOOTSTRAP_CURRENT"
+        "PROJECT_BOOTSTRAP_CURRENT",
+        "PROCESS_FAILURE_RULES_VALID",
+        "TASK_PACKET_SCHEMA_VALID",
+        "TASK_PACKET_COMPILER_VALID",
+        "TASK_EXECUTION_BINDER_VALID",
+        "ALL_REMAINING_TASK_PACKETS_VALID",
+        "TASK_PACKET_DETERMINISM_VALID",
+        "TASK_SCOPE_GUARD_VALID",
+        "BEHAVIORAL_RED_GUARD_VALID",
+        "ACCEPTED_RED_FREEZE_VALID",
+        "DYNAMIC_REF_GUARD_VALID",
+        "TEST_CONTRACT_GUARD_VALID",
+        "RUNTIME_CAPABILITY_PROFILE_VALID",
+        "RESULT_VALIDATOR_VALID",
+        "CI_EXECUTION_MODEL_VALID",
+        "TASK5_DRY_RUN_PASS",
+        "ADVERSARIAL_READINESS_PASS"
       ],
       "properties": {
         "REPO_CONTEXT_READY": {
@@ -204,6 +220,134 @@
           ]
         },
         "PROJECT_BOOTSTRAP_CURRENT": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "PROCESS_FAILURE_RULES_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK_PACKET_SCHEMA_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK_PACKET_COMPILER_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK_EXECUTION_BINDER_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "ALL_REMAINING_TASK_PACKETS_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK_PACKET_DETERMINISM_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK_SCOPE_GUARD_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "BEHAVIORAL_RED_GUARD_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "ACCEPTED_RED_FREEZE_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "DYNAMIC_REF_GUARD_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TEST_CONTRACT_GUARD_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "RUNTIME_CAPABILITY_PROFILE_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "RESULT_VALIDATOR_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "CI_EXECUTION_MODEL_VALID": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "TASK5_DRY_RUN_PASS": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "BLOCKED"
+          ]
+        },
+        "ADVERSARIAL_READINESS_PASS": {
           "enum": [
             "PASS",
             "FAIL",

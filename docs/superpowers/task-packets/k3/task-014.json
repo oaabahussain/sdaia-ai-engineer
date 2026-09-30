@@ -1,0 +1,72 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "2102ad46a1cf086f9c261b1ba746bf571fe3483239c5da9c8b3f26045738e7e0"
+  },
+  "commit": {
+    "message": "feat: add fail-closed K3 learner authorization"
+  },
+  "dependencies": [
+    13
+  ],
+  "green": {
+    "command": "PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Implement the port, default fail-closed resolver, and deterministic test resolver.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`LearnerAuthorizationPort.resolve(request)->AuthorizedLearner`; default implementation denies server sync; tests inject `StaticLearnerAuthorization`; `create_app(db_url=None, learner_auth=None)` uses the fail-closed resolver when `learner_auth` is omitted."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "C — Authorized synchronization and API",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 14: Fail-closed learner authorization port",
+  "red": {
+    "command": "PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_evidence_auth.py",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test && PYTHONPATH=server python3 -m pytest -q server/tests",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "server/app/evidence_auth.py",
+      "server/tests/test_k3_evidence_auth.py"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_14"
+  },
+  "source_contract_digest": "f42bba256b7dd34fc12cca5fb395396c5b2c6f1db9181aa3b2234e99e14ee365",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing tests proving `learner_id` and current `X-Anon-Id` alone never grant learner-evidence read/write. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Implement the port, default fail-closed resolver, and deterministic test resolver. - [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN. - [ ] Commit `feat: add fail-closed K3 learner authorization`."
+  ],
+  "task_id": 14,
+  "task_title": "Fail-closed learner authorization port"
+}

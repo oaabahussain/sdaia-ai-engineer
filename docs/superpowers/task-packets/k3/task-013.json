@@ -1,0 +1,74 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "a0d675a4975742be815695d3546dc4ddd4628bfe83adc0737374d251175d058d"
+  },
+  "commit": {
+    "message": "test: enforce K3 store conformance parity"
+  },
+  "dependencies": [
+    12
+  ],
+  "green": {
+    "command": "node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Fix adapter implementations only; do not weaken shared expected semantics.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "one logical fixture drives JSONL, IndexedDB, and SQLite disposition/order expectations."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "B — Fingerprint and durable reference stores",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 13: Cross-adapter store conformance",
+  "red": {
+    "command": "node --test tests/helpers/k3StoreConformance.js tests/k3-store-conformance.test.js && PYTHONPATH=server python3 -m pytest -q server/tests/test_k3_store_conformance.py",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test && PYTHONPATH=server python3 -m pytest -q server/tests",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "tests/k3-store-conformance.test.js",
+      "server/tests/test_k3_store_conformance.py"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [
+      "tests/helpers/k3StoreConformance.js"
+    ],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_13"
+  },
+  "source_contract_digest": "4c8d46a3b2244a2bffbff5ecfea05fb55e39151a70bbfbcc81df86f8ed99c0d4",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Add failing cases for normal append, exact retry, ID/body conflict, origin-seq conflict, late arrival, out-of-order arrival, multi-device distinct events, and filtered reads. - [ ] Run all three adapters and record RED mismatches. - [ ] Fix adapter implementations only; do not weaken shared expected semantics. - [ ] Run GREEN across Node and Python. - [ ] Commit `test: enforce K3 store conformance parity`."
+  ],
+  "task_id": 13,
+  "task_title": "Cross-adapter store conformance"
+}

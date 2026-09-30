@@ -1,0 +1,11 @@
+{
+ "$schema":"http://json-schema.org/draft-07/schema#","$id":"accepted-red-evidence-v1.schema.json","type":"object","additionalProperties":false,
+ "required":["schema_version","failure_class","command","test_hashes","fixture_hashes","evidence_digest"],
+ "properties":{
+  "schema_version":{"const":1},"failure_class":{"type":"string","minLength":1},"command":{"type":"string","minLength":1},
+  "test_hashes":{"type":"object","additionalProperties":{"type":"string","pattern":"^[0-9a-f]{64}$"}},
+  "fixture_hashes":{"type":"object","additionalProperties":{"type":"string","pattern":"^[0-9a-f]{64}$"}},
+  "replaces_digest":{"type":"string","pattern":"^[0-9a-f]{64}$"},"ruling":{"type":"string","minLength":1},
+  "evidence_digest":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+ }
+}

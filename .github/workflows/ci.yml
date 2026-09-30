@@ -24,6 +24,8 @@ jobs:
         run: npm run validate
       - name: Run Node tests
         run: npm test
+      - name: Verify deterministic execution control plane
+        run: npm run process:verify
       - name: Verify governed current-bank migration
         run: npm run verify:factory-import
       - name: Parse application module

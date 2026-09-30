@@ -1,0 +1,74 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "efc38ce8f66c5d3f69eccbab2f7990f105c4e919ad0734124e1ef6fd721653ef"
+  },
+  "commit": {
+    "message": "feat: add K3 replay and integrity kernel"
+  },
+  "dependencies": [
+    21
+  ],
+  "green": {
+    "command": "node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Implement deterministic failures separately from warnings; do not invent numeric anomaly thresholds.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "`replayEvidence(store,{fromSeq,toSeq,projectors})`; `inspectEvidenceIntegrity(events,context)->findings[]`."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "D — Strict assessment authority, corrections, and projections",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 22: Replay and deterministic integrity findings",
+  "red": {
+    "command": "node --test tests/k3-evidence-replay.test.js tests/k3-evidence-integrity.test.js",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "src/evidence/replay.js",
+      "src/platform-kernel/evidence/integrity.js",
+      "tests/k3-evidence-replay.test.js",
+      "tests/k3-evidence-integrity.test.js"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_22"
+  },
+  "source_contract_digest": "605e13bd6debebe67bcb77f07bbe025a9465c76fab58c8b00e7cd7f38063fe9a",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing watermark, late-event rebuild, orphan-target, sequence reuse, and clock-divergence-warning tests. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Implement deterministic failures separately from warnings; do not invent numeric anomaly thresholds. - [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN. - [ ] Commit `feat: add K3 replay and integrity kernel`."
+  ],
+  "task_id": 22,
+  "task_title": "Replay and deterministic integrity findings"
+}

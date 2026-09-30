@@ -1,0 +1,73 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "56ef4095a697a0d939717f5855d346848e11dc1097770adcfcd6d7141ac22cbb"
+  },
+  "commit": {
+    "message": "feat: add Caliper K3 adapter"
+  },
+  "dependencies": [
+    32
+  ],
+  "green": {
+    "command": "node --test tests/k3-caliper-adapter.test.js",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Implement supported deterministic mapping; unsupported semantics return declared omissions/rejections.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "preserve AssessmentEvent/AssessmentItemEvent/Attempt/Response and Started/Skipped/Completed/Submitted distinctions."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "G — Interoperability and governed bridges",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 33: Caliper 1.2 adapter",
+  "red": {
+    "command": "node --test tests/k3-caliper-adapter.test.js",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL because the task's specified behavior is not yet implemented. Module/import/path/setup failure alone does not satisfy RED; repair the test harness until the intended behavioral assertion fails.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "src/platform-kernel/interoperability/caliper.js",
+      "data/evidence/mappings/caliper-v1.json",
+      "tests/k3-caliper-adapter.test.js"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_33"
+  },
+  "source_contract_digest": "331357a3d17884be2ded28da87cd2e6dbf48b06b3febea02df56ab126f6845fc",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Write failing skip-not-attempt and response/attempt mapping tests. - [ ] Execute the exact RED command from the Low-model execution contract above and confirm Expected RED. - [ ] Implement supported deterministic mapping; unsupported semantics return declared omissions/rejections. - [ ] Execute the exact GREEN command from the Low-model execution contract above and confirm Expected GREEN. - [ ] Commit `feat: add Caliper K3 adapter`."
+  ],
+  "task_id": 33,
+  "task_title": "Caliper 1.2 adapter"
+}

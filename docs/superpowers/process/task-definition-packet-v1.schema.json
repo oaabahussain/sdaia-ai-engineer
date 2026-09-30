@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "task-definition-packet-v1.schema.json",
+  "title": "TaskDefinitionPacketV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "packet_version",
+    "programme",
+    "task_id",
+    "task_title",
+    "authority",
+    "purpose",
+    "phase",
+    "dependencies",
+    "scope",
+    "interfaces",
+    "red",
+    "implementation",
+    "green",
+    "regression",
+    "commit",
+    "stop_conditions",
+    "required_skills",
+    "runtime_requirements",
+    "merge_authority",
+    "source_contract_digest"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "packet_version": { "const": 1 },
+    "programme": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "integer", "minimum": 1 },
+    "task_title": { "type": "string", "minLength": 1 },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_path",
+        "spec_blob_sha",
+        "plan_path",
+        "plan_blob_sha",
+        "task_source_digest",
+        "process_failure_rules_revision",
+        "process_failure_rules_digest"
+      ],
+      "properties": {
+        "spec_path": { "type": "string", "minLength": 1 },
+        "spec_blob_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "plan_path": { "type": "string", "minLength": 1 },
+        "plan_blob_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "task_source_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "process_failure_rules_revision": { "type": "string", "minLength": 1 },
+        "process_failure_rules_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "purpose": { "type": "string", "minLength": 1 },
+    "phase": { "type": "string", "minLength": 1 },
+    "dependencies": {
+      "type": "array",
+      "items": { "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "string", "minLength": 1 }] }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_create", "allowed_modify", "allowed_delete", "forbidden_paths", "product_scope"],
+      "properties": {
+        "allowed_create": { "$ref": "#/definitions/pathList" },
+        "allowed_modify": { "$ref": "#/definitions/pathList" },
+        "allowed_delete": { "$ref": "#/definitions/pathList" },
+        "forbidden_paths": { "$ref": "#/definitions/pathList" },
+        "product_scope": { "type": "string", "minLength": 1 }
+      }
+    },
+    "interfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumes", "produces"],
+      "properties": {
+        "consumes": { "$ref": "#/definitions/stringList" },
+        "produces": { "$ref": "#/definitions/stringList" }
+      }
+    },
+    "red": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "expected_failure_class", "expected_failure_description", "invalid_failure_classes"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "expected_failure_class": { "type": "string", "minLength": 1 },
+        "expected_failure_description": { "type": "string", "minLength": 1 },
+        "invalid_failure_classes": { "$ref": "#/definitions/stringList" }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent", "prohibited_inventions"],
+      "properties": {
+        "intent": { "type": "string", "minLength": 1 },
+        "prohibited_inventions": { "$ref": "#/definitions/stringList" }
+      }
+    },
+    "green": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "expected_result"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "expected_result": { "type": "string", "minLength": 1 }
+      }
+    },
+    "regression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "expected_result"],
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "expected_result": { "type": "string", "minLength": 1 }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["message"],
+      "properties": {
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stop_conditions": { "$ref": "#/definitions/stringList" },
+    "required_skills": { "$ref": "#/definitions/stringList" },
+    "runtime_requirements": { "$ref": "#/definitions/stringList" },
+    "merge_authority": { "const": false },
+    "source_contract_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "definitions": {
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "pathList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

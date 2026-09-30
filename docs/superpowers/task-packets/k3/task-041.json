@@ -1,0 +1,73 @@
+{
+  "authority": {
+    "plan_blob_sha": "ac158561be17aa8424a71b53d5447ae4a2d375c7",
+    "plan_path": "docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md",
+    "process_failure_rules_digest": "6f30c61bd07df8d2960f6b5acf199f5188493a0a394ae7151c3330245c263760",
+    "process_failure_rules_revision": "h0-r2-v1",
+    "spec_blob_sha": "2ccb4c5c1d01b668c14dce6b97608d4eff04d57d",
+    "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
+    "task_source_digest": "b27d3c830c87350b67094009e160bca02d3a7c940bfaa61d41f55697e9cbf962"
+  },
+  "commit": {
+    "message": "Post-merge verification and programme closure"
+  },
+  "dependencies": [
+    40
+  ],
+  "green": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md",
+    "expected_result": "PASS with zero failures for the exact task verification command."
+  },
+  "implementation": {
+    "intent": "Resolve exact merged `main` SHA.",
+    "prohibited_inventions": []
+  },
+  "interfaces": {
+    "consumes": [],
+    "produces": [
+      "K3 becomes COMPLETE only after merged `main` passes runtime/server/release verification."
+    ]
+  },
+  "merge_authority": false,
+  "packet_version": 1,
+  "phase": "H — Repository gates, acceptance, review, and integration",
+  "programme": "K3",
+  "purpose": "Execute approved K3 Task 41: Post-merge verification and programme closure",
+  "red": {
+    "command": "test -s docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md",
+    "expected_failure_class": "EXPECTED_TASK_BEHAVIOR_MISSING",
+    "expected_failure_description": "FAIL (non-zero) because post-merge verification has not yet been recorded.",
+    "invalid_failure_classes": [
+      "UNRELATED_IMPORT_FAILURE",
+      "SETUP_FAILURE",
+      "ENVIRONMENT_FAILURE"
+    ]
+  },
+  "regression": {
+    "command": "npm test",
+    "expected_result": "PASS with zero failures"
+  },
+  "required_skills": [
+    "test-driven-development",
+    "systematic-debugging"
+  ],
+  "runtime_requirements": [],
+  "schema_version": 1,
+  "scope": {
+    "allowed_create": [
+      "docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md"
+    ],
+    "allowed_delete": [],
+    "allowed_modify": [
+      "HANDOFF.md"
+    ],
+    "forbidden_paths": [],
+    "product_scope": "K3_TASK_41"
+  },
+  "source_contract_digest": "ba69cf340990d1a8c23a7e973414b0fcdce072412fe670faaa13ca21c9e4270d",
+  "stop_conditions": [
+    "On any spec/plan conflict, record `Ruling:` and follow the spec. On any unexpected failure, invoke `systematic-debugging` before editing implementation. A low-reasoning executor must not merge, integrate, or push directly to `main`; stop at the high-reasoning merge gate. - [ ] Resolve exact merged `main` SHA. - [ ] Verify GitHub Actions exact merge SHA: Node/validate, server tests, Pages deployment. - [ ] Verify live Pages release, current bank count/allocation/digest, AR/EN/RTL/LTR, offline cached reload, and evidence-runtime asset availability. - [ ] Verify server evidence API/store contract against the merged SHA in the supported environment; if production auth/backend is not deployed, record that boundary rather than claiming live server sync. - [ ] Write post-merge verification and recovery handoff; only then mark K3 COMPLETE + MERGED + POST-MERGE VERIFIED. --- ## Phase checkpoint discipline After each Phase A–H: 1. run the phase-focused tests; 2. record exact branch HEAD; 3. update a durable K3 execution ledger/checkpoint; 4. verify no unexpected files or unrelated behavior changed; 5. continue approved plan tasks without requesting approval after ordinary microsteps. If implementation exposes an architectural contradiction with the approved K3 spec, stop the affected implementation path, record an explicit Ruling candidate, and return for architectural approval rather than silently changing the design. ## Commit discipline Target one reviewable commit per task plus explicit review/fix/checkpoint commits. Do not squash during execution. Integration history policy is chosen only in `finishing-a-development-branch`. ## Execution ordering Tasks are dependency ordered and should normally run sequentially. Independent test-fixture work inside a task may be parallelized, but no later task may assume an interface before the producing task is GREEN and committed. ## Plan self-review The plan is not ready for execution until all of these checks pass: - every normative K3 spec section has an owning task or Global Constraint; - every task has a checkable RED/GREEN cycle and an independently reviewable deliverable; - every later interface is introduced before it is consumed; - all five Review Focus risks have explicit owning tests; - current public content/runtime compatibility is protected; - authorized server sync remains fail-closed by default; - no K4/K5/K6/K8 semantics enter raw evidence; - no vendor/event-bus/LRS becomes canonical infrastructure; - whole-plan review, exact-head verification, branch finishing, and post-merge verification remain explicit gates."
+  ],
+  "task_id": 41,
+  "task_title": "Post-merge verification and programme closure"
+}
