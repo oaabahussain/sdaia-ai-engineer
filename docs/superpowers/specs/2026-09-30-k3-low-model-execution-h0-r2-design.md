@@ -174,6 +174,7 @@ authority:
   plan_blob_sha
   task_source_digest
   process_failure_rules_revision
+  process_failure_rules_digest
 
 purpose
 phase
@@ -215,7 +216,7 @@ stop_conditions
 required_skills
 runtime_requirements
 merge_authority
-packet_source_digest
+source_contract_digest
 ```
 
 ### 5.3 Required execution-envelope fields
@@ -271,7 +272,9 @@ The compiler emits UTF-8 JSON with:
 - arrays preserved in approved plan order;
 - no runtime timestamps or environment-specific fields.
 
-`packet_source_digest` is SHA-256 over the exact canonical packet bytes before any execution envelope exists.
+`source_contract_digest` is SHA-256 over a canonical source-authority tuple containing only: `spec_blob_sha`, `plan_blob_sha`, `task_source_digest`, `process_failure_rules_revision`, and `process_failure_rules_digest`. It is not a digest of the packet file itself.
+
+The packet file's own SHA-256 is computed **externally** by preflight/binding and written only to `TaskExecutionEnvelopeV1.task_packet_digest`. The packet therefore never contains a digest of bytes that include that same digest.
 
 Runtime capability profiles and execution envelopes use the same repository stable-JSON writer for their own digests. No new package is required solely for process canonicalization.
 
@@ -291,7 +294,9 @@ A valid task-definition packet MUST satisfy:
 - `merge_authority=false` for Tasks 5-41 lower-model execution;
 - source hashes equal the approved spec/plan contract revision;
 - `task_source_digest` equals the exact bytes emitted by Superpowers `task-brief` for that task;
-- packet digest reproducible from identical static sources;
+- packet bytes reproducible from identical static sources;
+- `source_contract_digest` reproducible from the canonical source-authority tuple;
+- packet self-digest is never stored inside the packet;
 - no live SHA/state revision/runtime observation is embedded;
 - no hidden architecture constant absent from spec/plan.
 
@@ -785,7 +790,7 @@ After GREEN/regression, the result validator checks the task definition packet, 
 - changed-file scope is computed from `task_base_sha`;
 - no forbidden file;
 - current live main still equals branch base;
-- packet source hashes still match;
+- packet source hashes and `source_contract_digest` still match;
 - envelope `state_revision/base_main_sha/execution_branch` still match current validated state;
 - `task_base_sha` is still the last durably completed task checkpoint;
 - no new Critical/Important process finding;
