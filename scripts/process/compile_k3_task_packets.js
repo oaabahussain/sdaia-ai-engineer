@@ -161,7 +161,7 @@ function implementationIntent(section, taskId) {
 
 export function gitBlobSha(text) {
   const bytes = Buffer.byteLength(text, 'utf8');
-  return createHash('sha1').update(`blob ${bytes}\\0`, 'utf8').update(text, 'utf8').digest('hex');
+  return createHash('sha1').update(`blob ${bytes}${String.fromCharCode(0)}`, 'utf8').update(text, 'utf8').digest('hex');
 }
 
 function parseSpecPath(planText) {

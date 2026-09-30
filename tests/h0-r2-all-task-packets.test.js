@@ -61,3 +61,8 @@ test('compiled packets contain no live execution state fields', () => {
     assert.doesNotMatch(text, /"run_id"|"project_bootstrap_revision"/);
   }
 });
+
+test('gitBlobSha matches the approved frozen K3 source blobs', () => {
+  assert.equal(gitBlobSha(SPEC), '2ccb4c5c1d01b668c14dce6b97608d4eff04d57d');
+  assert.equal(gitBlobSha(PLAN), 'ac158561be17aa8424a71b53d5447ae4a2d375c7');
+});
