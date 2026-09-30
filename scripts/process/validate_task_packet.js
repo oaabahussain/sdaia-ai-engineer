@@ -16,7 +16,7 @@ function formatError(error) {
 function scanPlaceholders(value, path = '/') {
   const errors = [];
   if (typeof value === 'string') {
-    if (/\b(?:TODO|TBD|FIXME)\b|<[^>]+>/i.test(value)) errors.push(`${path} unresolved placeholder`);
+    if (/\b(?:TODO|TBD|FIXME)\b|<(?:insert|decide|replace|fill|todo|tbd|fixme)[^>]*>/i.test(value)) errors.push(`${path} unresolved placeholder`);
     return errors;
   }
   if (Array.isArray(value)) {
