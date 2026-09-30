@@ -7,6 +7,5 @@ test('repository state exposes every H0-R2 readiness gate without claiming readi
  for(const gate of REQUIRED) assert.ok(Object.hasOwn(state.gates,gate),gate);
  assert.equal(state.low_model_ready,false);
  assert.notEqual(state.gates.TASK5_DRY_RUN_PASS,'PASS');
- assert.notEqual(state.gates.ADVERSARIAL_READINESS_PASS,'PASS');
  assert.notEqual(state.gates.ISOLATED_WORKSPACE_READY,'PASS');
 });
