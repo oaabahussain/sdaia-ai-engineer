@@ -88,7 +88,7 @@ function parseInterfaces(section) {
 }
 
 function lineValue(section, label) {
-  const re = new RegExp(`^- ${label}:\\s*(?:Run:\\s*)?`([^`]+)``, 'm');
+  const re = new RegExp('^- ' + label + ':\\\\s*(?:Run:\\\\s*)?`([^`]+)`', 'm');
   return re.exec(section)?.[1]?.trim() ?? null;
 }
 
