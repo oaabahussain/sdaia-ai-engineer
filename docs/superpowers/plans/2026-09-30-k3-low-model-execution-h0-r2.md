@@ -55,6 +55,20 @@ The final whole-branch review must deliberately test:
 13. Project bootstrap staleness;
 14. lower-model attempts to merge or broaden scope.
 
+## Execution-Class Matrix
+
+The executor MUST classify each task before running it. A task is complete only when its class-specific contract is satisfied.
+
+| Class | Tasks | Required contract |
+|---|---|---|
+| `INTEGRATION` | 1, 2, 23, 24 | exact preconditions, exact reviewed/ref SHA, exact action, exact postconditions, stop conditions |
+| `SETUP` | 3, 25 | capability preconditions, exact branch/workspace identity, exact verification, stop conditions |
+| `TDD` | 4-20, 26 | exact RED command, Expected RED, minimal implementation, exact GREEN, Expected GREEN, affected regression, stop conditions, commit |
+| `VERIFICATION` | 21, 22, 28, 29, 30 | exact inputs, exact verification command/procedure, Expected result, no mutation beyond named evidence/state files, stop conditions |
+| `EXTERNAL` | 27 | exact user-side action, exact re-read verification, state remains blocked until observed PASS |
+
+For `TDD` tasks, a missing or non-behavioral RED is a plan defect. For non-TDD classes, do not invent a fake RED merely to satisfy form; use the class-specific verification contract.
+
 ## Canonical File Layout
 
 ### Schemas / durable process contracts
@@ -207,8 +221,9 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - Create `tests/h0-r2-stable-json.test.js`
 
 **Interface:**
-- `stableJson(value) -> string`
+- `stableJson(value, propertyOrderByPath = {}) -> string`
 - `sha256Text(text) -> 64-lowercase-hex`
+- `propertyOrderByPath` maps JSON-pointer-like object paths to the exact schema-defined key order; object keys not listed at a path are appended in lexical order so unexpected keys serialize deterministically before schema rejection.
 
 **RED command:** `node --test tests/h0-r2-stable-json.test.js`
 
@@ -410,7 +425,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Interface:**
 - fixed capability keys from Spec;
 - values `AVAILABLE|UNAVAILABLE|UNKNOWN` plus documented mode fields;
-- no inference from model name.
+- no inference from model name;
+- reviewer capability is observational only; it cannot label a review `INDEPENDENT_SUBAGENT` unless an actual independent reviewer tool/run is observed.
 
 **RED:** `node --test tests/h0-r2-runtime-capabilities.test.js`
 
@@ -585,13 +601,14 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - Create `tests/h0-r2-preflight.test.js`
 - Modify `package.json`
 
-**CLI:** `npm run process:preflight -- --task <N> --state <path> --packet <path> --envelope <path> --runtime <path>`
+**CLI:** `npm run process:preflight -- --task "$TASK_ID" --state "$STATE_PATH" --packet "$PACKET_PATH" --envelope "$ENVELOPE_PATH" --runtime "$RUNTIME_PROFILE_PATH"`
 
 **RED:** `node --test tests/h0-r2-preflight.test.js`
 
 **Expected RED:** FAIL because preflight absent.
 
 **Tests cover every Spec gate, including:**
+- actual Superpowers task-brief bytes whose SHA-256 differs from packet `task_source_digest` -> `TASK_PACKET_STALE`;
 - state/hash/main/task mismatch;
 - stale packet;
 - non-deterministic packet;
@@ -695,7 +712,7 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Expected GREEN:** PASS while readiness remains false.
 
-**Regression:** `npm test && npm run validate:state -- --live-main-sha <CURRENT_R2_BASE_MAIN> --json`
+**Regression:** `LIVE_MAIN_SHA="$(git rev-parse main)"; npm test && npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --json`
 
 **Commit:** `feat: extend execution state for H0-R2 readiness`.
 
@@ -727,6 +744,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 ### Task 21: Full pre-integration checkpoint
 
+**Purpose:** Produce a fresh, exact-head verification checkpoint from the complete H0-R2 implementation branch.
+
 **Files:**
 - Create `docs/superpowers/reviews/2026-09-30-h0-r2-checkpoint.md`
 - Append `docs/superpowers/reviews/2026-09-30-h0-r2-execution-ledger.md`
@@ -745,7 +764,7 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - Pages builder + local live-release verifier
 - `python3 scripts/browser_smoke.py`
 
-**Expected:** zero failures.
+**Expected:** zero failures. Record exact command results from this HEAD only; no prior run may satisfy the checkpoint.
 
 **Checkpoint must report:**
 - exact HEAD;
@@ -765,6 +784,7 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Process:**
 - generate Superpowers review package for merge-base..HEAD;
+- write `review_mode` explicitly as one of `INDEPENDENT_SUBAGENT|FRESH_EXTERNAL_CONTEXT|SELF_REVIEW`; never infer independence from a new chat/session;
 - reviewer gets spec, plan, Review Focus, and Rulings only;
 - true fresh reviewer if available; otherwise record self-review explicitly;
 - re-grade all findings;
@@ -777,6 +797,10 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Commit:** `docs: record H0-R2 whole-branch review` plus fix commits if needed.
 
 ### Task 23: Open H0-R2 PR and verify exact head
+
+**Purpose:** Produce an integration candidate whose exact reviewed HEAD is externally evidenced without changing that HEAD to record its own run IDs.
+
+**Files:** no branch file changes after the final reviewed head; PR metadata/body may change.
 
 **Precondition:** Task 22 clean.
 
@@ -797,6 +821,10 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 ### Task 24: High-reasoning H0-R2 merge and post-merge verification
 
+**Purpose:** Integrate only the exact reviewed/green H0-R2 head and verify the resulting main SHA.
+
+**Files:** no pre-merge source changes; post-merge evidence is external until a later authorized checkpoint.
+
 **Preconditions:** exact reviewed PR head unchanged; required checks SUCCESS.
 
 **Actions:**
@@ -808,7 +836,11 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Expected:** R2 integrated, `low_model_ready=false` still.
 
+**Stop conditions:** exact PR head/check mismatch, merge conflict changing reviewed semantics, or post-merge required check failure.
+
 ### Task 25: Create real K3 execution branch and initialize official SDD workspace
+
+**Purpose:** Prove the actual runtime can execute the authoritative Superpowers lifecycle from the exact integrated R2 main without touching Task 5 product code.
 
 **Branch:** `impl/k3-learner-evidence-engine` from exact R2-integrated main.
 
@@ -834,13 +866,23 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - revision marker becomes `k3-h0-r2-v1`;
 - Create/modify `tests/h0-r2-project-bootstrap.test.js`.
 
-**RED:** bootstrap test fails against old revision/content.
+**RED command:** `node --test tests/h0-r2-project-bootstrap.test.js`
 
-**GREEN:** new pack is static, contains no live SHA/current task/run IDs, and points to CURRENT-STATE/preflight procedure.
+**Expected RED:** FAIL because revision `k3-h0-r2-v1` and required H0-R2 recovery/preflight text are absent.
+
+**GREEN command:** `node --test tests/h0-r2-project-bootstrap.test.js`
+
+**Expected GREEN:** PASS; new pack is static, contains no live SHA/current task/run IDs, and points to CURRENT-STATE/preflight procedure.
+
+**Affected regression:** `npm test`.
+
+**Stop conditions:** bootstrap requires mutable live status -> STOP `PROJECT_BOOTSTRAP_CONTRACT_INVALID`.
 
 **Commit:** `docs: publish H0-R2 Project bootstrap pack`.
 
 ### Task 27: Refresh active ChatGPT Project and verify bootstrap revision
+
+**Purpose:** Make the active Project's static bootstrap match the versioned repository bootstrap before lower-model execution.
 
 **External action:** user replaces stale Project bootstrap files because current tools cannot mutate Project membership/content.
 
@@ -849,11 +891,15 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - confirm expected new filenames/revision;
 - stale K2/H0 bootstrap does not remain authoritative.
 
+**Verification:** re-list active Project files and read the revision marker; Expected: `k3-h0-r2-v1` present and stale K2/H0 bootstrap files are not authoritative.
+
 **State:** set `PROJECT_BOOTSTRAP_CURRENT=PASS` only after observed verification.
 
 **Stop:** Project not refreshed -> `PROJECT_BOOTSTRAP_STALE`.
 
 ### Task 28: Run Task 5 no-write weak-model dry-run
+
+**Purpose:** Verify the lower-reasoning execution bundle is sufficient to identify every Task 5 action and stop condition without product writes or hidden context.
 
 **Inputs only:**
 - static Project bootstrap;
@@ -877,9 +923,15 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - stop codes;
 - merge prohibition.
 
-**Expected:** `TASK5_DRY_RUN_PASS=PASS`.
+**Verification procedure:** run the repository dry-run harness against Task 5 packet/envelope/brief with filesystem mutation disabled or pointed at a disposable fixture workspace.
+
+**Expected:** `TASK5_DRY_RUN_PASS=PASS`; product branch diff remains empty for Task 5 product files.
+
+**Stop conditions:** any missing instruction, invented decision, product write, or merge attempt -> FAIL and return to high-reasoning plan/compiler repair.
 
 ### Task 29: Run final live adversarial readiness against the real K3 branch/runtime
+
+**Purpose:** Re-prove fail-closed behavior against the actual K3 branch, current state, Project revision, and observed runtime rather than fixtures alone.
 
 Repeat the Spec adversarial cases against actual state/envelope/runtime, including:
 - synthetic main drift;
@@ -890,9 +942,15 @@ Repeat the Spec adversarial cases against actual state/envelope/runtime, includi
 - false review capability;
 - merge attempt.
 
-**Expected:** all blocked; no product files modified.
+**Verification command:** `node scripts/process/adversarial_readiness.js --live-runtime` (or the exact CLI implemented by Task 20 if its flag name differs through a ledgered mechanical ruling).
+
+**Expected:** all cases blocked with fixed codes; no product files modified.
+
+**Stop conditions:** any adversarial case reaches accepted execution or mutates product files.
 
 ### Task 30: Certify low-model readiness
+
+**Purpose:** Advance durable state to lower-model readiness only after every H0/H0-R2/live-runtime/Project gate has fresh evidence.
 
 **Files:**
 - update `CURRENT-STATE.json`;
@@ -912,13 +970,17 @@ Repeat the Spec adversarial cases against actual state/envelope/runtime, includi
 - `low_model_ready=true`.
 
 **Final validation command:**
-`npm run validate:state -- --live-main-sha <EXACT_R2_INTEGRATED_MAIN> --json`
+`LIVE_MAIN_SHA="$(git rev-parse main)"; npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --json`
 
-**Expected final machine result includes:**
+**Expected GREEN:** final machine result includes:
 - `ok=true`;
 - `next_task=5`;
 - `low_model_ready=true`;
 - all readiness gates PASS.
+
+**Affected regression:** `npm run process:verify && npm test`.
+
+**Stop conditions:** any gate non-PASS, main/base drift, packet/brief mismatch, SDD workspace invalid, Project bootstrap stale, or open Critical/Important finding.
 
 **Commit:** `chore: certify K3 low-model execution readiness`.
 
