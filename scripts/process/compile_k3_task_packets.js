@@ -140,8 +140,11 @@ function parseCommit(section, title) {
 function implementationIntent(section, taskId) {
   const items = [...section.matchAll(/^- \[[ xX]\]\s+(.+)$/gm)].map((m) => m[1].trim());
   const candidate = items.find((item) =>
-    /^(Implement|Generate|Add|Create|Resolve|Update|Reuse|Wire|Refactor|Persist|Build|Expose|Register|Assemble|Write post-merge|Verify live)/i.test(item)
-    && !/^Write failing/i.test(item)
+    !/^(?:Write|Add) failing\b/i.test(item)
+    && !/^Execute\b/i.test(item)
+    && !/^Run\b/i.test(item)
+    && !/^Commit\b/i.test(item)
+    && !/^Record exact branch HEAD\b/i.test(item)
   );
   if (!candidate) fail('implementation intent', taskId);
   return candidate;
