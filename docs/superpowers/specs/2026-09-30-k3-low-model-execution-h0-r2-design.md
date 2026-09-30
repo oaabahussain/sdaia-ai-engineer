@@ -108,10 +108,13 @@ approved spec + approved plan + CURRENT-STATE
          Deterministic Task Compiler
                     |
                     v
-       TaskExecutionPacketV1 (derived)
+       TaskDefinitionPacketV1 (derived, static)
                     |
                     v
-           Packet/Preflight Validator
+        TaskExecutionEnvelopeV1 (dynamic binding)
+                    |
+                    v
+         Packet/Envelope Preflight Validator
                     |
           +---------+---------+
           |                   |
@@ -135,25 +138,27 @@ approved spec + approved plan + CURRENT-STATE
 
 The lower-reasoning executor never receives architecture authority. It receives one validated task packet plus the minimum referenced files.
 
-## 5. TaskExecutionPacketV1
+## 5. TaskDefinitionPacketV1 and TaskExecutionEnvelopeV1
 
 ### 5.1 Purpose
 
-`TaskExecutionPacketV1` is a deterministic, immutable-for-a-source-revision execution projection of one approved task.
+`TaskDefinitionPacketV1` is a deterministic, immutable-for-a-contract-revision projection of one approved task. It contains only information that should remain stable while the approved spec/plan revision is unchanged.
 
 It is generated from:
 
 - frozen K3 spec;
 - frozen K3 plan;
-- validated current state;
-- runtime capability profile;
 - durable process failure rules.
 
-It is **not manually authored** after the compiler exists.
+It deliberately does **not** embed live state, branch HEAD, `base_main_sha`, Project bootstrap status, active runtime capability observations, or CI run IDs.
 
-### 5.2 Required packet fields
+`TaskExecutionEnvelopeV1` is the small dynamic binding created immediately before one task execution. It binds the static task packet to the validated live execution state and runtime.
 
-Each packet contains:
+Neither artifact is manually authored after the compiler/binder exists.
+
+### 5.2 Required task-definition packet fields
+
+Each `TaskDefinitionPacketV1` contains:
 
 ```text
 schema_version
@@ -167,9 +172,7 @@ authority:
   spec_blob_sha
   plan_path
   plan_blob_sha
-  state_revision
-  base_main_sha
-  execution_branch
+  process_failure_rules_revision
 
 purpose
 phase
@@ -214,9 +217,29 @@ merge_authority
 packet_source_digest
 ```
 
-### 5.3 Packet invariants
+### 5.3 Required execution-envelope fields
 
-A valid packet MUST satisfy:
+Each `TaskExecutionEnvelopeV1` contains:
+
+```text
+schema_version
+envelope_version
+task_id
+task_packet_digest
+state_revision
+base_main_sha
+execution_branch
+project_bootstrap_revision
+runtime_capability_profile_digest
+created_from_ref
+preflight_gate_set
+```
+
+The envelope is regenerated for the current task whenever live state changes. It is not precompiled for future tasks.
+
+### 5.4 Packet invariants
+
+A valid task-definition packet MUST satisfy:
 
 - exactly one task;
 - no unresolved placeholder;
@@ -228,15 +251,16 @@ A valid packet MUST satisfy:
 - explicit file scope;
 - explicit stop conditions;
 - `merge_authority=false` for Tasks 5-41 lower-model execution;
-- source hashes equal approved current spec/plan hashes;
-- packet digest reproducible from identical sources;
+- source hashes equal the approved spec/plan contract revision;
+- packet digest reproducible from identical static sources;
+- no live SHA/state revision/runtime observation is embedded;
 - no hidden architecture constant absent from spec/plan.
 
-## 6. Deterministic task compiler
+## 6. Deterministic task compiler and execution binder
 
 ### 6.1 Compiler role
 
-The compiler converts approved task text into packet structure. It may normalize syntax; it may not invent semantics.
+The compiler converts approved task text into `TaskDefinitionPacketV1`. It may normalize syntax; it may not invent semantics.
 
 Allowed transformations:
 
@@ -269,6 +293,21 @@ TASK_PACKET_COMPILE_BLOCKED
 ```
 
 The high-reasoning session repairs the plan/spec through the appropriate approval/amendment path. The compiler never guesses.
+
+### 6.2 Execution binder role
+
+The binder takes:
+
+- one valid `TaskDefinitionPacketV1`;
+- validated `CURRENT-STATE`;
+- observed runtime capability profile;
+- verified Project bootstrap revision;
+
+and produces `TaskExecutionEnvelopeV1` for the current `next_task` only.
+
+The binder MUST fail if `task_id != next_task`, `base_main_sha` is absent/mismatched, the packet hashes do not match the state-approved contract hashes, or the runtime cannot satisfy `runtime_requirements`.
+
+Dynamic execution facts belong in the envelope, not the static packet.
 
 ## 7. ProcessFailureRuleV1 registry
 
@@ -325,6 +364,8 @@ All must be PASS:
 - `TASK_PACKET_VALID`
 - `TASK_PACKET_FRESH`
 - `TASK_PACKET_DETERMINISTIC`
+- `TASK_EXECUTION_ENVELOPE_VALID`
+- `TASK_EXECUTION_ENVELOPE_FRESH`
 - `TASK_SCOPE_VALID`
 - `BEHAVIORAL_RED_DEFINED`
 - `GREEN_DEFINED`
@@ -584,7 +625,7 @@ Required check identities remain unique and stable:
 
 ## 17. Result validator
 
-After GREEN/regression, the result validator checks:
+After GREEN/regression, the result validator checks the task definition packet plus the exact execution envelope that authorized the run:
 
 - expected GREEN command passed;
 - affected regression passed;
@@ -592,6 +633,7 @@ After GREEN/regression, the result validator checks:
 - no forbidden file;
 - current live main still equals branch base;
 - packet source hashes still match;
+- envelope `state_revision/base_main_sha/execution_branch` still match current validated state;
 - no new Critical/Important process finding;
 - commit message matches packet;
 - task ledger entry contains required evidence fields.
@@ -674,11 +716,12 @@ The lower-reasoning executor receives only:
 
 1. static Project bootstrap;
 2. validated `CURRENT-STATE`;
-3. current `TaskExecutionPacketV1`;
-4. relevant approved spec slice;
-5. files listed in task scope/interfaces;
-6. focused tests;
-7. current SDD/task execution record.
+3. current `TaskDefinitionPacketV1`;
+4. current `TaskExecutionEnvelopeV1`;
+5. relevant approved spec slice;
+6. files listed in task scope/interfaces;
+7. focused tests;
+8. current SDD/task execution record.
 
 It does not receive by default:
 
@@ -761,6 +804,7 @@ H0-R2 extends readiness with:
 - `PROCESS_FAILURE_RULES_VALID`
 - `TASK_PACKET_SCHEMA_VALID`
 - `TASK_PACKET_COMPILER_VALID`
+- `TASK_EXECUTION_BINDER_VALID`
 - `ALL_REMAINING_TASK_PACKETS_VALID`
 - `TASK_PACKET_DETERMINISM_VALID`
 - `TASK_SCOPE_GUARD_VALID`
@@ -783,6 +827,8 @@ Fixed status codes include:
 - `TASK_PACKET_SCHEMA_INVALID`
 - `TASK_PACKET_STALE`
 - `TASK_PACKET_NONDETERMINISTIC`
+- `TASK_EXECUTION_ENVELOPE_INVALID`
+- `TASK_EXECUTION_ENVELOPE_STALE`
 - `TASK_ID_MISMATCH`
 - `MAIN_DRIFT`
 - `PLAN_SPEC_HASH_MISMATCH`
@@ -823,6 +869,7 @@ Even after H0-R2, these remain outside lower-model authority:
 H0-R2 may create or modify process/control-plane artifacts including:
 
 - packet schema/compiler/validator;
+- execution-envelope schema/binder/validator;
 - failure-rule registry;
 - task linter;
 - runtime capability schema/profile;
@@ -869,7 +916,8 @@ After written-spec approval, `writing-plans` will convert this design into small
 - create H0-R2 implementation branch.
 
 ### Phase R2-B — packet contracts
-- TaskExecutionPacketV1 schema;
+- TaskDefinitionPacketV1 schema;
+- TaskExecutionEnvelopeV1 schema/binder;
 - ProcessFailureRuleV1 schema/registry;
 - runtime capability profile schema;
 - deterministic compiler;
@@ -907,20 +955,21 @@ The implementation plan may split these further. It may not combine independent 
 H0-R2 is complete only when fresh evidence proves:
 
 1. H0 and H0-R2 are integrated and post-merge verified;
-2. Tasks 5-41 compile into valid deterministic packets;
-3. identical compiler inputs reproduce identical packet bytes;
-4. every packet is self-contained and source-hash bound;
-5. all known H0 failure families F001-F014 have durable regression coverage or a documented non-automatable compensating control;
-6. preflight fails closed on every adversarial pressure case;
-7. result validation catches unexpected file changes/test weakening/state drift;
-8. runtime capability profile matches the active execution environment;
-9. CI has no duplicate PR-branch server push run;
-10. no open Critical/Important finding remains;
-11. active Project bootstrap revision is verified;
-12. Task 5 no-write dry-run passes;
-13. real K3 execution branch is based on exact integrated main;
-14. official K3 SDD workspace initializes successfully or the active runtime records a verified approved equivalent only if the authoritative Superpowers workflow allows it;
-15. `CURRENT-STATE` validates with:
+2. Tasks 5-41 compile into valid deterministic static task-definition packets;
+3. identical compiler inputs reproduce identical task-definition packet bytes regardless of active runtime or state revision;
+4. execution envelopes are generated only for the current task and bind packet + live state + runtime truth;
+5. every packet is self-contained and source-hash bound;
+6. all known H0 failure families F001-F014 have durable regression coverage or a documented non-automatable compensating control;
+7. preflight fails closed on every adversarial pressure case;
+8. result validation catches unexpected file changes/test weakening/state drift;
+9. runtime capability profile matches the active execution environment;
+10. CI has no duplicate PR-branch server push run;
+11. no open Critical/Important finding remains;
+12. active Project bootstrap revision is verified;
+13. Task 5 no-write dry-run passes;
+14. real K3 execution branch is based on exact integrated main;
+15. official K3 SDD workspace initializes successfully or the active runtime records a verified approved equivalent only if the authoritative Superpowers workflow allows it;
+16. `CURRENT-STATE` validates with:
     - `next_task=5`;
     - `low_model_ready=true`;
     - every applicable H0/H0-R2 readiness gate PASS;
