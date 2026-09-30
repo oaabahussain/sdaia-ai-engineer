@@ -69,7 +69,9 @@ function parseFiles(section, taskId) {
     }
   }
 
-  if (!allowedCreate.length && !allowedModify.length && !allowedDelete.length) fail('Files paths', taskId);
+  if (!allowedCreate.length && !allowedModify.length && !allowedDelete.length) {
+    if (!/no planned product files/i.test(block)) fail('Files paths', taskId);
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
