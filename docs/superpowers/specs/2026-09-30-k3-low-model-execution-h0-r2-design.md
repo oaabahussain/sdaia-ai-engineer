@@ -6,7 +6,7 @@
 **Design base:** `27dd4f33218d5868bc4b8e057bb4f391c6fde4e6` (reviewed H0 PR #23 head)  
 **Programme:** K3 Learner Evidence Engine  
 **Scope:** Process/control-plane hardening only. No K3 Task 5 product implementation.  
-**Status:** DESIGN — awaiting explicit written-spec approval before implementation planning.
+**Status:** APPROVED FOR IMPLEMENTATION PLANNING — approved 2026-09-30; semantic changes require renewed approval.
 
 ## 1. Purpose
 
