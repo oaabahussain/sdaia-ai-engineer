@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "runtime-capability-profile-v1.schema.json",
+  "title": "RuntimeCapabilityProfileV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_version", "capabilities"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "profile_version": { "const": 1 },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_discovery",
+        "file_access",
+        "shell_execution",
+        "git_worktree",
+        "github_write",
+        "web_search",
+        "durable_workspace",
+        "subagent_review",
+        "fresh_context_review",
+        "project_file_mutation"
+      ],
+      "properties": {
+        "skill_discovery": { "$ref": "#/definitions/status" },
+        "file_access": { "$ref": "#/definitions/status" },
+        "shell_execution": { "$ref": "#/definitions/status" },
+        "git_worktree": { "$ref": "#/definitions/status" },
+        "github_write": { "$ref": "#/definitions/status" },
+        "web_search": { "$ref": "#/definitions/status" },
+        "durable_workspace": { "$ref": "#/definitions/status" },
+        "subagent_review": { "$ref": "#/definitions/status" },
+        "fresh_context_review": { "$ref": "#/definitions/status" },
+        "project_file_mutation": { "$ref": "#/definitions/status" }
+      }
+    }
+  },
+  "definitions": {
+    "status": { "enum": ["AVAILABLE", "UNAVAILABLE", "UNKNOWN"] }
+  }
+}
