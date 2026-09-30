@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import { extractTask, taskSourceDigest } from './k3_task_extract.js';
 import { stableJson, sha256Text } from './stable_json.js';
 import { validateTaskDefinitionPacket } from './validate_task_packet.js';
@@ -156,6 +157,11 @@ function implementationIntent(section, taskId) {
   return candidate;
 }
 
+export function gitBlobSha(text) {
+  const bytes = Buffer.byteLength(text, 'utf8');
+  return createHash('sha1').update(`blob ${bytes}\\0`, 'utf8').update(text, 'utf8').digest('hex');
+}
+
 function parseSpecPath(planText) {
   const match = planText.match(/^\*\*Spec:\*\*\s+`([^`]+)`/m);
   return match?.[1] ?? DEFAULT_SPEC_PATH;
@@ -244,15 +250,12 @@ function parseArg(name) {
 function runCli() {
   const planPath = parseArg('--plan') ?? DEFAULT_PLAN_PATH;
   const rulesPath = parseArg('--rules') ?? DEFAULT_RULES_PATH;
-  const specBlobSha = parseArg('--spec-blob-sha');
-  const planBlobSha = parseArg('--plan-blob-sha');
   const check = process.argv.includes('--check');
-  if (!specBlobSha || !planBlobSha) {
-    process.stderr.write('TASK_PACKET_COMPILE_BLOCKED CLI requires --spec-blob-sha and --plan-blob-sha\n');
-    process.exitCode = 1;
-    return;
-  }
   const planText = readFileSync(resolve(planPath), 'utf8');
+  const specPath = parseSpecPath(planText);
+  const specText = readFileSync(resolve(specPath), 'utf8');
+  const specBlobSha = parseArg('--spec-blob-sha') ?? gitBlobSha(specText);
+  const planBlobSha = parseArg('--plan-blob-sha') ?? gitBlobSha(planText);
   const rules = JSON.parse(readFileSync(resolve(rulesPath), 'utf8'));
   const rulesDigest = sha256Text(stableJson(rules));
   const packets = compileAllTaskPackets({

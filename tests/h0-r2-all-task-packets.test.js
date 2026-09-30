@@ -1,24 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { compileAllTaskPackets } from '../scripts/process/compile_k3_task_packets.js';
-import { stableJson } from '../scripts/process/stable_json.js';
+import { compileAllTaskPackets, gitBlobSha } from '../scripts/process/compile_k3_task_packets.js';
+import { stableJson, sha256Text } from '../scripts/process/stable_json.js';
 import { validateTaskDefinitionPacket } from '../scripts/process/validate_task_packet.js';
 
 const PLAN = readFileSync(
   new URL('../docs/superpowers/plans/2026-09-29-k3-learner-evidence-engine.md', import.meta.url),
   'utf8'
 );
-const H40 = 'a'.repeat(40);
-const H64 = 'b'.repeat(64);
+const SPEC = readFileSync(
+  new URL('../docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md', import.meta.url),
+  'utf8'
+);
+const RULES = JSON.parse(readFileSync(
+  new URL('../docs/superpowers/process/process-failure-rules-v1.json', import.meta.url),
+  'utf8'
+));
 
 function compile() {
   return compileAllTaskPackets({
     planText: PLAN,
-    specBlobSha: H40,
-    planBlobSha: H40,
-    rulesRevision: 'h0-r2-v1',
-    rulesDigest: H64,
+    specBlobSha: gitBlobSha(SPEC),
+    planBlobSha: gitBlobSha(PLAN),
+    rulesRevision: RULES.revision,
+    rulesDigest: sha256Text(stableJson(RULES)),
     firstTask: 5,
     lastTask: 41
   });
