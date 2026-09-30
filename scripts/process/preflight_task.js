@@ -23,7 +23,7 @@ export function preflightTask(x){
  add('REGRESSION_DEFINED',Boolean(packet?.regression?.command));
  add('STOP_CONDITIONS_DEFINED',Array.isArray(packet?.stop_conditions)&&packet.stop_conditions.length>0);
  add('NO_SHORTHAND',!/^\s*Run\s+(RED|GREEN)\s*$/mi.test(packet?.red?.command??''));
- add('NO_DYNAMIC_STALE_PINS',true);
+ add('NO_DYNAMIC_STALE_PINS',x.executionLintOk===true);
  add('NO_OPEN_CRITICAL',(state?.open_critical_findings??0)===0);
  add('NO_OPEN_IMPORTANT',(state?.open_important_findings??0)===0);
  add('EXECUTION_BRANCH_VALID',Boolean(state?.execution_branch)&&envelope?.execution_branch===state.execution_branch);
