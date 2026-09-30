@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "revision": "h0-r2-v1",
+  "rules": [
+    {
+      "rule_id": "F001",
+      "failure_family": "residual_execution_shorthand",
+      "severity": "IMPORTANT",
+      "original_symptom": "Bare Run RED/GREEN shorthand remained across later K3 tasks.",
+      "root_cause": "Task execution text depended on interpretation outside the task section.",
+      "prevention_rule": "Reject bare execution shorthand and require exact commands plus expected outcomes in each task contract.",
+      "validator_id": "lint_execution_contracts",
+      "regression_test_ref": "tests/h0-r2-execution-lint.test.js",
+      "applies_to": [
+        "plan",
+        "task_packet"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F002",
+      "failure_family": "historical_sha_pin",
+      "severity": "IMPORTANT",
+      "original_symptom": "A reusable state CLI regression pinned the pre-H0 main SHA.",
+      "root_cause": "Dynamic execution state was encoded as a static literal.",
+      "prevention_rule": "Resolve live execution refs from validated state/runtime and reject stale dynamic pins.",
+      "validator_id": "lint_execution_contracts",
+      "regression_test_ref": "tests/h0-r2-execution-lint.test.js",
+      "applies_to": [
+        "state",
+        "tests",
+        "bootstrap"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F003",
+      "failure_family": "implementation_coupled_contract_test",
+      "severity": "IMPORTANT",
+      "original_symptom": "Workflow tests asserted an inline cp -R implementation detail.",
+      "root_cause": "A boundary contract test was coupled to one implementation mechanism.",
+      "prevention_rule": "Prefer externally observable boundary behavior and allow structural assertions only when text is normative.",
+      "validator_id": "check_test_contracts",
+      "regression_test_ref": "tests/h0-r2-test-contract-guard.test.js",
+      "applies_to": [
+        "tests",
+        "ci"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F004",
+      "failure_family": "false_review_independence",
+      "severity": "IMPORTANT",
+      "original_symptom": "A new chat/session could be mistaken for an independent reviewer.",
+      "root_cause": "Review independence was inferred from session shape instead of observed capability.",
+      "prevention_rule": "Record review_mode truthfully and require actual independent execution before claiming independence.",
+      "validator_id": "runtime_capabilities",
+      "regression_test_ref": "tests/h0-r2-runtime-capabilities.test.js",
+      "applies_to": [
+        "review",
+        "runtime"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F005",
+      "failure_family": "unavailable_runtime_assumption",
+      "severity": "IMPORTANT",
+      "original_symptom": "Local worktree execution was unavailable in the active harness.",
+      "root_cause": "Runtime capabilities were assumed instead of observed.",
+      "prevention_rule": "Represent required capabilities explicitly and fail closed when unavailable or unknown.",
+      "validator_id": "runtime_capabilities",
+      "regression_test_ref": "tests/h0-r2-runtime-capabilities.test.js",
+      "applies_to": [
+        "runtime",
+        "workspace"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F006",
+      "failure_family": "stale_bootstrap_authority",
+      "severity": "IMPORTANT",
+      "original_symptom": "Static Project startup files lagged live repository state.",
+      "root_cause": "Mutable execution status was duplicated into bootstrap files.",
+      "prevention_rule": "Keep bootstrap static and gate execution on verified bootstrap revision plus live CURRENT-STATE.",
+      "validator_id": "lint_execution_contracts",
+      "regression_test_ref": "tests/h0-r2-project-bootstrap.test.js",
+      "applies_to": [
+        "bootstrap",
+        "state"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F007",
+      "failure_family": "verification_self_reference",
+      "severity": "IMPORTANT",
+      "original_symptom": "Recording final run IDs in the verified branch would change the exact head being verified.",
+      "root_cause": "Final evidence and verified code head were coupled into a self-reference loop.",
+      "prevention_rule": "Keep final exact-head evidence external to the exact verified head and checkpoint it later.",
+      "validator_id": "preflight_task",
+      "regression_test_ref": "tests/h0-r2-preflight.test.js",
+      "applies_to": [
+        "verification",
+        "git"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F008",
+      "failure_family": "ambiguous_ci_identity",
+      "severity": "IMPORTANT",
+      "original_symptom": "Multiple workflow jobs previously shared ambiguous check names.",
+      "root_cause": "Required check identity was not unique and stable.",
+      "prevention_rule": "Require unique stable check identities for mandatory CI gates.",
+      "validator_id": "lint_execution_contracts",
+      "regression_test_ref": "tests/h0-r2-ci-contract.test.js",
+      "applies_to": [
+        "ci"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F009",
+      "failure_family": "process_product_scope_leak",
+      "severity": "CRITICAL",
+      "original_symptom": "Process hardening could accidentally include K3 Task 5 product files.",
+      "root_cause": "Process work lacked a machine-enforced changed-file boundary.",
+      "prevention_rule": "Validate every task diff from task_base_sha against explicit allowed and forbidden paths.",
+      "validator_id": "check_task_scope",
+      "regression_test_ref": "tests/h0-r2-scope-guard.test.js",
+      "applies_to": [
+        "scope",
+        "git"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F010",
+      "failure_family": "non_behavioral_red",
+      "severity": "IMPORTANT",
+      "original_symptom": "A generic import/setup failure could be mistaken for proof of missing behavior.",
+      "root_cause": "RED failure class was not explicitly classified.",
+      "prevention_rule": "Require accepted behavioral RED evidence and reject unrelated setup/import/environment failures.",
+      "validator_id": "validate_accepted_red",
+      "regression_test_ref": "tests/h0-r2-accepted-red.test.js",
+      "applies_to": [
+        "tdd",
+        "tests"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F011",
+      "failure_family": "main_drift",
+      "severity": "CRITICAL",
+      "original_symptom": "An execution branch can outlive the main SHA it was based on.",
+      "root_cause": "Execution proceeded without binding branch state to live main.",
+      "prevention_rule": "Bind execution to base_main_sha and block when live main differs.",
+      "validator_id": "preflight_task",
+      "regression_test_ref": "tests/h0-r2-preflight.test.js",
+      "applies_to": [
+        "state",
+        "git"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F012",
+      "failure_family": "spec_plan_drift",
+      "severity": "CRITICAL",
+      "original_symptom": "Execution annotations can change the approved spec/plan blob SHA.",
+      "root_cause": "Derived execution contracts can silently become stale.",
+      "prevention_rule": "Bind packets to approved spec/plan blob hashes and fail closed on mismatch.",
+      "validator_id": "validate_task_packet",
+      "regression_test_ref": "tests/h0-r2-task-packet-schema.test.js",
+      "applies_to": [
+        "spec",
+        "plan",
+        "task_packet"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F013",
+      "failure_family": "batch_context_inflation",
+      "severity": "IMPORTANT",
+      "original_symptom": "Lower-reasoning execution required reading broad historical context.",
+      "root_cause": "The executor lacked a minimal one-task working set.",
+      "prevention_rule": "Compile one-task packets and supply only the current task working set.",
+      "validator_id": "compile_k3_task_packets",
+      "regression_test_ref": "tests/h0-r2-task-compiler.test.js",
+      "applies_to": [
+        "context",
+        "task_packet"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    },
+    {
+      "rule_id": "F014",
+      "failure_family": "hidden_capability_expansion",
+      "severity": "CRITICAL",
+      "original_symptom": "An executor may improvise when a required tool or capability is absent.",
+      "root_cause": "No explicit downgrade/block path existed for missing capabilities.",
+      "prevention_rule": "Observe capabilities explicitly; use only approved fallbacks; otherwise return RUNTIME_CAPABILITY_BLOCKED.",
+      "validator_id": "runtime_capabilities",
+      "regression_test_ref": "tests/h0-r2-runtime-capabilities.test.js",
+      "applies_to": [
+        "runtime",
+        "safety"
+      ],
+      "introduced_by_evidence": "docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md",
+      "status": "ACTIVE"
+    }
+  ]
+}

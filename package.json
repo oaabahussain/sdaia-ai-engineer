@@ -8,7 +8,8 @@
     "verify:sw": "node scripts/verify_sw_assets.js .",
     "factory": "node scripts/platform-kernel/cli.js",
     "verify:factory-import": "node scripts/platform-kernel/verify_current_import.js",
-    "validate:state": "node scripts/validate_current_state.js"
+    "validate:state": "node scripts/validate_current_state.js",
+    "process:validate-rules": "node scripts/process/validate_failure_rules.js"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
