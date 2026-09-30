@@ -320,6 +320,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Affected regression:** `npm test`.
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: define H0-R2 task packet contract`.
 
 ### Task 7: Implement deterministic K3 task extraction
@@ -385,6 +387,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Affected regression:** `npm test`.
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: compile deterministic K3 task packets`.
 
 ### Task 9: Prove all Tasks 5-41 packet completeness and byte determinism
@@ -408,6 +412,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - no runtime/live fields.
 
 **Affected regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `test: enforce K3 packet completeness and determinism`.
 
@@ -437,6 +443,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** PASS; missing observation -> UNKNOWN, never AVAILABLE.
 
 **Regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `feat: add truthful runtime capability profile`.
 
@@ -469,6 +477,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** PASS.
 
 **Regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `feat: bind K3 packets to live execution state`.
 
@@ -508,6 +518,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Regression:** `npm test`.
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: lint low-model execution contracts`.
 
 ### Task 13: Add AcceptedRedEvidenceV1 freeze guard
@@ -534,6 +546,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** PASS.
 
 **Regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `feat: freeze accepted RED evidence`.
 
@@ -562,6 +576,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Regression:** `npm test`.
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: enforce per-task changed-file scope`.
 
 ### Task 15: Add implementation-coupling test guard
@@ -587,6 +603,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** PASS.
 
 **Regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `feat: guard known implementation-coupled tests`.
 
@@ -624,6 +642,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Regression:** `npm test`.
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: add low-model task preflight gate`.
 
 ### Task 17: Implement result validator and completion atomicity
@@ -655,6 +675,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** PASS.
 
 **Regression:** `npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `feat: validate task results before checkpoint`.
 
@@ -714,6 +736,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Regression:** `LIVE_MAIN_SHA="$(git rev-parse main)"; npm test && npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --json`
 
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
+
 **Commit:** `feat: extend execution state for H0-R2 readiness`.
 
 ---
@@ -739,6 +763,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Expected GREEN:** 15/15 fail closed.
 
 **Regression:** `npm run process:verify && npm test`.
+
+**Stop conditions:** unexpected failure class -> systematic-debugging; requirement not uniquely determined by approved spec/plan -> `PLAN_DECISION_REQUIRED`; file outside named task scope -> `SCOPE_EXPANSION_BLOCKED`.
 
 **Commit:** `test: prove H0-R2 adversarial fail-closed behavior`.
 
@@ -766,6 +792,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 
 **Expected:** zero failures. Record exact command results from this HEAD only; no prior run may satisfy the checkpoint.
 
+**Stop conditions:** any fresh command fails, packet regeneration differs, adversarial suite is not 15/15 blocked, or a Task 5 product file changed.
+
 **Checkpoint must report:**
 - exact HEAD;
 - packet count 37/37;
@@ -777,6 +805,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 **Commit:** `test: checkpoint H0-R2 pre-integration readiness`.
 
 ### Task 22: Whole-branch review and one Important/Critical fix pass
+
+**Purpose:** Apply the Superpowers whole-branch review floor to the complete H0-R2 diff and close every Critical/Important finding through one RED->GREEN fix pass before integration.
 
 **Files:**
 - Create `docs/superpowers/reviews/2026-09-30-h0-r2-whole-branch-review.md`
@@ -791,6 +821,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - Critical/Important -> one RED->GREEN fix pass;
 - Minor -> deferred ledger entries;
 - rerun Task 21 full suite after fix pass.
+
+**Expected:** review mode is truthfully recorded; all Review Focus items are explicitly checked; Critical/Important open count is 0 after at most one fix pass; full Task 21 verification is green after fixes.
 
 **Stop:** any open Critical/Important.
 
@@ -812,6 +844,8 @@ Run: authoritative Superpowers workspace/ledger check for this plan.
 - changed-file boundary contains no K3 Task 5 product implementation.
 
 **Evidence rule:** final run IDs go in PR metadata/body, not a new branch commit.
+
+**Expected:** PR head remains exactly the reviewed H0-R2 HEAD, both required checks are SUCCESS on that head, changed-file boundary excludes all K3 Task 5 product files, and no evidence-only commit changes the verified head.
 
 **Stop:** low-reasoning executor cannot merge.
 
