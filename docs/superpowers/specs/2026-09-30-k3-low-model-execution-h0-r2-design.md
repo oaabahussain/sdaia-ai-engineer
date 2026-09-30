@@ -241,7 +241,41 @@ The envelope is regenerated for the current task whenever live state changes. It
 
 `task_base_sha` is the exact durable checkpoint HEAD from which this one task begins. Scope/result validation always compares `task_base_sha..task_result_head`, not programme base..HEAD.
 
-### 5.4 Packet invariants
+### 5.4 Canonical artifact locations
+
+Static task-definition packets are checked in under:
+
+`docs/superpowers/task-packets/k3/task-005.json` through `task-041.json`.
+
+They are derived artifacts and may always be regenerated from the approved plan/spec/rules. A checked-in packet that differs from regeneration is invalid.
+
+Dynamic execution artifacts live inside the plan's Superpowers SDD workspace, not in Git by default:
+
+- `task-<N>-execution-envelope.json`;
+- `task-<N>-accepted-red.json`;
+- focused test logs;
+- temporary validation reports.
+
+This keeps current-state truth in `CURRENT-STATE`/ledger while preserving compact per-task recovery data in the workspace Superpowers already owns.
+
+### 5.5 Canonical bytes and digests
+
+Packet determinism is byte-level, not merely semantic JSON equality.
+
+The compiler emits UTF-8 JSON with:
+
+- fixed schema-defined property order;
+- two-space indentation;
+- LF line endings;
+- exactly one trailing newline;
+- arrays preserved in approved plan order;
+- no runtime timestamps or environment-specific fields.
+
+`packet_source_digest` is SHA-256 over the exact canonical packet bytes before any execution envelope exists.
+
+Runtime capability profiles and execution envelopes use the same repository stable-JSON writer for their own digests. No new package is required solely for process canonicalization.
+
+### 5.6 Packet invariants
 
 A valid task-definition packet MUST satisfy:
 
@@ -330,7 +364,15 @@ The high/low-model execution session still follows `superpowers:executing-plans`
 
 If the active runtime cannot satisfy the required Superpowers workspace/worktree behavior, low-model execution is blocked unless the authoritative Superpowers workflow itself provides an approved equivalent. H0-R2 cannot invent one.
 
-### 7.2 Task start
+### 7.2 Compiler/Superpowers extraction compatibility
+
+The repository compiler implements its own deterministic task-section extractor because GitHub CI cannot depend on marketplace Skill files being mounted there.
+
+Compatibility is enforced at execution time: after Superpowers `task-start` writes the actual brief, preflight hashes those exact brief bytes and requires equality with `task_source_digest` stored in the packet.
+
+This makes the Superpowers brief authoritative for the execution session while keeping packet compilation portable in CI. Any future extraction-rule drift becomes `TASK_PACKET_STALE`, not silent divergence.
+
+### 7.3 Task start
 
 For task N:
 
@@ -344,7 +386,7 @@ For task N:
 
 Any brief/packet mismatch returns `TASK_PACKET_STALE`.
 
-### 7.3 Ruling boundary
+### 7.4 Ruling boundary
 
 Superpowers permits ledgered rulings when the plan is wrong. H0-R2 preserves that rule but narrows what a lower-reasoning executor may decide.
 
@@ -358,7 +400,7 @@ It MUST record the normal Superpowers `Ruling:` line.
 
 A lower-reasoning executor MUST stop with `PLAN_DECISION_REQUIRED` when resolving the issue would choose among multiple valid product/process semantics, broaden scope, change an interface, choose a dependency, weaken an assertion, or invent a fallback.
 
-### 7.4 RED and implementation
+### 7.5 RED and implementation
 
 The normal Superpowers/TDD order remains:
 
@@ -374,7 +416,7 @@ task-start
 -> H0-R2 result validation
 ```
 
-### 7.5 Task done
+### 7.6 Task done
 
 Only after H0-R2 result validation passes:
 
@@ -385,7 +427,7 @@ Only after H0-R2 result validation passes:
 
 If durable checkpoint/state advancement fails after `task-done`, mark recovery as `IMPLEMENTED_NOT_CHECKPOINTED`; do not reimplement the task.
 
-### 7.6 Final review
+### 7.7 Final review
 
 H0-R2 does not weaken the Superpowers whole-branch review floor:
 
@@ -527,7 +569,7 @@ Once RED is accepted as the intended behavioral failure, persist a compact `Acce
 - hashes of every test/fixture file participating in the focused RED;
 - accepted-at task HEAD.
 
-From accepted RED until task result validation, those test/fixture hashes are frozen.
+From accepted RED until task result validation, those test/fixture hashes are frozen. The accepted-RED record lives in the Superpowers SDD workspace during execution and its essential evidence is copied into the durable K3 ledger only when the task is checkpointed.
 
 A later change to an accepted RED test/fixture is not automatically forbidden, but it requires:
 
@@ -772,7 +814,7 @@ Logical completion requires:
 6. durable ledger completion entry;
 7. current-state advancement.
 
-If state update fails after implementation, recovery resumes from the unfinished completion transaction; it does not reimplement the task.
+If state update fails after implementation, recovery resumes from the unfinished completion transaction; it does not reimplement the task. If the SDD workspace itself was lost, recovery uses `task_base_sha`, implementation commits, durable task evidence already available, and the approved packet to reconstruct the minimum missing verification; it never marks completion from conversation memory alone.
 
 The system must support:
 
