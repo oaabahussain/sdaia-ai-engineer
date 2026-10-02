@@ -97,6 +97,18 @@ Task 12: complete (range 4b75574..da2c8de; RED head 0697da6; exact focused GREEN
 
 Task 12: Ruling: restart semantics use an injected persistence adapter with `load/save` while the outbox state machine remains storage-technology-neutral — preserves transport metadata separation and lets IndexedDB/local persistence be supplied without embedding event bodies — cost if wrong: a future persistence adapter may need a more granular record API.
 
+## Native low-model execution (continued)
+
+Task 13: complete (range 376eaba..571335a; parity RED c07d5ed; adapter-scope RED 42bbcee; compiler scope fix 5b57f04; deterministic packet regeneration 54f859f; GREEN 571335a; quality run 37070809855 SUCCESS; server run 37070809809 SUCCESS).
+
+Task 13: Ruling: parity RED identified only JSONL's `type` filter as non-conformant; scope was extended only to `scripts/platform-kernel/adapters/jsonlEvidenceStore.js`, while IndexedDB and SQLite were left untouched because they already passed the same fixture — cost if wrong: a later parity defect in another adapter requires a new fail-closed scope repair instead of being pre-authorized.
+
+Task 13: Ruling: the harness cannot run the plan's exact Node+Python chained focused command in one local clone because the connected shell lacks the repository/dependency workspace; the exact Node conformance files passed in the quality suite and the exact Python conformance file passed in the server suite on the identical GREEN SHA — cost if wrong: a shell-chain-only interaction could be missed, while both language suites run independently on the same commit.
+
+## Phase B checkpoint
+
+Phase B adapters now share one logical fixture for append order, exact retry, event-ID conflict, origin-sequence conflict, late/out-of-order evidence, distinct origins, and governed filtered reads.
+
 ## Next task
 
-Task 13 — Cross-adapter store conformance.
+Task 14 — Fail-closed learner authorization port.
