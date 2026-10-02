@@ -6,3 +6,7 @@ export function getOrCreateAnonId(storage=defaultStorage()){
  try{const existing=storage?.getItem?.(ANON_KEY)||storage?.getItem?.(LEGACY_ANON_KEY);if(existing){storage?.setItem?.(ANON_KEY,existing);return existing}}catch{}
  if(memoryAnonId)return memoryAnonId;const created=globalThis.crypto?.randomUUID?.();if(!created)throw new Error('crypto.randomUUID is required to create an anonymous identifier');memoryAnonId=created;try{storage?.setItem?.(ANON_KEY,created)}catch{}return created;
 }
+
+
+export const EVIDENCE_ORIGIN_KEY='learning-platform.evidence-origin-id.v1';
+export const EVIDENCE_ORIGIN_SEQ_KEY='learning-platform.evidence-origin-seq.v1';
