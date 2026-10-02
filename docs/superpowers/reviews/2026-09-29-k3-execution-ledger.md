@@ -139,6 +139,12 @@ Task 17: complete (range 8c9ca74..e6ba98f; RED head 0b22eea; GREEN product head 
 
 Task 17: Ruling: mark outbox records IN_FLIGHT only after a push response arrives; a network/lost-ACK exception leaves the original PENDING event untouched so the next run retries the same immutable event and DUPLICATE becomes the acknowledgement — preserves at-least-once delivery without adding a reset transition to the Task 12 outbox — cost if wrong: attempt_count records acknowledged transport attempts rather than every socket attempt.
 
+## Native low-model execution (continued)
+
+Task 18: complete (range 77bd6a1..3f204c6; RED head c1772d3; GREEN head 3f204c6; quality run 37074955939 SUCCESS; server run 37074955971 SUCCESS).
+
+Task 18: Ruling: the resolver never reads client `occurred_at`; APPLIED is determined only by candidate base revision matching the current authoritative revision, with `store_seq` and `authority_ref` recorded on the resolution event — cost if wrong: callers must provide authoritative current revision explicitly rather than expecting timestamp arbitration.
+
 ## Next task
 
-Task 18 — Strict-assessment optimistic revision resolver.
+Task 19 — Correction/supersession graph resolver.
