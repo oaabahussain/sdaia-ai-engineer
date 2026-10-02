@@ -12,6 +12,8 @@ from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT7
 
+from app.evidence_auth import DenyLearnerAuthorization
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
 DATA_DIR = ROOT / 'data'
@@ -140,9 +142,10 @@ def require_anon(value):
     return None
 
 
-def create_app(db_url=None):
+def create_app(db_url=None, learner_auth=None):
     app = FastAPI(title='SDAIA AI Engineer Study Space API')
     app.state.db_url = db_url or os.getenv('DB_URL', 'sqlite:///./dev.db')
+    app.state.learner_auth = learner_auth if learner_auth is not None else DenyLearnerAuthorization()
     init_db(app.state.db_url)
 
     @app.get('/v1/health')
