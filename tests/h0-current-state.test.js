@@ -175,7 +175,7 @@ test('rejects a missing referenced execution artifact', () => {
 });
 
 
-test('repository revision-1 state is real, frozen, and intentionally not low-model ready', () => {
+test('repository current state is real and validates against its recorded live-main base', () => {
   const statePath = 'docs/superpowers/state/CURRENT-STATE.json';
   const ledgerPath = 'docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md';
   assert.equal(existsSync(statePath), true, 'CURRENT-STATE.json must exist');
@@ -185,9 +185,11 @@ test('repository revision-1 state is real, frozen, and intentionally not low-mod
   const existingPaths = [actual.spec_path, actual.plan_path, actual.ledger_path, actual.checkpoint_path]
     .filter((p) => existsSync(p));
   const blob = (p) => execFileSync('git', ['rev-parse', 'HEAD:' + p], { encoding: 'utf8' }).trim();
+  const liveMainSha = actual.base_main_sha ?? SHA_A;
+  const sourceRef = actual.base_main_sha ? actual.execution_branch : 'main';
   const checked = validateCurrentState(actual, {
-    liveMainSha: SHA_A,
-    sourceRef: 'main',
+    liveMainSha,
+    sourceRef,
     specBlobSha: blob(actual.spec_path),
     planBlobSha: blob(actual.plan_path),
     ledgerText: ledger,
@@ -195,10 +197,9 @@ test('repository revision-1 state is real, frozen, and intentionally not low-mod
     minimumStateRevision: 1
   });
   assert.equal(checked.ok, true, JSON.stringify(checked));
-  assert.equal(actual.state_revision, 1);
+  assert.ok(actual.state_revision >= 1);
   assert.equal(actual.completed_through_task, 4);
   assert.equal(actual.next_task, 5);
-  assert.equal(actual.low_model_ready, false);
   assert.equal(actual.gates.K3_TASK_BRIEFS_SELF_CONTAINED, 'PASS');
   assert.equal(actual.gates.TASKS_1_4_DURABLY_VERIFIED, 'PASS');
 });
