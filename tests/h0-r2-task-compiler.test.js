@@ -61,6 +61,7 @@ test('Task 10 dependency clause expands deterministic npm manifest scope', () =>
 test('Task 13 expand clause permits deterministic fixture modification', () => {
   const packet = compileTaskPacket({ taskId: 13, ...ARGS });
   assert.ok(packet.scope.allowed_modify.includes('tests/fixtures/k3/store-conformance.json'));
+  assert.ok(packet.scope.allowed_modify.includes('scripts/platform-kernel/adapters/jsonlEvidenceStore.js'));
 });
 
 test('Task 14 interface ruling permits create_app integration file', () => {
