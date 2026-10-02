@@ -121,6 +121,12 @@ Task 14: Ruling: the packet's exact focused pytest command was not separately in
 
 Tasks 12, 13, and 14 are durably complete. Phase C authorization boundary is now fail-closed by default.
 
+## Native low-model execution (continued)
+
+Task 15: complete (range 08df803..f02409b; RED head 10572c7; GREEN head f02409b; quality run 37072803073 SUCCESS; server run 37072803091 SUCCESS).
+
+Task 15: Ruling: authorization mismatch is an HTTP 403 boundary before any storage write, while structurally/semantically invalid evidence within an authorized batch returns a per-event REJECTED receipt so safe siblings are not rolled back — follows K3 authorization boundary plus batch per-event disposition semantics — cost if wrong: clients must distinguish authorization failure from evidence validation failure.
+
 ## Next task
 
-Task 15 — Authorized batch-push API.
+Task 16 — Authorized cursor-based pull API.
