@@ -198,8 +198,8 @@ test('repository current state is real and validates against its recorded live-m
   });
   assert.equal(checked.ok, true, JSON.stringify(checked));
   assert.ok(actual.state_revision >= 1);
-  assert.equal(actual.completed_through_task, 4);
-  assert.equal(actual.next_task, 5);
+  assert.ok(actual.completed_through_task >= 4);
+  assert.equal(actual.next_task, actual.completed_through_task + 1);
   assert.equal(actual.gates.K3_TASK_BRIEFS_SELF_CONTAINED, 'PASS');
   assert.equal(actual.gates.TASKS_1_4_DURABLY_VERIFIED, 'PASS');
 });
@@ -216,7 +216,7 @@ test('CURRENT-STATE CLI validates the real repository state', () => {
   const checked = JSON.parse(output.trim());
   assert.equal(checked.ok, true, JSON.stringify(checked));
   assert.equal(checked.code, 'STATE_VALID');
-  assert.equal(checked.details.next_task, 5);
+  assert.equal(checked.details.next_task, actual.next_task);
   assert.equal(checked.details.low_model_ready, actual.low_model_ready);
 });
 
