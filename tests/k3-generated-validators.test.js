@@ -27,7 +27,8 @@ test('generator is deterministic and committed output is fresh', () => {
   const second = readFileSync(generatedUrl, 'utf8');
   assert.equal(sha(first), sha(second), 'generator output must be deterministic');
   assert.equal(first, second, 'second generation must produce zero diff');
-  assert.doesNotMatch(first, /node:fs|from ['"]fs['"]|require\(['"]fs['"]\)/, 'generated module must be browser-safe');
-  assert.match(first, /learner-evidence-event-v2/);
+  assert.doesNotMatch(first, /\brequire\s*\(/, 'generated module must not depend on CommonJS require in the browser');
+  assert.doesNotMatch(first, /node:fs|from ['"]fs['"]/, 'generated module must be browser-safe');
+  assert.match(first, /validate_learner_evidence_event_v2/);
   assert.match(first, /response-recorded-v1/);
 });
