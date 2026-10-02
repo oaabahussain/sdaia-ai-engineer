@@ -133,6 +133,12 @@ Task 16: complete (range f1ae5ff..06d5e62; RED head ae39dc6; GREEN head 06d5e62;
 
 Task 16: Ruling: pull page size is bounded by an explicit app/env policy (`evidence_pull_max_limit` / `K3_EVIDENCE_PULL_MAX_LIMIT`) and authorization selects learner scope; query claims never select another learner — cost if wrong: deployments must configure a suitable bound for their scale profile.
 
+## Native low-model execution (continued)
+
+Task 17: complete (range 8c9ca74..e6ba98f; RED head 0b22eea; GREEN product head decb2df; test-fixture repair e6ba98f; quality run 37074326163 SUCCESS; server run 37074326128 SUCCESS).
+
+Task 17: Ruling: mark outbox records IN_FLIGHT only after a push response arrives; a network/lost-ACK exception leaves the original PENDING event untouched so the next run retries the same immutable event and DUPLICATE becomes the acknowledgement — preserves at-least-once delivery without adding a reset transition to the Task 12 outbox — cost if wrong: attempt_count records acknowledged transport attempts rather than every socket attempt.
+
 ## Next task
 
-Task 17 — EvidenceSync port and coordinator.
+Task 18 — Strict-assessment optimistic revision resolver.
