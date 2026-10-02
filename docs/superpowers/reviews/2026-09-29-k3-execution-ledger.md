@@ -83,6 +83,20 @@ Task 11: complete (range 1857e9c..dd26196; RED head 98c3f78; GREEN head dd26196;
 
 Task 11: Ruling: the approved scope cannot create one crash-atomic transaction spanning localStorage identity/sequence state and IndexedDB evidence bytes; implement serialized call-atomic sequence allocation that commits the sequence only after ACCEPTED/DUPLICATE local persistence, does not enqueue on failure, and surfaces durability failures — cost if wrong: a process crash in the narrow cross-store commit window can still require recovery/reconciliation rather than being impossible by construction.
 
+## Batch 12-14 control-plane rulings
+
+Task 13/14 control-plane RED: `4b9b699`; compiler fix `bf1934f`; regenerated packets `4b75574`; quality run `37069480541` SUCCESS; server run `37069480546` SUCCESS.
+
+Task 13: Ruling: the approved Files clause says `expand tests/fixtures/k3/store-conformance.json`; compiler now treats `expand` as deterministic modify scope — required to execute the approved plan without bypassing the scope guard — cost if wrong: any future Files clause using the word expand also grants modification to its backticked paths.
+
+Task 14: Ruling: the approved interface explicitly requires `create_app(db_url=None, learner_auth=None)`, but the Files clause omitted `server/app/main.py`; packet compiler grants that exact integration file for Task 14 only — required to implement the approved interface fail-closed — cost if wrong: Task 14 gains one additional modification path beyond the literal Files line.
+
+## Native low-model execution (continued)
+
+Task 12: complete (range 4b75574..da2c8de; RED head 0697da6; exact focused GREEN 6/6; quality run 37069801628 SUCCESS; server run 37069801413 SUCCESS).
+
+Task 12: Ruling: restart semantics use an injected persistence adapter with `load/save` while the outbox state machine remains storage-technology-neutral — preserves transport metadata separation and lets IndexedDB/local persistence be supplied without embedding event bodies — cost if wrong: a future persistence adapter may need a more granular record API.
+
 ## Next task
 
-Task 12 — EvidenceOutboxRecordV1 state machine.
+Task 13 — Cross-adapter store conformance.
