@@ -48,6 +48,15 @@ test('Task 5 compiles only approved files, interfaces, commands and commit messa
   assert.match(packet.source_contract_digest, /^[0-9a-f]{64}$/);
 });
 
+test('Task 10 dependency clause expands deterministic npm manifest scope', () => {
+  const packet = compileTaskPacket({ taskId: 10, ...ARGS });
+  assert.deepEqual(packet.scope.allowed_create, [
+    'src/evidence/indexedDbStore.js',
+    'tests/k3-indexeddb-evidence-store.test.js'
+  ]);
+  assert.deepEqual(packet.scope.allowed_modify, ['package.json', 'package-lock.json']);
+});
+
 test('Task 41 preserves post-merge verification contract without inventing unspecified paths', () => {
   const packet = compileTaskPacket({ taskId: 41, ...ARGS });
   assert.equal(packet.task_title, 'Post-merge verification and programme closure');
