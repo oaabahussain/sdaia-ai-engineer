@@ -199,10 +199,16 @@ def require_anon(value):
     return None
 
 
-def create_app(db_url=None, learner_auth=None):
+def create_app(db_url=None, learner_auth=None, evidence_pull_max_limit=None):
     app = FastAPI(title='SDAIA AI Engineer Study Space API')
     app.state.db_url = db_url or os.getenv('DB_URL', 'sqlite:///./dev.db')
     app.state.learner_auth = learner_auth if learner_auth is not None else DenyLearnerAuthorization()
+    configured_pull_limit = evidence_pull_max_limit
+    if configured_pull_limit is None:
+        configured_pull_limit = int(os.getenv('K3_EVIDENCE_PULL_MAX_LIMIT', '100'))
+    if not isinstance(configured_pull_limit, int) or configured_pull_limit < 1:
+        raise ValueError('K3 evidence pull max limit must be a positive integer')
+    app.state.evidence_pull_max_limit = configured_pull_limit
     init_db(app.state.db_url)
 
     @app.get('/v1/health')
@@ -271,6 +277,26 @@ def create_app(db_url=None, learner_auth=None):
             db.execute('INSERT INTO feedback (id, anon_id, question_id, issue_type, details, created_at) VALUES (?, ?, ?, ?, ?, ?)', (next_id, x_anon_id, payload['question_id'], payload['issue_type'], payload.get('details'), time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())))
         return {'ok': True, 'ref': f'feedback:{next_id}'}
 
+    @app.get('/v1/learner-evidence')
+    async def get_learner_evidence(request: Request, after_store_seq: int = 0, limit: int = 100):
+        try:
+            authorized = app.state.learner_auth.resolve(request)
+        except LearnerAuthorizationDenied:
+            return error('learner_not_authorized', 'Learner evidence access is not authorized', 403)
+        if after_store_seq < 0:
+            return error('validation_failed', 'after_store_seq must be zero or greater', 400)
+        if limit < 1:
+            return error('validation_failed', 'limit must be a positive integer', 400)
+        bounded_limit = min(limit, app.state.evidence_pull_max_limit)
+        with connect(app.state.db_url) as db:
+            store_id = ensure_evidence_store_id(app.state.db_url)
+            rows = db.execute(
+                'SELECT store_seq, event_json FROM k3_evidence_events WHERE store_id = ? AND learner_id = ? AND store_seq > ? ORDER BY store_seq ASC LIMIT ?',
+                (store_id, authorized.learner_id, after_store_seq, bounded_limit),
+            ).fetchall()
+        events = [json.loads(row['event_json']) for row in rows]
+        next_store_seq = rows[-1]['store_seq'] if rows else after_store_seq
+        return {'events': events, 'next_store_seq': next_store_seq}
     @app.post('/v1/learner-evidence/batch')
     async def post_learner_evidence_batch(request: Request):
         try:
