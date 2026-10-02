@@ -57,6 +57,12 @@ Task 6: Ruling: the connected runtime cannot run the plan's combined focused she
 
 Task 7: complete (range 0357fc6..a3be5b7; RED head 90ddef0; exact focused GREEN 5/5 locally; quality run 37055721650 SUCCESS; server run 37055721436 SUCCESS; planned commit a3be5b7).
 
+## Native low-model execution (continued)
+
+Task 8: complete (range fbea661..ee88c03; RED head 462b71b; GREEN head ee88c03; quality run 37059190149 SUCCESS; server run 37059190169 SUCCESS).
+
+Task 8: Ruling: exact focused command was observed as the same test file passing inside the repository-wide Node suite on the identical GREEN SHA; no separate local clone was available in this harness — cost if wrong: invocation-order-only behavior could be missed, while the full-suite run exercises a stricter environment.
+
 ## Next task
 
-Task 8 — JSONL EvidenceStoreV2.
+Task 9 — SQLite EvidenceStoreV2.
