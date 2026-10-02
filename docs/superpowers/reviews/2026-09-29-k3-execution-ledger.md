@@ -53,6 +53,10 @@ Task 6: complete (range a5a76f0..5527aa3; RED head 605b4b3; GREEN implementation
 
 Task 6: Ruling: the connected runtime cannot run the plan's combined focused shell command directly against a live local clone because the local GitHub clone path is unavailable; the same Task 6 Node test ran inside `npm test` and the Python Task 6 test ran inside `pytest -q server/tests` on the identical implementation SHA, with both workflow gates green — cost if wrong: an ordering-only interaction between the isolated focused invocation and full-suite invocation could be missed, so the shared-vector parity is additionally asserted in both language-specific tests.
 
+## Native low-model execution (continued)
+
+Task 7: complete (range 0357fc6..a3be5b7; RED head 90ddef0; exact focused GREEN 5/5 locally; quality run 37055721650 SUCCESS; server run 37055721436 SUCCESS; planned commit a3be5b7).
+
 ## Next task
 
-Task 7 — EvidenceStore port/conformance harness.
+Task 8 — JSONL EvidenceStoreV2.
