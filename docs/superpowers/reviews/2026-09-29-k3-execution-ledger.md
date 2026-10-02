@@ -47,6 +47,12 @@ Task 5: complete (range 07cd50b..99ba56b; RED head cf87711, behavioral failures 
 
 Task 5: Ruling: Ajv standalone emitted CommonJS runtime helpers despite ESM output — inline only the two deterministic helpers (Unicode code-point length and date-time format predicate) after Ajv standalone generation, and fail generation if any other CommonJS helper remains — preserves schema-derived Ajv validation while satisfying the browser-safe interface; cost if wrong: a future Ajv upgrade can introduce a new helper and generation will fail closed.
 
+## Native low-model execution (continued)
+
+Task 6: complete (range a5a76f0..5527aa3; RED head 605b4b3; GREEN implementation head d9642ee; quality run 37054735055 SUCCESS; server run 37054735166 SUCCESS; planned commit 5527aa3).
+
+Task 6: Ruling: the connected runtime cannot run the plan's combined focused shell command directly against a live local clone because the local GitHub clone path is unavailable; the same Task 6 Node test ran inside `npm test` and the Python Task 6 test ran inside `pytest -q server/tests` on the identical implementation SHA, with both workflow gates green — cost if wrong: an ordering-only interaction between the isolated focused invocation and full-suite invocation could be missed, so the shared-vector parity is additionally asserted in both language-specific tests.
+
 ## Next task
 
-Task 6 — RFC 8785 canonicalization and fingerprints.
+Task 7 — EvidenceStore port/conformance harness.
