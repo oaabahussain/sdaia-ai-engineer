@@ -135,3 +135,29 @@ paths:
                 properties: { ok: { type: boolean, const: true } }
                 additionalProperties: false
         '400': { $ref: '#/components/responses/Error' }
+
+  /learner-evidence/batch:
+    post:
+      operationId: postLearnerEvidenceBatch
+      summary: Push an authorized learner-evidence batch
+      description: Authorization selects the learner principal. X-Anon-Id is not sufficient authorization for learner evidence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [events]
+              additionalProperties: false
+              properties:
+                events:
+                  type: array
+                  items: { $ref: ../data/schema/learner-evidence-event-v2.schema.json }
+      responses:
+        '200':
+          description: Per-event evidence acceptance result
+          content:
+            application/json:
+              schema: { $ref: ../data/schema/evidence-batch-result-v1.schema.json }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }

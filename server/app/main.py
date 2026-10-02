@@ -1,8 +1,11 @@
+import hashlib
 import json
 import os
 import sqlite3
 import time
 import uuid
+
+import rfc8785
 from collections import defaultdict, deque
 from pathlib import Path
 
@@ -12,7 +15,8 @@ from jsonschema import Draft7Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT7
 
-from app.evidence_auth import DenyLearnerAuthorization
+from app.evidence_auth import DenyLearnerAuthorization, LearnerAuthorizationDenied
+from app.evidence_store import accept_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
@@ -51,7 +55,60 @@ VALIDATORS = {
     'state': make_validator('state-v2.schema.json'),
     'feedback': make_validator('feedback.schema.json'),
     'events': make_validator('events.schema.json'),
+    'learner_evidence': make_validator('learner-evidence-event-v2.schema.json'),
 }
+
+
+def load_event_definitions():
+    definitions = json.loads((DATA_DIR / 'evidence' / 'event-definitions-v1.json').read_text(encoding='utf-8'))
+    return {f"{item['event_name']}@{item['event_version']}": item for item in definitions}
+
+
+EVENT_DEFINITIONS = load_event_definitions()
+
+
+def validate_learner_evidence_event(event):
+    envelope = validate('learner_evidence', event)
+    if envelope:
+        return envelope
+    definition = EVENT_DEFINITIONS.get(event.get('definition_id'))
+    if definition is None:
+        return 'Unknown learner evidence definition'
+    for field in definition.get('required_context_fields', []):
+        if event.get(field) in (None, ''):
+            return f"Missing required context field {field}"
+    payload_path = ROOT / definition['payload_schema_ref']
+    payload_schema = json.loads(payload_path.read_text(encoding='utf-8'))
+    payload_errors = sorted(
+        Draft7Validator(payload_schema, format_checker=FormatChecker()).iter_errors(event.get('payload')),
+        key=lambda item: list(item.path),
+    )
+    if payload_errors:
+        return '; '.join(error.message for error in payload_errors)
+    return None
+
+
+def ensure_evidence_store_id(db_url):
+    with connect(db_url) as db:
+        row = db.execute('SELECT store_id FROM k3_evidence_store_meta WHERE id = 1').fetchone()
+        if row:
+            return row['store_id']
+        store_id = f"sqlite-k3:{uuid.uuid4()}"
+        db.execute('INSERT INTO k3_evidence_store_meta (id, store_id) VALUES (1, ?)', (store_id,))
+        return store_id
+
+
+def rejected_evidence_receipt(db_url, event, reason_code):
+    return {
+        'schema_version': 1,
+        'store_id': ensure_evidence_store_id(db_url),
+        'event_id': event.get('event_id') if valid_uuid4(event.get('event_id')) else str(uuid.uuid4()),
+        'event_fingerprint': hashlib.sha256(rfc8785.dumps(event)).hexdigest(),
+        'disposition': 'REJECTED',
+        'accepted_at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        'reason_code': reason_code,
+        'warnings': [],
+    }
 
 
 def load_track_registry():
@@ -213,6 +270,31 @@ def create_app(db_url=None, learner_auth=None):
             next_id = db.execute('SELECT COALESCE(MAX(id), 0) + 1 FROM feedback').fetchone()[0]
             db.execute('INSERT INTO feedback (id, anon_id, question_id, issue_type, details, created_at) VALUES (?, ?, ?, ?, ?, ?)', (next_id, x_anon_id, payload['question_id'], payload['issue_type'], payload.get('details'), time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())))
         return {'ok': True, 'ref': f'feedback:{next_id}'}
+
+    @app.post('/v1/learner-evidence/batch')
+    async def post_learner_evidence_batch(request: Request):
+        try:
+            authorized = app.state.learner_auth.resolve(request)
+        except LearnerAuthorizationDenied:
+            return error('learner_not_authorized', 'Learner evidence access is not authorized', 403)
+        try:
+            payload = await request.json()
+        except Exception:
+            return error('validation_failed', 'Request body must be JSON', 400)
+        events = payload.get('events') if isinstance(payload, dict) else None
+        if not isinstance(events, list):
+            return error('validation_failed', 'events must be an array', 400)
+        if any(not isinstance(event, dict) or event.get('learner_id') != authorized.learner_id for event in events):
+            return error('learner_not_authorized', 'Event learner scope does not match authorized principal', 403)
+
+        receipts = []
+        for event in events:
+            validation = validate_learner_evidence_event(event)
+            if validation:
+                receipts.append(rejected_evidence_receipt(app.state.db_url, event, 'INVALID_EVIDENCE'))
+                continue
+            receipts.append(accept_evidence(app.state.db_url, event))
+        return {'schema_version': 1, 'receipts': receipts}
 
     @app.post('/v1/events')
     async def events(request: Request, x_anon_id: str = Header(..., alias='X-Anon-Id')):
