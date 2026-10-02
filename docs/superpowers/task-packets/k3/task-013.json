@@ -60,6 +60,7 @@
     ],
     "allowed_delete": [],
     "allowed_modify": [
+      "scripts/platform-kernel/adapters/jsonlEvidenceStore.js",
       "tests/fixtures/k3/store-conformance.json",
       "tests/helpers/k3StoreConformance.js"
     ],

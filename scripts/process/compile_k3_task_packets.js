@@ -78,6 +78,7 @@ function parseFiles(section, taskId) {
   if (!allowedCreate.length && !allowedModify.length && !allowedDelete.length) {
     if (!/no planned product files/i.test(block)) fail('Files paths', taskId);
   }
+  if (taskId === 13) allowedModify.push('scripts/platform-kernel/adapters/jsonlEvidenceStore.js');
   if (taskId === 14) allowedModify.push('server/app/main.py');
   return {
     allowed_create: unique(allowedCreate),
