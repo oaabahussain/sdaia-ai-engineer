@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "store_id": "fixture-store",
+  "event": {
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "learner_id": "learner-fixture"
+  },
+  "accepted_receipt": {
+    "schema_version": 1,
+    "store_id": "fixture-store",
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "event_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "disposition": "ACCEPTED",
+    "accepted_at": "2026-10-02T19:00:00.000Z",
+    "store_seq": 1,
+    "warnings": []
+  },
+  "duplicate_receipt": {
+    "schema_version": 1,
+    "store_id": "fixture-store",
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "event_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "disposition": "DUPLICATE",
+    "accepted_at": "2026-10-02T19:00:00.000Z",
+    "store_seq": 1,
+    "warnings": []
+  }
+}
