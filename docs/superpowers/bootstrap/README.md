@@ -1,6 +1,6 @@
 # K3 H0-R2 Project Bootstrap
 
-Revision is stored in `BOOTSTRAP-REVISION`.
+Bootstrap revision: `k3-h0-r2-v1`
 
 The bootstrap exists only to tell a new session where authoritative live information lives and how to fail closed. It is not a second state store.
 

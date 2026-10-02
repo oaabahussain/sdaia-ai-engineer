@@ -20,6 +20,7 @@ function read(name) {
 test('publishes static k3-h0-r2-v1 bootstrap pack', () => {
   for (const name of expected) assert.equal(existsSync(resolve(bootstrap, name)), true, `missing ${name}`);
   assert.equal(read('BOOTSTRAP-REVISION').trim(), 'k3-h0-r2-v1');
+  assert.match(read('README.md'), /Bootstrap revision:\s*`k3-h0-r2-v1`/);
 
   const text = expected.filter((name) => name.endsWith('.md')).map(read).join('\n');
   assert.match(text, /docs\/superpowers\/state\/CURRENT-STATE\.json/);
