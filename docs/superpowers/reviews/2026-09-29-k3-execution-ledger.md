@@ -41,6 +41,12 @@ Task 4 — RETROSPECTIVE VERIFIED — scoring policy and RuntimeBundleV4 evidenc
 - `docs/superpowers/reviews/2026-09-29-k3-tasks-1-4-verification.md`
 - `docs/superpowers/reviews/2026-09-29-k3-tasks-1-4-independent-audit.md`
 
+## Native low-model execution
+
+Task 5: complete (range 07cd50b..99ba56b; RED head cf87711, behavioral failures 8/8 as expected; browser-safety RED ff8ef06; GREEN product head 86f74d81; quality run 37043480615 SUCCESS; server run 37043480593 SUCCESS; final planned commit 99ba56b).
+
+Task 5: Ruling: Ajv standalone emitted CommonJS runtime helpers despite ESM output — inline only the two deterministic helpers (Unicode code-point length and date-time format predicate) after Ajv standalone generation, and fail generation if any other CommonJS helper remains — preserves schema-derived Ajv validation while satisfying the browser-safe interface; cost if wrong: a future Ajv upgrade can introduce a new helper and generation will fail closed.
+
 ## Next task
 
-Task 5 — Schema-derived browser validators and event constructor. Execution resumes only after H0 produces `low_model_ready=true`.
+Task 6 — RFC 8785 canonicalization and fingerprints.
