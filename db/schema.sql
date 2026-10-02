@@ -92,3 +92,41 @@ CREATE TABLE IF NOT EXISTS k2_governance_records (
 );
 
 CREATE INDEX IF NOT EXISTS idx_k2_governance_kind ON k2_governance_records(kind, artifact_id);
+
+CREATE TABLE IF NOT EXISTS k3_evidence_store_meta (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  store_id TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS k3_evidence_events (
+  store_seq INTEGER PRIMARY KEY AUTOINCREMENT,
+  store_id TEXT NOT NULL,
+  event_id TEXT NOT NULL,
+  event_fingerprint TEXT NOT NULL,
+  origin_id TEXT NOT NULL,
+  origin_seq INTEGER NOT NULL CHECK (origin_seq >= 1),
+  learner_id TEXT NOT NULL,
+  activity_id TEXT NOT NULL,
+  assessment_attempt_id TEXT,
+  item_version_id TEXT,
+  content_release_id TEXT NOT NULL,
+  definition_id TEXT NOT NULL,
+  accepted_at TEXT NOT NULL,
+  event_json TEXT NOT NULL,
+  UNIQUE (store_id, event_id),
+  UNIQUE (store_id, origin_id, origin_seq)
+);
+
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_learner_seq
+  ON k3_evidence_events(store_id, learner_id, store_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_activity_seq
+  ON k3_evidence_events(store_id, activity_id, store_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_attempt_seq
+  ON k3_evidence_events(store_id, assessment_attempt_id, store_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_item_seq
+  ON k3_evidence_events(store_id, item_version_id, store_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_release_seq
+  ON k3_evidence_events(store_id, content_release_id, store_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_evidence_definition_seq
+  ON k3_evidence_events(store_id, definition_id, store_seq);
+
