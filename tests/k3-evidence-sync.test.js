@@ -38,7 +38,7 @@ function localStore(seed=[]) {
       return {schema_version:1,store_id:'local',event_id:value.event_id,event_fingerprint:'a'.repeat(64),disposition:'ACCEPTED',accepted_at:'2026-10-02T22:00:00Z',store_seq:rows.size,warnings:[]};
     },
     async getById(id){ return structuredClone(rows.get(id) ?? null); },
-    values(){ return [...rows.values()].map(structuredClone); }
+    values(){ return [...rows.values()].map((value)=>structuredClone(value)); }
   };
 }
 
