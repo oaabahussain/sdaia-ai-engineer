@@ -55,9 +55,12 @@ function parseFiles(section, taskId) {
 
   const clauses = normalized.split(';').map((x) => x.trim()).filter(Boolean);
   for (const clause of clauses) {
+    const lower = clause.toLowerCase();
+    if (/\b(?:add|install)\b.*\b(?:dev\s+)?dependenc(?:y|ies)\b/.test(lower)) {
+      allowedModify.push('package.json', 'package-lock.json');
+    }
     const paths = extractBackticks(clause);
     if (!paths.length) continue;
-    const lower = clause.toLowerCase();
     if (/\bcreate\s+or\s+modify\b/.test(lower)) {
       allowedCreate.push(...paths);
       allowedModify.push(...paths);
