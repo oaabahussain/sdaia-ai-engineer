@@ -109,6 +109,18 @@ Task 13: Ruling: the harness cannot run the plan's exact Node+Python chained foc
 
 Phase B adapters now share one logical fixture for append order, exact retry, event-ID conflict, origin-sequence conflict, late/out-of-order evidence, distinct origins, and governed filtered reads.
 
+## Native low-model execution (continued)
+
+Task 14: complete (range e89b46a..26c8044; RED head 5c81e17; GREEN head 26c8044; quality run 37071342991 SUCCESS; server run 37071343095 SUCCESS).
+
+Task 14: Ruling: `StaticLearnerAuthorization` is a deterministic injected test resolver that returns only its configured pseudonymous learner principal and never derives authority from query/body/`X-Anon-Id`; production default is `DenyLearnerAuthorization` — keeps authorization fail-closed until a real identity provider is configured — cost if wrong: future integration needs a separate concrete authorization adapter rather than extending the test resolver.
+
+Task 14: Ruling: the packet's exact focused pytest command was not separately invokable in the connected local shell, but `server/tests/test_k3_evidence_auth.py` ran as part of the full server suite on the identical GREEN SHA and server gate passed — cost if wrong: a focused-invocation-only difference could be missed, while the full suite is stricter and includes all four auth tests.
+
+## Batch 12-14 checkpoint
+
+Tasks 12, 13, and 14 are durably complete. Phase C authorization boundary is now fail-closed by default.
+
 ## Next task
 
-Task 14 — Fail-closed learner authorization port.
+Task 15 — Authorized batch-push API.
