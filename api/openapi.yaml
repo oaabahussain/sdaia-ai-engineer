@@ -161,3 +161,35 @@ paths:
               schema: { $ref: ../data/schema/evidence-batch-result-v1.schema.json }
         '400': { $ref: '#/components/responses/Error' }
         '403': { $ref: '#/components/responses/Error' }
+
+  /learner-evidence:
+    get:
+      operationId: getLearnerEvidence
+      summary: Pull authorized learner evidence by authoritative store sequence
+      description: Authorization selects the learner principal; learner_id query claims are ignored as authority.
+      parameters:
+        - name: after_store_seq
+          in: query
+          required: false
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: limit
+          in: query
+          required: false
+          description: Requested page size, bounded by configured server policy.
+          schema: { type: integer, minimum: 1, default: 100 }
+      responses:
+        '200':
+          description: Ordered learner evidence page
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [events, next_store_seq]
+                additionalProperties: false
+                properties:
+                  events:
+                    type: array
+                    items: { $ref: ../data/schema/learner-evidence-event-v2.schema.json }
+                  next_store_seq: { type: integer, minimum: 0 }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
