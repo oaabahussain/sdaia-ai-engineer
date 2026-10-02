@@ -77,6 +77,12 @@ Task 10: complete (range 8963f12..38139fa; control-plane RED e750c87; compiler G
 
 Task 10: Ruling: packet compiler omitted package files for the approved plan's explicit `fake-indexeddb@6.2.5` dependency clause; corrected compiler deterministically and regenerated packet 010 before Product edits — follows the approved plan and fail-closed scope guard — cost if wrong: compiler now assumes npm manifests for any add/install dependency clause.
 
+## Native low-model execution (continued)
+
+Task 11: complete (range 1857e9c..dd26196; RED head 98c3f78; GREEN head dd26196; quality run 37062520059 SUCCESS; server run 37062520217 SUCCESS).
+
+Task 11: Ruling: the approved scope cannot create one crash-atomic transaction spanning localStorage identity/sequence state and IndexedDB evidence bytes; implement serialized call-atomic sequence allocation that commits the sequence only after ACCEPTED/DUPLICATE local persistence, does not enqueue on failure, and surfaces durability failures — cost if wrong: a process crash in the narrow cross-store commit window can still require recovery/reconciliation rather than being impossible by construction.
+
 ## Next task
 
-Task 11 — Origin identity, local sequence allocation, and durable capture.
+Task 12 — EvidenceOutboxRecordV1 state machine.
