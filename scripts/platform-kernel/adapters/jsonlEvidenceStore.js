@@ -78,7 +78,8 @@ function receiptFromEntry(entry, disposition = 'ACCEPTED') {
 function matchesFilters(event, filters = {}) {
   for (const [key, value] of Object.entries(filters ?? {})) {
     if (value === undefined) continue;
-    if (event[key] !== value) return false;
+    const actualKey = key === 'type' ? 'definition_id' : key;
+    if (event[actualKey] !== value) return false;
   }
   return true;
 }
