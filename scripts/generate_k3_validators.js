@@ -26,7 +26,11 @@ for (const path of schemaFiles) {
   exportMap[name] = key;
   exportsByPath[path] = name;
 }
-const code = standaloneCode(ajv, exportMap);
+let code = standaloneCode(ajv, exportMap);
+code = code
+  .replace('const func3 = require("ajv/dist/runtime/ucs2length").default;', 'const func3 = (value) => Array.from(value).length;')
+  .replace('const formats0 = require("ajv-formats/dist/formats").fullFormats["date-time"];', 'const formats0 = {validate: (value) => /^\\\\d{4}-\\\\d{2}-\\\\d{2}[Tt ]\\\\d{2}:\\\\d{2}:\\\\d{2}(?:\\\\.\\\\d+)?(?:[Zz]|[+-]\\\\d{2}:\\\\d{2})$/.test(value) && Number.isFinite(Date.parse(value))};');
+if (/\\brequire\\s*\\(/.test(code)) throw new Error('Ajv standalone output contains an unsupported CommonJS runtime helper');
 const payloadEntries = Object.entries(exportsByPath)
   .filter(([path]) => path.startsWith('data/evidence/payload-schemas/'))
   .map(([path, name]) => `  ${JSON.stringify(path)}: ${name}`)
