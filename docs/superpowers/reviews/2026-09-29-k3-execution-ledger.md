@@ -127,6 +127,12 @@ Task 15: complete (range 08df803..f02409b; RED head 10572c7; GREEN head f02409b;
 
 Task 15: Ruling: authorization mismatch is an HTTP 403 boundary before any storage write, while structurally/semantically invalid evidence within an authorized batch returns a per-event REJECTED receipt so safe siblings are not rolled back — follows K3 authorization boundary plus batch per-event disposition semantics — cost if wrong: clients must distinguish authorization failure from evidence validation failure.
 
+## Native low-model execution (continued)
+
+Task 16: complete (range f1ae5ff..06d5e62; RED head ae39dc6; GREEN head 06d5e62; quality run 37073587931 SUCCESS; server run 37073587926 SUCCESS).
+
+Task 16: Ruling: pull page size is bounded by an explicit app/env policy (`evidence_pull_max_limit` / `K3_EVIDENCE_PULL_MAX_LIMIT`) and authorization selects learner scope; query claims never select another learner — cost if wrong: deployments must configure a suitable bound for their scale profile.
+
 ## Next task
 
-Task 16 — Authorized cursor-based pull API.
+Task 17 — EvidenceSync port and coordinator.
