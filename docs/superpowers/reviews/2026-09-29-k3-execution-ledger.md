@@ -63,6 +63,14 @@ Task 8: complete (range fbea661..ee88c03; RED head 462b71b; GREEN head ee88c03; 
 
 Task 8: Ruling: exact focused command was observed as the same test file passing inside the repository-wide Node suite on the identical GREEN SHA; no separate local clone was available in this harness — cost if wrong: invocation-order-only behavior could be missed, while the full-suite run exercises a stricter environment.
 
+## Native low-model execution (continued)
+
+Task 9: complete (range b3b9744..a50064a; RED head 056b4b5; GREEN head a50064a; quality run 37059777675 SUCCESS; server run 37059777647 SUCCESS).
+
+Task 9: Ruling: `server/tests/test_k3_evidence_store.py` already existed from Task 6 although the Task 9 packet listed it under allowed_create; preserve the Task 6 RFC 8785 parity tests and extend the same file with Task 9 SQLite tests — follows the shared-file reality without deleting earlier coverage — cost if wrong: the test file carries two task concerns instead of one.
+
+Task 9: Ruling: the harness could not run the packet's exact focused Python command locally because `rfc8785` is not installed in the isolated local shell; the identical test file passed inside `pytest -q server/tests` on the GREEN SHA in the server workflow — cost if wrong: a focused-only invocation-order difference could be missed, while the full server suite is stricter and includes the same tests.
+
 ## Next task
 
-Task 9 — SQLite EvidenceStoreV2.
+Task 10 — IndexedDB EvidenceStoreV2.
