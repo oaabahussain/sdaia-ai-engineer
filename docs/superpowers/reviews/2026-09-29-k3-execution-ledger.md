@@ -71,6 +71,12 @@ Task 9: Ruling: `server/tests/test_k3_evidence_store.py` already existed from Ta
 
 Task 9: Ruling: the harness could not run the packet's exact focused Python command locally because `rfc8785` is not installed in the isolated local shell; the identical test file passed inside `pytest -q server/tests` on the GREEN SHA in the server workflow — cost if wrong: a focused-only invocation-order difference could be missed, while the full server suite is stricter and includes the same tests.
 
+## Native low-model execution (continued)
+
+Task 10: complete (range 8963f12..38139fa; control-plane RED e750c87; compiler GREEN 8d68c2d; dependency setup 2ed2d20; behavioral RED c74b79d; GREEN head 38139fa; quality run 37061764750 SUCCESS; server run 37061765049 SUCCESS).
+
+Task 10: Ruling: packet compiler omitted package files for the approved plan's explicit `fake-indexeddb@6.2.5` dependency clause; corrected compiler deterministically and regenerated packet 010 before Product edits — follows the approved plan and fail-closed scope guard — cost if wrong: compiler now assumes npm manifests for any add/install dependency clause.
+
 ## Next task
 
-Task 10 — IndexedDB EvidenceStoreV2.
+Task 11 — Origin identity, local sequence allocation, and durable capture.
