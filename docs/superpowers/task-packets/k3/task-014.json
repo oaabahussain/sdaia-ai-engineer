@@ -59,7 +59,9 @@
       "server/tests/test_k3_evidence_auth.py"
     ],
     "allowed_delete": [],
-    "allowed_modify": [],
+    "allowed_modify": [
+      "server/app/main.py"
+    ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_14"
   },

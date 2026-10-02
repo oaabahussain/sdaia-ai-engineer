@@ -60,6 +60,7 @@
     ],
     "allowed_delete": [],
     "allowed_modify": [
+      "tests/fixtures/k3/store-conformance.json",
       "tests/helpers/k3StoreConformance.js"
     ],
     "forbidden_paths": [],
