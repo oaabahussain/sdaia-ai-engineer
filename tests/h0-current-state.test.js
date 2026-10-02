@@ -220,7 +220,7 @@ test('CURRENT-STATE CLI validates the real repository state', () => {
   assert.equal(checked.details.low_model_ready, actual.low_model_ready);
 });
 
-test('process guard record agrees with current state and forbids low-model integration', () => {
+test('process guard record agrees with current state and keeps integration high-reasoning', () => {
   const guardPath = new URL('../docs/superpowers/reviews/2026-09-29-k3-h0-process-guard.md', import.meta.url);
   assert.equal(existsSync(guardPath), true, 'process guard record must exist');
   const guard = readFileSync(guardPath, 'utf8');
@@ -231,7 +231,10 @@ test('process guard record agrees with current state and forbids low-model integ
   assert.match(guard, /whole-branch review/i);
   assert.match(guard, /exact-head/i);
   assert.equal(current.gates.PROCESS_GUARDS_READY, 'PASS');
-  assert.equal(current.low_model_ready, false);
+  if (current.low_model_ready) {
+    assert.equal(current.merge_guard_mode, 'HIGH_REASONING_MERGE_GATE');
+    assert.match(guard, /must not.*(?:merge|push).*main/i);
+  }
 });
 
 test('CURRENT-STATE CLI regression is not pinned to a historical main SHA', () => {
