@@ -57,6 +57,21 @@ test('Task 10 dependency clause expands deterministic npm manifest scope', () =>
   assert.deepEqual(packet.scope.allowed_modify, ['package.json', 'package-lock.json']);
 });
 
+
+test('Task 13 expand clause permits deterministic fixture modification', () => {
+  const packet = compileTaskPacket({ taskId: 13, ...ARGS });
+  assert.ok(packet.scope.allowed_modify.includes('tests/fixtures/k3/store-conformance.json'));
+});
+
+test('Task 14 interface ruling permits create_app integration file', () => {
+  const packet = compileTaskPacket({ taskId: 14, ...ARGS });
+  assert.deepEqual(packet.scope.allowed_create, [
+    'server/app/evidence_auth.py',
+    'server/tests/test_k3_evidence_auth.py'
+  ]);
+  assert.ok(packet.scope.allowed_modify.includes('server/app/main.py'));
+});
+
 test('Task 41 preserves post-merge verification contract without inventing unspecified paths', () => {
   const packet = compileTaskPacket({ taskId: 41, ...ARGS });
   assert.equal(packet.task_title, 'Post-merge verification and programme closure');
