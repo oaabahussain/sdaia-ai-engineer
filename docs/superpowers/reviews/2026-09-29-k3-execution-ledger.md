@@ -184,6 +184,18 @@ Task 23: complete (BASE `36855bf`; RED `0160ecb`; GREEN `0e70074`; quality run `
 
 Task 23: Ruling: the connected harness cannot run the packet's exact chained Node+Python focused command in one repository workspace; the exact Node identity-link tests passed inside the quality suite and the exact Python identity-link tests passed inside the server suite on the identical GREEN SHA — cost if wrong: a shell-chain-only interaction could be missed, while each half of the chain is independently verified on the same commit.
 
+## Native low-model execution (continued)
+
+Task 24: complete (BASE `8b3d136`; RED `6f4f3d3`; GREEN `65960a8`; quality run `37122866898` SUCCESS; server run `37122866901` SUCCESS).
+
+Task 24: Ruling: the connected harness cannot run the packet's exact focused Node command from a live dependency-complete repository clone; `tests/k3-legacy-learner-event.test.js` passed inside the full Node suite on the identical GREEN SHA, alongside all existing V1 tests — cost if wrong: a focused-invocation-only difference could be missed, while the full suite is stricter and includes the same test.
+
+Task 24: Ruling: JSON Schema remains normative V1; a record is `KNOWN_V1_VARIANT` only when the only normative-required fields absent are `answer` and/or `confidence`, matching the documented JS/Python validator drift. Missing values remain absent and no fine-grained evidence is invented — cost if wrong: an undocumented historical validator variant outside those two fields is classified invalid and requires an explicit future compatibility ruling.
+
+## Wave 1 checkpoint
+
+Tasks 5-24 are durably complete. Do not execute Task 25+ in the low-model wave. Whole-branch review is required before any integration decision.
+
 ## Next task
 
-Task 24 — Honest LearnerEventV1 compatibility reader.
+Task 25 is not authorized for this low-model wave; stop at high-reasoning review gate.
