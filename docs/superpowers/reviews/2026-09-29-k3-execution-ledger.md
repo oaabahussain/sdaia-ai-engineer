@@ -145,6 +145,12 @@ Task 18: complete (range 77bd6a1..3f204c6; RED head c1772d3; GREEN head 3f204c6;
 
 Task 18: Ruling: the resolver never reads client `occurred_at`; APPLIED is determined only by candidate base revision matching the current authoritative revision, with `store_seq` and `authority_ref` recorded on the resolution event — cost if wrong: callers must provide authoritative current revision explicitly rather than expecting timestamp arbitration.
 
+## Native low-model execution (continued)
+
+Task 19: complete by recovery (implementation blob `0ebd90d39decd91a18c0c863fb46c7dfeed15ec7` already present at Task 18 checkpoint head `2329664`; verification test head `bf07162`; exact focused command `node --test tests/k3-evidence-corrections.test.js` -> 6/6 PASS; quality run `37119221239` SUCCESS; server run `37119221249` SUCCESS).
+
+Task 19: Ruling: this was `IMPLEMENTED_NOT_CHECKPOINTED`, not missing Product behavior. The first test draft at `29f1139` imposed unapproved finding field names/classification (`reason_code`, `COMPETING_SUPERSESSION`, `CORRECTION_CYCLE`, unauthorized-as-unresolved) that the spec never requires; the existing resolver already satisfied the approved semantics with deterministic `code` values and unauthorized corrections treated as conflicts. Per recovery protocol, do not reimplement; correct the verification contract, prove focused/full GREEN, then checkpoint — cost if wrong: downstream consumers must use the resolver's documented finding `code` vocabulary rather than the discarded test-only names.
+
 ## Next task
 
-Task 19 — Correction/supersession graph resolver.
+Task 20 — ActivityProjectionV1.
