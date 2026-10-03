@@ -1,4 +1,4 @@
-name: K3 isolated integration audit
+name: K3 isolated post-merge recovery
 on:
   pull_request:
     branches: [main]
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          ref: dd3ece1cc6434b43b495dd97ca904748b4bc5393
+          ref: dbf718f65396388efa234e459155e0e4d3fc8b6d
           fetch-depth: 0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
@@ -24,10 +24,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/k3-recovery /tmp/k3-baseline
-          test "$(git rev-parse HEAD)" = dd3ece1cc6434b43b495dd97ca904748b4bc5393
-          git fetch origin main
+          test "$(git rev-parse HEAD)" = dbf718f65396388efa234e459155e0e4d3fc8b6d
+          git fetch origin main impl/k3-learner-evidence-engine
           LIVE_MAIN="$(git rev-parse origin/main)"
-          test "$LIVE_MAIN" = 559e46a21cd1fe4006158f9ae14f96400a4568f2
+          test "$LIVE_MAIN" = dbf718f65396388efa234e459155e0e4d3fc8b6d
+          test "$(git rev-parse origin/impl/k3-learner-evidence-engine)" = "$LIVE_MAIN"
           git update-ref refs/heads/main "$LIVE_MAIN"
           git update-ref refs/heads/impl/k3-learner-evidence-engine HEAD
           git bundle create /tmp/k3-recovery/repository.bundle refs/heads/main refs/heads/impl/k3-learner-evidence-engine
@@ -66,7 +67,7 @@ jobs:
           find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: k3-authenticated-integration-evidence
+          name: k3-authenticated-postmerge-evidence
           path: /tmp/k3-recovery/
           if-no-files-found: error
           retention-days: 7
