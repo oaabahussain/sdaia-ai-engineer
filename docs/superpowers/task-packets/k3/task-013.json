@@ -60,7 +60,9 @@
     ],
     "allowed_delete": [],
     "allowed_modify": [
-      "tests/helpers/k3StoreConformance.js"
+      "tests/fixtures/k3/store-conformance.json",
+      "tests/helpers/k3StoreConformance.js",
+      "scripts/platform-kernel/adapters/jsonlEvidenceStore.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_13"

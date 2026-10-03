@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "store_id": "fixture-store",
+  "event": {
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "learner_id": "learner-fixture"
+  },
+  "accepted_receipt": {
+    "schema_version": 1,
+    "store_id": "fixture-store",
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "event_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "disposition": "ACCEPTED",
+    "accepted_at": "2026-10-02T19:00:00.000Z",
+    "store_seq": 1,
+    "warnings": []
+  },
+  "duplicate_receipt": {
+    "schema_version": 1,
+    "store_id": "fixture-store",
+    "event_id": "123e4567-e89b-42d3-a456-426614174000",
+    "event_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "disposition": "DUPLICATE",
+    "accepted_at": "2026-10-02T19:00:00.000Z",
+    "store_seq": 1,
+    "warnings": []
+  },
+  "parity": {
+    "events": [
+      {
+        "schema_version": 2,
+        "event_id": "123e4567-e89b-42d3-a456-426614174010",
+        "definition_id": "learner.response.recorded@1",
+        "learner_id": "learner:parity",
+        "origin_id": "223e4567-e89b-42d3-a456-426614174011",
+        "origin_seq": 1,
+        "activity_id": "323e4567-e89b-42d3-a456-426614174012",
+        "track_id": "sdaia-ai-engineer",
+        "content_release_id": "release-a",
+        "mode": "practice",
+        "locale": "en",
+        "occurred_at": "2026-10-02T21:10:00.000Z",
+        "item_interaction_id": "423e4567-e89b-42d3-a456-426614174013",
+        "item_version_id": "item-a",
+        "payload": {
+          "response_version": 1,
+          "response_kind": "OPTION",
+          "response": {
+            "option_index": 0
+          }
+        }
+      },
+      {
+        "schema_version": 2,
+        "event_id": "523e4567-e89b-42d3-a456-426614174014",
+        "definition_id": "learner.response.recorded@1",
+        "learner_id": "learner:parity",
+        "origin_id": "223e4567-e89b-42d3-a456-426614174011",
+        "origin_seq": 2,
+        "activity_id": "623e4567-e89b-42d3-a456-426614174015",
+        "track_id": "sdaia-ai-engineer",
+        "content_release_id": "release-a",
+        "mode": "practice",
+        "locale": "en",
+        "occurred_at": "2026-10-02T20:00:00.000Z",
+        "item_interaction_id": "723e4567-e89b-42d3-a456-426614174016",
+        "item_version_id": "item-b",
+        "payload": {
+          "response_version": 1,
+          "response_kind": "OPTION",
+          "response": {
+            "option_index": 1
+          }
+        }
+      },
+      {
+        "schema_version": 2,
+        "event_id": "823e4567-e89b-42d3-a456-426614174017",
+        "definition_id": "learner.response.evaluated@1",
+        "learner_id": "learner:parity",
+        "origin_id": "923e4567-e89b-42d3-a456-426614174018",
+        "origin_seq": 1,
+        "activity_id": "a23e4567-e89b-42d3-a456-426614174019",
+        "assessment_attempt_id": "b23e4567-e89b-42d3-a456-42661417401a",
+        "track_id": "sdaia-ai-engineer",
+        "content_release_id": "release-b",
+        "mode": "practice",
+        "locale": "en",
+        "occurred_at": "2026-10-02T22:00:00.000Z",
+        "item_version_id": "item-c",
+        "payload": {
+          "response_event_id": "123e4567-e89b-42d3-a456-426614174010",
+          "scoring_policy_ref": "policy:1",
+          "evaluation_status": "GRADED",
+          "correct": true,
+          "score": 1
+        }
+      }
+    ],
+    "id_conflict": {
+      "payload": {
+        "response_version": 1,
+        "response_kind": "OPTION",
+        "response": {
+          "option_index": 2
+        }
+      }
+    },
+    "origin_seq_conflict": {
+      "schema_version": 2,
+      "event_id": "c23e4567-e89b-42d3-a456-42661417401b",
+      "definition_id": "learner.response.recorded@1",
+      "learner_id": "learner:parity",
+      "origin_id": "223e4567-e89b-42d3-a456-426614174011",
+      "origin_seq": 2,
+      "activity_id": "d23e4567-e89b-42d3-a456-42661417401c",
+      "track_id": "sdaia-ai-engineer",
+      "content_release_id": "release-a",
+      "mode": "practice",
+      "locale": "en",
+      "occurred_at": "2026-10-02T23:00:00.000Z",
+      "item_interaction_id": "e23e4567-e89b-42d3-a456-42661417401d",
+      "item_version_id": "item-d",
+      "payload": {
+        "response_version": 1,
+        "response_kind": "OPTION",
+        "response": {
+          "option_index": 3
+        }
+      }
+    },
+    "expected": {
+      "accepted_dispositions": [
+        "ACCEPTED",
+        "ACCEPTED",
+        "ACCEPTED"
+      ],
+      "store_seq": [
+        1,
+        2,
+        3
+      ],
+      "read_ids": [
+        "123e4567-e89b-42d3-a456-426614174010",
+        "523e4567-e89b-42d3-a456-426614174014",
+        "823e4567-e89b-42d3-a456-426614174017"
+      ],
+      "type_filter_ids": [
+        "823e4567-e89b-42d3-a456-426614174017"
+      ],
+      "item_filter_ids": [
+        "523e4567-e89b-42d3-a456-426614174014"
+      ]
+    }
+  }
+}

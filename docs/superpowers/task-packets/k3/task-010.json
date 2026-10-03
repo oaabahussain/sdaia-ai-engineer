@@ -59,7 +59,10 @@
       "tests/k3-indexeddb-evidence-store.test.js"
     ],
     "allowed_delete": [],
-    "allowed_modify": [],
+    "allowed_modify": [
+      "package.json",
+      "package-lock.json"
+    ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_10"
   },

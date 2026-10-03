@@ -14,3 +14,6 @@ test('quality gate runs deterministic process control verification',()=>{
  assert.doesNotMatch(ci,/paths-ignore/);
  assert.ok(pkg.scripts['process:verify']);
 });
+test('quality gate validates execution state against the dynamic PR base',()=>{
+ assert.match(ci,/name:\s*Validate K3 execution state against PR base[\s\S]*LIVE_MAIN_SHA:[\s\S]*github\.event\.pull_request\.base\.sha[\s\S]*npm run validate:state -- --live-main-sha "\$LIVE_MAIN_SHA" --json/);
+});

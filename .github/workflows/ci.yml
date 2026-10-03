@@ -26,6 +26,11 @@ jobs:
         run: npm test
       - name: Verify deterministic execution control plane
         run: npm run process:verify
+      - name: Validate K3 execution state against PR base
+        if: github.event_name == 'pull_request'
+        env:
+          LIVE_MAIN_SHA: ${{ github.event.pull_request.base.sha }}
+        run: npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --json
       - name: Verify governed current-bank migration
         run: npm run verify:factory-import
       - name: Parse application module

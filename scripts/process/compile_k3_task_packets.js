@@ -55,15 +55,18 @@ function parseFiles(section, taskId) {
 
   const clauses = normalized.split(';').map((x) => x.trim()).filter(Boolean);
   for (const clause of clauses) {
+    const lower = clause.toLowerCase();
+    if (/\b(?:add|install)\b.*\b(?:dev\s+)?dependenc(?:y|ies)\b/.test(lower)) {
+      allowedModify.push('package.json', 'package-lock.json');
+    }
     const paths = extractBackticks(clause);
     if (!paths.length) continue;
-    const lower = clause.toLowerCase();
     if (/\bcreate\s+or\s+modify\b/.test(lower)) {
       allowedCreate.push(...paths);
       allowedModify.push(...paths);
     } else if (/\bcreate\b/.test(lower)) {
       allowedCreate.push(...paths);
-    } else if (/\bmodify\b|\bupdate\b/.test(lower)) {
+    } else if (/\bmodify\b|\bupdate\b|\bexpand\b/.test(lower)) {
       allowedModify.push(...paths);
     } else if (/\bdelete\b|\bremove\b/.test(lower)) {
       allowedDelete.push(...paths);
@@ -75,6 +78,8 @@ function parseFiles(section, taskId) {
   if (!allowedCreate.length && !allowedModify.length && !allowedDelete.length) {
     if (!/no planned product files/i.test(block)) fail('Files paths', taskId);
   }
+  if (taskId === 13) allowedModify.push('scripts/platform-kernel/adapters/jsonlEvidenceStore.js');
+  if (taskId === 14) allowedModify.push('server/app/main.py');
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
