@@ -134,3 +134,23 @@ test('pull is resumable and stores authoritative events without re-enqueueing th
   assert.deepEqual(store.values(),remote);
   assert.deepEqual(await outbox.listPending(),[]);
 });
+
+
+test('restart retries persisted IN_FLIGHT evidence and duplicate ACK completes delivery', async()=>{
+  const { syncEvidence }=await loadSync();
+  const store=localStore([event(A)]);
+  const shared=persistence();
+  let outbox=createEvidenceOutbox({persistence:shared});
+  await outbox.enqueue(A);
+  await outbox.markInFlight([A], '2026-10-03T12:00:00Z');
+
+  outbox=createEvidenceOutbox({persistence:shared});
+  const pushed=[];
+  const port={
+    async push(events){ pushed.push(structuredClone(events)); return {schema_version:1,receipts:[receipt(A,'DUPLICATE',12)]}; },
+    async pull(after){ return {events:[],next_store_seq:after}; }
+  };
+  await syncEvidence({store,outbox,syncPort:port,watermark:0,policy:{now:()=> '2026-10-03T12:01:00Z'}});
+  assert.deepEqual(pushed.flat().map(x=>x.event_id),[A]);
+  assert.deepEqual(await outbox.listPending(),[]);
+});

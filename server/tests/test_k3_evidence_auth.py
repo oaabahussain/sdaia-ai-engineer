@@ -84,3 +84,14 @@ def test_create_app_accepts_explicit_authorization_port(tmp_path):
     assert "learner_auth" in signature.parameters, "create_app learner_auth injection is missing"
     app = create_app(f"sqlite:///{tmp_path / 'injected-auth.db'}", learner_auth=auth)
     assert app.state.learner_auth is auth
+
+
+@pytest.mark.parametrize("learner_id", [
+    "person@example.com",
+    "+1 555 123 4567",
+    "192.0.2.55",
+])
+def test_authorized_learner_rejects_direct_pii_principals(learner_id):
+    api = _auth_api()
+    with pytest.raises(ValueError, match="pseudonymous|PII"):
+        api["AuthorizedLearner"](learner_id)

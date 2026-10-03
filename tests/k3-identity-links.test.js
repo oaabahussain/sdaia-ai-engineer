@@ -70,3 +70,10 @@ test('JSONL identity-link store is append-only, idempotent on exact retry, and c
  assert.deepEqual(await store.readAll(),[record]);
  assert.equal((await readFile(file,'utf8')).trim().split('\n').length,1);
 });
+
+
+test('identity-link records reject raw IP principals as direct PII',async()=>{
+ const {assertIdentityLinkRecord}=await loadIdentity();
+ const record=rec('10000000-0000-4000-8000-000000000009','link-ip','LINK','192.0.2.55','learner:b','2026-10-03T10:05:00Z');
+ assert.throws(()=>assertIdentityLinkRecord(record),/pseudonymous|PII/i);
+});

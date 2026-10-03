@@ -60,3 +60,22 @@ def test_identity_link_table_is_additive_to_raw_evidence_schema(tmp_path):
         tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert "k3_evidence_events" in tables
     assert "k3_identity_link_records" in tables
+
+
+def test_sqlite_identity_link_store_rejects_direct_pii_principals(tmp_path):
+    append = getattr(evidence_store, "append_identity_link_record", None)
+    db_url = f"sqlite:///{tmp_path / 'pii-links.db'}"
+    init_db(db_url)
+    for field, value in (
+        ("source_learner_id", "person@example.com"),
+        ("target_learner_id", "+1 555 123 4567"),
+        ("source_learner_id", "192.0.2.55"),
+    ):
+        bad = record(record_id=f"10000000-0000-4000-8000-00000000000{len(value)%9+1}")
+        bad[field] = value
+        try:
+            append(db_url, bad)
+        except ValueError as exc:
+            assert "pseudonymous" in str(exc).lower() or "pii" in str(exc).lower()
+        else:
+            raise AssertionError(f"{field} direct PII must fail closed")
