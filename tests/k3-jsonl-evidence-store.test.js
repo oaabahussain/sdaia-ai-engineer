@@ -111,3 +111,24 @@ test('JSONL EvidenceStore fails closed on malformed event JSONL', async () => {
   const store = createJsonlEvidenceStore(paths.eventFile, paths.indexFile, { storeId: 'jsonl-test' });
   await assert.rejects(() => store.read('learner:p1'), /Malformed K3 evidence event at line 2/);
 });
+
+test('JSONL existing immutable evidence with missing or empty sidecar fails closed', async (t) => {
+  const { createJsonlEvidenceStore } = await loadAdapter();
+  for (const emptyIndex of [false, true]) {
+    await t.test(emptyIndex ? 'empty sidecar' : 'missing sidecar', async () => {
+      const paths = await files();
+      const bytes = JSON.stringify(event()) + '\n';
+      await writeFile(paths.eventFile, bytes);
+      if (emptyIndex) {
+        await writeFile(paths.indexFile, JSON.stringify({
+          schema_version: 1, store_id: 'jsonl-test', next_store_seq: 1, entries: []
+        }));
+      }
+      const store = createJsonlEvidenceStore(paths.eventFile, paths.indexFile, { storeId: 'jsonl-test' });
+      await assert.rejects(() => store.read('learner:p1'), /event\/index length mismatch/);
+      await assert.rejects(() => store.getById(event().event_id), /event\/index length mismatch/);
+      await assert.rejects(() => store.accept(event()), /event\/index length mismatch/);
+      assert.equal(await readFile(paths.eventFile, 'utf8'), bytes);
+    });
+  }
+});

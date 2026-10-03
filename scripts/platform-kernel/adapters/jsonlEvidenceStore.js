@@ -90,7 +90,7 @@ export function createJsonlEvidenceStore(eventFile, indexFile, { storeId }) {
   async function load() {
     const events = await readJsonl(eventFile);
     const index = await readIndex(indexFile, storeId);
-    if (events.length !== index.entries.length && index.entries.length !== 0) {
+    if (events.length !== index.entries.length) {
       throw new Error('K3 evidence event/index length mismatch');
     }
     return { events, index };
