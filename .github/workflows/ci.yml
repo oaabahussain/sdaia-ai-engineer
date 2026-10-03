@@ -1,5 +1,7 @@
 name: K3 isolated integration audit
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
