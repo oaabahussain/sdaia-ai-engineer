@@ -21,8 +21,10 @@ test('generator is deterministic and committed output is fresh', () => {
   if (!existsSync(generatedUrl) || !packageJson.scripts?.['generate:k3-validators']) {
     assert.fail('K3 validator generator behavior is not implemented');
   }
+  const before = readFileSync(generatedUrl, 'utf8');
   execFileSync(process.execPath, ['scripts/generate_k3_validators.js'], { cwd: root, stdio: 'pipe' });
   const first = readFileSync(generatedUrl, 'utf8');
+  assert.equal(first, before, 'committed generatedValidators.js must match deterministic generator output');
   execFileSync(process.execPath, ['scripts/generate_k3_validators.js'], { cwd: root, stdio: 'pipe' });
   const second = readFileSync(generatedUrl, 'utf8');
   assert.equal(sha(first), sha(second), 'generator output must be deterministic');
