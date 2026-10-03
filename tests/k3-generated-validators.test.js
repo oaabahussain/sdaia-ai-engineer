@@ -34,3 +34,10 @@ test('generator is deterministic and committed output is fresh', () => {
   assert.match(first, /validate_learner_evidence_event_v2/);
   assert.match(first, /response-recorded-v1/);
 });
+
+test('generator publishes generatedValidators.js atomically for parallel test/import safety', () => {
+  const source = readFileSync(new URL('../scripts/generate_k3_validators.js', import.meta.url), 'utf8');
+  assert.match(source, /rename\s*\(/, 'generator must publish via atomic rename');
+  assert.match(source, /\.tmp/, 'generator must write a temporary artifact before publish');
+  assert.doesNotMatch(source, /writeFile\(resolve\(root, 'src\/evidence\/generatedValidators\.js'\)/, 'generator must not truncate the live module directly');
+});
