@@ -1,4 +1,4 @@
-import { canonicalizeJson } from '../../../evidence/jcs.js';
+import { canonicalizeJson } from '../../evidence/jcs.js';
 
 const severityRank={ERROR:0,WARNING:1,INFO:2};
 function finding(code,severity,extra={}){return {code,severity,...extra}}
