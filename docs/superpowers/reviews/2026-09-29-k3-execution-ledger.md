@@ -163,6 +163,18 @@ Task 21: complete (range 3e799e6..3a22883; RED head 2513afd; GREEN head 3a22883;
 
 Task 21: Ruling: corrections are resolved before selecting current accepted responses; a valid SUPERSEDE may replace the visible current response while the original APPLIED response remains in response_history with its revision provenance — cost if wrong: downstream consumers must distinguish current view identity from original mutation candidate identity.
 
+## Native low-model execution (continued)
+
+Task 22: complete (range 24d5bc0..f9b5a13; RED head b4b466f; initial implementation 2a52c35; import-harness fix f9b5a13; quality run 37120787317 SUCCESS; server run 37120787292 SUCCESS).
+
+Task 22: Ruling: replay uses an explicit replay-read adapter method `readRange({fromSeq,toSeq})` because the existing learner-scoped EvidenceStore `read` cannot satisfy the task's learner-agnostic replay signature without inventing a learner selector — cost if wrong: adapters that support replay must expose this narrow read-only range capability separately.
+Task 22: Ruling: clock divergence is a WARNING only when source `occurred_at` is objectively later than trusted `accepted_at`; no numeric tolerance is introduced — cost if wrong: smaller clock skews are still surfaced, leaving thresholding to later policy/calibration.
+Task 22: Ruling: the first implementation exposed a test-harness weakness where dynamic-import catch converted a bad relative import into “behavior missing”; tests now import the modules directly so future import/setup failures surface honestly — cost if wrong: none beyond stricter test failure classification.
+
+## Phase D checkpoint
+
+Tasks 18-22 are durably verified. Strict assessment authority, correction-aware projections, replay, and deterministic integrity checks are green.
+
 ## Next task
 
-Task 22 — Replay and deterministic integrity findings.
+Task 23 — Append-only LearnerIdentityLinkRecordV1.
