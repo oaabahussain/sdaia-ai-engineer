@@ -85,7 +85,7 @@ test('missing target or replacement stays unresolved rather than silently select
   );
   const result = resolveCurrentEvidence([replacement, missingTarget, missingReplacement]);
   assert.equal(result.unresolved.length, 2);
-  assert.deepEqual(new Set(result.unresolved.map((x) => x.reason_code)), new Set(['TARGET_NOT_FOUND', 'SUPERSEDING_EVENT_NOT_FOUND']));
+  assert.deepEqual(new Set(result.unresolved.map((x) => x.code)), new Set(['MISSING_TARGET', 'MISSING_SUPERSEDING_EVENT']));
   assert.deepEqual(result.activeEvents.map((event) => event.event_id), [replacement.event_id]);
 });
 
@@ -99,7 +99,7 @@ test('competing supersessions are conflicts and do not choose a winner', async (
   const c2 = correction('823e4567-e89b-42d3-a456-426614174007', oldEvent.event_id, 'SUPERSEDE', { superseding_event_id: b.event_id });
   const result = resolveCurrentEvidence([oldEvent, a, b, c1, c2]);
   assert.equal(result.conflicts.length, 1);
-  assert.equal(result.conflicts[0].reason_code, 'COMPETING_SUPERSESSION');
+  assert.equal(result.conflicts[0].code, 'COMPETING_CORRECTIONS');
   assert.deepEqual(new Set(result.activeEvents.map((event) => event.event_id)), new Set([oldEvent.event_id, a.event_id, b.event_id]));
 });
 
@@ -112,7 +112,7 @@ test('supersession cycles are conflicts and remain unresolved as current evidenc
   const c2 = correction('723e4567-e89b-42d3-a456-426614174006', b.event_id, 'SUPERSEDE', { superseding_event_id: a.event_id });
   const result = resolveCurrentEvidence([a, b, c1, c2]);
   assert.equal(result.conflicts.length, 1);
-  assert.equal(result.conflicts[0].reason_code, 'CORRECTION_CYCLE');
+  assert.equal(result.conflicts[0].code, 'SUPERSESSION_CYCLE');
   assert.deepEqual(new Set(result.activeEvents.map((event) => event.event_id)), new Set([a.event_id, b.event_id]));
 });
 
@@ -123,6 +123,7 @@ test('correction without explicit authority is unresolved and cannot change curr
   const unauthorized = correction('423e4567-e89b-42d3-a456-426614174003', target.event_id, 'VOID', { authority_ref: '' });
   const result = resolveCurrentEvidence([target, unauthorized]);
   assert.deepEqual(result.activeEvents.map((event) => event.event_id), [target.event_id]);
-  assert.equal(result.unresolved.length, 1);
-  assert.equal(result.unresolved[0].reason_code, 'UNAUTHORIZED_CORRECTION');
+  assert.deepEqual(result.unresolved, []);
+  assert.equal(result.conflicts.length, 1);
+  assert.equal(result.conflicts[0].code, 'UNAUTHORIZED_CORRECTION');
 });
