@@ -1,0 +1,52 @@
+name: K3 merged browser verification (no deployment)
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  merged-browser-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: dbf718f65396388efa234e459155e0e4d3fc8b6d
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: '22'
+      - name: Verify exact merged source and install frozen dependencies
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = dbf718f65396388efa234e459155e0e4d3fc8b6d
+          mkdir -p /tmp/k3-browser-evidence
+          git rev-parse HEAD HEAD^{tree} > /tmp/k3-browser-evidence/source-refs.txt
+          npm ci --ignore-scripts
+      - name: Run canonical browser and offline smoke test
+        run: |
+          set -euo pipefail
+          python3 scripts/browser_smoke.py 2>&1 | tee /tmp/k3-browser-evidence/browser-smoke.log
+      - name: Verify assembled release without publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build_pages_artifact.js _site 2>&1 | tee /tmp/k3-browser-evidence/build.log
+          node scripts/verify_html.js _site/index.html
+          node scripts/verify_sw_assets.js _site
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory _site > /tmp/k3-browser-evidence/http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid"' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:4174/index.html > /dev/null; then break; fi
+            if [ "$attempt" -eq 20 ]; then exit 1; fi
+            sleep 1
+          done
+          node scripts/verify_live_release.js http://127.0.0.1:4174 2>&1 | tee /tmp/k3-browser-evidence/release-verification.log
+          git diff --exit-code
+          printf 'PASS\n' > /tmp/k3-browser-evidence/result.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: k3-merged-browser-evidence
+          path: /tmp/k3-browser-evidence/
+          if-no-files-found: error
+          retention-days: 7
