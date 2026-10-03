@@ -178,6 +178,12 @@ Task 22: Ruling: generated validator publication is part of the runtime test con
 
 Tasks 18-22 are durably verified. Strict assessment authority, correction-aware projections, replay, and deterministic integrity checks are green.
 
+## Native low-model execution (continued)
+
+Task 23: complete (BASE `36855bf`; RED `0160ecb`; GREEN `0e70074`; quality run `37121671258` SUCCESS; server run `37121671284` SUCCESS).
+
+Task 23: Ruling: the connected harness cannot run the packet's exact chained Node+Python focused command in one repository workspace; the exact Node identity-link tests passed inside the quality suite and the exact Python identity-link tests passed inside the server suite on the identical GREEN SHA — cost if wrong: a shell-chain-only interaction could be missed, while each half of the chain is independently verified on the same commit.
+
 ## Next task
 
-Task 23 — Append-only LearnerIdentityLinkRecordV1.
+Task 24 — Honest LearnerEventV1 compatibility reader.
