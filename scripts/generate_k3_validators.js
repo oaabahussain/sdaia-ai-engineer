@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, rename } from 'node:fs/promises';
 import { readdirSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import Ajv from 'ajv';
@@ -37,4 +37,7 @@ const payloadEntries = Object.entries(exportsByPath)
   .join(',\n');
 const eventName = exportsByPath['data/schema/learner-evidence-event-v2.schema.json'];
 const output = `${code}\nexport const validateLearnerEvidenceEventSchema = ${eventName};\nexport const payloadValidators = {\n${payloadEntries}\n};\n`;
-await writeFile(resolve(root, 'src/evidence/generatedValidators.js'), output);
+const target = resolve(root, 'src/evidence/generatedValidators.js');
+const temp = `${target}.tmp-${process.pid}`;
+await writeFile(temp, output);
+await rename(temp, target);
