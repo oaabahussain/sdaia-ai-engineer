@@ -171,6 +171,9 @@ Task 22: Ruling: replay uses an explicit replay-read adapter method `readRange({
 Task 22: Ruling: clock divergence is a WARNING only when source `occurred_at` is objectively later than trusted `accepted_at`; no numeric tolerance is introduced — cost if wrong: smaller clock skews are still surfaced, leaving thresholding to later policy/calibration.
 Task 22: Ruling: the first implementation exposed a test-harness weakness where dynamic-import catch converted a bad relative import into “behavior missing”; tests now import the modules directly so future import/setup failures surface honestly — cost if wrong: none beyond stricter test failure classification.
 
+Task 22 corrective regression: checkpoint run `37120900031` exposed a parallel-test race in `generate_k3_validators.js`: direct `writeFile` could truncate the live ES module while another test imported `localCapture -> contract -> generatedValidators`. Freshness was already correct, so the defect was publication atomicity, not stale generation. Atomic-publication RED `562f8c6` failed with `generator must publish via atomic rename`; fix `3728d1d` writes a PID-scoped temp artifact then renames it atomically; quality `37121297440` SUCCESS; server `37121297438` SUCCESS.
+Task 22: Ruling: generated validator publication is part of the runtime test contract because Node test files execute concurrently and the generated module is imported by Product code; require atomic temp→rename publication and committed-output freshness — cost if wrong: platforms without same-filesystem atomic rename semantics would need an adapter-specific publication strategy.
+
 ## Phase D checkpoint
 
 Tasks 18-22 are durably verified. Strict assessment authority, correction-aware projections, replay, and deterministic integrity checks are green.

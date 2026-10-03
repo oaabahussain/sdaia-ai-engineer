@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 22,
+  "state_revision": 23,
   "programme": "K3",
   "phase": "E",
   "status": "EXECUTING",
@@ -16,7 +16,7 @@
   "checkpoint_path": "docs/superpowers/reviews/2026-10-03-k3-task-22-checkpoint.md",
   "open_critical_findings": 0,
   "open_important_findings": 0,
-  "last_verified_scope": "K3_TASK_22_GREEN_F9B5A139",
+  "last_verified_scope": "K3_TASK_22_CHECKPOINT_GREEN_3728D1DF",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
@@ -48,5 +48,5 @@
   "low_model_ready": true,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-03T11:47:00Z"
+  "updated_at": "2026-10-03T11:58:00Z"
 }

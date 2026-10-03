@@ -28,3 +28,16 @@ Tasks 18-22 complete.
 
 ## Next
 Task 23. No merge authority.
+
+## Corrective checkpoint verification
+
+The first documentation/state checkpoint exposed a pre-existing concurrent publication race in the K3 validator generator:
+
+- failing checkpoint quality run: `37120900031`
+- freshness check: committed artifact matched deterministic generator output
+- atomic-publication RED: `562f8c6aa43e66c845700e0f49fb7faeeb7b0a49`
+- atomic publication fix: `3728d1df3e8055068475660d095426752313934c`
+- final quality run: `37121297440` — SUCCESS
+- final server run: `37121297438` — SUCCESS
+
+The generator now writes a PID-scoped temporary file and publishes with atomic rename, preventing parallel imports from observing a truncated module.
