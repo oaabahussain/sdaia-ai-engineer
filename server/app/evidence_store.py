@@ -175,3 +175,54 @@ def read_evidence(db_url, learner_id, after_store_seq=None, filters=None):
             params,
         ).fetchall()
         return [json.loads(row["event_json"]) for row in rows]
+
+
+def _identity_link_json(record):
+    return json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def append_identity_link_record(db_url, record):
+    required = (
+        "identity_link_record_id", "link_id", "action", "source_learner_id",
+        "target_learner_id", "effective_at", "authority_ref", "reason_code", "created_at",
+    )
+    if record.get("schema_version") != 1:
+        raise ValueError("identity-link schema_version must equal 1")
+    if record.get("action") not in {"LINK", "UNLINK"}:
+        raise ValueError("identity-link action must be LINK or UNLINK")
+    for field in required:
+        if not isinstance(record.get(field), str) or not record[field]:
+            raise ValueError(f"identity-link {field} is required")
+    body = _identity_link_json(record)
+    with _connect(db_url) as db:
+        previous = db.execute(
+            "SELECT record_json FROM k3_identity_link_records WHERE identity_link_record_id = ?",
+            (record["identity_link_record_id"],),
+        ).fetchone()
+        if previous:
+            if previous["record_json"] == body:
+                return {"disposition": "DUPLICATE", "identity_link_record_id": record["identity_link_record_id"]}
+            raise ValueError(f"identity-link record conflict: {record['identity_link_record_id']}")
+        db.execute(
+            """
+            INSERT INTO k3_identity_link_records (
+              identity_link_record_id, link_id, action, source_learner_id, target_learner_id,
+              effective_at, authority_ref, reason_code, predecessor_record_id, created_at, record_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                record["identity_link_record_id"], record["link_id"], record["action"],
+                record["source_learner_id"], record["target_learner_id"], record["effective_at"],
+                record["authority_ref"], record["reason_code"], record.get("predecessor_record_id"),
+                record["created_at"], body,
+            ),
+        )
+        return {"disposition": "ACCEPTED", "identity_link_record_id": record["identity_link_record_id"]}
+
+
+def read_identity_link_records(db_url):
+    with _connect(db_url) as db:
+        rows = db.execute(
+            "SELECT record_json FROM k3_identity_link_records ORDER BY record_seq ASC"
+        ).fetchall()
+        return [json.loads(row["record_json"]) for row in rows]

@@ -130,3 +130,25 @@ CREATE INDEX IF NOT EXISTS idx_k3_evidence_release_seq
 CREATE INDEX IF NOT EXISTS idx_k3_evidence_definition_seq
   ON k3_evidence_events(store_id, definition_id, store_seq);
 
+
+CREATE TABLE IF NOT EXISTS k3_identity_link_records (
+  record_seq INTEGER PRIMARY KEY AUTOINCREMENT,
+  identity_link_record_id TEXT NOT NULL UNIQUE,
+  link_id TEXT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('LINK','UNLINK')),
+  source_learner_id TEXT NOT NULL,
+  target_learner_id TEXT NOT NULL,
+  effective_at TEXT NOT NULL,
+  authority_ref TEXT NOT NULL,
+  reason_code TEXT NOT NULL,
+  predecessor_record_id TEXT,
+  created_at TEXT NOT NULL,
+  record_json TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_k3_identity_link_source_seq
+  ON k3_identity_link_records(source_learner_id, record_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_identity_link_target_seq
+  ON k3_identity_link_records(target_learner_id, record_seq);
+CREATE INDEX IF NOT EXISTS idx_k3_identity_link_link_seq
+  ON k3_identity_link_records(link_id, record_seq);
