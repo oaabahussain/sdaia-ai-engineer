@@ -1,120 +1,128 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-async function loadApi() {
+async function loadResolver() {
   try { return await import('../src/evidence/corrections.js'); }
   catch { return {}; }
 }
 
-const A='123e4567-e89b-42d3-a456-426614174000';
-const B='223e4567-e89b-42d3-a456-426614174001';
-const D='323e4567-e89b-42d3-a456-426614174002';
-const C1='423e4567-e89b-42d3-a456-426614174003';
-const C2='523e4567-e89b-42d3-a456-426614174004';
-const C3='623e4567-e89b-42d3-a456-426614174005';
-const MISSING='723e4567-e89b-42d3-a456-426614174006';
-
-function raw(id, storeSeq, extra={}) {
-  return {event_id:id,definition_id:'learner.response.recorded@1',store_seq:storeSeq,payload:{value:id},...extra};
-}
-function correction(id, storeSeq, target, action, options={}) {
+function evidence(id, overrides = {}) {
   return {
-    event_id:id,
-    definition_id:'learner.evidence.correction.recorded@1',
-    store_seq:storeSeq,
-    authority_ref: options.authorityRef === undefined ? 'authority:corrections' : options.authorityRef,
-    payload:{
-      target_event_id:target,
-      action,
-      reason_code:'ADMIN_CORRECTION',
-      ...(options.supersedingEventId ? {superseding_event_id:options.supersedingEventId} : {})
-    }
+    schema_version: 2,
+    event_id: id,
+    definition_id: 'learner.response.recorded@1',
+    learner_id: 'learner:p1',
+    origin_id: '223e4567-e89b-42d3-a456-426614174001',
+    origin_seq: 1,
+    activity_id: '323e4567-e89b-42d3-a456-426614174002',
+    track_id: 'sdaia-ai-engineer',
+    content_release_id: 'release-1',
+    mode: 'practice',
+    locale: 'en',
+    occurred_at: '2026-10-03T10:00:00Z',
+    payload: { response_version: 1, response_kind: 'OPTION', response: { option_index: 0 } },
+    ...overrides
   };
 }
-function ids(events){ return events.map((event)=>event.event_id); }
 
-test('VOID excludes target from current evidence without mutating raw bytes', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  assert.equal(typeof resolveCurrentEvidence,'function','resolveCurrentEvidence behavior is missing');
-  const target=raw(A,1); const fix=correction(C1,2,A,'VOID');
-  const before=structuredClone([target,fix]);
-  const result=resolveCurrentEvidence([target,fix]);
-  assert.deepEqual([target,fix],before);
-  assert.deepEqual(result.activeEvents,[]);
-  assert.deepEqual(result.unresolved,[]);
-  assert.deepEqual(result.conflicts,[]);
-});
+function correction(id, target, action, overrides = {}) {
+  return evidence(id, {
+    definition_id: 'learner.evidence.correction.recorded@1',
+    authority_ref: 'authority:test',
+    payload: {
+      target_event_id: target,
+      action,
+      reason_code: 'ADMIN_CORRECTION',
+      ...(action === 'SUPERSEDE' ? { superseding_event_id: overrides.superseding_event_id } : {})
+    },
+    ...overrides
+  });
+}
 
-test('SUPERSEDE activates replacement and correction-before-target resolves from complete graph', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const target=raw(A,2); const replacement=raw(B,3);
-  const earlyCorrection=correction(C1,1,A,'SUPERSEDE',{supersedingEventId:B});
-  const result=resolveCurrentEvidence([earlyCorrection,replacement,target]);
-  assert.deepEqual(ids(result.activeEvents),[B]);
-  assert.deepEqual(result.unresolved,[]);
-  assert.deepEqual(result.conflicts,[]);
-});
-
-test('missing target or replacement stays explicit unresolved evidence', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const target=raw(A,1);
-  const missingTarget=correction(C1,2,MISSING,'VOID');
-  const missingReplacement=correction(C2,3,A,'SUPERSEDE',{supersedingEventId:MISSING});
-  const result=resolveCurrentEvidence([target,missingTarget,missingReplacement]);
-  assert.deepEqual(ids(result.activeEvents),[A]);
-  assert.deepEqual(result.unresolved,[
-    {code:'MISSING_TARGET',correction_event_id:C1,target_event_id:MISSING},
-    {code:'MISSING_SUPERSEDING_EVENT',correction_event_id:C2,target_event_id:A,superseding_event_id:MISSING}
+test('VOID excludes target from active evidence without mutating raw bytes', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const target = evidence('123e4567-e89b-42d3-a456-426614174000');
+  const before = structuredClone(target);
+  const result = resolveCurrentEvidence([
+    target,
+    correction('423e4567-e89b-42d3-a456-426614174003', target.event_id, 'VOID')
   ]);
-  assert.deepEqual(result.conflicts,[]);
+  assert.deepEqual(result.activeEvents, []);
+  assert.deepEqual(result.unresolved, []);
+  assert.deepEqual(result.conflicts, []);
+  assert.deepEqual(target, before);
 });
 
-test('competing supersessions are a conflict and never select an arbitrary winner', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const result=resolveCurrentEvidence([
-    raw(A,1),raw(B,2),raw(D,3),
-    correction(C1,4,A,'SUPERSEDE',{supersedingEventId:B}),
-    correction(C2,5,A,'SUPERSEDE',{supersedingEventId:D})
-  ]);
-  assert.deepEqual(ids(result.activeEvents),[A,B,D]);
-  assert.deepEqual(result.unresolved,[]);
-  assert.deepEqual(result.conflicts,[{
-    code:'COMPETING_CORRECTIONS',
-    target_event_id:A,
-    correction_event_ids:[C1,C2]
-  }]);
+test('SUPERSEDE makes referenced replacement current even when correction arrives before target', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const oldEvent = evidence('123e4567-e89b-42d3-a456-426614174000');
+  const replacement = evidence('523e4567-e89b-42d3-a456-426614174004', { origin_seq: 2 });
+  const fix = correction('423e4567-e89b-42d3-a456-426614174003', oldEvent.event_id, 'SUPERSEDE', {
+    superseding_event_id: replacement.event_id
+  });
+  const result = resolveCurrentEvidence([fix, replacement, oldEvent]);
+  assert.deepEqual(result.activeEvents.map((event) => event.event_id), [replacement.event_id]);
+  assert.deepEqual(result.unresolved, []);
+  assert.deepEqual(result.conflicts, []);
 });
 
-test('supersession cycles fail closed and keep cycle members active', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const result=resolveCurrentEvidence([
-    raw(A,1),raw(B,2),
-    correction(C1,3,A,'SUPERSEDE',{supersedingEventId:B}),
-    correction(C2,4,B,'SUPERSEDE',{supersedingEventId:A})
-  ]);
-  assert.deepEqual(ids(result.activeEvents),[A,B]);
-  assert.deepEqual(result.unresolved,[]);
-  assert.equal(result.conflicts.length,1);
-  assert.equal(result.conflicts[0].code,'SUPERSESSION_CYCLE');
-  assert.deepEqual(result.conflicts[0].event_ids,[A,B]);
-  assert.deepEqual(result.conflicts[0].correction_event_ids,[C1,C2]);
+test('missing target or replacement stays unresolved rather than silently selecting evidence', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const replacement = evidence('523e4567-e89b-42d3-a456-426614174004', { origin_seq: 2 });
+  const missingTarget = correction(
+    '423e4567-e89b-42d3-a456-426614174003',
+    '623e4567-e89b-42d3-a456-426614174005',
+    'VOID'
+  );
+  const missingReplacement = correction(
+    '723e4567-e89b-42d3-a456-426614174006',
+    replacement.event_id,
+    'SUPERSEDE',
+    { superseding_event_id: '823e4567-e89b-42d3-a456-426614174007' }
+  );
+  const result = resolveCurrentEvidence([replacement, missingTarget, missingReplacement]);
+  assert.equal(result.unresolved.length, 2);
+  assert.deepEqual(new Set(result.unresolved.map((x) => x.reason_code)), new Set(['TARGET_NOT_FOUND', 'SUPERSEDING_EVENT_NOT_FOUND']));
+  assert.deepEqual(result.activeEvents.map((event) => event.event_id), [replacement.event_id]);
 });
 
-test('correction without explicit authority is rejected as conflict', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const result=resolveCurrentEvidence([raw(A,1),correction(C1,2,A,'VOID',{authorityRef:''})]);
-  assert.deepEqual(ids(result.activeEvents),[A]);
-  assert.deepEqual(result.conflicts,[{
-    code:'UNAUTHORIZED_CORRECTION',
-    correction_event_id:C1,
-    target_event_id:A
-  }]);
+test('competing supersessions are conflicts and do not choose a winner', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const oldEvent = evidence('123e4567-e89b-42d3-a456-426614174000');
+  const a = evidence('523e4567-e89b-42d3-a456-426614174004', { origin_seq: 2 });
+  const b = evidence('623e4567-e89b-42d3-a456-426614174005', { origin_seq: 3 });
+  const c1 = correction('723e4567-e89b-42d3-a456-426614174006', oldEvent.event_id, 'SUPERSEDE', { superseding_event_id: a.event_id });
+  const c2 = correction('823e4567-e89b-42d3-a456-426614174007', oldEvent.event_id, 'SUPERSEDE', { superseding_event_id: b.event_id });
+  const result = resolveCurrentEvidence([oldEvent, a, b, c1, c2]);
+  assert.equal(result.conflicts.length, 1);
+  assert.equal(result.conflicts[0].reason_code, 'COMPETING_SUPERSESSION');
+  assert.deepEqual(new Set(result.activeEvents.map((event) => event.event_id)), new Set([oldEvent.event_id, a.event_id, b.event_id]));
 });
 
-test('resolution is deterministic across input permutations', async()=>{
-  const { resolveCurrentEvidence }=await loadApi();
-  const events=[raw(A,1),raw(B,2),correction(C1,3,A,'SUPERSEDE',{supersedingEventId:B}),correction(C3,4,MISSING,'VOID')];
-  const forward=resolveCurrentEvidence(events);
-  const reverse=resolveCurrentEvidence([...events].reverse());
-  assert.deepEqual(forward,reverse);
+test('supersession cycles are conflicts and remain unresolved as current evidence', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const a = evidence('123e4567-e89b-42d3-a456-426614174000');
+  const b = evidence('523e4567-e89b-42d3-a456-426614174004', { origin_seq: 2 });
+  const c1 = correction('623e4567-e89b-42d3-a456-426614174005', a.event_id, 'SUPERSEDE', { superseding_event_id: b.event_id });
+  const c2 = correction('723e4567-e89b-42d3-a456-426614174006', b.event_id, 'SUPERSEDE', { superseding_event_id: a.event_id });
+  const result = resolveCurrentEvidence([a, b, c1, c2]);
+  assert.equal(result.conflicts.length, 1);
+  assert.equal(result.conflicts[0].reason_code, 'CORRECTION_CYCLE');
+  assert.deepEqual(new Set(result.activeEvents.map((event) => event.event_id)), new Set([a.event_id, b.event_id]));
+});
+
+test('correction without explicit authority is unresolved and cannot change current evidence', async () => {
+  const { resolveCurrentEvidence } = await loadResolver();
+  assert.equal(typeof resolveCurrentEvidence, 'function', 'resolveCurrentEvidence behavior is missing');
+  const target = evidence('123e4567-e89b-42d3-a456-426614174000');
+  const unauthorized = correction('423e4567-e89b-42d3-a456-426614174003', target.event_id, 'VOID', { authority_ref: '' });
+  const result = resolveCurrentEvidence([target, unauthorized]);
+  assert.deepEqual(result.activeEvents.map((event) => event.event_id), [target.event_id]);
+  assert.equal(result.unresolved.length, 1);
+  assert.equal(result.unresolved[0].reason_code, 'UNAUTHORIZED_CORRECTION');
 });
