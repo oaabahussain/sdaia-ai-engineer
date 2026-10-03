@@ -1,7 +1,8 @@
 import { readFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { validateTaskDefinitionPacket } from './validate_task_packet.js';
 import { validateTaskExecutionEnvelope } from './bind_task_execution.js';
-import { requireCapabilities } from './runtime_capabilities.js';
+import { requireCapabilities, validateRuntimeCapabilityProfile } from './runtime_capabilities.js';
 import { stableJson, sha256Text } from './stable_json.js';
 import { compileTaskPacket, gitBlobSha } from './compile_k3_task_packets.js';
 import { lintExecutionContracts } from './lint_execution_contracts.js';
@@ -21,6 +22,7 @@ export function preflightTask(x){
  add('PROCESS_FAILURE_RULES_MATCH',packet?.authority?.process_failure_rules_digest===x.failureRulesDigest);
  add('TASK_EXECUTION_ENVELOPE_VALID',validateTaskExecutionEnvelope(envelope).ok);
  add('TASK_EXECUTION_ENVELOPE_FRESH',envelope?.task_packet_digest===sha256Text(stableJson(packet))&&envelope?.state_revision===state?.state_revision
+  &&typeof x.currentHeadSha==='string'&&envelope?.task_base_sha===x.currentHeadSha
   &&envelope?.task_id===packet?.task_id
   &&envelope?.base_main_sha===state?.base_main_sha
   &&envelope?.created_from_ref===state?.execution_branch
@@ -35,8 +37,8 @@ export function preflightTask(x){
  add('NO_DYNAMIC_STALE_PINS',x.executionLintOk===true);
  add('NO_OPEN_CRITICAL',(state?.open_critical_findings??0)===0);
  add('NO_OPEN_IMPORTANT',(state?.open_important_findings??0)===0);
- add('EXECUTION_BRANCH_VALID',Boolean(state?.execution_branch)&&envelope?.execution_branch===state.execution_branch);
- add('RUNTIME_CAPABILITIES_SATISFY_PACKET',requireCapabilities(runtime,packet?.runtime_requirements??[]).ok);
+ add('EXECUTION_BRANCH_VALID',Boolean(state?.execution_branch)&&envelope?.execution_branch===state.execution_branch&&x.sourceRef===state.execution_branch);
+ add('RUNTIME_CAPABILITIES_SATISFY_PACKET',validateRuntimeCapabilityProfile(runtime).ok&&requireCapabilities(runtime,packet?.runtime_requirements??[]).ok);
  add('MERGE_AUTHORITY_FALSE',packet?.merge_authority===false);
  add('PROJECT_BOOTSTRAP_CURRENT',state?.gates?.PROJECT_BOOTSTRAP_CURRENT==='PASS'&&envelope?.project_bootstrap_revision===state?.project_bootstrap_revision);
  return failures.length?{ok:false,code:'TASK_EXECUTION_READY_FAIL',failures}:{ok:true,code:'TASK_EXECUTION_READY_PASS',failures:[]};
@@ -58,12 +60,15 @@ function runCli(){
   const lintPaths=[state.plan_path,'docs/superpowers/specs/2026-09-30-k3-low-model-execution-h0-r2-design.md','PROJECT-INDEX.md','RECOVERY-PROTOCOL.md'];
   const executionLint=lintExecutionContracts(lintPaths.map(path=>({path,content:readFileSync(path,'utf8')})));
   const liveMainSha=arg('--live-main-sha');
+  // Observe checkout identity; envelope claims cannot verify themselves.
+  const currentHeadSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const sourceRef=execFileSync('git',['branch','--show-current'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
   const stateCheck=validateCurrentState(state,{
-   liveMainSha,sourceRef:envelope.created_from_ref,specBlobSha,planBlobSha,
+   liveMainSha,sourceRef,specBlobSha,planBlobSha,
    existingPaths:[state.spec_path,state.plan_path,state.ledger_path,state.checkpoint_path].filter(path=>existsSync(path)),
    ledgerText:readFileSync(state.ledger_path,'utf8')
   });
-  const result=preflightTask({packet,state,envelope,runtime,brief,liveMainSha,
+  const result=preflightTask({packet,state,envelope,runtime,brief,liveMainSha,currentHeadSha,sourceRef,
    stateValid:stateCheck.ok,
    authorityHashesMatch:specBlobSha===state.spec_blob_sha&&planBlobSha===state.plan_blob_sha,
    deterministicPacket:stableJson(compiled)===stableJson(packet),
