@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'nod
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { extractTask } from '../scripts/process/k3_task_extract.js';
 import { bindTaskExecution } from '../scripts/process/bind_task_execution.js';
 import { createRuntimeCapabilityProfile } from '../scripts/process/runtime_capabilities.js';
@@ -23,7 +23,12 @@ function fixture(t) {
   state.gates.ACTIVE_REF_RESOLUTION_VALID = 'PASS';
   const packet = JSON.parse(readFileSync(join(ROOT, 'docs/superpowers/task-packets/k3/task-025.json')));
   const runtime = createRuntimeCapabilityProfile({ shell_execution: 'AVAILABLE', git_worktree: 'AVAILABLE' });
-  const bound = bindTaskExecution({ packet, state, runtimeProfile: runtime, taskBaseSha: MAIN, liveMainSha: MAIN, sourceRef: state.execution_branch });
+  // Real checkout facts are distinct from the synthetic external main reference.
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  git('init', '-q', '-b', state.execution_branch);
+  git('-c', 'user.name=K3 Test', '-c', 'user.email=k3-test@example.invalid', 'commit', '-q', '--allow-empty', '-m', 'fixture baseline');
+  const currentHeadSha = git('rev-parse', 'HEAD');
+  const bound = bindTaskExecution({ packet, state, runtimeProfile: runtime, taskBaseSha: currentHeadSha, liveMainSha: MAIN, sourceRef: state.execution_branch });
   assert.equal(bound.ok, true);
   const brief = extractTask(readFileSync(join(ROOT, state.plan_path), 'utf8'), 25);
   const files = [state.plan_path, state.spec_path, state.ledger_path, state.checkpoint_path, RULES,
@@ -33,8 +38,8 @@ function fixture(t) {
     writeFileSync(join(cwd, path), readFileSync(join(ROOT, path)));
   }
   const x = { packet, state, runtime, envelope: bound.envelope, brief, liveMainSha: MAIN,
-    deterministicPacket: true, failureRulesDigest: packet.authority.process_failure_rules_digest, executionLintOk: true };
-  return { cwd, x };
+    currentHeadSha, sourceRef: state.execution_branch, deterministicPacket: true, failureRulesDigest: packet.authority.process_failure_rules_digest, executionLintOk: true };
+  return { cwd, x, git };
 }
 function run(f) {
   for (const name of ['state', 'packet', 'runtime', 'envelope']) writeFileSync(join(f.cwd, `${name}.json`), JSON.stringify(f.x[name]));
@@ -82,6 +87,51 @@ test('preflight rejects envelope task, main base and execution ref drift', t => 
   for (const [key, value] of [['task_id', 26], ['base_main_sha', 'b'.repeat(40)], ['created_from_ref', 'main']]) {
     const f = fixture(t);
     f.x.envelope[key] = value;
+    assert.equal(preflightTask(f.x).ok, false, key);
+  }
+});
+
+test('preflight CLI rejects a syntactically valid but stale task base', t => {
+  const f = fixture(t);
+  f.x.envelope.task_base_sha = 'b'.repeat(40);
+  failure(run(f), 'TASK_EXECUTION_ENVELOPE_FRESH');
+});
+test('preflight CLI requires rebind after checkout HEAD advances', t => {
+  const f = fixture(t);
+  f.git('-c', 'user.name=K3 Test', '-c', 'user.email=k3-test@example.invalid', 'commit', '-q', '--allow-empty', '-m', 'new checkpoint');
+  failure(run(f), 'TASK_EXECUTION_ENVELOPE_FRESH');
+});
+test('preflight CLI rejects checkout branch drift despite matching envelope claims', t => {
+  const f = fixture(t);
+  f.git('checkout', '-q', '-b', 'wrong-execution-branch');
+  failure(run(f), 'EXECUTION_BRANCH_VALID');
+});
+test('preflight CLI fails closed without a Git checkout', t => {
+  const f = fixture(t);
+  rmSync(join(f.cwd, '.git'), { recursive: true, force: true });
+  const result = run(f);
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stdout + result.stderr, /TASK_EXECUTION_READY = FAIL/);
+});
+for (const [name, invalidRuntime] of [['empty', {}], ['null', null], ['partial', { schema_version: 1, profile_version: 1, capabilities: {} }]]) {
+  test(`preflight CLI rejects ${name} runtime even with no required capabilities`, t => {
+    const f = fixture(t);
+    assert.deepEqual(f.x.packet.runtime_requirements, []);
+    f.x.runtime = invalidRuntime;
+    f.x.envelope.runtime_capability_profile_digest = sha256Text(stableJson(f.x.runtime));
+    failure(run(f), 'RUNTIME_CAPABILITIES_SATISFY_PACKET');
+  });
+}
+test('preflight CLI rejects unknown runtime capability status', t => {
+  const f = fixture(t);
+  f.x.runtime.capabilities.shell_execution = 'ASSUMED';
+  f.x.envelope.runtime_capability_profile_digest = sha256Text(stableJson(f.x.runtime));
+  failure(run(f), 'RUNTIME_CAPABILITIES_SATISFY_PACKET');
+});
+test('callable preflight rejects missing verified checkout facts', t => {
+  for (const key of ['currentHeadSha', 'sourceRef']) {
+    const f = fixture(t);
+    delete f.x[key];
     assert.equal(preflightTask(f.x).ok, false, key);
   }
 });
