@@ -157,6 +157,12 @@ Task 20: complete (range ffa7546..964f0d3; RED head 71d852c; GREEN head 964f0d3;
 
 Task 20: Ruling: deterministic projection metadata derives `generated_at` from the latest accepted/source event time inside the projection watermark rather than wall-clock generation time, preserving deterministic replay — cost if wrong: consumers expecting literal computation time must treat this field as deterministic projection-generation watermark time.
 
+## Native low-model execution (continued)
+
+Task 21: complete (range 3e799e6..3a22883; RED head 2513afd; GREEN head 3a22883; quality run 37120307064 SUCCESS; server run 37120307023 SUCCESS).
+
+Task 21: Ruling: corrections are resolved before selecting current accepted responses; a valid SUPERSEDE may replace the visible current response while the original APPLIED response remains in response_history with its revision provenance — cost if wrong: downstream consumers must distinguish current view identity from original mutation candidate identity.
+
 ## Next task
 
-Task 21 — AttemptProjectionV1.
+Task 22 — Replay and deterministic integrity findings.
