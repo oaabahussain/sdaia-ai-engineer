@@ -199,3 +199,18 @@ Tasks 5-24 are durably complete. Do not execute Task 25+ in the low-model wave. 
 ## Next task
 
 Task 25 is not authorized for this low-model wave; stop at high-reasoning review gate.
+
+
+## Final whole-branch review — Wave 1 Tasks 5-24
+
+Final review: self-review (no subagent tool).
+
+Final: fixed persisted IN_FLIGHT retry gap — restart retry test RED at `010f526` → GREEN at `b753582`; full quality/server suites SUCCESS.
+
+Final: fixed SQLite identity-link direct-PII acceptance — Python identity-link privacy test RED at `010f526` → GREEN at `b753582`; server suite SUCCESS.
+
+Final: fixed authorization principal direct-PII acceptance — AuthorizedLearner privacy tests RED at `010f526` → GREEN at `b753582`; server suite SUCCESS.
+
+Final: minor (deferred): JSONL event append precedes atomic sidecar-index replacement, so an interruption in the narrow interval requires reconstruction; adapter fails closed and preserves immutable bytes, and automatic JSONL crash reconstruction is not required by the frozen K3 spec.
+
+Final review result: Critical 0; Important open 0; Important fixed 3; Minor deferred 1. Task 25+ remains outside the approved low-model wave.
