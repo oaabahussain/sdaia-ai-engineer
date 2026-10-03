@@ -151,6 +151,12 @@ Task 19: complete by recovery (implementation blob `0ebd90d39decd91a18c0c863fb46
 
 Task 19: Ruling: this was `IMPLEMENTED_NOT_CHECKPOINTED`, not missing Product behavior. The first test draft at `29f1139` imposed unapproved finding field names/classification (`reason_code`, `COMPETING_SUPERSESSION`, `CORRECTION_CYCLE`, unauthorized-as-unresolved) that the spec never requires; the existing resolver already satisfied the approved semantics with deterministic `code` values and unauthorized corrections treated as conflicts. Per recovery protocol, do not reimplement; correct the verification contract, prove focused/full GREEN, then checkpoint — cost if wrong: downstream consumers must use the resolver's documented finding `code` vocabulary rather than the discarded test-only names.
 
+## Native low-model execution (continued)
+
+Task 20: complete (range ffa7546..964f0d3; RED head 71d852c; GREEN head 964f0d3; quality run 37120084248 SUCCESS; server run 37120084287 SUCCESS).
+
+Task 20: Ruling: deterministic projection metadata derives `generated_at` from the latest accepted/source event time inside the projection watermark rather than wall-clock generation time, preserving deterministic replay — cost if wrong: consumers expecting literal computation time must treat this field as deterministic projection-generation watermark time.
+
 ## Next task
 
-Task 20 — ActivityProjectionV1.
+Task 21 — AttemptProjectionV1.
