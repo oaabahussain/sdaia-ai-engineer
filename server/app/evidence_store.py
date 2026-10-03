@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -177,6 +178,11 @@ def read_evidence(db_url, learner_id, after_store_seq=None, filters=None):
         return [json.loads(row["event_json"]) for row in rows]
 
 
+def _assert_pseudonymous_principal(value, field):
+    if not isinstance(value, str) or not value or "@" in value or re.fullmatch(r"\+?\d[\d\s().-]{6,}", value):
+        raise ValueError(f"{field} must be a pseudonymous principal and must not contain direct PII")
+
+
 def _identity_link_json(record):
     return json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
@@ -193,6 +199,8 @@ def append_identity_link_record(db_url, record):
     for field in required:
         if not isinstance(record.get(field), str) or not record[field]:
             raise ValueError(f"identity-link {field} is required")
+    _assert_pseudonymous_principal(record["source_learner_id"], "source_learner_id")
+    _assert_pseudonymous_principal(record["target_learner_id"], "target_learner_id")
     body = _identity_link_json(record)
     with _connect(db_url) as db:
         previous = db.execute(

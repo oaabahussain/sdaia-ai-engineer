@@ -73,7 +73,7 @@ export function createEvidenceOutbox({ persistence }) {
         for (const eventId of eventIds) {
           const record = records.find((item) => item.event_id === eventId);
           if (!record) throw new Error(`Outbox record not found: ${eventId}`);
-          if (record.state !== 'PENDING') throw new Error(`Outbox record is not PENDING: ${eventId}`);
+          if (!['PENDING', 'IN_FLIGHT'].includes(record.state)) throw new Error(`Outbox record is not retryable: ${eventId}`);
           record.state = 'IN_FLIGHT';
           record.attempt_count += 1;
           record.last_attempt_at = at;
@@ -123,7 +123,7 @@ export function createEvidenceOutbox({ persistence }) {
         const now = options?.now === undefined ? null : Date.parse(options.now);
         if (options?.now !== undefined && !Number.isFinite(now)) throw new TypeError('options.now must be a date-time string');
         return records
-          .filter((record) => record.state === 'PENDING')
+          .filter((record) => record.state === 'PENDING' || (options?.includeInFlight === true && record.state === 'IN_FLIGHT'))
           .filter((record) => {
             if (now === null || !record.next_attempt_at) return true;
             return Date.parse(record.next_attempt_at) <= now;

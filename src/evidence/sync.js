@@ -35,7 +35,7 @@ export async function syncEvidence({
   assertEvidenceSyncPort(syncPort);
   assertWatermark(watermark);
 
-  const pending = await outbox.listPending(policy.pendingOptions ?? {});
+  const pending = await outbox.listPending({ ...(policy.pendingOptions ?? {}), includeInFlight: true });
   const selected = Number.isInteger(policy.pushBatchSize) && policy.pushBatchSize > 0
     ? pending.slice(0, policy.pushBatchSize)
     : pending;

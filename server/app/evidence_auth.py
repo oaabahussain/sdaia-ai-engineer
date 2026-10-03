@@ -1,5 +1,11 @@
+import re
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
+
+
+def _assert_pseudonymous_principal(value: str):
+    if not isinstance(value, str) or not value or "@" in value or re.fullmatch(r"\+?\d[\d\s().-]{6,}", value):
+        raise ValueError("learner_id must be a non-empty pseudonymous principal and must not contain direct PII")
 
 
 @dataclass(frozen=True)
@@ -7,8 +13,7 @@ class AuthorizedLearner:
     learner_id: str
 
     def __post_init__(self):
-        if not isinstance(self.learner_id, str) or not self.learner_id:
-            raise ValueError("learner_id must be a non-empty pseudonymous principal")
+        _assert_pseudonymous_principal(self.learner_id)
 
 
 class LearnerAuthorizationDenied(PermissionError):
