@@ -1,0 +1,132 @@
+{
+  "retrieved_at": "2026-10-04T07:37:04Z",
+  "sources": [
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-86qp-5c8j-p5mr",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-86qp-5c8j-p5mr"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-jp82-jpqv-5vv3",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-jp82-jpqv-5vv3"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-x746-7m8f-x49c",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-x746-7m8f-x49c"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-82w8-qh3p-5jfq",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-82w8-qh3p-5jfq"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-wqp7-x3pw-xc5r",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-wqp7-x3pw-xc5r"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/security/advisories/GHSA-7f5h-v6xp-fcq8",
+      "family": "Starlette maintainer advisories",
+      "role": "primary advisory/version boundaries",
+      "locator": "GHSA-7f5h-v6xp-fcq8"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/actions/runs/31245889281",
+      "family": "Starlette upstream release",
+      "role": "distribution provenance",
+      "locator": "07cb508ca8cbddc7735bf7ca7f64493092c52f5a"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/blob/1.3.1/.github/workflows/publish.yml",
+      "family": "Starlette upstream release",
+      "role": "official distribution acquisition pattern",
+      "locator": "Upload package distributions"
+    },
+    {
+      "source": "https://github.com/fastapi/fastapi/blob/0.141.1/pyproject.toml",
+      "family": "FastAPI maintainer",
+      "role": "candidate dependency declaration",
+      "locator": "project.dependencies"
+    },
+    {
+      "source": "https://github.com/fastapi/fastapi/blob/0.141.1/.github/workflows/publish.yml",
+      "family": "FastAPI maintainer",
+      "role": "publisher has no retained distribution upload",
+      "locator": "Build distribution / Publish"
+    },
+    {
+      "source": "https://pypi.org/project/fastapi/0.141.1/",
+      "family": "PyPI package registry",
+      "role": "expected wheel identity and hash",
+      "locator": "File details"
+    },
+    {
+      "source": "https://docs.npmjs.com/cli/v10/commands/npm-audit/",
+      "family": "npm documentation",
+      "role": "live advisory service boundary",
+      "locator": "Audit Endpoints"
+    },
+    {
+      "source": "https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks",
+      "family": "GitHub CI documentation",
+      "role": "checks must cover the latest commit",
+      "locator": "Required check needs to succeed against the latest commit SHA"
+    },
+    {
+      "source": "https://github.com/fastapi/fastapi/security/advisories",
+      "family": "FastAPI maintainer",
+      "role": "adjacent advisory discovery",
+      "locator": "Published advisories; not a full dependency scan"
+    },
+    {
+      "source": "https://github.com/ajv-validator/ajv/security/advisories",
+      "family": "Ajv maintainer",
+      "role": "adjacent advisory discovery only",
+      "locator": "No absence-of-risk inference"
+    },
+    {
+      "source": "https://github.com/fastify/fast-uri/security/advisories",
+      "family": "fast-uri maintainer",
+      "role": "prior dependency fix context",
+      "locator": "Published advisories; not fresh npm audit"
+    },
+    {
+      "source": "https://github.com/fastapi/fastapi/tree/0.141.1",
+      "family": "FastAPI maintainer",
+      "role": "qualified application framework source",
+      "locator": "tag 0.141.1"
+    },
+    {
+      "source": "https://github.com/Kludex/starlette/releases/tag/1.7.0",
+      "family": "Starlette maintainer",
+      "role": "qualified patched framework distribution",
+      "locator": "tag 1.7.0"
+    },
+    {
+      "source": "https://github.com/pydantic/httpx2/releases/tag/v2.13.1",
+      "family": "HTTPX2 maintainer",
+      "role": "qualified test/client distribution",
+      "locator": "tag v2.13.1"
+    },
+    {
+      "source": "https://github.com/pytest-dev/pytest/releases/tag/9.0.3",
+      "family": "pytest maintainer",
+      "role": "security-fixed test runner",
+      "locator": "9.0.3 / CVE-2025-71176 fix"
+    },
+    {
+      "source": "https://github.com/github/advisory-database",
+      "family": "GitHub Advisory Database",
+      "role": "current exact-package vulnerability ranges across PyPI and npm",
+      "locator": "queries captured 2026-10-04"
+    }
+  ],
+  "independence_note": "Maintainer release/source evidence and GitHub Advisory Database rows are separate evidence roles but not treated as multiple independent reproductions. Current local tests are the direct reproduction family. Registry-native audits remain unavailable and are not claimed."
+}

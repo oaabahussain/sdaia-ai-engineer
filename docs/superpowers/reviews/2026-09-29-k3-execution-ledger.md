@@ -214,3 +214,46 @@ Final: fixed authorization principal direct-PII acceptance — AuthorizedLearner
 Final: minor (deferred): JSONL event append precedes atomic sidecar-index replacement, so an interruption in the narrow interval requires reconstruction; adapter fails closed and preserves immutable bytes, and automatic JSONL crash reconstruction is not required by the frozen K3 spec.
 
 Final review result: Critical 0; Important open 0; Important fixed 3; Minor deferred 1. Task 25+ remains outside the approved low-model wave.
+
+
+## Task 25 - privileged privacy lifecycle
+
+Task 25: complete (BASE 680035b83c489013cbd09ca554229ecae8404518; local code 2719740b199ce5224da5502dc2fc9a0eb89085e3; Node 619/619, Python 59/59; focused 17 Node + 9 Python; process 72/72; accepted RED/result/scope PASS). Checkpoint: `docs/superpowers/reviews/2026-10-03-k3-task25-privacy-lifecycle.md`. All Tasks 1-24 entries above are unchanged. Remote publication and hosted CI are recorded separately; main is not merged.
+
+Ruling: use test-only no-op fallbacks solely while the new APIs are absent, so RED proves missing erasure/export behavior rather than import failure. Final tests invoke real APIs when present. Cost if wrong: full behavior assertions still fail rather than allowing a missing implementation to pass.
+Ruling: provide a privileged local snapshot adapter (load/atomic commit) and a separate authorization-injected SQLite lifecycle, not generic ordinary-store deletion methods. Require explicit policy references and ERASE/RETAIN decisions; no retention durations. Broad cache invalidation requires explicit INVALIDATE_ALL policy because dependency indexing is not yet specified. External deletion uses an injected export adapter and honest append-only outcomes; local deletion never claims remote erasure. Cost if wrong: an unsupported storage/deployment policy is rejected or needs a future adapter instead of silently asserting deletion.
+Ruling: append five review regression cases without removing or weakening any initial assertion; replace accepted RED hashes under high-reasoning review while retaining the original evidence and replacement chain. Cost if wrong: acceptance remains blocked by frozen test hashes.
+Ruling: result validation reads task BASE from the actual completion checkpoint into validation context only; it does not add an undeclared field to CURRENT-STATE. Durable metadata promotion follows product-scope acceptance as a separately checked metadata change. Cost if wrong: a checkpoint/base mismatch blocks acceptance or requires recovery reconciliation.
+
+## Final pre-merge requalification — 2026-10-04
+
+Final review: self-review (no subagent/reviewer tool available).
+
+Final: fresh local requalification of Tasks 1-25 on product commit `14e1240` passed Node 752/752, Python 116/116, process 73/73, adversarial 15/15, framework 6/6, residual Node 16/16, residual Python 9/9, boundary 3/3, content/factory/storage/API/TCP/Pages gates, syntax/parse checks, `git diff --check`, recovery checksum/bundle/fsck, and conflict-free merge-tree against observed `main@dbf718f`.
+
+Final: current dependency/advisory refresh found no reviewed selected dependency version inside the material affected ranges used by the security decision. Registry-native npm audit remains DNS-blocked and is not claimed clean; a source-exact fresh local pip-check is not claimed because the reconstructed environment lacks truststore distribution metadata. The authenticated S01 qualified environment remains the latest `pip check: PASS` evidence.
+
+Final: native browser exact-source gate remains ENVIRONMENT_BLOCKED locally because Chromium exists but chromedriver does not. Hosted CI on exact latest source is NOT RUN because the source is not yet published through a permitted Git route.
+
+Final: independent review remains NOT RUN. PR #28 is stale at `680035b` and MUST NOT be merged as the latest K3 implementation.
+
+Final: minor (deferred, carried): JSONL event append precedes atomic sidecar-index replacement; an interruption in the narrow interval fails closed and requires explicit recovery, as previously ruled.
+
+Final pre-merge result: new Critical 0; new Important 0; remote merge NOT READY until exact-history publication, hosted CI/browser on the exact published SHA, applicable independent review, and final live-main drift check pass. Task 26 remains NOT STARTED.
+
+
+## Final pre-merge governance hardening — 2026-10-04
+
+Final: repository-control-plane review identified `MD-GOV-002` (missing CODEOWNERS), `MD-GOV-005` (missing machine-readable dependency update policy), and `MD-WF-006` (Pages checkout retained credentials under write-capable Pages/OIDC authority).
+
+Final: RED hardening contract failed on exactly those three conditions before implementation; GREEN passed after commit `ec94597e1e9d2c28a65eb63a6ec05eda53c9e85b`.
+
+Final: added `.github/CODEOWNERS`, weekly Dependabot coverage for npm/pip/github-actions, and `persist-credentials: false` to the Pages checkout. No Product, schema, content, dependency, test, approved spec, or Task 26 source was changed.
+
+Final: post-hardening local verification passed YAML parse, `git diff --check`, state validation, content 1120/7/140, Node 752/752, process 73/73, adversarial 15/15, factory import, service-worker 34, Pages assembly, conflict-marker scan, and intended-diff secret-signature scan. Applicable Maintainer Defense v1.1.1 rules were rerun as a manual equivalent from the exact installed-skill implementation and returned 0 findings; the packaged auditor itself was not executable/materializable in this runtime and is not claimed to have run.
+
+Final: native browser remains ENVIRONMENT_BLOCKED locally because `chromedriver` is absent. Repository rulesets are empty and branch-protection detail remains connector-unreadable (403), so `HIGH_REASONING_MERGE_GATE` remains in force.
+
+Final: ZzzOps remains read-only/not initialized for K3 because the repository already has one authoritative durable control plane; creating a second state authority at the merge boundary is rejected.
+
+Final pre-merge status after governance hardening: new Critical 0; new Important 0; exact-history publication, hosted exact-SHA CI/browser/Python, independent current-head review, and final live-main drift check remain open. Task 26 remains NOT STARTED.

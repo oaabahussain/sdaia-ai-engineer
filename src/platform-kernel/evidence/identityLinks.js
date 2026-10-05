@@ -1,18 +1,11 @@
+import { canonicalizeJson } from '../../evidence/jcs.js';
+
 const DIRECT_PII = [/@/, /^\+?\d[\d\s().-]{6,}$/];
 
 function assertPrincipal(value, field = 'learner principal') {
   if (typeof value !== 'string' || !value || DIRECT_PII.some((pattern) => pattern.test(value))) {
     throw new TypeError(`${field} must be a pseudonymous learner principal and must not contain direct PII`);
   }
-}
-
-function ordered(records) {
-  return [...records].sort((a, b) => {
-    const at = String(a?.created_at ?? '');
-    const bt = String(b?.created_at ?? '');
-    if (at !== bt) return at.localeCompare(bt);
-    return String(a?.identity_link_record_id ?? '').localeCompare(String(b?.identity_link_record_id ?? ''));
-  });
 }
 
 export function assertIdentityLinkRecord(record) {
@@ -30,17 +23,35 @@ export function assertIdentityLinkRecord(record) {
 export function resolveLearnerPrincipal(learnerId, records) {
   assertPrincipal(learnerId);
   if (!Array.isArray(records)) throw new TypeError('records must be an array');
-  const latestByLink = new Map();
-  for (const record of ordered(records)) {
+  // Resolve a graph of immutable transitions, never a timestamp winner.
+  const byId = new Map(), byLink = new Map(), conflictedSources = new Set();
+  for (const record of records) {
     assertIdentityLinkRecord(record);
-    if (record.action === 'UNLINK' && record.predecessor_record_id) {
-      const previous = latestByLink.get(record.link_id);
-      if (!previous || previous.identity_link_record_id !== record.predecessor_record_id) continue;
+    const previous = byId.get(record.identity_link_record_id);
+    if (previous) {
+      if (canonicalizeJson(previous) !== canonicalizeJson(record)) {
+        conflictedSources.add(previous.source_learner_id);
+        conflictedSources.add(record.source_learner_id);
+      }
+      continue;
     }
-    latestByLink.set(record.link_id, record);
+    byId.set(record.identity_link_record_id, record);
+    const group = byLink.get(record.link_id) ?? [];
+    group.push(record); byLink.set(record.link_id, group);
+  }
+  const active = [];
+  for (const group of byLink.values()) {
+    const roots = group.filter(record => record.action === 'LINK' && !record.predecessor_record_id);
+    const root = roots[0];
+    const unlink = group.filter(record => record.action === 'UNLINK');
+    const valid = roots.length === 1 && group.length === 1 + unlink.length && unlink.length <= 1
+      && group.every(record => record.source_learner_id === root.source_learner_id && record.target_learner_id === root.target_learner_id)
+      && unlink.every(record => record.predecessor_record_id === root.identity_link_record_id);
+    if (!valid) {
+      for (const record of group) conflictedSources.add(record.source_learner_id);
+    } else if (unlink.length === 0) active.push(root);
   }
 
-  const active = [...latestByLink.values()].filter((record) => record.action === 'LINK');
   const outgoing = new Map();
   for (const record of active) {
     const entries = outgoing.get(record.source_learner_id) ?? [];
@@ -53,6 +64,7 @@ export function resolveLearnerPrincipal(learnerId, records) {
   let current = learnerId;
   let linked = false;
   while (true) {
+    if (conflictedSources.has(current)) return { principal: null, chain, status: 'CONFLICT' };
     const candidates = outgoing.get(current) ?? [];
     const targets = [...new Set(candidates.map((record) => record.target_learner_id))].sort();
     if (targets.length > 1) return { principal: null, chain, status: 'CONFLICT' };

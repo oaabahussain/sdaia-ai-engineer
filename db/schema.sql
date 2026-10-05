@@ -112,6 +112,15 @@ CREATE TABLE IF NOT EXISTS k3_evidence_events (
   content_release_id TEXT NOT NULL,
   definition_id TEXT NOT NULL,
   accepted_at TEXT NOT NULL,
+  domain_id TEXT,
+  form_id TEXT,
+  item_interaction_id TEXT,
+  locale TEXT,
+  mode TEXT,
+  objective_id TEXT,
+  occurred_at TEXT,
+  question_family_id TEXT,
+  track_id TEXT,
   event_json TEXT NOT NULL,
   UNIQUE (store_id, event_id),
   UNIQUE (store_id, origin_id, origin_seq)
@@ -152,3 +161,28 @@ CREATE INDEX IF NOT EXISTS idx_k3_identity_link_target_seq
   ON k3_identity_link_records(target_learner_id, record_seq);
 CREATE INDEX IF NOT EXISTS idx_k3_identity_link_link_seq
   ON k3_identity_link_records(link_id, record_seq);
+
+-- The logical export records remain append-only outside privileged privacy work.
+-- learner_id is an internal erasure index, not an exported schema field.
+CREATE TABLE IF NOT EXISTS k3_evidence_export_records (
+  record_seq INTEGER PRIMARY KEY AUTOINCREMENT,
+  export_record_id TEXT NOT NULL UNIQUE,
+  event_id TEXT NOT NULL,
+  learner_id TEXT NOT NULL,
+  record_json TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_k3_export_learner
+  ON k3_evidence_export_records(learner_id, record_seq);
+
+CREATE TABLE IF NOT EXISTS k3_projection_caches (
+  projection_id TEXT PRIMARY KEY,
+  learner_id TEXT NOT NULL,
+  projection_json TEXT NOT NULL
+);
+
+-- Contains no learner IDs, event hashes, or copies of erased evidence.
+CREATE TABLE IF NOT EXISTS k3_privacy_replay_state (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  replay_complete INTEGER NOT NULL CHECK (replay_complete = 0),
+  policy_json TEXT NOT NULL
+);

@@ -6,6 +6,7 @@ import time
 import uuid
 
 import rfc8785
+from contextlib import closing
 from collections import defaultdict, deque
 from pathlib import Path
 
@@ -16,7 +17,8 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT7
 
 from app.evidence_auth import DenyLearnerAuthorization, LearnerAuthorizationDenied
-from app.evidence_store import accept_evidence
+from app.evidence_store import accept_evidence, accept_evidence_batch, prepare_evidence_batch, migrate_evidence_query_columns, _store_id as resolve_evidence_store_id
+from app.evidence_validation import validate_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / 'data' / 'schema'
@@ -68,47 +70,12 @@ EVENT_DEFINITIONS = load_event_definitions()
 
 
 def validate_learner_evidence_event(event):
-    envelope = validate('learner_evidence', event)
-    if envelope:
-        return envelope
-    definition = EVENT_DEFINITIONS.get(event.get('definition_id'))
-    if definition is None:
-        return 'Unknown learner evidence definition'
-    for field in definition.get('required_context_fields', []):
-        if event.get(field) in (None, ''):
-            return f"Missing required context field {field}"
-    payload_path = ROOT / definition['payload_schema_ref']
-    payload_schema = json.loads(payload_path.read_text(encoding='utf-8'))
-    payload_errors = sorted(
-        Draft7Validator(payload_schema, format_checker=FormatChecker()).iter_errors(event.get('payload')),
-        key=lambda item: list(item.path),
-    )
-    if payload_errors:
-        return '; '.join(error.message for error in payload_errors)
-    return None
+    return validate_evidence(event)
 
 
 def ensure_evidence_store_id(db_url):
-    with connect(db_url) as db:
-        row = db.execute('SELECT store_id FROM k3_evidence_store_meta WHERE id = 1').fetchone()
-        if row:
-            return row['store_id']
-        store_id = f"sqlite-k3:{uuid.uuid4()}"
-        db.execute('INSERT INTO k3_evidence_store_meta (id, store_id) VALUES (1, ?)', (store_id,))
-        return store_id
-
-
-def rejected_evidence_receipt(db_url, event, reason_code):
-    return {
-        'schema_version': 1,
-        'store_id': ensure_evidence_store_id(db_url),
-        'event_id': event.get('event_id') if valid_uuid4(event.get('event_id')) else str(uuid.uuid4()),
-        'event_fingerprint': hashlib.sha256(rfc8785.dumps(event)).hexdigest(),
-        'disposition': 'REJECTED',
-        'accepted_at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-        'reason_code': reason_code,
-        'warnings': [],
-    }
+    with closing(connect(db_url)) as db, db:
+        return resolve_evidence_store_id(db)
 
 
 def load_track_registry():
@@ -171,8 +138,10 @@ def connect(db_url=None):
 
 
 def init_db(db_url=None):
-    with connect(db_url) as db:
+    with closing(connect(db_url)) as db, db:
         db.executescript((ROOT / 'db' / 'schema.sql').read_text(encoding='utf-8'))
+        db.execute('BEGIN IMMEDIATE')
+        migrate_evidence_query_columns(db)
 
 
 def validate(name, payload):
@@ -278,25 +247,29 @@ def create_app(db_url=None, learner_auth=None, evidence_pull_max_limit=None):
         return {'ok': True, 'ref': f'feedback:{next_id}'}
 
     @app.get('/v1/learner-evidence')
-    async def get_learner_evidence(request: Request, after_store_seq: int = 0, limit: int = 100):
+    async def get_learner_evidence(request: Request, after_store_seq: int = 0, limit: int = 100, source_store_id: str | None = None):
         try:
             authorized = app.state.learner_auth.resolve(request)
         except LearnerAuthorizationDenied:
             return error('learner_not_authorized', 'Learner evidence access is not authorized', 403)
-        if after_store_seq < 0:
-            return error('validation_failed', 'after_store_seq must be zero or greater', 400)
+        if not 0 <= after_store_seq <= 9007199254740991:
+            return error('validation_failed', 'after_store_seq must be a nonnegative safe integer', 400)
         if limit < 1:
             return error('validation_failed', 'limit must be a positive integer', 400)
         bounded_limit = min(limit, app.state.evidence_pull_max_limit)
         with connect(app.state.db_url) as db:
             store_id = ensure_evidence_store_id(app.state.db_url)
+            if after_store_seq > 0 and source_store_id is None:
+                return error('validation_failed', 'A nonzero cursor requires source_store_id', 400)
+            if source_store_id is not None and source_store_id != store_id:
+                return error('source_store_mismatch', 'Cursor belongs to another evidence store', 409)
             rows = db.execute(
                 'SELECT store_seq, event_json FROM k3_evidence_events WHERE store_id = ? AND learner_id = ? AND store_seq > ? ORDER BY store_seq ASC LIMIT ?',
                 (store_id, authorized.learner_id, after_store_seq, bounded_limit),
             ).fetchall()
         events = [json.loads(row['event_json']) for row in rows]
         next_store_seq = rows[-1]['store_seq'] if rows else after_store_seq
-        return {'events': events, 'next_store_seq': next_store_seq}
+        return {'store_id':store_id, 'events': events, 'next_store_seq': next_store_seq}
     @app.post('/v1/learner-evidence/batch')
     async def post_learner_evidence_batch(request: Request):
         try:
@@ -313,14 +286,19 @@ def create_app(db_url=None, learner_auth=None, evidence_pull_max_limit=None):
         if any(not isinstance(event, dict) or event.get('learner_id') != authorized.learner_id for event in events):
             return error('learner_not_authorized', 'Event learner scope does not match authorized principal', 403)
 
-        receipts = []
-        for event in events:
-            validation = validate_learner_evidence_event(event)
-            if validation:
-                receipts.append(rejected_evidence_receipt(app.state.db_url, event, 'INVALID_EVIDENCE'))
-                continue
-            receipts.append(accept_evidence(app.state.db_url, event))
-        return {'schema_version': 1, 'receipts': receipts}
+        for value in events:
+            definition_id = value.get('definition_id')
+            definition = EVENT_DEFINITIONS.get(definition_id) if isinstance(definition_id, str) else None
+            if definition and definition.get('actor_kind') != 'LEARNER':
+                grant = (value.get('definition_id'), value.get('authority_ref'))
+                if not isinstance(grant[1], str) or grant not in getattr(authorized, 'producer_grants', frozenset()):
+                    return error('producer_not_authorized', 'Event producer authority is not authorized', 403)
+
+        try:
+            prepare_evidence_batch(events)
+        except (TypeError, ValueError, OverflowError):
+            return error('validation_failed', 'Batch identities or numeric values cannot form canonical receipts', 400)
+        return accept_evidence_batch(app.state.db_url, events)
 
     @app.post('/v1/events')
     async def events(request: Request, x_anon_id: str = Header(..., alias='X-Anon-Id')):

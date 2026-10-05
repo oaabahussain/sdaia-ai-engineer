@@ -1,0 +1,98 @@
+{
+  "status": "FIXED_AND_VERIFIED_LOCAL_PENDING_PUBLICATION",
+  "source": "c9c52972e7bb851284967bf7fdc3dd9e61843683",
+  "findings": [
+    {
+      "id": "R01",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "20f138cef0e5cb0ce0dc43ef55b27750146abe5c",
+      "tests": [
+        "tests/k3-residual-store-replay.test.js",
+        "server/tests/test_k3_residual_cursor.py"
+      ]
+    },
+    {
+      "id": "R02",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "b76bbccfeb41a340aec26046940bc255df86b274",
+      "tests": [
+        "tests/k3-residual-delivery.test.js"
+      ]
+    },
+    {
+      "id": "R03",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "b76bbccfeb41a340aec26046940bc255df86b274",
+      "tests": [
+        "tests/k3-residual-delivery.test.js"
+      ]
+    },
+    {
+      "id": "R04",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "d133bcdca67d9bbbc0425adba5c79a726977e1d7",
+      "tests": [
+        "tests/k3-residual-delivery.test.js",
+        "tests/k3-residual-async-receipt.test.js"
+      ]
+    },
+    {
+      "id": "R05",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "20f138cef0e5cb0ce0dc43ef55b27750146abe5c",
+      "tests": [
+        "tests/k3-residual-store-replay.test.js"
+      ]
+    },
+    {
+      "id": "R06",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "09a66f471055a107cb28db4b00fa8af921e8afe2",
+      "tests": [
+        "tests/k3-residual-identity.test.js"
+      ]
+    },
+    {
+      "id": "R07",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "09a66f471055a107cb28db4b00fa8af921e8afe2",
+      "tests": [
+        "server/tests/test_k3_residual_identity.py"
+      ]
+    },
+    {
+      "id": "R08",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "797d86060baa08b78de5b6b92ce8cb5a36bb84dd",
+      "tests": [
+        "tests/k3-residual-security.test.js",
+        "server/tests/test_k3_residual_security.py"
+      ]
+    },
+    {
+      "id": "R09",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "cc9d02c74a188c659c1d8427e7cb84ce9035b629",
+      "tests": [
+        "tests/k3-residual-revision.test.js"
+      ]
+    },
+    {
+      "id": "R10",
+      "status": "FIXED_AND_VERIFIED_LOCAL",
+      "commit": "797d86060baa08b78de5b6b92ce8cb5a36bb84dd",
+      "tests": [
+        "tests/k3-residual-security.test.js",
+        "server/tests/test_k3_residual_security.py"
+      ]
+    }
+  ],
+  "verified_scope": "R01-R10 plus four final-review groups; not programme closure or remote release",
+  "remaining_verification_gates": [
+    "REMOTE_PUBLICATION_HOLD",
+    "EXACT_SOURCE_HOSTED_CI",
+    "NATIVE_BROWSER_NOT_AVAILABLE",
+    "FRESH_REGISTRY_AUDIT_DNS_BLOCKED"
+  ],
+  "canonical_next_task": 26
+}

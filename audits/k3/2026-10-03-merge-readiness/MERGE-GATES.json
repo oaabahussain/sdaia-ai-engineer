@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-04T07:37:04Z",
+  "decision": "NOT_READY_FOR_REMOTE_MERGE",
+  "source_local_merge": "f5bbf1977ef4b54cfada610a1c4c9a516f94a929",
+  "verification_fix_commit": "9fdfa55240909129fe715868df6b50ba6d8e8aef",
+  "remote_main_observed": "dbf718f65396388efa234e459155e0e4d3fc8b6d",
+  "remote_impl_observed": "680035b83c489013cbd09ca554229ecae8404518",
+  "checks": [
+    {
+      "id": "CORE_REGRESSION",
+      "status": "PASS",
+      "evidence": "Node752/Python115, original residual25, boundary3"
+    },
+    {
+      "id": "STRICT_COMMAND_EXIT",
+      "status": "PASS",
+      "evidence": "same real-runner test RED0 versus GREEN2 for native BLOCKED"
+    },
+    {
+      "id": "SERVER_DEPENDENCY_SECURITY",
+      "status": "PASS",
+      "evidence": "FastAPI0.141.1/Starlette1.7.0/httpx2-2.13.1/pytest9.0.3; pip check clean; framework6/6; Node752/Python116; TCP+Pages PASS"
+    },
+    {
+      "id": "CURRENT_ADVISORY_SCAN",
+      "status": "PASS",
+      "evidence": "2026-10-04 GitHub Advisory Database exact-package/version scan; see advisory-scan-2026-10-04.json",
+      "limitation": "Registry-native audit endpoints unavailable from container DNS; scope recorded explicitly"
+    },
+    {
+      "id": "NATIVE_BROWSER_EXACT_SOURCE",
+      "status": "BLOCKED",
+      "required": "Original browser smoke plus native IndexedDB scenarios in a permitted browser runtime"
+    },
+    {
+      "id": "HOSTED_CI_EXACT_SOURCE",
+      "status": "NOT_RUN",
+      "required": "Verified repaired-source SHA must be the actual CI subject"
+    },
+    {
+      "id": "INDEPENDENT_REVIEW",
+      "status": "NOT_RUN",
+      "required": "Reviewer assessment of repaired candidate; self-review is labeled separately"
+    },
+    {
+      "id": "PERMITTED_PUBLICATION",
+      "status": "BLOCKED",
+      "required": "Resolve the prior tool publication hold without an alternate-tool workaround"
+    }
+  ],
+  "known_limits": [
+    {
+      "id": "JSONL_OPERATOR_RECOVERY",
+      "classification": "EXPLICIT_REFERENCE_ADAPTER_LIMIT",
+      "automatic_repair_claim": false
+    },
+    {
+      "id": "PYTHON_DEPRECATION",
+      "classification": "RESOLVED_BY_STARLETTE_HTTPX2_UPGRADE",
+      "status": "CLOSED"
+    }
+  ],
+  "no_task26": true,
+  "no_remote_merge": true
+}

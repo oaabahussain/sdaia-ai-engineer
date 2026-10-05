@@ -1,3 +1,4 @@
+import { assertResponsePrivacy } from './responsePrivacy.js';
 import { newUuid } from './ids.js';
 import { payloadValidators, validateLearnerEvidenceEventSchema } from './generatedValidators.js';
 
@@ -51,6 +52,7 @@ export function validateLearnerEvidenceEvent(event, runtimeContext) {
       errors.push(...errorsOf(validatePayload).map((message) => `payload ${message}`));
     }
   }
+  try { assertResponsePrivacy(event); } catch (error) { errors.push(error.message); }
   return { ok: errors.length === 0, errors };
 }
 

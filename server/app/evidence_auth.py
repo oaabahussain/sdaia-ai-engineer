@@ -11,9 +11,14 @@ def _assert_pseudonymous_principal(value: str):
 @dataclass(frozen=True)
 class AuthorizedLearner:
     learner_id: str
+    producer_grants: frozenset[tuple[str, str]] = frozenset()
 
     def __post_init__(self):
         _assert_pseudonymous_principal(self.learner_id)
+        grants = frozenset(self.producer_grants)
+        if any(not isinstance(pair, tuple) or len(pair) != 2 or any(not isinstance(x, str) or not x or x == '*' for x in pair) for pair in grants):
+            raise ValueError('Producer grants must bind exact definition and authority references')
+        object.__setattr__(self, 'producer_grants', grants)
 
 
 class LearnerAuthorizationDenied(PermissionError):
@@ -34,8 +39,8 @@ class DenyLearnerAuthorization:
 class StaticLearnerAuthorization:
     """Deterministic test resolver. Never derives authority from request claims."""
 
-    def __init__(self, learner_id: str):
-        self._authorized = AuthorizedLearner(learner_id)
+    def __init__(self, learner_id: str, *, producer_grants=frozenset()):
+        self._authorized = AuthorizedLearner(learner_id, producer_grants=frozenset(producer_grants))
 
     def resolve(self, request) -> AuthorizedLearner:
         return self._authorized

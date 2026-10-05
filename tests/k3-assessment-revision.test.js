@@ -20,6 +20,7 @@ function candidate(eventId, base, occurredAt) {
     assessment_attempt_id:ATTEMPT,
     occurred_at:occurredAt,
     base_attempt_revision:base,
+    proposed_attempt_revision:base+1,
     payload:{exam_profile_ref:'exam:1',scoring_policy_ref:'policy:1'}
   };
 }

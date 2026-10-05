@@ -94,7 +94,8 @@
           "evaluation_status": "GRADED",
           "correct": true,
           "score": 1
-        }
+        },
+        "authority_ref": "authority:test"
       }
     ],
     "id_conflict": {

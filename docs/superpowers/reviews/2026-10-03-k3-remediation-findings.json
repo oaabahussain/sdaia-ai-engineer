@@ -1,0 +1,264 @@
+[
+  {
+    "id": "F01",
+    "category": "Local-capture atomicity",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A14",
+      "A15"
+    ],
+    "files": [
+      "src/evidence/localCapture.js",
+      "src/evidence/origin.js",
+      "src/evidence/indexedDbStore.js"
+    ],
+    "requirement": "Spec 17.2; Task 11; K3 acceptance 7/8",
+    "observed": "After the outbox enqueue callback fails, one raw event remains persisted while the origin sequence has not advanced. A subsequent capture fails with CONFLICT.",
+    "root_cause": "Event acceptance, outbox creation, and sequence advancement are separate operations, not one transaction.",
+    "priority": "Resolve before K3 runtime integration",
+    "next_test": "Persist event, origin sequence and enabled-sync outbox reference atomically, or prove an explicitly approved equivalent recovery protocol; both failure-injection probes must pass.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F01-red.log",
+      "F01-green.log",
+      "F01-full-node.log",
+      "F01-full-python.log",
+      "review-red-node.log",
+      "review-red-python.log",
+      "review-green-node.log",
+      "review-green-python.log"
+    ],
+    "fix_sha": "a6fcdd1a9049d7f5e116c2c705560ceedf437c3a",
+    "final_review_sha": "58ca1d9a607c20f9195d8bccd3218e7257cd1ee1",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F02",
+    "category": "Origin identity/sequence fallback",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A16",
+      "A17"
+    ],
+    "files": [
+      "src/evidence/origin.js"
+    ],
+    "requirement": "Spec 8.5/8.6, 17.3; Task 11",
+    "observed": "When localStorage reads work but writes fail, the second capture reuses a committed origin sequence and conflicts. When storage is null, successive origin lookups return different UUIDs.",
+    "root_cause": "readSeq returns 0 for an absent stored value rather than the retained memory sequence; optional storage access does not throw, so null storage creates a new origin instead of using the fallback.",
+    "priority": "Resolve before K3 runtime integration",
+    "next_test": "Cover read-only/quota-blocked/missing storage and stable per-session identity without silently resetting committed sequence state.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F02-red.log",
+      "F02-green.log",
+      "F02-full-node.log",
+      "F02-full-python.log"
+    ],
+    "fix_sha": "555102e62e0b038fe7212812e555bd3962df5269",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F03",
+    "category": "JSONL concurrent writers",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A01"
+    ],
+    "files": [
+      "scripts/platform-kernel/adapters/jsonlEvidenceStore.js"
+    ],
+    "requirement": "Spec 15/27/28.1; Tasks 8/13",
+    "observed": "Eight concurrent accept calls on one adapter produced one success and seven ENOENT rename errors in the recorded reproduction; source appends race with a shared temporary sidecar path.",
+    "root_cause": "No acceptance serialization; each call reads an old index and writes the same index.json.tmp.",
+    "priority": "Resolve before allowing concurrent JSONL use",
+    "next_test": "Concurrent writes and exact retries must preserve every acknowledged event and unique monotonic receipts, including multiple adapter instances or an explicitly enforced single-writer boundary.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F03-red.log",
+      "F03-green.log",
+      "F03-full-node.log",
+      "F03-full-python.log"
+    ],
+    "fix_sha": "18fe10601fd1c6f96ca830dec7957de441380788",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F04",
+    "category": "JSONL same-count corruption is not detected",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A02",
+      "A03"
+    ],
+    "files": [
+      "scripts/platform-kernel/adapters/jsonlEvidenceStore.js"
+    ],
+    "requirement": "Spec 13/27.1/37/39; Tasks 8/22",
+    "observed": "Reversing two index entries without changing their count made read(learner:a) return learner:b evidence. A changed raw body was also returned despite its stale stored fingerprint.",
+    "root_cause": "load checks only event/index lengths and coarse index shape, then joins events to entries by array position.",
+    "priority": "Fail closed before reading corrupted storage",
+    "next_test": "Validate identity, learner/origin linkage, fingerprint and sequence invariants before read/getById/accept. This is a synthetic local corruption test, NOT a report of live data leakage.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F04-red.log",
+      "F04-green.log",
+      "F04-full-node.log",
+      "F04-full-python.log"
+    ],
+    "fix_sha": "515c2f23dcd106129e531429b73844410b6f24f0",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F05",
+    "category": "SQLite exact-retry race",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A08[2]",
+      "A08[3]",
+      "A19"
+    ],
+    "files": [
+      "server/app/evidence_store.py:accept_evidence"
+    ],
+    "requirement": "Spec 27.1/28.2 and acceptance 3; Tasks 9/13",
+    "observed": "Concurrent identical accepts returned CONFLICT or IntegrityError instead of DUPLICATE. The deterministic two-connection interleaving yielded one ACCEPTED and one UNIQUE-constraint IntegrityError.",
+    "root_cause": "The ID/origin checks and insertion are not enclosed in an early write transaction or a conflict-safe reselect path.",
+    "priority": "Resolve before multi-writer server use",
+    "next_test": "Use real concurrent SQLite connections; exact retries must yield one ACCEPTED and all remaining DUPLICATE without losing the immutable event. A19 pauses after real SELECT results; no DB outcomes are mocked.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F05-red.log",
+      "F05-green.log",
+      "F05-full-node.log",
+      "F05-full-python.log",
+      "review-red-node.log",
+      "review-red-python.log",
+      "review-green-node.log",
+      "review-green-python.log"
+    ],
+    "fix_sha": "38d7f4180c198178f26f52b9390cb82002527a13",
+    "final_review_sha": "58ca1d9a607c20f9195d8bccd3218e7257cd1ee1",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F06",
+    "category": "Direct store acceptance does not enforce the evidence contract",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A04-jsonl",
+      "A04-indexeddb",
+      "A07"
+    ],
+    "files": [
+      "scripts/platform-kernel/adapters/jsonlEvidenceStore.js",
+      "src/evidence/indexedDbStore.js",
+      "server/app/evidence_store.py"
+    ],
+    "requirement": "Spec 27.1 explicitly requires supported schema, definition, context, payload, privacy and producer checks in adapter-equivalent semantics",
+    "observed": "All three store APIs accepted and persisted schema_version=999 plus an undeclared mastery field.",
+    "root_cause": "The direct persistence APIs fingerprint/write without the envelope and governance checks applied by the constructor/HTTP endpoint.",
+    "priority": "Resolve contract boundary before adding more producers",
+    "next_test": "Reject unsupported schema/derived truth on every governed store entry path, or obtain an explicit reviewed contract decision that defines a validated-only storage boundary. Control A11 confirms the current HTTP endpoint DOES reject these inputs; this finding is not an HTTP validation bypass.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F06-red.log",
+      "F06-green.log",
+      "F06-full-node.log",
+      "F06-full-python.log",
+      "review-red-node.log",
+      "review-red-python.log",
+      "review-green-node.log",
+      "review-green-python.log"
+    ],
+    "fix_sha": "24c07fd40d8d9bb46d03ee393c0e828e3a7f403f",
+    "final_review_sha": "58ca1d9a607c20f9195d8bccd3218e7257cd1ee1",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F07",
+    "category": "Pull cursor integer overflow",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A09[2**63]",
+      "A09[10**100]"
+    ],
+    "files": [
+      "server/app/main.py:get_learner_evidence"
+    ],
+    "requirement": "Spec 19.2/38/39; Task 16",
+    "observed": "Authorized GET requests with an oversized positive after_store_seq returned HTTP 500 rather than an explicit client-input rejection.",
+    "root_cause": "Positive Python integers are passed to SQLite without checking its representable cursor range.",
+    "priority": "Input-validation correction",
+    "next_test": "Reject out-of-range cursor values with a defined 400/422 contract; preserve default-deny authorization.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F07-red.log",
+      "F07-green.log",
+      "F07-full-node.log",
+      "F07-full-python.log"
+    ],
+    "fix_sha": "b017c79fde3d413c001c06388dc4257013ab16a1",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F08",
+    "category": "SQLite schema does not fully match approved query-column contract",
+    "scope": "Pre-Task25 / merged main",
+    "cases": [
+      "A10"
+    ],
+    "files": [
+      "db/schema.sql:k3_evidence_events",
+      "server/app/evidence_store.py"
+    ],
+    "requirement": "Spec 28.2; Task 9",
+    "observed": "Nine specified separate columns are absent: domain_id, form_id, item_interaction_id, locale, mode, objective_id, occurred_at, question_family_id, track_id.",
+    "root_cause": "The implemented table/index contract is narrower than the approved logical-column list.",
+    "priority": "Specification/conformance gap, not proven data loss",
+    "next_test": "Implement an additive, migration-tested query-column contract or formally reconcile the specification. These values may still exist inside event_json; the audit does NOT claim their raw values were erased.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F08-red.log",
+      "F08-green.log",
+      "F08-full-node.log",
+      "F08-full-python.log"
+    ],
+    "fix_sha": "e9362c4be6d062e53fc305df0a80f5d8cc7c948b",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  },
+  {
+    "id": "F09",
+    "category": "Export-ledger orphan terminal record",
+    "scope": "Task 25 local only; not published",
+    "cases": [
+      "A05"
+    ],
+    "files": [
+      "src/platform-kernel/evidence/exportLedger.js:records/propagateDeletion"
+    ],
+    "requirement": "Spec 36/39; Task 25 append-only predecessor integrity",
+    "observed": "A persisted schema-valid DELETED record whose predecessor is absent was returned as a completed outcome.",
+    "root_cause": "records validates individual schemas; propagation follows descendants and returns a terminal record without proving the ancestor chain.",
+    "priority": "Persistence-corruption hardening before Task 25 acceptance",
+    "next_test": "Validate roots, predecessors, identity and lifecycle continuity before reporting a completed deletion. Normal append paths already check predecessor transitions; this finding specifically concerns inconsistent persisted history.",
+    "status": "FIXED_LOCAL",
+    "severity": "IMPORTANT",
+    "evidence": [
+      "F09-red.log",
+      "F09-green.log",
+      "F09-full-node.log",
+      "F09-full-python.log"
+    ],
+    "fix_sha": "203070785a4fd5ee65ec94bdba2054d3b5ae7232",
+    "final_status": "FIXED_AND_VERIFIED_LOCAL_PUBLICATION_HOLD"
+  }
+]

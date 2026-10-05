@@ -1,0 +1,51 @@
+{
+  "source_head": "465aafd2b0ba81d628fabd970fd62b3288ce204c",
+  "tree": "32a5c6334e5f6d26f03504c6ec086631e7521b5f",
+  "unchanged_candidate": {
+    "node": {
+      "total": 682,
+      "pass": 682,
+      "fail": 0,
+      "skip": 0
+    },
+    "python": {
+      "pass": 100,
+      "fail": 0,
+      "warnings": 1
+    }
+  },
+  "audit_metadata_checkpoint": {
+    "node": {
+      "pass": 682,
+      "fail": 0
+    },
+    "python": {
+      "pass": 100,
+      "fail": 0,
+      "warnings": 1
+    }
+  },
+  "new_probes": {
+    "node": {
+      "total": 16,
+      "pass": 2,
+      "fail": 14
+    },
+    "python": {
+      "total": 9,
+      "pass": 3,
+      "fail": 6
+    },
+    "repeat_results_identical": true
+  },
+  "groups": {
+    "important": 9,
+    "minor": 1
+  },
+  "known_boundary_controls": 3,
+  "process_subset": 73,
+  "original_compatible_audit": 23,
+  "production_edits_this_audit": false,
+  "remote_merge": false,
+  "staged_candidate_committed": false
+}

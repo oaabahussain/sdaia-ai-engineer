@@ -1,0 +1,10 @@
+{
+  "method": "HOST_VALIDATOR",
+  "checks": [
+    "required fields",
+    "completed phase statuses",
+    "blocked phase consistency"
+  ],
+  "result": "PASS",
+  "scope": "structural only, not decision readiness"
+}

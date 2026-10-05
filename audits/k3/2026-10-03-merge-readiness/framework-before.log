@@ -1,0 +1,66 @@
+test_invalid_host_fragment_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_fragment_cannot_hide_path) ... FAIL
+test_invalid_host_question_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_question_cannot_hide_path) ... FAIL
+test_invalid_host_slash_cannot_change_path (__main__.FrameworkBoundaryTests.test_invalid_host_slash_cannot_change_path) ... FAIL
+test_normal_url_control (__main__.FrameworkBoundaryTests.test_normal_url_control) ... ok
+test_path_without_slash_cannot_change_authority (__main__.FrameworkBoundaryTests.test_path_without_slash_cannot_change_authority) ... FAIL
+test_unregistered_method_cannot_dispatch_internal_helper (__main__.FrameworkBoundaryTests.test_unregistered_method_cannot_dispatch_internal_helper) ... FAIL
+
+======================================================================
+FAIL: test_invalid_host_fragment_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_fragment_cannot_hide_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/k3_merge_readiness/evidence/python-advisory/test_framework_boundaries.py", line 24, in test_invalid_host_fragment_cannot_hide_path
+    self.assertEqual(Request(scope(host=b'example.invalid#fragment')).url.path, '/private')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' != '/private'
++ /private
+
+
+======================================================================
+FAIL: test_invalid_host_question_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_question_cannot_hide_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/k3_merge_readiness/evidence/python-advisory/test_framework_boundaries.py", line 27, in test_invalid_host_question_cannot_hide_path
+    self.assertEqual(Request(scope(host=b'example.invalid?query')).url.path, '/private')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' != '/private'
++ /private
+
+
+======================================================================
+FAIL: test_invalid_host_slash_cannot_change_path (__main__.FrameworkBoundaryTests.test_invalid_host_slash_cannot_change_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/k3_merge_readiness/evidence/python-advisory/test_framework_boundaries.py", line 21, in test_invalid_host_slash_cannot_change_path
+    self.assertEqual(Request(scope(host=b'example.invalid/public?x=')).url.path, '/private')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '/public' != '/private'
+- /public
++ /private
+
+
+======================================================================
+FAIL: test_path_without_slash_cannot_change_authority (__main__.FrameworkBoundaryTests.test_path_without_slash_cannot_change_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/k3_merge_readiness/evidence/python-advisory/test_framework_boundaries.py", line 34, in test_path_without_slash_cannot_change_authority
+    self.assertEqual(value.hostname, 'example.invalid')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'example.invalidother.invalid' != 'example.invalid'
+- example.invalidother.invalid
++ example.invalid
+
+
+======================================================================
+FAIL: test_unregistered_method_cannot_dispatch_internal_helper (__main__.FrameworkBoundaryTests.test_unregistered_method_cannot_dispatch_internal_helper)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/k3_merge_readiness/evidence/python-advisory/test_framework_boundaries.py", line 50, in test_unregistered_method_cannot_dispatch_internal_helper
+    self.assertEqual(start['status'], 405)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 405
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.002s
+
+FAILED (failures=5)

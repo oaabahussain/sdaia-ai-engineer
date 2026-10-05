@@ -65,6 +65,11 @@ export function resolveCurrentEvidence(events) {
       continue;
     }
 
+    if (!correction.learner_id || byId.get(targetId).learner_id !== correction.learner_id) {
+      conflicts.push({code:'CORRECTION_PRINCIPAL_MISMATCH', correction_event_id:correction.event_id, target_event_id:targetId});
+      continue;
+    }
+
     if (payload.action === 'SUPERSEDE') {
       const supersedingId = payload.superseding_event_id;
       if (!byId.has(supersedingId)) {
@@ -74,6 +79,10 @@ export function resolveCurrentEvidence(events) {
           target_event_id: targetId,
           superseding_event_id: supersedingId
         });
+        continue;
+      }
+      if (byId.get(supersedingId).learner_id !== correction.learner_id) {
+        conflicts.push({code:'SUPERSEDING_PRINCIPAL_MISMATCH', correction_event_id:correction.event_id, target_event_id:targetId});
         continue;
       }
     } else if (payload.action !== 'VOID') {
