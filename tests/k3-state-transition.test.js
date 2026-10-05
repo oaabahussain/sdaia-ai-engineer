@@ -121,3 +121,37 @@ test('activities created after the per-track K3 transition are not reclassified 
   assert.equal(reloaded.tracks[TRACK_ID].active_exam.legacy_state_v2, undefined);
   assert.equal(reloaded.legacy.preserved.k3_transition_tracks?.[TRACK_ID], true);
 });
+
+
+test('submitted pre-K3 attempt remains legacy history after cutover without marking post-K3 history', () => {
+  const activated = migrateState(preK3StateV2(), ctx);
+  const next = structuredClone(activated);
+  const legacyAttempt = {
+    ...structuredClone(next.tracks[TRACK_ID].active_exam),
+    submitted: true,
+    submitted_at: '2026-10-05T14:00:00Z'
+  };
+  next.tracks[TRACK_ID].active_exam = null;
+  next.tracks[TRACK_ID].exam_history = [
+    {
+      attempt: {
+        id: 'post-k3-submitted',
+        started_at: '2026-10-05T15:00:00Z',
+        submitted_at: '2026-10-05T15:10:00Z',
+        submitted: true
+      },
+      result: { correct: 8, total: 10 }
+    },
+    {
+      attempt: legacyAttempt,
+      result: { correct: 7, total: 10 }
+    }
+  ];
+
+  const reloaded = migrateState(next, ctx);
+  const [postK3History, legacyHistory] = reloaded.tracks[TRACK_ID].exam_history;
+
+  assert.equal(postK3History.legacy_summary, undefined);
+  assert.equal(legacyHistory.attempt.legacy_state_v2, true);
+  assert.equal(legacyHistory.legacy_summary, true);
+});
