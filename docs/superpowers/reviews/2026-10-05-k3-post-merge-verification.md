@@ -77,6 +77,6 @@ Task 26 packet remains:
 
 Do not implement, test, or commit Task 26 as part of this checkpoint.
 
-Because snapshot-primary publication intentionally changed Git ancestry, the old remote execution branch `impl/k3-learner-evidence-engine` must not be force-moved or treated as current. A future Task 26 start must establish a fresh isolated execution workspace from the durable post-merge baseline and bind a fresh execution envelope before RED.
+Because snapshot-primary publication intentionally changed Git ancestry, the old remote execution branch `impl/k3-learner-evidence-engine` must not be force-moved or treated as current. The main checkpoint intentionally keeps `base_main_sha=null` while `low_model_ready=false`; a future Task 26 start must first resolve the then-live `main`, establish a fresh isolated execution workspace, bind that exact live-main SHA into execution state/envelope, and only then enter RED.
 
 This checkpoint intentionally stops at the Task 26 boundary.
