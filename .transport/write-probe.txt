@@ -1,1 +1,0 @@
-K3 GitHub write probe. Safe temporary file; no production effect.
