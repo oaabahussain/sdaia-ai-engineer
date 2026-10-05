@@ -172,6 +172,16 @@ test('accepts a fresh K3 execution branch when state and source ref agree', () =
   assert.equal(result.ok, true, JSON.stringify(result));
 });
 
+test('rejects an execution state when checkout ref differs from the bound execution branch', () => {
+  const branch = 'impl/k3-task26-statev2-transition';
+  const result = validateCurrentState(
+    state({ state_revision: 49, execution_branch: branch, base_main_sha: SHA_A }),
+    context({ sourceRef: 'impl/k3-other' })
+  );
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'EXECUTION_BRANCH_INVALID');
+});
+
 test('rejects unapproved execution branch name', () => {
   const result = validateCurrentState(state({ execution_branch: 'impl/other' }), context());
   assert.equal(result.ok, false);
