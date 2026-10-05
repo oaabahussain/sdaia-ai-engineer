@@ -278,8 +278,17 @@ Phase E implementation is complete at the Product boundary pending result accept
 
 Codex current-head review on `1718795a54e1409402852b675eca1e3fe148df2c` found one valid in-scope P2: a pre-K3 active attempt submitted after the per-track cutover retained nested `attempt.legacy_state_v2` but the already-transitioned fast path failed to promote its new history wrapper to `legacy_summary`.
 
-Behavioral review RED: `ba0cc3356f90e7685f28addab275021f26f4a759`; exact focused Task 26 command 6/7 PASS with the new classification assertion failing. Accepted RED was explicitly replaced, not silently mutated: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a` → `b266395db43868a874ebfbe79ef8c77e8850e943ac79ef0573ab32ac68d9e7ed`.
+Behavioral review RED: `ba0cc3356f90e7685f28addab275021f26f4a759`; exact focused Task 26 command 6/7 PASS with the new classification assertion failing. Accepted RED was explicitly replaced, not silently mutated: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a` → `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`.
 
 Fix: `604c7ad4a046f6140668221f6e884320eca0b2d9`; normalize only history already marked legacy or derived from `attempt.legacy_state_v2`, leaving genuine post-K3 history unmarked. Exact focused command after fix: 7/7 PASS. Task result revalidation against frozen execution state revision 49: `TASK_RESULT_ACCEPTED`, zero failures.
 
 Ruling: preserve the initial Task 26 accepted RED chain and replace it only with the added review regression; final exact-head CI/re-review evidence stays external until the head is frozen.
+
+
+## Task 26 evidence-hash correction
+
+Current-head re-review found that the review-RED test hash in the prior metadata revision did not equal the raw committed file SHA-256. Independent recomputation from `ba0cc3356f90e7685f28addab275021f26f4a759` confirms `tests/k3-state-transition.test.js` = `6db018f28cd3dd791e6d852d6341e444dd0c96bd3930ced507f65d5fcc558a8e`; `tests/state-migration.test.js` remains `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`.
+
+The corrected accepted-RED replacement digest is `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`. Re-running the actual Task result validation logic with the corrected evidence returns `TASK_RESULT_ACCEPTED`, zero failures.
+
+Ruling: supersede only the erroneous evidence hash/digest in the prior Task 26 metadata revision; Product code, review RED behavior, review fix, and Task BASE remain unchanged.

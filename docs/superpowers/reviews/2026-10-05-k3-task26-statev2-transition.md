@@ -122,9 +122,9 @@ A review regression was added at `ba0cc3356f90e7685f28addab275021f26f4a759`. The
 Accepted RED replacement:
 
 - prior accepted digest: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a`
-- replacement test hash `tests/k3-state-transition.test.js`: `ff166148ce78eb0d0bd2b27714008d91276bc1ebe4967838d8500f015c905439`
+- replacement test hash `tests/k3-state-transition.test.js`: `6db018f28cd3dd791e6d852d6341e444dd0c96bd3930ced507f65d5fcc558a8e`
 - unchanged `tests/state-migration.test.js` hash: `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`
-- replacement accepted RED digest: `b266395db43868a874ebfbe79ef8c77e8850e943ac79ef0573ab32ac68d9e7ed`
+- replacement accepted RED digest: `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`
 
 Ruling: replace the accepted Task 26 RED only to add the in-scope review regression proving a submitted pre-K3 active attempt retains coarse legacy history classification after cutover while genuine post-K3 history stays unmarked; preserve every original Task 26 assertion and command.
 
@@ -135,3 +135,14 @@ The fix changes only the already-transitioned-track normalization path: history 
 The exact focused Task 26 command after the fix produced 7 PASS / 0 FAIL locally. Result validation using the frozen execution state revision 49, Task BASE, replacement RED evidence, current source authority, Product scope, and durable evidence returned `TASK_RESULT_ACCEPTED` with zero failures.
 
 Final hosted exact-head CI and current-head re-review remain external evidence and must be verified after this metadata promotion without editing the final candidate head.
+
+
+## Evidence-hash correction after current-head re-review
+
+Codex re-review of `37765aa6c9e014c55b521e6c204ba779d5304fe8` correctly identified that the recorded review-RED test hash had been computed from the wrong byte representation rather than the committed raw file bytes.
+
+Independent recomputation from `ba0cc3356f90e7685f28addab275021f26f4a759:tests/k3-state-transition.test.js` produced raw SHA-256 `6db018f28cd3dd791e6d852d6341e444dd0c96bd3930ced507f65d5fcc558a8e`. The unchanged `tests/state-migration.test.js` raw SHA-256 remains `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`.
+
+Using those exact committed-file hashes with the existing explicit replacement Ruling, the repository acceptance algorithm produced replacement evidence digest `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`. Re-running `validateTaskResult` against frozen execution state revision 49, Task BASE, exact packet/source authority, Product scope, GREEN/regression evidence, and durable checkpoint evidence returned `TASK_RESULT_ACCEPTED` with zero failures.
+
+Ruling: this correction supersedes the erroneous review-RED hash/digest recorded in the preceding metadata revision. It changes evidence bookkeeping only; the behavioral RED commit, review fix, Product implementation, and test assertions are unchanged.

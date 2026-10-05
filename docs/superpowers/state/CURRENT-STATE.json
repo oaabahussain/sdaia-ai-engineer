@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 51,
+  "state_revision": 52,
   "programme": "K3",
   "phase": "F",
   "status": "EXECUTING",
@@ -16,7 +16,7 @@
   "checkpoint_path": "docs/superpowers/reviews/2026-10-05-k3-task26-statev2-transition.md",
   "open_critical_findings": 0,
   "open_important_findings": 0,
-  "last_verified_scope": "K3_TASK_26_REVIEW_FIX_RESULT_ACCEPTED_PHASE_E_COMPLETE_TASK27_NEXT",
+  "last_verified_scope": "K3_TASK_26_CORRECTED_RED_EVIDENCE_RESULT_ACCEPTED_PHASE_E_COMPLETE_TASK27_NEXT",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
@@ -48,5 +48,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-05T20:57:00Z"
+  "updated_at": "2026-10-05T21:05:00Z"
 }
