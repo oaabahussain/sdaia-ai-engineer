@@ -28,7 +28,7 @@ export function validateCurrentState(state, context = {}) {
     return result(false, 'STATE_SCHEMA_INVALID', { errors: validateSchema.errors ?? [] });
   }
 
-  if (state.execution_branch !== 'impl/k3-learner-evidence-engine') {
+  if (!/^impl\/k3-[a-z0-9][a-z0-9._\/-]*$/.test(state.execution_branch)) {
     return result(false, 'EXECUTION_BRANCH_INVALID', { execution_branch: state.execution_branch });
   }
 
@@ -75,6 +75,13 @@ export function validateCurrentState(state, context = {}) {
     return result(false, 'MAIN_DRIFT', {
       base_main_sha: state.base_main_sha,
       live_main_sha: context.liveMainSha
+    });
+  }
+
+  if (state.base_main_sha !== null && context.sourceRef !== state.execution_branch) {
+    return result(false, 'EXECUTION_BRANCH_INVALID', {
+      execution_branch: state.execution_branch,
+      source_ref: context.sourceRef
     });
   }
 
@@ -143,7 +150,7 @@ function main() {
   const ledgerExists = existingPaths.includes(state.ledger_path);
   const context = {
     liveMainSha,
-    sourceRef: process.env.GITHUB_REF_NAME || execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
+    sourceRef: arg('--source-ref') || process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
     specBlobSha: existingPaths.includes(state.spec_path) ? gitBlobSha(state.spec_path) : null,
     planBlobSha: existingPaths.includes(state.plan_path) ? gitBlobSha(state.plan_path) : null,
     ledgerText: ledgerExists ? readFileSync(path.join(repoRoot, state.ledger_path), 'utf8') : '',

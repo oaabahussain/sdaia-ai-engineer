@@ -158,6 +158,40 @@ test('rejects readiness when Project bootstrap gate is stale', () => {
   assert.equal(result.code, 'LOW_MODEL_GATE_INVALID');
 });
 
+test('accepts a fresh K3 execution branch when state and source ref agree', () => {
+  const branch = 'impl/k3-task26-statev2-transition';
+  const s = state({
+    state_revision: 49,
+    execution_branch: branch,
+    base_main_sha: SHA_A,
+    gates: { ...allPassGates },
+    low_model_ready: true,
+    project_bootstrap_revision: 'k3-h0-r2-v1'
+  });
+  const result = validateCurrentState(s, context({ sourceRef: branch }));
+  assert.equal(result.ok, true, JSON.stringify(result));
+});
+
+test('rejects an execution state when checkout ref differs from the bound execution branch', () => {
+  const branch = 'impl/k3-task26-statev2-transition';
+  const result = validateCurrentState(
+    state({ state_revision: 49, execution_branch: branch, base_main_sha: SHA_A }),
+    context({ sourceRef: 'impl/k3-other' })
+  );
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'EXECUTION_BRANCH_INVALID');
+});
+
+test('rejects an execution state when checkout ref is unavailable', () => {
+  const branch = 'impl/k3-task26-statev2-transition';
+  const result = validateCurrentState(
+    state({ state_revision: 49, execution_branch: branch, base_main_sha: SHA_A }),
+    context({ sourceRef: '' })
+  );
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'EXECUTION_BRANCH_INVALID');
+});
+
 test('rejects unapproved execution branch name', () => {
   const result = validateCurrentState(state({ execution_branch: 'impl/other' }), context());
   assert.equal(result.ok, false);
