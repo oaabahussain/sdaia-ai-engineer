@@ -78,6 +78,13 @@ export function validateCurrentState(state, context = {}) {
     });
   }
 
+  if (state.base_main_sha !== null && context.sourceRef && context.sourceRef !== state.execution_branch) {
+    return result(false, 'EXECUTION_BRANCH_INVALID', {
+      execution_branch: state.execution_branch,
+      source_ref: context.sourceRef
+    });
+  }
+
   if (context.sourceRef === state.execution_branch && state.base_main_sha === null) {
     return result(false, 'MAIN_DRIFT', { reason: 'execution branch requires non-null base_main_sha' });
   }
