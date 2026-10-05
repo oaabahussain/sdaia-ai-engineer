@@ -1,7 +1,7 @@
 import hashlib
 import math
 import copy
-from app.evidence_validation import validate_evidence
+from app.evidence_validation import validate_evidence, validate_evidence_structure
 import json
 import re
 import sqlite3
@@ -62,7 +62,7 @@ def migrate_evidence_query_columns(db):
             rows = db.execute('SELECT store_seq, event_json, event_fingerprint FROM k3_evidence_events').fetchall()
             for row in rows:
                 event = json.loads(row['event_json'])
-                if validate_evidence(event) or _fingerprint(event) != row['event_fingerprint']:
+                if validate_evidence_structure(event) or _fingerprint(event) != row['event_fingerprint']:
                     raise ValueError('Cannot migrate corrupt evidence')
                 assignments = ', '.join(f'{key} = ?' for key in missing)
                 db.execute(f'UPDATE k3_evidence_events SET {assignments} WHERE store_seq = ?',
