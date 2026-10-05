@@ -30,7 +30,8 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LIVE_MAIN_SHA: ${{ github.event.pull_request.base.sha }}
-        run: npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --json
+          SOURCE_REF: ${{ github.head_ref }}
+        run: npm run validate:state -- --live-main-sha "$LIVE_MAIN_SHA" --source-ref "$SOURCE_REF" --json
       - name: Verify governed current-bank migration
         run: npm run verify:factory-import
       - name: Parse application module
