@@ -5,7 +5,7 @@
   "phase": "E",
   "status": "PHASE_GATE",
   "execution_branch": "impl/k3-learner-evidence-engine",
-  "base_main_sha": "26dbc671b150bf72fc3ad2b43aac663083c681cd",
+  "base_main_sha": null,
   "completed_through_task": 25,
   "next_task": 26,
   "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
@@ -48,5 +48,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-05T10:42:00Z"
+  "updated_at": "2026-10-05T10:49:00Z"
 }
