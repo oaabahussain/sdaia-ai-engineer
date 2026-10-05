@@ -1,0 +1,11 @@
+test_invalid_host_fragment_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_fragment_cannot_hide_path) ... ok
+test_invalid_host_question_cannot_hide_path (__main__.FrameworkBoundaryTests.test_invalid_host_question_cannot_hide_path) ... ok
+test_invalid_host_slash_cannot_change_path (__main__.FrameworkBoundaryTests.test_invalid_host_slash_cannot_change_path) ... ok
+test_normal_url_control (__main__.FrameworkBoundaryTests.test_normal_url_control) ... ok
+test_path_without_slash_cannot_change_authority (__main__.FrameworkBoundaryTests.test_path_without_slash_cannot_change_authority) ... ok
+test_unregistered_method_cannot_dispatch_internal_helper (__main__.FrameworkBoundaryTests.test_unregistered_method_cannot_dispatch_internal_helper) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

@@ -137,6 +137,7 @@ def test_k3_sqlite_batch_sequence_lookup_and_filters(tmp_path):
         item_interaction_id="a23e4567-e89b-42d3-a456-426614174009",
         item_version_id="item-v2",
         definition_id="learner.response.evaluated@1",
+        authority_ref="authority:test",
         payload={
             "response_event_id": "123e4567-e89b-42d3-a456-426614174000",
             "scoring_policy_ref": "policy:1",

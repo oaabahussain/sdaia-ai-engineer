@@ -1,0 +1,42 @@
+[
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/AUDIT-STATE.json",
+    "sha256": "3a7db16e90228009dfd0f94bdbf9e3b8ae44a9001d0a4028c0171686a089bda6"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/DEPENDENCY-INVENTORY.json",
+    "sha256": "67e2c54970e925c2eef7b4e6315efccfef41efecda13c0ba0ac5ed42d54bd52d"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/FINDINGS.json",
+    "sha256": "486e588c2d77261e48ec8899ee77c8fb6cb2a4785cddfc7d6eda23305518fe80"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/RESULTS.json",
+    "sha256": "7f7f57233b0a7b01aa139ec049fd688490cfe03ab56c9ed505a3d7fe151fb00e"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/TCP-OBSERVATIONS.json",
+    "sha256": "d377d4a65d55571d77d5181d9af3055198ef6acedf3dc1dee509db6ccca49b59"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/known-boundaries.test.mjs",
+    "sha256": "836ad568627a51947f11a0b2fd3e786a443ae3c2a8fd265dc8d19886185f9c85"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/remaining.test.mjs",
+    "sha256": "bbab7a19199d2374e44b446ebec39ed71bb073094c60617be048560e1451d4d3"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/run-probes.sh",
+    "sha256": "aef6b53e87b044a1f2f8a82b5e7177c8f5ed01cc12472b83784a65cf5a791ad7"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/tcp_and_pages.py",
+    "sha256": "6fc1b7a19f5cf4eff94e97b5a28fc6d69fd27fb0bf3021e7a618e6aa75f15ae8"
+  },
+  {
+    "path": "audits/k3/2026-10-03-integration-residual/test_remaining_server.py",
+    "sha256": "293d3713313de459fd49bb19af262972c7a7ea0b96c5d4ce5585e6bcd0a97388"
+  }
+]

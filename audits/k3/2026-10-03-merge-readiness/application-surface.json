@@ -1,0 +1,138 @@
+{
+  "scope": "inspection and bounded controls on current application; not an exploitability certification",
+  "routes": [
+    {
+      "path": "/openapi.json",
+      "type": "Route",
+      "methods": [
+        "GET",
+        "HEAD"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/docs",
+      "type": "Route",
+      "methods": [
+        "GET",
+        "HEAD"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/docs/oauth2-redirect",
+      "type": "Route",
+      "methods": [
+        "GET",
+        "HEAD"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/redoc",
+      "type": "Route",
+      "methods": [
+        "GET",
+        "HEAD"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/health",
+      "type": "APIRoute",
+      "methods": [
+        "GET"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/bank",
+      "type": "APIRoute",
+      "methods": [
+        "GET"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/progress/{anon_id}",
+      "type": "APIRoute",
+      "methods": [
+        "GET"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/progress/{anon_id}",
+      "type": "APIRoute",
+      "methods": [
+        "PUT"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/feedback",
+      "type": "APIRoute",
+      "methods": [
+        "POST"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/learner-evidence",
+      "type": "APIRoute",
+      "methods": [
+        "GET"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/learner-evidence/batch",
+      "type": "APIRoute",
+      "methods": [
+        "POST"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    },
+    {
+      "path": "/v1/events",
+      "type": "APIRoute",
+      "methods": [
+        "POST"
+      ],
+      "httpendpoint_class": false,
+      "staticfiles_mount": false
+    }
+  ],
+  "user_middleware": [],
+  "application_form_calls": [],
+  "default_deny_controls": [
+    {
+      "case": "default-deny evidence authorization",
+      "synthetic_host": "example.invalid",
+      "status": 403
+    },
+    {
+      "case": "default-deny evidence authorization",
+      "synthetic_host": "example.invalid/public?x=",
+      "status": 403
+    },
+    {
+      "case": "default-deny evidence authorization",
+      "synthetic_host": "example.invalid#fragment",
+      "status": 403
+    }
+  ],
+  "native_windows_staticfiles_test": "NOT_RUN: current runtime is Linux and app has no StaticFiles mount",
+  "controls_passed": 5
+}

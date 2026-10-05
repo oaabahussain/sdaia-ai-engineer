@@ -26,8 +26,8 @@ export function resolveAssessmentMutation({
   if (typeof candidateEvent.assessment_attempt_id !== 'string' || !candidateEvent.assessment_attempt_id) {
     throw new TypeError('candidateEvent.assessment_attempt_id is required');
   }
-  if (!Number.isInteger(currentRevision) || currentRevision < 0) throw new TypeError('currentRevision must be a non-negative integer');
-  if (!Number.isInteger(storeSeq) || storeSeq < 1) throw new TypeError('storeSeq must be a positive integer');
+  if (!Number.isSafeInteger(currentRevision) || currentRevision < 0) throw new TypeError('currentRevision must be a non-negative integer');
+  if (!Number.isSafeInteger(storeSeq) || storeSeq < 1) throw new TypeError('storeSeq must be a positive integer');
 
   const base = baseRevisionOf(candidateEvent);
   let decision;
@@ -35,9 +35,12 @@ export function resolveAssessmentMutation({
   if (typeof authorityRef !== 'string' || !authorityRef) {
     decision = 'REJECTED';
     reasonCode = 'AUTHORITY_REQUIRED';
-  } else if (!Number.isInteger(base) || base < 0) {
+  } else if (!Number.isSafeInteger(base) || base < 0) {
     decision = 'REJECTED';
     reasonCode = 'INVALID_BASE_REVISION';
+  } else if (!Number.isSafeInteger(candidateEvent.proposed_attempt_revision) || candidateEvent.proposed_attempt_revision !== base + 1) {
+    decision = 'REJECTED';
+    reasonCode = 'INVALID_PROPOSED_REVISION';
   } else if (base === currentRevision) {
     decision = 'APPLIED';
     reasonCode = 'BASE_REVISION_MATCH';

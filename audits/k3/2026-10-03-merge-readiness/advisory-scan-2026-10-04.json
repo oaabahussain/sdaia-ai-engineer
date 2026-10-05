@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-04T07:37:04Z",
+  "source": "GitHub Advisory Database exact-package queries plus installed-version inventory",
+  "coverage_claim": "Package-name/version comparison for every installed Node package and material Python package in the tested candidate; not a universal security certification.",
+  "candidate": {
+    "python_direct": [
+      "fastapi==0.141.1",
+      "starlette==1.7.0",
+      "uvicorn==0.35.0",
+      "jsonschema==4.25.1",
+      "httpx2==2.13.1",
+      "pytest==9.0.3",
+      "rfc8785==0.1.4"
+    ],
+    "node_installed": [
+      "ajv==8.20.0",
+      "ajv-formats==3.0.1",
+      "fake-indexeddb==6.2.5",
+      "fast-deep-equal==3.1.3",
+      "fast-uri==3.1.8",
+      "json-schema-traverse==1.0.0",
+      "require-from-string==2.0.2"
+    ]
+  },
+  "version_boundary_checks": [
+    {
+      "package": "starlette",
+      "installed": "1.7.0",
+      "advisories_checked": 13,
+      "highest_material_fixed_boundary": "1.3.1",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "fastapi",
+      "installed": "0.141.1",
+      "advisories_checked": 2,
+      "highest_fixed_boundary": "0.109.1",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "httpx2",
+      "installed": "2.13.1",
+      "advisories_checked": 5,
+      "highest_fixed_boundary": "2.12.0",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "httpcore2",
+      "installed": "2.13.1",
+      "advisories_checked": 1,
+      "highest_fixed_boundary": "2.10.0",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "anyio",
+      "installed": "4.15.1",
+      "advisories_checked": 3,
+      "highest_fixed_boundary": "4.14.2",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "idna",
+      "installed": "3.20",
+      "advisories_checked": 2,
+      "highest_fixed_boundary": "3.15",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "pytest",
+      "installed": "9.0.3",
+      "advisories_checked": 1,
+      "highest_fixed_boundary": "9.0.3",
+      "status": "FIXED_VERSION"
+    },
+    {
+      "package": "uvicorn",
+      "installed": "0.35.0",
+      "advisories_checked": 2,
+      "highest_fixed_boundary": "0.11.7",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "ajv",
+      "installed": "8.20.0",
+      "advisories_checked": 2,
+      "highest_fixed_boundary": "8.18.0",
+      "status": "NOT_IN_KNOWN_AFFECTED_RANGE"
+    },
+    {
+      "package": "fast-uri",
+      "installed": "3.1.8",
+      "advisories_checked": 13,
+      "highest_fixed_boundary_for_3_x": "3.1.8",
+      "status": "FIXED_VERSION"
+    }
+  ],
+  "exact_package_queries_without_matching_advisory_rows": [
+    "rfc8785",
+    "pydantic-core",
+    "rpds-py",
+    "typing-extensions",
+    "typing-inspection",
+    "annotated-doc",
+    "ajv-formats",
+    "fake-indexeddb",
+    "fast-deep-equal",
+    "json-schema-traverse",
+    "require-from-string"
+  ],
+  "limitations": [
+    "Registry-native npm audit and PyPI audit endpoints remain unavailable from the container because DNS is blocked.",
+    "GitHub Advisory Database coverage is authoritative for the rows it contains but is not proof that no undisclosed or future issue exists.",
+    "pytest 9.0.3 was qualified with source files matching every upstream 9.0.2->9.0.3 changed Git blob; the official wheel bytes were identified by published SHA-256 but could not be fetched into this container."
+  ],
+  "decision": "PASS_WITH_STATED_SCOPE"
+}

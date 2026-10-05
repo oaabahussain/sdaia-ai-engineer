@@ -67,7 +67,10 @@ export function assertEvidenceStorageReceipt(receipt) {
     throw new TypeError('warnings must be an array of non-empty strings');
   }
 
-  if (receipt.store_seq !== undefined && (!Number.isInteger(receipt.store_seq) || receipt.store_seq < 1)) {
+  if (['ACCEPTED', 'DUPLICATE'].includes(receipt.disposition) && receipt.store_seq === undefined) {
+    throw new TypeError('stored receipt must include store_seq');
+  }
+  if (receipt.store_seq !== undefined && (!Number.isSafeInteger(receipt.store_seq) || receipt.store_seq < 1)) {
     throw new TypeError('store_seq must be a positive integer');
   }
   if (receipt.reason_code !== undefined) assertNonEmptyString(receipt.reason_code, 'reason_code');

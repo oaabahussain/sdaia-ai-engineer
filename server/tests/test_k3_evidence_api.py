@@ -140,7 +140,8 @@ def test_pull_is_ordered_cursor_based_and_repeatable(client):
     replay = client.get("/v1/learner-evidence?after_store_seq=0&limit=2")
     assert replay.json() == first.json()
 
-    second = client.get("/v1/learner-evidence?after_store_seq=2&limit=2")
+    second = client.get("/v1/learner-evidence",
+                        params={"after_store_seq": 2, "limit": 2, "source_store_id": first.json()["store_id"]})
     assert second.status_code == 200
     assert [item["event_id"] for item in second.json()["events"]] == [events[2]["event_id"]]
     assert second.json()["next_store_seq"] == 3

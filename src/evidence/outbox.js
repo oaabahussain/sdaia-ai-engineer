@@ -1,3 +1,5 @@
+import { assertEvidenceStorageReceipt } from './storePort.js';
+
 const ACK = new Set(['ACCEPTED', 'DUPLICATE']);
 const BLOCK = new Set(['CONFLICT', 'REJECTED']);
 
@@ -85,8 +87,21 @@ export function createEvidenceOutbox({ persistence }) {
       });
     },
 
-    applyReceipt(receipt) {
-      if (!receipt || typeof receipt !== 'object') throw new TypeError('receipt is required');
+    markPending(eventIds) {
+      return exclusive(async () => {
+        const records = await load();
+        for (const id of eventIds) {
+          const record = records.find(row => row.event_id === id);
+          if (!record) throw new Error(`Outbox record not found: ${id}`);
+          if (record.state === 'IN_FLIGHT') record.state = 'PENDING';
+        }
+        await save(records);
+      });
+    },
+
+    async applyReceipt(receipt) {
+      receipt = clone(receipt);
+      assertEvidenceStorageReceipt(receipt);
       assertEventId(receipt.event_id);
       if (!ACK.has(receipt.disposition) && !BLOCK.has(receipt.disposition)) {
         throw new TypeError('unsupported receipt disposition');
@@ -96,6 +111,14 @@ export function createEvidenceOutbox({ persistence }) {
         const record = records.find((item) => item.event_id === receipt.event_id);
         if (!record) throw new Error(`Outbox record not found: ${receipt.event_id}`);
 
+        if (record.state === 'ACKNOWLEDGED') {
+          if (!['ACCEPTED','DUPLICATE'].includes(receipt.disposition)
+              || record.authoritative_store_id !== receipt.store_id
+              || record.authoritative_store_seq !== receipt.store_seq) {
+            throw new Error('Contradictory receipt cannot change acknowledged evidence');
+          }
+          return clone(record);
+        }
         record.last_disposition = receipt.disposition;
         if (receipt.reason_code) record.last_reason_code = receipt.reason_code;
         else delete record.last_reason_code;

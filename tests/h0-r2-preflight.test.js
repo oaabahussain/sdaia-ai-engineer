@@ -9,7 +9,7 @@ function fixture(){
  const state={state_revision:2,next_task:5,base_main_sha:H40,execution_branch:'impl/k3',spec_blob_sha:H40,plan_blob_sha:H40,project_bootstrap_revision:'r1',open_critical_findings:0,open_important_findings:0,gates:{PROJECT_BOOTSTRAP_CURRENT:'PASS'}};
  const runtime={schema_version:1,profile_version:1,capabilities:{skill_discovery:'AVAILABLE',file_access:'AVAILABLE',shell_execution:'AVAILABLE',git_worktree:'AVAILABLE',github_write:'AVAILABLE',web_search:'AVAILABLE',durable_workspace:'AVAILABLE',subagent_review:'UNKNOWN',fresh_context_review:'UNKNOWN',project_file_mutation:'UNKNOWN'}};
  const envelope={schema_version:1,envelope_version:1,task_id:5,task_packet_digest:sha256Text(stableJson(packet)),state_revision:2,base_main_sha:H40,task_base_sha:'c'.repeat(40),execution_branch:'impl/k3',project_bootstrap_revision:'r1',runtime_capability_profile_digest:sha256Text(stableJson(runtime)),created_from_ref:'impl/k3',preflight_gate_set:[]};
- return {packet,state,runtime,envelope,brief,liveMainSha:H40,deterministicPacket:true,failureRulesDigest:H64,executionLintOk:true};
+ return {packet,state,runtime,envelope,brief,currentHeadSha:'c'.repeat(40),sourceRef:'impl/k3',liveMainSha:H40,deterministicPacket:true,failureRulesDigest:H64,executionLintOk:true};
 }
 test('all gates pass only for a fresh deterministic current task',()=>{const r=preflightTask(fixture());assert.equal(r.ok,true,JSON.stringify(r.failures));assert.equal(r.code,'TASK_EXECUTION_READY_PASS');});
 test('fails closed on stale brief, main, task, bootstrap, findings, merge authority, runtime, determinism, or missing stop condition',()=>{

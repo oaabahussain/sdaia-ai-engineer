@@ -1,6 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
+
+const storeQueues = new Map();
+
 import { fingerprintEvent } from '../../../src/evidence/jcs.js';
+import { assertEvidenceAcceptance, prepareEvidenceBatch, rejectedEvidenceReceipt } from '../../../src/evidence/acceptance.js';
 
 async function readJsonl(file) {
   let text;
@@ -40,9 +45,59 @@ async function readIndex(file, storeId) {
 
 async function writeIndex(file, index) {
   await fs.mkdir(path.dirname(file), { recursive: true });
-  const temp = file + '.tmp';
-  await fs.writeFile(temp, JSON.stringify(index, null, 2) + '\n');
-  await fs.rename(temp, file);
+  const temp = `${file}.tmp-${randomUUID()}`;
+  const handle = await fs.open(temp, 'wx');
+  try {
+    await handle.writeFile(JSON.stringify(index, null, 2) + '\n');
+    await handle.sync();
+    await handle.close();
+    await fs.rename(temp, file);
+  } finally {
+    await handle.close();
+    await fs.rm(temp, { force: true });
+  }
+}
+
+async function canonicalPath(file) {
+  const absolute = path.resolve(file);
+  await fs.mkdir(path.dirname(absolute), { recursive: true });
+  try { return await fs.realpath(absolute); }
+  catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    return path.join(await fs.realpath(path.dirname(absolute)), path.basename(absolute));
+  }
+}
+
+async function exclusiveStore(eventFile, indexFile, operation) {
+  const key = await canonicalPath(eventFile);
+  const indexKey = await canonicalPath(indexFile);
+  if (key === indexKey) throw new Error('Evidence and index paths must differ');
+  const previous = storeQueues.get(key) ?? Promise.resolve();
+  const run = previous.catch(() => {}).then(async () => {
+    const owned = [];
+    try {
+      for (const file of [key, indexKey].sort()) {
+        const lockPath = file + '.lock';
+        let handle;
+        try { handle = await fs.open(lockPath, 'wx'); }
+        catch (error) {
+          if (error.code === 'EEXIST') throw new Error('K3 reference store busy: an existing writer lock requires its owner or explicit recovery');
+          throw error;
+        }
+        owned.push({ handle, lockPath });
+      }
+      return await operation();
+    } finally {
+      for (const { handle, lockPath } of owned.reverse()) {
+        await handle.close();
+        await fs.unlink(lockPath);
+      }
+    }
+  });
+  const settled = run.then(() => undefined, () => undefined);
+  storeQueues.set(key, settled);
+  void settled.then(() => { if (storeQueues.get(key) === settled) storeQueues.delete(key); });
+  return run;
 }
 
 function nowIso() {
@@ -93,11 +148,46 @@ export function createJsonlEvidenceStore(eventFile, indexFile, { storeId }) {
     if (events.length !== index.entries.length) {
       throw new Error('K3 evidence event/index length mismatch');
     }
+    let previousSeq = 0;
+    const ids = new Set();
+    const origins = new Set();
+    for (let position = 0; position < events.length; position += 1) {
+      const event = events[position];
+      const entry = index.entries[position];
+      const fail = reason => { throw new Error(`K3 evidence index integrity at ${position}: ${reason}`); };
+      if (!event || !entry || entry.store_id !== storeId) fail('store identity');
+      for (const field of ['event_id', 'learner_id', 'origin_id', 'origin_seq']) {
+        if (entry[field] !== event[field]) fail(`${field} linkage`);
+      }
+      if (!Number.isSafeInteger(entry.store_seq) || entry.store_seq <= previousSeq) fail('store sequence');
+      if (typeof entry.accepted_at !== 'string' || !Number.isFinite(Date.parse(entry.accepted_at))) fail('acceptance time');
+      const originKey = JSON.stringify([event.origin_id, event.origin_seq]);
+      if (ids.has(event.event_id) || origins.has(originKey)) fail('duplicate identity');
+      if (entry.event_fingerprint !== await fingerprintEvent(event)) fail('immutable fingerprint');
+      ids.add(event.event_id);
+      origins.add(originKey);
+      previousSeq = entry.store_seq;
+    }
+    if (!Number.isSafeInteger(index.next_store_seq) || index.next_store_seq <= previousSeq) {
+      throw new Error('K3 evidence index integrity: next store sequence');
+    }
     return { events, index };
   }
 
   return {
+    store_id: storeId,
+    async readRange({fromSeq=1,toSeq,learnerId,filters={}}={}) {
+      if (!Number.isSafeInteger(fromSeq) || fromSeq < 1 || !Number.isSafeInteger(toSeq) || toSeq < fromSeq) throw new RangeError('Invalid replay watermark range');
+      return exclusiveStore(eventFile,indexFile,async()=>{
+        const {events,index}=await load();
+        return index.entries.flatMap((entry,i)=> entry.store_seq >= fromSeq && entry.store_seq <= toSeq && (learnerId === undefined || entry.learner_id === learnerId) && matchesFilters(events[i],filters)
+          ? [{...events[i],store_id:storeId,store_seq:entry.store_seq,accepted_at:entry.accepted_at,event_fingerprint:entry.event_fingerprint}] : []);
+      });
+    },
     async accept(event) {
+      event = structuredClone(event);
+      assertEvidenceAcceptance(event);
+      return exclusiveStore(eventFile, indexFile, async () => {
       const fingerprint = await fingerprintEvent(event);
       const { events, index } = await load();
 
@@ -124,26 +214,32 @@ export function createJsonlEvidenceStore(eventFile, indexFile, { storeId }) {
       };
 
       await fs.mkdir(path.dirname(eventFile), { recursive: true });
-      await fs.appendFile(eventFile, JSON.stringify(event) + '\n');
+      const eventHandle = await fs.open(eventFile, 'a');
+      try { await eventHandle.writeFile(JSON.stringify(event) + '\n'); await eventHandle.sync(); }
+      finally { await eventHandle.close(); }
       index.entries.push(entry);
       index.next_store_seq += 1;
       await writeIndex(indexFile, index);
       return receiptFromEntry(entry);
+      });
     },
 
     async acceptBatch(events) {
-      const receipts = [];
-      for (const event of events) receipts.push(await this.accept(event));
+      const prepared = await prepareEvidenceBatch(events), receipts = [];
+      for (const value of prepared) receipts.push(value.invalid ? rejectedEvidenceReceipt(storeId, value) : await this.accept(value.event));
       return { schema_version: 1, receipts };
     },
 
     async getById(eventId) {
+      return exclusiveStore(eventFile, indexFile, async () => {
       const { events, index } = await load();
       const entryIndex = index.entries.findIndex((entry) => entry.event_id === eventId);
       return entryIndex < 0 ? null : events[entryIndex];
+      });
     },
 
     async read(learnerId, afterStoreSeq = undefined, filters = {}) {
+      return exclusiveStore(eventFile, indexFile, async () => {
       const { events, index } = await load();
       const result = [];
       for (let i = 0; i < index.entries.length; i += 1) {
@@ -156,6 +252,7 @@ export function createJsonlEvidenceStore(eventFile, indexFile, { storeId }) {
       }
       result.sort((a, b) => a.store_seq - b.store_seq);
       return result.map((row) => row.event);
+      });
     }
   };
 }

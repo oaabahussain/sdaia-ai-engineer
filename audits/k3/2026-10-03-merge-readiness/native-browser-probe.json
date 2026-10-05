@@ -1,0 +1,9 @@
+{
+  "url": "http://127.0.0.1:39587/index.html",
+  "engine": "system Chromium via installed Playwright",
+  "policy_overrides": false,
+  "http_control": 200,
+  "version": "144.0.7559.96",
+  "status": "BLOCKED",
+  "error": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:39587/index.html\nCall log:\n  - navigating to \"http://127.0.0.1:39587/index.html\", waiting until \"domcontentloaded\"\n"
+}

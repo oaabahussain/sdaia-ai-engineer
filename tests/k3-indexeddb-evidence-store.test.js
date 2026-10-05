@@ -103,6 +103,7 @@ test('IndexedDB store exposes governed indexes and ordered filtered reads', asyn
     item_interaction_id: 'c23e4567-e89b-42d3-a456-42661417400b',
     item_version_id: 'item-v2',
     definition_id: 'learner.response.evaluated@1',
+    authority_ref: 'authority:test',
     payload: { response_event_id: one.event_id, scoring_policy_ref: 'policy:1', evaluation_status: 'GRADED', correct: true, score: 1 }
   });
   await store.acceptBatch([one, two]);

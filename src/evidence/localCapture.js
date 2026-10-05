@@ -1,5 +1,5 @@
-import { createLearnerEvidenceEvent } from './contract.js';
-import { getOrCreateEvidenceOriginId, withNextEvidenceOriginSeq } from './origin.js';
+
+import { assertOrdinaryEvidenceProducer } from './acceptance.js';
 
 function definitionId(definition) {
   if (!definition?.event_name || !Number.isInteger(definition.event_version)) {
@@ -9,26 +9,15 @@ function definitionId(definition) {
 }
 
 export async function captureLocalEvidence({ store, outbox, eventInput, definition, runtimeContext }) {
-  if (!store || typeof store.accept !== 'function') throw new TypeError('store.accept is required');
-  const storage = runtimeContext?.originStorage;
-  const originId = getOrCreateEvidenceOriginId(storage);
-
-  return withNextEvidenceOriginSeq(storage, async (originSeq) => {
-    const event = createLearnerEvidenceEvent({
-      ...eventInput,
-      definition_id: eventInput.definition_id ?? definitionId(definition),
-      origin_id: originId,
-      origin_seq: originSeq
-    }, runtimeContext);
-
-    const receipt = await store.accept(event);
-    if (!receipt || !['ACCEPTED', 'DUPLICATE'].includes(receipt.disposition)) {
-      throw new Error(`Local evidence was not durably recorded: ${receipt?.disposition ?? 'NO_RECEIPT'}`);
-    }
-
-    if (outbox?.enqueue) await outbox.enqueue(event.event_id);
-    return { event, receipt };
-  });
+  if (!store || typeof store.captureLocal !== 'function') throw new TypeError('an atomic store.captureLocal implementation is required');
+  const input = structuredClone(eventInput);
+  input.definition_id ??= definitionId(definition);
+  assertOrdinaryEvidenceProducer(input.definition_id);
+  const result = await store.captureLocal({ outbox, eventInput: input, runtimeContext });
+  if (!result?.receipt || !['ACCEPTED', 'DUPLICATE'].includes(result.receipt.disposition)) {
+    throw new Error(`Local evidence was not durably recorded: ${result?.receipt?.disposition ?? 'NO_RECEIPT'}`);
+  }
+  return result;
 }
 
 export async function requestEvidenceStoragePersistence(navigatorLike = globalThis.navigator) {

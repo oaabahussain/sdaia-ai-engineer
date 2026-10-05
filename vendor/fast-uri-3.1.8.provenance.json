@@ -1,0 +1,18 @@
+{
+  "package": "fast-uri",
+  "version": "3.1.8",
+  "upstream": "https://github.com/fastify/fast-uri",
+  "commit": "ead3ab7bb134c989e972c8174632d0670023f269",
+  "tag": "v3.1.8",
+  "archive_kind": "Locally packed minimal runtime from verified unmodified upstream Git blobs; not the npm-published tarball",
+  "sha256": "438e2629b7e84fac85608d0e0d63c2ecd526fc5d556d1911ed7a718153841878",
+  "git_blobs": {
+    "index.js": "01f68d8f5ec1392022cfe0e3325dca93ea924633",
+    "lib/schemes.js": "94e574d3fc508c1654776169e4e73d1bfca02139",
+    "lib/utils.js": "6353b0b02529c0ddbc8a0bd700e27918fc7f04af",
+    "package.json": "4ed1a3833afb83ce56d8af0c916348d9a4de0c22",
+    "types/index.d.ts": "c1481ba9c3b8c99c0c1ca1893acaecf2943e46e4",
+    "LICENSE": "9c93c1c0e5c1861b77da95d4cfb96504768285bc",
+    "README.md": "87ae09545a6480ba223f07fd431c3ede0ffb2e73"
+  }
+}

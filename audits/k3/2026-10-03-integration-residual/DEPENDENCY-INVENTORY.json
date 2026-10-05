@@ -1,0 +1,377 @@
+{
+  "scope": "HISTORICAL_SAME_DAY_NOT_REFRESHED",
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 10,
+      "high": 11,
+      "critical": 0,
+      "total": 22
+    },
+    "dependencies": {
+      "prod": 1,
+      "dev": 253,
+      "optional": 3,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 253
+    }
+  },
+  "affected_package_names": [
+    "@faker-js/faker",
+    "@opentelemetry/core",
+    "@opentelemetry/exporter-trace-otlp-http",
+    "@opentelemetry/otlp-exporter-base",
+    "@opentelemetry/otlp-transformer",
+    "@opentelemetry/propagator-b3",
+    "@opentelemetry/propagator-jaeger",
+    "@opentelemetry/resources",
+    "@opentelemetry/sdk-logs",
+    "@opentelemetry/sdk-metrics",
+    "@opentelemetry/sdk-trace-base",
+    "@opentelemetry/sdk-trace-node",
+    "@redocly/cli",
+    "@redocly/openapi-core",
+    "@redocly/respect-core",
+    "brace-expansion",
+    "braces",
+    "chokidar",
+    "dompurify",
+    "fast-uri",
+    "js-yaml",
+    "undici"
+  ],
+  "direct_advisory_objects": [
+    {
+      "source": 1158500,
+      "name": "@faker-js/faker",
+      "dependency": "@faker-js/faker",
+      "title": "Faker: helpers.fake exploitable into arbritary code execution",
+      "url": "https://github.com/advisories/GHSA-qxc2-j82w-r537",
+      "severity": "high",
+      "cwe": [
+        "CWE-95"
+      ],
+      "cvss": {
+        "score": 7.8,
+        "vectorString": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "range": "<=10.4.0"
+    },
+    {
+      "source": 1153174,
+      "name": "@opentelemetry/core",
+      "dependency": "@opentelemetry/core",
+      "title": "OpenTelemetry Core: Unbounded memory allocation in W3C Baggage propagation",
+      "url": "https://github.com/advisories/GHSA-8988-4f7v-96qf",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-770"
+      ],
+      "cvss": {
+        "score": 5.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "range": "<2.8.0"
+    },
+    {
+      "source": 1124011,
+      "name": "@opentelemetry/propagator-jaeger",
+      "dependency": "@opentelemetry/propagator-jaeger",
+      "title": "OpenTelemetry JavaScript: Denial of service in `JaegerPropagator` via unhandled exception on a malformed header",
+      "url": "https://github.com/advisories/GHSA-45rx-2jwx-cxfr",
+      "severity": "high",
+      "cwe": [
+        "CWE-248"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": "<2.9.0"
+    },
+    {
+      "source": 1240100,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+      "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-400",
+        "CWE-407"
+      ],
+      "cvss": {
+        "score": 5.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "range": "<1.1.21"
+    },
+    {
+      "source": 1240101,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+      "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-400",
+        "CWE-407"
+      ],
+      "cvss": {
+        "score": 5.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "range": ">=2.0.0 <2.1.7"
+    },
+    {
+      "source": 1240104,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+      "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+      "severity": "high",
+      "cwe": [
+        "CWE-400",
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": "<1.1.20"
+    },
+    {
+      "source": 1240105,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+      "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+      "severity": "high",
+      "cwe": [
+        "CWE-400",
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": ">=2.0.0 <2.1.6"
+    },
+    {
+      "source": 1240108,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+      "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+      "severity": "high",
+      "cwe": [
+        "CWE-400",
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": "<1.1.19"
+    },
+    {
+      "source": 1240109,
+      "name": "brace-expansion",
+      "dependency": "brace-expansion",
+      "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+      "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+      "severity": "high",
+      "cwe": [
+        "CWE-400",
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": ">=2.0.0 <2.1.5"
+    },
+    {
+      "source": 1240992,
+      "name": "braces",
+      "dependency": "braces",
+      "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "severity": "high",
+      "cwe": [
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": "<=3.0.3"
+    },
+    {
+      "source": 1240621,
+      "name": "dompurify",
+      "dependency": "dompurify",
+      "title": "DOMPurify: IN_PLACE: node-removing afterSanitize hook leaves detached subtree event handlers armed, causing DOM XSS",
+      "url": "https://github.com/advisories/GHSA-p98j-92pf-mc4p",
+      "severity": "low",
+      "cwe": [
+        "CWE-79"
+      ],
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "range": ">=3.4.13 <=3.4.15"
+    },
+    {
+      "source": 1240091,
+      "name": "fast-uri",
+      "dependency": "fast-uri",
+      "title": "fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets",
+      "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-178"
+      ],
+      "cvss": {
+        "score": 4.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+      },
+      "range": ">=3.0.0 <3.1.8"
+    },
+    {
+      "source": 1193727,
+      "name": "js-yaml",
+      "dependency": "js-yaml",
+      "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+      "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+      "severity": "high",
+      "cwe": [
+        "CWE-400",
+        "CWE-407"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": ">=4.0.0 <4.3.2"
+    },
+    {
+      "source": 1130716,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to downstream response desynchronization via retry interceptor",
+      "url": "https://github.com/advisories/GHSA-8xcm-r25x-g524",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-444"
+      ],
+      "cvss": {
+        "score": 4.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+      },
+      "range": "<6.28.0"
+    },
+    {
+      "source": 1130727,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to CRLF Injection via blob-like body 'type' property",
+      "url": "https://github.com/advisories/GHSA-m8rv-5g2x-5cg5",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-93"
+      ],
+      "cvss": {
+        "score": 4.2,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N"
+      },
+      "range": "<6.28.0"
+    },
+    {
+      "source": 1130732,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields",
+      "url": "https://github.com/advisories/GHSA-v3r7-h72x-cjcm",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-74"
+      ],
+      "cvss": {
+        "score": 4.8,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+      },
+      "range": "<6.28.0"
+    },
+    {
+      "source": 1239934,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to Denial of Service via unhandled error in WebSocket permessage-deflate decompression",
+      "url": "https://github.com/advisories/GHSA-3wwx-pv8p-q78v",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-248"
+      ],
+      "cvss": {
+        "score": 5.9,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": ">=6.25.0 <6.28.1"
+    },
+    {
+      "source": 1240039,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to downstream response splitting via retry interceptor",
+      "url": "https://github.com/advisories/GHSA-r53p-7pc4-xj5r",
+      "severity": "low",
+      "cwe": [
+        "CWE-444"
+      ],
+      "cvss": {
+        "score": 3.7,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+      },
+      "range": "<6.28.1"
+    },
+    {
+      "source": 1240042,
+      "name": "undici",
+      "dependency": "undici",
+      "title": "undici vulnerable to Denial of Service via unrequested WebSocket subprotocol",
+      "url": "https://github.com/advisories/GHSA-rfgv-xxqx-mfg5",
+      "severity": "high",
+      "cwe": [
+        "CWE-248",
+        "CWE-252"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": ">=6.7.0 <6.28.1"
+    }
+  ],
+  "production": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 1,
+      "dev": 253,
+      "optional": 3,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 253
+    }
+  }
+}

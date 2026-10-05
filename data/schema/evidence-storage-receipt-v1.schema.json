@@ -41,7 +41,8 @@
     },
     "store_seq": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 1,
+      "maximum": 9007199254740991
     },
     "reason_code": {
       "type": "string",
@@ -54,5 +55,27 @@
         "minLength": 1
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "enum": [
+              "ACCEPTED",
+              "DUPLICATE"
+            ]
+          }
+        },
+        "required": [
+          "disposition"
+        ]
+      },
+      "then": {
+        "required": [
+          "store_seq"
+        ]
+      }
+    }
+  ]
 }

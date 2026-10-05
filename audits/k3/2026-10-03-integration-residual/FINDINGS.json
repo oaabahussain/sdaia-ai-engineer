@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-03T19:18:06.605117+00:00",
+  "source_head": "465aafd2b0ba81d628fabd970fd62b3288ce204c",
+  "source_tree": "32a5c6334e5f6d26f03504c6ec086631e7521b5f",
+  "verdict": "INTEGRATION_HOLD",
+  "counts": {
+    "critical": 0,
+    "important": 9,
+    "minor": 1,
+    "groups": 10,
+    "diagnostic_cases": 25,
+    "failed": 20,
+    "passed": 5
+  },
+  "findings": [
+    {
+      "id": "R01",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Store identity and cursor provenance",
+      "cases": [
+        "R01a",
+        "R01b"
+      ],
+      "files": [
+        "src/evidence/indexedDbStore.js",
+        "server/app/main.py:get_learner_evidence",
+        "src/evidence/sync.js"
+      ],
+      "spec_sections": [
+        15,
+        19,
+        30
+      ],
+      "observed": "Reopening the same IndexedDB database with a different storeId produced receipts under different store identities. HTTP pull returned only events and next_store_seq, without a source identity bound to the cursor.",
+      "acceptance": "Persist and validate stable store identity. Bind resumable remote cursors to the authoritative store or a demonstrably equivalent source-generation contract. Test reopen mismatch and source replacement without comparing unrelated sequences.",
+      "limitations": "Changing database configuration/source is required for the first scenario. The pull shape is observed; an equivalent explicit source-binding design is acceptable, not necessarily one hard-coded field."
+    },
+    {
+      "id": "R02",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Outgoing same-origin revision order",
+      "cases": [
+        "R02 native outbox",
+        "R02 strict offline chain"
+      ],
+      "files": [
+        "src/evidence/indexedDbOutbox.js:listPending",
+        "src/evidence/sync.js"
+      ],
+      "spec_sections": [
+        16,
+        19
+      ],
+      "observed": "Native outbox iteration followed UUID key order. Two committed origin sequences 1,2 were pushed as 2,1. Composing the real revision resolver with that push produced STALE,APPLIED instead of APPLIED,APPLIED.",
+      "acceptance": "Preserve per-origin ordering and strict revision chains through pending selection, batching and retries. Do not sort across devices by client time. Test UUIDs in reverse sequence order and partial/restarted batches.",
+      "limitations": "The transport was a synthetic recording adapter, and IndexedDB used fake-indexeddb. This is not a live browser incident. Native outbox integration added by the atomic-capture repair exposed this composition gap."
+    },
+    {
+      "id": "R03",
+      "severity": "MINOR",
+      "status": "OPEN_REPRODUCED",
+      "title": "Failed send attempt accounting",
+      "cases": [
+        "R03"
+      ],
+      "files": [
+        "src/evidence/sync.js"
+      ],
+      "spec_sections": [
+        18,
+        39
+      ],
+      "observed": "A push that threw a simulated network error left attempt_count=0 and no last_attempt_at because markInFlight is called after push returns receipts.",
+      "acceptance": "Record attempt metadata before invoking the network operation and preserve retryable IN_FLIGHT recovery without falsely acknowledging failures.",
+      "limitations": "The event remains pending/retryable. No evidence loss was demonstrated. This is not a merge blocker on its own."
+    },
+    {
+      "id": "R04",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Incomplete and unsafe acknowledgement receipts",
+      "cases": [
+        "R04 ACCEPTED",
+        "R04 DUPLICATE",
+        "R04 unsafe"
+      ],
+      "files": [
+        "src/evidence/storePort.js",
+        "src/evidence/indexedDbOutbox.js",
+        "data/schema/evidence-storage-receipt-v1.schema.json"
+      ],
+      "spec_sections": [
+        14,
+        15
+      ],
+      "observed": "Receipts with ACCEPTED or DUPLICATE but no store_seq acknowledged an outbox event. A store_seq outside the safe integer range was also accepted.",
+      "acceptance": "Require valid representable sequence metadata whenever the receipt asserts that the event exists, and keep an event pending on malformed receipt. Preserve legitimate REJECTED/CONFLICT semantics.",
+      "limitations": "The receiver is being given malformed synthetic receipts. The test demonstrates false acknowledgement, not actual remote event loss."
+    },
+    {
+      "id": "R05",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Replay integration with durable adapters",
+      "cases": [
+        "R05 IndexedDB",
+        "R05 JSONL"
+      ],
+      "files": [
+        "src/evidence/replay.js",
+        "src/evidence/indexedDbStore.js",
+        "scripts/platform-kernel/adapters/jsonlEvidenceStore.js"
+      ],
+      "spec_sections": [
+        27,
+        30
+      ],
+      "observed": "replayEvidence requires readRange, but the actual IndexedDB and JSONL adapters do not provide it. Calling replay after a real stored event raises store.readRange is required for replay.",
+      "acceptance": "Define and implement the store/replay boundary with raw events separated from receipt/sequence metadata. Exercise actual durable adapters, replay gaps, deletions and source-bound watermarks rather than a stand-in store.",
+      "limitations": "Missing-method errors were caught and asserted as an integration outcome. This is a real interface gap in Task22 integration, not an unrelated missing module/import failure."
+    },
+    {
+      "id": "R06",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Identity-link retargeting without explicit lineage",
+      "cases": [
+        "R06"
+      ],
+      "files": [
+        "src/platform-kernel/evidence/identityLinks.js"
+      ],
+      "spec_sections": [
+        22
+      ],
+      "observed": "Two LINK records with the same link_id and source but different targets were resolved to the later timestamp target, without a predecessor/UNLINK requirement or conflict signal. Different-link-ID conflict control passes.",
+      "acceptance": "Make legitimate relinking and conflicting history distinguishable by an approved transition/lineage contract; reject or surface ungoverned competing targets without choosing by timestamp alone.",
+      "limitations": "Observed behavior is reproduced. Exact authorized relinking semantics require a documented contract decision; this finding does not assert that all legitimate relinking must be forbidden. Also compare approved Task23 conflict expectations."
+    },
+    {
+      "id": "R07",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "SQLite identity-link duplicate race",
+      "cases": [
+        "R07"
+      ],
+      "files": [
+        "server/app/evidence_store.py:append_identity_link_record"
+      ],
+      "spec_sections": [
+        22
+      ],
+      "observed": "Two real SQLite connections reading an absent record before insert produced one ACCEPTED and one UNIQUE-constraint IntegrityError for an exact retry; serial exact retry passes.",
+      "acceptance": "Serialize or reselect conflicting inserts so exact concurrent retries produce one ACCEPTED and remaining DUPLICATE, while a changed record body remains CONFLICT.",
+      "limitations": "A barrier pauses after actual SELECT results to reproduce the race; no database outcome is mocked. This is the identity-link path, distinct from the repaired event acceptance race."
+    },
+    {
+      "id": "R08",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Authority-sensitive producer authorization",
+      "cases": [
+        "R08 correction Node",
+        "R08 correction HTTP",
+        "R08 evaluation HTTP",
+        "R08 resolution HTTP"
+      ],
+      "files": [
+        "server/app/main.py:post_learner_evidence_batch",
+        "server/app/evidence_validation.py",
+        "src/evidence/corrections.js"
+      ],
+      "spec_sections": [
+        21,
+        27,
+        38
+      ],
+      "observed": "An ordinary StaticLearnerAuthorization principal submitted ADMINISTRATIVE correction and SYSTEM evaluation/resolution event definitions with unverified authority_ref strings. The API accepted and stored all three. Real TCP independently confirmed correction acceptance. A separate mixed-principal reducer probe also changed another principal without validated scope.",
+      "acceptance": "Derive producer privileges from trusted authorization context; ordinary learner clients must not grant themselves evaluation/correction authority by payload strings. Validate correction target scope/lineage with explicit administrative policy. Add ordinary-deny and genuinely authorized positive controls.",
+      "limitations": "All data and principals are synthetic in a locally configured test server. Default-deny with no authorization and foreign-learner body rejection pass. No deployed breach or real credential misuse is claimed. The mixed-principal reducer probe needs explicit privileged-scope policy; the three ordinary-producer API failures independently establish the blocker."
+    },
+    {
+      "id": "R09",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Strict proposed revision precondition",
+      "cases": [
+        "R09 undefined",
+        "R09 7"
+      ],
+      "files": [
+        "src/evidence/assessmentRevision.js"
+      ],
+      "spec_sections": [
+        16
+      ],
+      "observed": "With current/base revision 0, both missing proposed_attempt_revision and proposed_attempt_revision=7 were marked APPLIED and advanced to 1.",
+      "acceptance": "Enforce proposed=base+1 and valid revision ranges for strict candidate mutation before APPLIED; preserve valid same-origin chains and stale-branch decisions.",
+      "limitations": "This is the real deterministic resolver with synthetic candidates; no live assessment result was changed."
+    },
+    {
+      "id": "R10",
+      "severity": "IMPORTANT",
+      "status": "OPEN_REPRODUCED",
+      "title": "Nested response privacy contract",
+      "cases": [
+        "R10 native capture",
+        "R10 HTTP"
+      ],
+      "files": [
+        "src/evidence/acceptance.js",
+        "server/app/evidence_validation.py",
+        "data/evidence/payload-schemas/response-recorded-v1.schema.json"
+      ],
+      "spec_sections": [
+        23,
+        27,
+        38
+      ],
+      "observed": "An OPTION response containing an undeclared access_token key was accepted by native capture and the HTTP API. Real loopback TCP confirmed the synthetic field remained in stored evidence.",
+      "acceptance": "Apply response-kind/item-specific nested property and privacy validation before persistence, without blanket deletion of legitimate required text. Test both stores and HTTP, and preserve explicit schema/privacy failures.",
+      "limitations": "The value is explicitly SYNTHETIC-NOT-A-REAL-CREDENTIAL. No actual token was used. This reopens the broader privacy claim of F06, not the previously fixed unsupported-schema assertion."
+    }
+  ]
+}

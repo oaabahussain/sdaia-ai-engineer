@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { fixture as nativeFixture, faultAdd, snapshot } from './helpers/k3AtomicCapture.js';
 
 async function loadApi() {
   const [origin, capture] = await Promise.all([
@@ -71,83 +72,42 @@ test('evidence origin id is stable, random UUIDv4, and blocked storage falls bac
   assert.equal(c, d);
 });
 
-test('local capture serializes origin_seq and enqueues only after durable local receipt', async () => {
+test('local capture serializes origin_seq and commits outbox with durable local receipt', async () => {
   const { captureLocalEvidence } = await loadApi();
-  assert.equal(typeof captureLocalEvidence, 'function', 'captureLocalEvidence behavior is missing');
-  const storage = memoryStorage();
-  const accepted = [];
-  const enqueued = [];
-  const store = {
-    async accept(event) {
-      await new Promise((resolve) => setTimeout(resolve, event.payload.response.option_index === 0 ? 5 : 0));
-      accepted.push(event);
-      return {
-        schema_version: 1, store_id: 'local', event_id: event.event_id,
-        event_fingerprint: 'a'.repeat(64), disposition: 'ACCEPTED',
-        accepted_at: '2026-10-02T17:00:00.000Z', store_seq: accepted.length, warnings: []
-      };
-    }
-  };
-  const outbox = { async enqueue(id) { enqueued.push(id); } };
-  const runtimeContext = { ...runtimeBase, originStorage: storage };
-
+  const f = nativeFixture();
+  assert.equal(typeof f.store.outbox?.listPending, 'function', 'native durable outbox is required');
+  const runtimeContext = { ...runtimeBase, originStorage: memoryStorage() };
   const [one, two] = await Promise.all([
-    captureLocalEvidence({ store, outbox, eventInput: input(), definition, runtimeContext }),
-    captureLocalEvidence({ store, outbox, eventInput: input({ payload: { response_version: 1, response_kind: 'OPTION', response: { option_index: 1 } } }), definition, runtimeContext })
+    captureLocalEvidence({ store: f.store, outbox: f.store.outbox, eventInput: input(), definition, runtimeContext }),
+    captureLocalEvidence({ store: f.store, outbox: f.store.outbox, eventInput: input({ payload: { response_version: 1, response_kind: 'OPTION', response: { option_index: 1 } } }), definition, runtimeContext })
   ]);
   assert.deepEqual([one.event.origin_seq, two.event.origin_seq], [1, 2]);
   assert.equal(one.event.origin_id, two.event.origin_id);
-  assert.deepEqual(enqueued, [one.event.event_id, two.event.event_id]);
+  assert.deepEqual(new Set((await f.store.outbox.listPending()).map(r => r.event_id)), new Set([one.event.event_id, two.event.event_id]));
+  assert.equal((await f.store.read('learner:p1')).length, 2);
 });
 
-test('failed local persistence is surfaced and does not consume origin_seq or enqueue', async () => {
+test('failed local persistence is surfaced and does not consume origin_seq or enqueue', async t => {
   const { captureLocalEvidence } = await loadApi();
-  assert.equal(typeof captureLocalEvidence, 'function', 'captureLocalEvidence behavior is missing');
-  const storage = memoryStorage();
-  const enqueued = [];
-  const runtimeContext = { ...runtimeBase, originStorage: storage };
-  const failingStore = { async accept() { throw new Error('disk full'); } };
-  const outbox = { async enqueue(id) { enqueued.push(id); } };
-
-  await assert.rejects(
-    () => captureLocalEvidence({ store: failingStore, outbox, eventInput: input(), definition, runtimeContext }),
-    /disk full/
-  );
-  assert.deepEqual(enqueued, []);
-
-  let retried;
-  const goodStore = {
-    async accept(event) {
-      retried = event;
-      return {
-        schema_version: 1, store_id: 'local', event_id: event.event_id,
-        event_fingerprint: 'b'.repeat(64), disposition: 'ACCEPTED',
-        accepted_at: '2026-10-02T17:00:00.000Z', store_seq: 1, warnings: []
-      };
-    }
-  };
-  await captureLocalEvidence({ store: goodStore, outbox, eventInput: input(), definition, runtimeContext });
-  assert.equal(retried.origin_seq, 1);
+  const f = nativeFixture();
+  assert.equal(typeof f.store.outbox?.listPending, 'function', 'native durable outbox is required');
+  const runtimeContext = { ...runtimeBase, originStorage: memoryStorage() };
+  const restore = faultAdd(t, 'events');
+  await assert.rejects(() => captureLocalEvidence({ store: f.store, outbox: f.store.outbox, eventInput: input(), definition, runtimeContext }), /injected/);
+  restore();
+  assert.deepEqual(await f.store.outbox.listPending(), []);
+  assert.deepEqual((await snapshot(f.name)).events, []);
+  const retried = await captureLocalEvidence({ store: f.store, outbox: f.store.outbox, eventInput: input(), definition, runtimeContext });
+  assert.equal(retried.event.origin_seq, 1);
 });
 
-test('non-durable local dispositions are surfaced and not queued as recorded', async () => {
+test('non-atomic store cannot be reported as durably recorded or enqueue evidence', async () => {
   const { captureLocalEvidence } = await loadApi();
-  assert.equal(typeof captureLocalEvidence, 'function', 'captureLocalEvidence behavior is missing');
-  const storage = memoryStorage();
+  let called = false;
+  const store = { async accept() { called = true; return { disposition: 'CONFLICT' }; } };
   const outbox = { async enqueue() { throw new Error('must not enqueue'); } };
-  const store = {
-    async accept(event) {
-      return {
-        schema_version: 1, store_id: 'local', event_id: event.event_id,
-        event_fingerprint: 'c'.repeat(64), disposition: 'CONFLICT',
-        accepted_at: '2026-10-02T17:00:00.000Z', reason_code: 'ORIGIN_SEQ_CONFLICT', warnings: []
-      };
-    }
-  };
-  await assert.rejects(
-    () => captureLocalEvidence({ store, outbox, eventInput: input(), definition, runtimeContext: { ...runtimeBase, originStorage: storage } }),
-    /CONFLICT|durably recorded/
-  );
+  await assert.rejects(() => captureLocalEvidence({ store, outbox, eventInput: input(), definition, runtimeContext: { ...runtimeBase, originStorage: memoryStorage() } }), /atomic|durably recorded/);
+  assert.equal(called, false);
 });
 
 test('persistent storage request reports supported grant and denial without throwing', async () => {

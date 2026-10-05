@@ -34,9 +34,12 @@ export function createEvidenceApiTransport({
       });
       return readJsonResponse(response, 'push');
     },
-    async pull(afterStoreSeq = 0) {
-      if (!Number.isInteger(afterStoreSeq) || afterStoreSeq < 0) throw new TypeError('afterStoreSeq must be a non-negative integer');
+    async pull(afterStoreSeq = 0, sourceStoreId) {
+      if (afterStoreSeq && typeof afterStoreSeq === 'object') { sourceStoreId=afterStoreSeq.store_id; afterStoreSeq=afterStoreSeq.through_store_seq; }
+      if (!Number.isSafeInteger(afterStoreSeq) || afterStoreSeq < 0) throw new TypeError('afterStoreSeq must be a non-negative safe integer');
+      if (afterStoreSeq > 0 && (typeof sourceStoreId !== 'string' || !sourceStoreId)) throw new TypeError('Nonzero cursor requires source store identity');
       const query = new URLSearchParams({ after_store_seq: String(afterStoreSeq) });
+      if (sourceStoreId !== undefined) query.set('source_store_id',sourceStoreId);
       if (pullLimit !== undefined) query.set('limit', String(pullLimit));
       const response = await fetchImpl(joinUrl(baseUrl, '/v1/learner-evidence?' + query.toString()), { method: 'GET' });
       return readJsonResponse(response, 'pull');

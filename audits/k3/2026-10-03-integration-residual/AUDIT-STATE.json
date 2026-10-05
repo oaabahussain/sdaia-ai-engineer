@@ -1,0 +1,19 @@
+{
+  "status": "INTEGRATION_HOLD",
+  "candidate_committed": false,
+  "remote_merge": false,
+  "product_publication": "EXISTING_HOLD_NOT_RETRIED",
+  "local_state_revision": 42,
+  "canonical_completed_through_task": 25,
+  "next_task": 26,
+  "open_important": 9,
+  "open_minor": 1,
+  "low_model_ready": false,
+  "new_probes": {
+    "total": 25,
+    "pass": 5,
+    "fail": 20
+  },
+  "original_candidate_state_revision": 41,
+  "remote_state_revision_last_read": 29
+}

@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { canonicalizeJson } from '../src/evidence/jcs.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEvidenceOutbox } from '../src/evidence/outbox.js';
@@ -43,7 +45,7 @@ function localStore(seed=[]) {
 }
 
 function receipt(id, disposition='ACCEPTED', seq=1) {
-  return {schema_version:1,store_id:'authority',event_id:id,event_fingerprint:'b'.repeat(64),disposition,accepted_at:'2026-10-02T22:10:00Z',store_seq:seq,warnings:[]};
+  return {schema_version:1,store_id:'authority',event_id:id,event_fingerprint:createHash('sha256').update(canonicalizeJson(event(id))).digest('hex'),disposition,accepted_at:'2026-10-02T22:10:00Z',store_seq:seq,warnings:[]};
 }
 
 test('sync port requires push and pull', async()=>{
@@ -121,14 +123,14 @@ test('pull is resumable and stores authoritative events without re-enqueueing th
     async push(){return {schema_version:1,receipts:[]}},
     async pull(after){
       calls.push(after);
-      if(after===0) return {events:[remote[0]],next_store_seq:10};
-      if(after===10) return {events:[remote[1]],next_store_seq:11};
+      if(after===0) return {store_id:'authority',events:[remote[0]],next_store_seq:10};
+      if(after===10) return {store_id:'authority',events:[remote[1]],next_store_seq:11};
       return {events:[],next_store_seq:after};
     }
   };
   const first=await syncEvidence({store,outbox,syncPort:port,watermark:0,policy:{}});
   assert.equal(first.watermark,10);
-  const second=await syncEvidence({store,outbox,syncPort:port,watermark:first.watermark,policy:{}});
+  const second=await syncEvidence({store,outbox,syncPort:port,watermark:first.cursor,policy:{}});
   assert.equal(second.watermark,11);
   assert.deepEqual(calls,[0,10]);
   assert.deepEqual(store.values(),remote);

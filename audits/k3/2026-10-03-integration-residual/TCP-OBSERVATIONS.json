@@ -1,0 +1,22 @@
+{
+  "transport": "real loopback TCP HTTP, synthetic principal and data",
+  "controls": {
+    "first_accept": "ACCEPTED",
+    "exact_retry": "DUPLICATE",
+    "foreign_learner_status": 403,
+    "out_of_range_cursor_status": 400
+  },
+  "unfixed_findings": {
+    "R08_ordinary_learner_correction": {
+      "http": 200,
+      "receipt": "ACCEPTED",
+      "persisted": true
+    },
+    "R10_nested_sensitive_field": {
+      "http": 200,
+      "receipt": "ACCEPTED",
+      "persisted": true
+    },
+    "R01b_pull_has_store_identity": false
+  }
+}

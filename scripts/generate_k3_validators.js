@@ -36,7 +36,8 @@ const payloadEntries = Object.entries(exportsByPath)
   .map(([path, name]) => `  ${JSON.stringify(path)}: ${name}`)
   .join(',\n');
 const eventName = exportsByPath['data/schema/learner-evidence-event-v2.schema.json'];
-const output = `${code}\nexport const validateLearnerEvidenceEventSchema = ${eventName};\nexport const payloadValidators = {\n${payloadEntries}\n};\n`;
+const definitions = JSON.parse(await readFile(resolve(root, 'data/evidence/event-definitions-v1.json'), 'utf8'));
+const output = `${code}\nexport const validateLearnerEvidenceEventSchema = ${eventName};\nexport const payloadValidators = {\n${payloadEntries}\n};\nexport const evidenceDefinitionContracts = ${JSON.stringify(definitions)};\n`;
 const target = resolve(root, 'src/evidence/generatedValidators.js');
 const temp = `${target}.tmp-${process.pid}`;
 await writeFile(temp, output);
