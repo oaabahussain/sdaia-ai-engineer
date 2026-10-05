@@ -35,9 +35,26 @@ function markLegacyHistory(history) {
   return Array.isArray(history) ? history.map((item) => ({ ...item, legacy_summary: true })) : [];
 }
 
+function preserveSubmittedLegacyHistory(history) {
+  return Array.isArray(history)
+    ? history.map((item) => (item?.legacy_summary === true || item?.attempt?.legacy_state_v2 === true
+        ? { ...item, legacy_summary: true }
+        : item))
+    : [];
+}
+
 function transitionStateV2Track(state, { trackId, trackVersion }) {
   const transitionTracks = transitionTracksOf(state);
-  if (transitionTracks[trackId] === true && state.tracks?.[trackId]) return state;
+  if (transitionTracks[trackId] === true && state.tracks?.[trackId]) {
+    const track = state.tracks[trackId];
+    return {
+      ...state,
+      tracks: {
+        ...(state.tracks || {}),
+        [trackId]: { ...track, exam_history: preserveSubmittedLegacyHistory(track.exam_history) }
+      }
+    };
+  }
 
   const existingTrack = state.tracks?.[trackId];
   const transitionedTrack = existingTrack
