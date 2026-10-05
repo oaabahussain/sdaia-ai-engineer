@@ -272,3 +272,14 @@ Task 26 result validator before durable evidence: `IMPLEMENTED_NOT_CHECKPOINTED`
 ## Phase E checkpoint — Task 26 candidate
 
 Phase E implementation is complete at the Product boundary pending result acceptance and current-head review. Legacy V1 stays read-only/coarse; privacy lifecycle remains privileged; StateV2 active attempts/history remain coarse legacy state; no fabricated historical K3 evidence is allowed.
+
+
+## Task 26 current-head review correction
+
+Codex current-head review on `1718795a54e1409402852b675eca1e3fe148df2c` found one valid in-scope P2: a pre-K3 active attempt submitted after the per-track cutover retained nested `attempt.legacy_state_v2` but the already-transitioned fast path failed to promote its new history wrapper to `legacy_summary`.
+
+Behavioral review RED: `ba0cc3356f90e7685f28addab275021f26f4a759`; exact focused Task 26 command 6/7 PASS with the new classification assertion failing. Accepted RED was explicitly replaced, not silently mutated: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a` → `b266395db43868a874ebfbe79ef8c77e8850e943ac79ef0573ab32ac68d9e7ed`.
+
+Fix: `604c7ad4a046f6140668221f6e884320eca0b2d9`; normalize only history already marked legacy or derived from `attempt.legacy_state_v2`, leaving genuine post-K3 history unmarked. Exact focused command after fix: 7/7 PASS. Task result revalidation against frozen execution state revision 49: `TASK_RESULT_ACCEPTED`, zero failures.
+
+Ruling: preserve the initial Task 26 accepted RED chain and replace it only with the added review regression; final exact-head CI/re-review evidence stays external until the head is frozen.

@@ -109,3 +109,29 @@ Task 26 completes the Phase E legacy-compatibility implementation boundary:
 - exact-head merge readiness check;
 - merge using merge commit with expected head SHA;
 - perform post-merge verification and durable state normalization.
+
+
+## Current-head review correction
+
+Codex review of head `1718795a54e1409402852b675eca1e3fe148df2c` identified one valid in-scope P2: after a pre-K3 active attempt is submitted, `submitExam()` preserves `attempt.legacy_state_v2` inside the new history wrapper, but an already-transitioned StateV2 track returned early and did not promote that wrapper to `legacy_summary: true`.
+
+Root cause: the post-cutover fast path treated the transition marker as meaning no compatibility normalization could ever be needed again. That assumption is false for a legacy active attempt whose final StateV2 submission occurs after the cutover.
+
+A review regression was added at `ba0cc3356f90e7685f28addab275021f26f4a759`. The exact Task 26 focused command reproduced 6 PASS / 1 FAIL locally, with the sole failure being the missing `legacy_summary` assertion; no import/setup/environment failure occurred.
+
+Accepted RED replacement:
+
+- prior accepted digest: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a`
+- replacement test hash `tests/k3-state-transition.test.js`: `ff166148ce78eb0d0bd2b27714008d91276bc1ebe4967838d8500f015c905439`
+- unchanged `tests/state-migration.test.js` hash: `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`
+- replacement accepted RED digest: `b266395db43868a874ebfbe79ef8c77e8850e943ac79ef0573ab32ac68d9e7ed`
+
+Ruling: replace the accepted Task 26 RED only to add the in-scope review regression proving a submitted pre-K3 active attempt retains coarse legacy history classification after cutover while genuine post-K3 history stays unmarked; preserve every original Task 26 assertion and command.
+
+Fix commit: `604c7ad4a046f6140668221f6e884320eca0b2d9`.
+
+The fix changes only the already-transitioned-track normalization path: history wrappers whose `legacy_summary` is already true or whose nested `attempt.legacy_state_v2` is true remain/are marked coarse legacy history. Genuine post-K3 history lacking those markers remains unchanged.
+
+The exact focused Task 26 command after the fix produced 7 PASS / 0 FAIL locally. Result validation using the frozen execution state revision 49, Task BASE, replacement RED evidence, current source authority, Product scope, and durable evidence returned `TASK_RESULT_ACCEPTED` with zero failures.
+
+Final hosted exact-head CI and current-head re-review remain external evidence and must be verified after this metadata promotion without editing the final candidate head.
