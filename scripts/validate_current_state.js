@@ -28,7 +28,7 @@ export function validateCurrentState(state, context = {}) {
     return result(false, 'STATE_SCHEMA_INVALID', { errors: validateSchema.errors ?? [] });
   }
 
-  if (state.execution_branch !== 'impl/k3-learner-evidence-engine') {
+  if (!/^impl\/k3-[a-z0-9][a-z0-9._\/-]*$/.test(state.execution_branch)) {
     return result(false, 'EXECUTION_BRANCH_INVALID', { execution_branch: state.execution_branch });
   }
 
