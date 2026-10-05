@@ -78,7 +78,7 @@ export function validateCurrentState(state, context = {}) {
     });
   }
 
-  if (state.base_main_sha !== null && context.sourceRef && context.sourceRef !== state.execution_branch) {
+  if (state.base_main_sha !== null && context.sourceRef !== state.execution_branch) {
     return result(false, 'EXECUTION_BRANCH_INVALID', {
       execution_branch: state.execution_branch,
       source_ref: context.sourceRef
@@ -150,7 +150,7 @@ function main() {
   const ledgerExists = existingPaths.includes(state.ledger_path);
   const context = {
     liveMainSha,
-    sourceRef: process.env.GITHUB_REF_NAME || execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
+    sourceRef: arg('--source-ref') || process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim(),
     specBlobSha: existingPaths.includes(state.spec_path) ? gitBlobSha(state.spec_path) : null,
     planBlobSha: existingPaths.includes(state.plan_path) ? gitBlobSha(state.plan_path) : null,
     ledgerText: ledgerExists ? readFileSync(path.join(repoRoot, state.ledger_path), 'utf8') : '',
