@@ -264,3 +264,26 @@ On exact review-fix head `ff706e34eee7647e21afba1452b41beef49d6095`:
 The review regression tests remain unchanged after `ad283045...`, so the replacement RED hashes remain frozen.
 
 Task result acceptance must be rerun using the corrected/replacement Accepted RED and only after all three review findings are closed. Any earlier Task 27 acceptance recorded above is superseded by this review correction.
+
+
+## Review-corrected durable result acceptance
+
+After all three current-head review findings were fixed and their threads were closed, the repository's actual Accepted RED and Task result validation logic was rerun against the frozen Task 27 execution state revision 54.
+
+Accepted RED chain:
+
+- corrected initial: `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`;
+- review replacement: `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`;
+- replacement ruling: preserve every original Task 27 assertion/command and add only the two current-head review regressions plus app wiring.
+
+Task result:
+
+`TASK_RESULT_ACCEPTED`
+
+Failures: `0`
+
+The revalidation found no RED mutation, GREEN/regression failure, scope expansion, main/state/source/branch drift against the frozen execution envelope, task-base checkpoint drift, open finding, or required Product commit-message mismatch.
+
+All three review findings are closed with exact-head GREEN evidence on `ff706e34eee7647e21afba1452b41beef49d6095`.
+
+Task 27 is eligible again for durable CURRENT-STATE promotion. Task 28 remains NOT STARTED and merge remains a separate high-reasoning gate.
