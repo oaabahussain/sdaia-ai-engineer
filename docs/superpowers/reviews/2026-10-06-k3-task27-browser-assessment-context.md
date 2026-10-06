@@ -168,3 +168,99 @@ Validated Accepted RED digest:
 The validation found no RED mutation, scope expansion, main drift, state drift, execution-branch drift, packet/source drift, task-base checkpoint drift, open finding, GREEN/regression failure, or Product commit-message mismatch.
 
 Task 27 is therefore eligible for CURRENT-STATE promotion. This acceptance does not authorize merge and does not start Task 28.
+
+
+## Current-head review corrections — evidence and runtime invariants
+
+Codex current-head review on `055e8e1cdb167d970a45c74528ccf7230dee28a7` found three valid in-scope issues:
+
+1. P1: the new static browser module was not guaranteed available for the first offline reload after a fresh service-worker installation;
+2. P2: JSON persistence removed the snapshot's runtime freeze before a resumed assessment was assigned to `activeExam`;
+3. P1: the originally recorded Task 27 RED SHA-256 values were not raw committed-file hashes.
+
+CURRENT-STATE revision 56 explicitly revoked the prior Task 27 acceptance while these findings were open: completed through Task 26, Task 27 next, status REVIEW, three open important findings.
+
+### Corrected initial RED evidence
+
+Independent recomputation from the raw GitHub base64 blobs at initial RED commit `3fc631f74dd6f8d7b929cbd8210191222ce44d52` gives:
+
+- `tests/assessment-snapshot.test.js`: `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`
+- `tests/k3-runtime-assessment-context.test.js`: `9b3e4d7f9c0ded125f292bb14cd5c48b768aece94c746d9e1faabe1a27ae7af1`
+
+The corrected initial Accepted RED digest is:
+
+`3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`
+
+This supersedes the earlier incorrect Task 27 hashes/digest recorded above. The original RED commit, command, failure class, and behavioral failures are unchanged.
+
+### Review regression RED
+
+Review RED commit:
+
+`ad2830452ce01d95294c85a07155a7e5b540d624`
+
+It added only in-scope regression assertions for:
+
+- re-freezing a JSON-persisted assessment snapshot on resume;
+- seeding the shared assessment module into browser CacheStorage after service-worker readiness;
+- wiring both protections in the browser app without changing the learner-facing mode.
+
+Hosted quality #873 produced:
+
+- 765 tests total;
+- 762 PASS;
+- 3 intended behavioral FAIL;
+- failures only for missing snapshot rehydration, missing offline cache behavior, and missing app wiring;
+- no unrelated import/setup/environment failure.
+
+Raw review-RED SHA-256 values:
+
+- `tests/assessment-snapshot.test.js`: `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`
+- `tests/k3-runtime-assessment-context.test.js`: `ad896a689c62957fe4c6a9c283db59538f39aa7c5c93f122479dfbea9a64a30b`
+
+Ruling: replace the corrected initial Task 27 RED only to add current-head review regressions for first-offline-reload caching and persisted snapshot re-freezing; preserve every original Task 27 assertion and command.
+
+Replacement Accepted RED:
+
+- replaces: `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`
+- replacement digest: `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`
+
+### Review fixes
+
+Review fix commit:
+
+`ff706e34eee7647e21afba1452b41beef49d6095` — `fix: preserve Task 27 offline and resume invariants`
+
+Offline invariant:
+
+- the Task 27 packet does not authorize `sw.js` modification;
+- the shared assessment module now exposes an offline-seeding helper;
+- the browser app invokes it after `navigator.serviceWorker.ready`;
+- the helper stores the exact module URL in `learning-platform-runtime-v1`;
+- the existing service worker resolves offline requests with `caches.match(event.request)`, which searches CacheStorage across named caches.
+
+Ruling: satisfy the first-offline-reload invariant inside Task 27's declared app/shared-module scope instead of expanding the task into `sw.js`; cache the already-loaded assessment module after service-worker activation in a dedicated runtime cache that the existing cross-cache `caches.match` can resolve. Cost if wrong: a future service-worker cache strategy that stops using cross-cache matching must explicitly add this module to its own shell manifest or replace this adapter.
+
+Resume invariant:
+
+- JSON persistence still remains unchanged;
+- when an evidence-backed active assessment is resumed, its persisted `assessment_snapshot` is rehydrated through `createAssessmentFormSnapshot`;
+- this restores deep immutability and revalidates required snapshot identity without fabricating any data.
+
+### Review-fix verification
+
+On exact review-fix head `ff706e34eee7647e21afba1452b41beef49d6095`:
+
+- quality #874 — SUCCESS;
+- Node project suite — 765/765 PASS;
+- deterministic/process tests — 73/73 PASS;
+- state validation — PASS at review state revision 56;
+- application parse — PASS;
+- service-worker asset verification — PASS;
+- Pages artifact — PASS;
+- browser smoke — PASS, including offline cached reload;
+- server/adapter #1999 — SUCCESS.
+
+The review regression tests remain unchanged after `ad283045...`, so the replacement RED hashes remain frozen.
+
+Task result acceptance must be rerun using the corrected/replacement Accepted RED and only after all three review findings are closed. Any earlier Task 27 acceptance recorded above is superseded by this review correction.
