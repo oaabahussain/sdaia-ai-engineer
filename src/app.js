@@ -5,7 +5,8 @@ import { expandConceptBank } from './logic/questionBank.js';
 import { CORE_I18N, CORE_DEFAULT_LOCALE } from './presentation/coreI18n.js';
 import { loadTrackPresentation, resolvePresentationLocale, getPresentationLocale, getDomainLabel } from './presentation/trackPresentation.js';
 import { loadTrackRegistry, resolveActiveTrackId } from './tracks/registry.js';
-import { readSavedTrackId, saveTrackId } from './tracks/selection.js';\nimport { createBrowserAssessmentContext } from './assessment/assessmentSnapshot.js';
+import { readSavedTrackId, saveTrackId } from './tracks/selection.js';
+import { createBrowserAssessmentContext } from './assessment/assessmentSnapshot.js';
 
 registerServiceWorker();
 
