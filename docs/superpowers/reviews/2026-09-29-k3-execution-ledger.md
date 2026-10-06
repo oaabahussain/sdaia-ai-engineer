@@ -355,3 +355,119 @@ Phase E is COMPLETE.
 Task 27 — Make AssessmentFormSnapshot browser-safe and release-bound — is NEXT and NOT STARTED.
 
 The historical branch `impl/k3-task26-statev2-transition` must not be reused as the active Task 27 workspace. Task 27 startup must resolve then-live main, create a fresh isolated execution branch/workspace, bind that exact main SHA, validate packet/spec/plan authority and preflight, and only then enter RED.
+
+
+## Task 27 — browser-safe release-bound AssessmentFormSnapshot
+
+Task 27 Product candidate: COMPLETE at Product scope, pending final metadata promotion/current-head review/integration.
+
+- BASE: `fe0db5349a82119f4bc3a1b2b60b1fd5042cddda`
+- Behavioral RED: `3fc631f74dd6f8d7b929cbd8210191222ce44d52`
+- Required Product GREEN: `55e901b427926be3daf5a1672d49774029503263` — `refactor: expose frozen assessment context to browser`
+- Syntax-only verification correction: `fbd3ca15496166b4934643868f6c650d06f9d5ef`
+- Base main: `41a9b91e176877277837bfa18d3a459aa641cd3e`
+- Checkpoint: `docs/superpowers/reviews/2026-10-06-k3-task27-browser-assessment-context.md`
+
+RED: exact focused command produced 2 PASS / 3 intended behavioral FAIL; hosted quality #865 failed at Node tests as intended and server/adapter #1990 succeeded. Accepted RED test hashes are `da79632629132939c9f2545dbdd9f20d8b2bccbe38cb9a240190b5793ac87d44` for `tests/assessment-snapshot.test.js` and `66d4a7e414c383344ceb9fc3845cf9ace4d1a246bbca958f45f83b9ef0eab307` for `tests/k3-runtime-assessment-context.test.js`; accepted digest `2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`.
+
+GREEN: shared browser-safe snapshot logic is exported from `src/assessment/assessmentSnapshot.js`; the prior platform-kernel path re-exports it; new strict browser exams freeze exact release, item IDs, option order, exam profile, scoring-policy stable reference, locale, form identity, and start time. Learner-facing `full` remains `full` while evidence mode is `mock`; section remains `section`.
+
+Ruling: current UI mode `full` remains learner-visible and maps only to K3 evidence mode `mock`; the existing runtime `scoring_policy_ref` is frozen into AssessmentFormSnapshotV1's established `scoring_policy_version` stable-reference field. Cost if wrong: later evidence instrumentation may require an explicit policy-ID/version split, but Task 27 must not change learner-visible labels or scoring semantics.
+
+Systematic-debugging: quality #866 proved Node/process/state behavior green but application parse failed because the generated import separator contained literal backslash+n characters. Commit `fbd3ca15496166b4934643868f6c650d06f9d5ef` fixes only that syntax serialization error; tests and Accepted RED remained unchanged.
+
+Final current-Product-head evidence: quality #867 SUCCESS with Node 762/762, process 73/73, application parse, service-worker, Pages artifact, current-bank, state validation, and browser smoke all PASS; server/adapter #1992 SUCCESS.
+
+Ruling: the connected harness cannot directly invoke the focused GREEN command from a native dependency-complete live clone. Both exact test files named by the command execute and pass inside the full Node suite on the identical current head, and the exact focused command produced intended RED before implementation. Cost if wrong: a focused-invocation-only ordering difference could be missed; the full suite is broader and runs both files on the actual branch head.
+
+Scope from BASE is exactly two declared additions (`src/assessment/assessmentSnapshot.js`, `tests/k3-runtime-assessment-context.test.js`) and two declared modifications (`src/platform-kernel/release/assessmentSnapshot.js`, `src/app.js`). No undeclared Product path changed.
+
+Task result before durable checkpoint/ledger: `IMPLEMENTED_NOT_CHECKPOINTED` with only `DURABLE_EVIDENCE_MISSING`. Rerun result validation after this ledger/checkpoint exists; promote CURRENT-STATE only if it returns `TASK_RESULT_ACCEPTED`.
+
+Task 28 — Browser EvidenceRuntime manager — is NEXT only after Task 27 acceptance/integration and is NOT STARTED.
+
+
+Task 27 result validation after durable checkpoint/ledger: `TASK_RESULT_ACCEPTED`, zero failures. Accepted RED digest revalidated as `2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`. No RED mutation, scope, main/state/branch/source, task-base, finding, GREEN/regression, or Product commit-message failure remains. CURRENT-STATE may now promote Task 27 completion; Task 28 remains NOT STARTED pending Task 27 review/integration boundary.
+
+
+## Task 27 current-head review correction
+
+Codex review on `055e8e1cdb167d970a45c74528ccf7230dee28a7` found three valid findings: first-offline-reload availability for the newly imported assessment module, loss of deep freeze after JSON resume, and incorrect previously recorded raw RED hashes. CURRENT-STATE revision 56 revoked Task 27 acceptance while all three findings were open.
+
+Corrected raw initial RED hashes at `3fc631f74dd6f8d7b929cbd8210191222ce44d52`:
+
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `9b3e4d7f9c0ded125f292bb14cd5c48b768aece94c746d9e1faabe1a27ae7af1`;
+- corrected initial Accepted RED digest = `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`.
+
+The earlier Task 27 hash/digest values are superseded; the initial RED behavior itself is unchanged.
+
+Review RED `ad2830452ce01d95294c85a07155a7e5b540d624` added only offline/resume/app-wiring regressions. Hosted quality #873: 765 total, 762 PASS, 3 intended behavioral FAIL, no import/setup/environment failure. Review-RED runtime-test raw hash = `ad896a689c62957fe4c6a9c283db59538f39aa7c5c93f122479dfbea9a64a30b`; assessment snapshot test hash remains `be721da1...`.
+
+Ruling: replace the corrected initial Task 27 RED only to add current-head review regressions for first-offline-reload caching and persisted snapshot re-freezing; preserve every original Task 27 assertion and command.
+
+Replacement Accepted RED digest = `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`, replacing `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`.
+
+Review fix `ff706e34eee7647e21afba1452b41beef49d6095` preserves Task 27 scope:
+
+- after `navigator.serviceWorker.ready`, the app seeds the already-loaded assessment module into dedicated CacheStorage; existing service-worker `caches.match(event.request)` resolves it across caches for the first subsequent offline reload;
+- resumed evidence-backed assessments rehydrate their JSON-parsed snapshot through the same frozen snapshot constructor.
+
+Ruling: repair first-offline-reload availability inside Task 27's declared `src/app.js` + shared snapshot-module scope rather than expanding the packet into `sw.js`. Cost if wrong: a future service-worker implementation that no longer performs cross-cache matching must explicitly absorb this asset into its shell manifest or replace the cache adapter.
+
+Exact review-fix evidence: quality #874 SUCCESS; Node 765/765; process 73/73; app parse / service-worker asset check / Pages / browser smoke PASS; server/adapter #1999 SUCCESS.
+
+Task 27 must be result-revalidated with the replacement Accepted RED after closing the three review findings. Task 28 remains NOT STARTED.
+
+
+## Task 27 final current-head review race correction
+
+Codex final re-review on `4fbfee6ff752a4493dfb82ba90a6936af79424a1` found one valid P1: the assessment-module CacheStorage seed was detached with `void`, so application readiness could race `cache.add()` on the first offline reload. CURRENT-STATE revision 58 revoked Task 27 acceptance while this finding remained open.
+
+Final review RED `eb661650c7f247519b3b857362a202420970bc88`: hosted quality #880 = 766 total / 765 PASS / 1 intended behavioral FAIL, solely `browser init awaits offline assessment seeding before becoming ready`; no import/setup/environment failure.
+
+Final review RED hashes:
+
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `32b37ab071d8407c401f2156eeb6d6643ce7b3b37ecf9e0d4e547d906096e462`.
+
+Ruling: replace the prior Task 27 review RED only to add the final current-head offline-readiness race regression; preserve every earlier Task 27 assertion and command.
+
+Final replacement Accepted RED digest = `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`, replacing `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`.
+
+Fix `14b5e71b680b23e0ae472f3b57c7eabb9318a101`: remove the detached seed call and await `cacheAssessmentSnapshotModuleForOffline()` as the first browser `init()` readiness step. The helper already waits for `serviceWorker.ready` and `cache.add()`; failures now remain inside the application's init error boundary rather than allowing false-ready continuation. No `sw.js` scope expansion.
+
+Exact fix evidence: quality #881 SUCCESS; Node 766/766; process 73/73; adversarial 15/15; state validation revision 58 PASS; app parse / service-worker assets / Pages / browser smoke PASS; server/adapter #2006 SUCCESS.
+
+Task 27 remains unaccepted until the final review thread is closed and Task result is revalidated with this final replacement RED. Task 28 remains NOT STARTED.
+
+
+Task 27 final-review result revalidation after closing the offline-readiness race: final Accepted RED digest `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`; `ACCEPTED_RED_VALID`; `TASK_SCOPE_VALID`; `TASK_RESULT_ACCEPTED`; zero failures. Validation used frozen Task 27 execution state revision 54, exact packet/source authority, unchanged live main, declared Product paths only, quality #881 / server #2006 GREEN evidence, required Product commit message, and durable checkpoint/ledger evidence.
+
+All Task 27 review findings are closed. CURRENT-STATE may promote completed-through Task 27 / Task 28 next. Task 28 remains NOT STARTED pending Task 27 exact-head review/integration.
+
+
+## Task 27 service-worker readiness deadlock correction
+
+Codex exact-head review of `f2a070638fa29da7d0a467f649aecf46a96c4461` found one valid P1: browser startup awaited `navigator.serviceWorker.ready`, which can remain pending forever when registration/install fails even though ordinary online use could continue. CURRENT-STATE revision 60 revoked Task 27 acceptance while this finding was open.
+
+Exploratory RED `c86188bc461960cf3394e5bd356c0e95c42919b5` is INVALID as Accepted RED because its never-settling promise caused test cancellation. The harness-only repair `748acc187f1c85c806a233a1f67fb7493440badc` produced valid RED in quality #886: 767 total / 765 PASS / 2 FAIL / 0 cancelled, only the service-worker-readiness dependency and cache-failure fallback assertions.
+
+Valid final-review RED hashes:
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `30d4b495d86db0f0bf5bef6652c3b4ec19ba1ff41eae2fa0af144a50b32f38ae`.
+
+Ruling: replace the prior Task 27 final-review RED to remove the unsafe service-worker-ready precondition and add the online-startup fallback regression; preserve all Task 27 behavioral requirements while keeping the fix inside declared app/shared-module scope.
+
+Final replacement Accepted RED digest = `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf`, replacing `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`.
+
+Fix `0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb`: cache the assessment module directly in `learning-platform-shell-v1` without reading `serviceWorker.ready`; await only the cache operation itself; return `false` on cache failure so normal online startup proceeds. No `sw.js` scope expansion.
+
+Exact fix evidence: quality #887 SUCCESS; Node/process/state/application/service-worker/Pages/browser checks PASS; server/adapter #2012 SUCCESS.
+
+Task 27 must be result-revalidated with the final replacement RED after closing this finding. Task 28 remains NOT STARTED.
+
+
+Task 27 final durable acceptance after service-worker-readiness correction: Accepted RED `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf` = VALID; Product scope = VALID; `TASK_RESULT_ACCEPTED`; zero failures. Live main remained `41a9b91e176877277837bfa18d3a459aa641cd3e`; Product scope is exactly `src/app.js`, new shared assessment snapshot module, platform-kernel re-export, and Task 27 runtime assessment-context test. All Task 27 review findings are closed.
+
+CURRENT-STATE may promote Task 27 complete / Task 28 next. Task 28 remains NOT STARTED pending exact-head review, merge, and post-merge verification.
