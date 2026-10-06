@@ -358,3 +358,23 @@ On exact fix head `14b5e71b680b23e0ae472f3b57c7eabb9318a101`:
 The final review RED test remains unchanged after `eb661650...`, so the final replacement RED hashes are frozen.
 
 Task result acceptance must be rerun with the final replacement Accepted RED after the final review thread is closed. All earlier Task 27 acceptance claims are superseded until that revalidation succeeds.
+
+
+## Final review-corrected durable result acceptance
+
+After the final offline-readiness review thread was fixed and closed, Task 27 result validation was rerun using the frozen execution state revision 54, the final replacement Accepted RED, exact Task 27 packet/source authority, current live main, exact Product scope, GREEN/regression evidence, required Product commit message, and durable checkpoint/ledger evidence.
+
+Final Accepted RED digest:
+
+`66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`
+
+Validation results:
+
+- Accepted RED: `ACCEPTED_RED_VALID`;
+- scope: `TASK_SCOPE_VALID`;
+- Task result: `TASK_RESULT_ACCEPTED`;
+- failures: `0`.
+
+The validator found no RED mutation, GREEN/regression failure, scope expansion, main drift, frozen execution-state drift, execution-branch drift, plan/spec/source drift, task-base checkpoint drift, open finding, Product commit-message mismatch, or durable-evidence failure.
+
+All final-review findings are closed. Task 27 is eligible for durable CURRENT-STATE promotion again. Task 28 remains NOT STARTED and merge remains a separate high-reasoning exact-head gate.
