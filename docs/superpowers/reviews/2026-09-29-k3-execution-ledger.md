@@ -257,3 +257,38 @@ Final: native browser remains ENVIRONMENT_BLOCKED locally because `chromedriver`
 Final: ZzzOps remains read-only/not initialized for K3 because the repository already has one authoritative durable control plane; creating a second state authority at the merge boundary is rejected.
 
 Final pre-merge status after governance hardening: new Critical 0; new Important 0; exact-history publication, hosted exact-SHA CI/browser/Python, independent current-head review, and final live-main drift check remain open. Task 26 remains NOT STARTED.
+
+
+## Native high-reasoning execution — Task 26 StateV2 transition compatibility
+
+Task 26 durable evidence candidate: BASE `17ed821c03803f933f394e63d5a01f4466af0560`; behavioral RED `cf0b6e84c1904eb8d19720ae6de4e9a0254a3cb1` (quality #854: 755 pass / 3 intended assertion failures); GREEN Product head `fb63460d9fbb416c8a1863984f35a9b0c403dced`; quality #855 SUCCESS; server/adapter #1978 SUCCESS; Node 758/758; process 73/73; Python 117/117. Accepted RED digest `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a`. Product scope from BASE is exactly one added transition test plus `src/state/migrate.js` modification.
+
+Task 26: Ruling: preserve pre-K3 active StateV2 attempts and exam history as explicit coarse legacy compatibility state, using a per-track cutover marker; never reconstruct K3 fine-grained events or historical timestamps. Activities created after the track cutover are not reclassified as legacy. Cost if wrong: downstream runtime integration must honor this explicit cutover marker rather than inferring legacy status from timestamps.
+
+Task 26: Ruling: the exact focused Node command cannot be invoked directly in the connected local shell because no dependency-complete live clone is available. Both exact test files ran on the identical GREEN SHA inside the full Node suite and passed, after producing the intended behavioral RED before implementation. Cost if wrong: a focused-invocation-only ordering difference could be missed while the repository-wide suite exercises the same files in a stricter regression environment.
+
+Task 26 result validator before durable evidence: `IMPLEMENTED_NOT_CHECKPOINTED` with only `DURABLE_EVIDENCE_MISSING`. Checkpoint: `docs/superpowers/reviews/2026-10-05-k3-task26-statev2-transition.md`. Re-run result validation after this metadata exists; only then promote CURRENT-STATE.
+
+## Phase E checkpoint — Task 26 candidate
+
+Phase E implementation is complete at the Product boundary pending result acceptance and current-head review. Legacy V1 stays read-only/coarse; privacy lifecycle remains privileged; StateV2 active attempts/history remain coarse legacy state; no fabricated historical K3 evidence is allowed.
+
+
+## Task 26 current-head review correction
+
+Codex current-head review on `1718795a54e1409402852b675eca1e3fe148df2c` found one valid in-scope P2: a pre-K3 active attempt submitted after the per-track cutover retained nested `attempt.legacy_state_v2` but the already-transitioned fast path failed to promote its new history wrapper to `legacy_summary`.
+
+Behavioral review RED: `ba0cc3356f90e7685f28addab275021f26f4a759`; exact focused Task 26 command 6/7 PASS with the new classification assertion failing. Accepted RED was explicitly replaced, not silently mutated: `ba96e4c846962b3c0300f3131b3f3711465dfc727e2601dc49bf7241c3ced70a` → `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`.
+
+Fix: `604c7ad4a046f6140668221f6e884320eca0b2d9`; normalize only history already marked legacy or derived from `attempt.legacy_state_v2`, leaving genuine post-K3 history unmarked. Exact focused command after fix: 7/7 PASS. Task result revalidation against frozen execution state revision 49: `TASK_RESULT_ACCEPTED`, zero failures.
+
+Ruling: preserve the initial Task 26 accepted RED chain and replace it only with the added review regression; final exact-head CI/re-review evidence stays external until the head is frozen.
+
+
+## Task 26 evidence-hash correction
+
+Current-head re-review found that the review-RED test hash in the prior metadata revision did not equal the raw committed file SHA-256. Independent recomputation from `ba0cc3356f90e7685f28addab275021f26f4a759` confirms `tests/k3-state-transition.test.js` = `6db018f28cd3dd791e6d852d6341e444dd0c96bd3930ced507f65d5fcc558a8e`; `tests/state-migration.test.js` remains `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`.
+
+The corrected accepted-RED replacement digest is `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`. Re-running the actual Task result validation logic with the corrected evidence returns `TASK_RESULT_ACCEPTED`, zero failures.
+
+Ruling: supersede only the erroneous evidence hash/digest in the prior Task 26 metadata revision; Product code, review RED behavior, review fix, and Task BASE remain unchanged.
