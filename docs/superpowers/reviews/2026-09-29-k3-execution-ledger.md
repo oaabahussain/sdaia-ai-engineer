@@ -471,3 +471,58 @@ Task 27 must be result-revalidated with the final replacement RED after closing 
 Task 27 final durable acceptance after service-worker-readiness correction: Accepted RED `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf` = VALID; Product scope = VALID; `TASK_RESULT_ACCEPTED`; zero failures. Live main remained `41a9b91e176877277837bfa18d3a459aa641cd3e`; Product scope is exactly `src/app.js`, new shared assessment snapshot module, platform-kernel re-export, and Task 27 runtime assessment-context test. All Task 27 review findings are closed.
 
 CURRENT-STATE may promote Task 27 complete / Task 28 next. Task 28 remains NOT STARTED pending exact-head review, merge, and post-merge verification.
+
+
+## Task 27 COMPLETE — post-merge closure — 2026-10-06
+
+Task 27 — browser-safe release-bound AssessmentFormSnapshot — is COMPLETE, merged, and post-merge verified.
+
+Final Product integration:
+
+- final reviewed PR #43 head: `65aef0355b595b3136f16df35a552c224eaedf42`;
+- Product merge commit / durable Tasks 1-27 baseline: `73c1eea47ca0d20bbdd1d7e1913477156f9f7978`;
+- final PR-head tree and merge tree are identical: `1f115904398c76d696a7c02d4f91911287d643ad`;
+- final reviewed head to merged `main`: one merge commit, zero file differences.
+
+Final exact-head evidence:
+
+- quality #889 SUCCESS;
+- Node 767/767 PASS;
+- process 73/73 PASS;
+- adversarial 15/15 fail closed;
+- state validation revision 61 PASS;
+- app parse / service-worker assets / Pages artifact / browser smoke PASS;
+- server/adapter #2014 SUCCESS;
+- Codex exact-head review clean;
+- unresolved review threads 0;
+- live-main drift before merge 0.
+
+Final Accepted RED digest: `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf`.
+
+Final Task result: `TASK_RESULT_ACCEPTED`, zero failures.
+
+Post-merge evidence on `main@73c1eea47ca0d20bbdd1d7e1913477156f9f7978`:
+
+- server/adapter #2015 SUCCESS;
+- Pages #45 SUCCESS;
+- browser smoke SUCCESS;
+- deploy SUCCESS;
+- live release verification SUCCESS;
+- merge tree equals the final reviewed Product tree.
+
+Durable checkpoint:
+`docs/superpowers/reviews/2026-10-06-k3-task27-post-merge-verification.md`.
+
+CURRENT-STATE after this checkpoint:
+
+- revision 62;
+- `completed_through_task=27`;
+- `next_task=28`;
+- Phase F / `PHASE_GATE`;
+- `base_main_sha=null`;
+- `ACTIVE_REF_RESOLUTION_VALID=PENDING`;
+- zero open Critical/Important findings.
+
+Task 28 — Browser EvidenceRuntime manager — is NEXT and NOT STARTED.
+
+The historical branch `impl/k3-task27-browser-assessment-context` must not be reused as the active Task 28 workspace. Task 28 startup must bind a fresh isolated workspace to then-live main before RED.
