@@ -30,7 +30,7 @@ Task 28:
 
 Task 29:
 - packet `task-029.json`;
-- packet blob `8fb1e1cab4e94ddd8b53281d475cb536ab95da98`;
+- packet blob `875c3c3e4f7c9cc825fa4f5dabead41e014fccbe`;
 - dependency Task 28;
 - exact RED/GREEN `node --test tests/k3-app-evidence-integration.test.js tests/k1-current-runtime-regression.test.js`;
 - required commit `feat: record assessment learner evidence`.
@@ -55,8 +55,9 @@ Shared authority:
 - `docs/superpowers/reviews/2026-10-06-k3-task30-launch.md`
 - `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-preparation-checkpoint.md`
 - `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-handoff.md`
+- `docs/superpowers/reviews/2026-10-06-k3-task29-offline-scope-ruling.md`
 
-The original packets remain authoritative and byte-unchanged.
+Task 28 and Task 30 packets remain byte-unchanged. Task 29 was regenerated deterministically with a narrow governed scope augmentation for `sw.js` and `scripts/browser_smoke.py`; approved spec/plan hashes and Task 29 behavior remain unchanged.
 
 ## Dependency policy for one-session three-task execution
 
@@ -69,9 +70,11 @@ Required sequence:
 
 Do not pre-bind Tasks 29/30 before their predecessor is merged.
 
-## Known high-reasoning gate
+## Known high-reasoning gates
 
-There is one pre-identified Task 28/29 design tension:
+### SYSTEM evaluation authority
+
+There is a pre-identified Task 28/29 design tension:
 
 - `recordEvaluation` is part of Task 28 recorder interface;
 - Task 29 says submit emits evaluation events;
@@ -81,6 +84,16 @@ There is one pre-identified Task 28/29 design tension:
 Execution must not weaken that guard or fabricate an authority origin/sequence.
 
 At Task 28 startup, inspect then-live main for an authorized SYSTEM capture path. If none exists, record a high-reasoning `Ruling:` and use the governed amendment/scope process before Product edits. This checkpoint intentionally keeps the issue visible rather than silently choosing an unsafe workaround.
+
+### Task 29 offline update boundary
+
+Task 29 adds browser modules imported by `src/app.js`. The governed scope ruling allows `sw.js` and `scripts/browser_smoke.py` so execution can preserve the first navigation after a service-worker update while offline. Browser smoke must cover service-worker update → network offline → first new-version navigation, without relying on an online warmup of the new modules.
+
+`tests/k1-current-runtime-regression.test.js` and `tests/storage.api.test.js` are read/run-only for Tasks 29/30. New assertions belong in the new packet-allowed test files.
+
+## Preparation review correction
+
+Codex P1/P2 were incorporated before merge. The deterministic packet compiler carries the Task 29 offline scope augmentation; Task 29 packet was regenerated; no Product runtime code was changed. Preparation state advances to revision 64 while Task 28 remains NOT STARTED.
 
 ## No execution performed
 
