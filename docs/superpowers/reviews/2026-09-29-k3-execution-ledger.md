@@ -526,3 +526,38 @@ CURRENT-STATE after this checkpoint:
 Task 28 — Browser EvidenceRuntime manager — is NEXT and NOT STARTED.
 
 The historical branch `impl/k3-task27-browser-assessment-context` must not be reused as the active Task 28 workspace. Task 28 startup must bind a fresh isolated workspace to then-live main before RED.
+
+
+## Tasks 28–30 execution wave PREPARED — 2026-10-06
+
+Preparation source baseline: `main@7b30975a377e2b41b2841cde324410b38671791b`.
+
+Prepared operational artifacts:
+
+- `docs/superpowers/plans/2026-10-06-k3-tasks-28-30-execution-wave.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task28-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task29-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task30-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-preparation-checkpoint.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-handoff.md`.
+
+Authoritative Task 28/29/30 packets remain byte-unchanged. Dependency order is 28 → 29 → 30; each task requires its own fresh branch, RED/GREEN/result/review/merge/post-merge closure before the next begins.
+
+Known gate retained explicitly: Task 28/29 evaluation evidence is SYSTEM/authority-sensitive while ordinary local capture is learner-only. Execution must not weaken `assertOrdinaryEvidenceProducer` or fabricate origin sequence; inspect then-live main and record a high-reasoning `Ruling:`/scope amendment if no authorized producer path exists.
+
+No Task 28/29/30 Product implementation or RED execution occurred during preparation. Task 28 remains next and NOT STARTED. Task 31 remains outside the prepared wave.
+
+
+## Tasks 28–30 preparation review corrections — 2026-10-06
+
+Codex preparation review found two valid execution-contract issues before Task 28 began.
+
+1. **P1 offline update boundary:** Task 29 introduces new browser modules imported by the application, but its original generated scope did not allow updating the install-time service-worker release boundary or adding an update-first browser-smoke scenario. High-reasoning ruling: preserve approved Task 29 behavior and augment generated Task 29 scope only to allow `sw.js` and `scripts/browser_smoke.py`. Task 29 must prove service-worker update → first new-version navigation offline without prior online module warmup.
+
+2. **P2 existing regression paths:** `tests/k1-current-runtime-regression.test.js` and `tests/storage.api.test.js` already exist while their source clauses classify them as create/test paths. Since scope validation distinguishes added from modified paths, these files are now explicitly read/run-only for Tasks 29/30. New assertions go into `tests/k3-app-evidence-integration.test.js` and `tests/k3-storage-sync-capability.test.js` respectively.
+
+Ruling: `docs/superpowers/reviews/2026-10-06-k3-task29-offline-scope-ruling.md`.
+
+Task 28/30 packets are unchanged. Task 29 packet is regenerated deterministically with scope augmentation only; approved spec/plan hashes and learner-visible behavior remain unchanged.
+
+No Task 28/29/30 Product implementation or RED execution occurred. Task 28 remains NOT STARTED; Task 31 remains out of scope.

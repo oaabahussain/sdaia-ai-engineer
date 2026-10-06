@@ -61,7 +61,9 @@
     ],
     "allowed_delete": [],
     "allowed_modify": [
-      "src/app.js"
+      "src/app.js",
+      "sw.js",
+      "scripts/browser_smoke.py"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_29"
