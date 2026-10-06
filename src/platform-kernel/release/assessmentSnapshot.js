@@ -1,2 +1,1 @@
-function deepFreeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){for(const v of Object.values(value))deepFreeze(v);Object.freeze(value)}return value}
-export function createAssessmentFormSnapshot(input){if(!input?.form_id||!input?.content_release_id)throw new Error('Assessment form identity is required');const ids=[...(input.item_version_ids||[])];if(!ids.length||new Set(ids).size!==ids.length)throw new Error('Assessment form requires unique item versions');return deepFreeze(structuredClone({...input,item_version_ids:ids}))}
+export { createAssessmentFormSnapshot } from '../../assessment/assessmentSnapshot.js';
