@@ -59,6 +59,8 @@ export function createEvidenceRecorder({
 
   const activities=new Map();
   const interactions=new Map();
+  const attemptRevisions=new Map();
+  const attemptRevisionTails=new Map();
 
   async function capture(eventName,eventInput){
     return captureLocalEvidence({
@@ -100,16 +102,29 @@ export function createEvidenceRecorder({
 
     let assessment_attempt_id=input.assessment_attempt_id;
     let form_id=input.form_id??assessment_snapshot?.form_id;
+    let attempt_revision;
+    if(assessment_snapshot&&input.form_id!==undefined){
+      mismatch(input.form_id,assessment_snapshot.form_id,'form_id');
+    }
     if(ASSESSMENT_MODES.has(mode)){
       assessment_attempt_id=assessment_attempt_id??(generateActivity?uuidV4(crypto):undefined);
       requiredString(assessment_attempt_id,'assessment_attempt_id');
-      form_id=requiredString(form_id,'form_id');
+      form_id=requiredString(assessment_snapshot?.form_id??form_id,'form_id');
+      if(generateActivity){
+        attempt_revision=input.attempt_revision??0;
+      }else{
+        attempt_revision=input.attempt_revision;
+      }
+      if(!Number.isSafeInteger(attempt_revision)||attempt_revision<0){
+        throw new TypeError('Strict assessment activity context requires a non-negative attempt_revision');
+      }
     }
 
     return deepFreeze({
       learner_id,activity_id,track_id,content_release_id,mode,locale,
       ...(assessment_attempt_id?{assessment_attempt_id}:{}),
       ...(form_id?{form_id}:{}),
+      ...(attempt_revision!==undefined?{attempt_revision}:{}),
       ...(assessment_snapshot?{
         assessment_snapshot,
         exam_profile_ref:assessmentProfileRef(assessment_snapshot),
@@ -131,10 +146,20 @@ export function createEvidenceRecorder({
         mismatch(assessmentProfileRef(input.assessment_snapshot),existing.exam_profile_ref,'exam_profile_ref');
         mismatch(input.assessment_snapshot.scoring_policy_version,existing.scoring_policy_ref,'scoring_policy_ref');
       }
+      if(ASSESSMENT_MODES.has(existing.mode)&&input.attempt_revision!==undefined){
+        mismatch(input.attempt_revision,attemptRevisions.get(existing.assessment_attempt_id),'attempt_revision');
+      }
       return existing;
     }
     if(input?.activity_context){
       const restored=commonFromInput({...input.activity_context,activity_id:id},{generateActivity:false});
+      if(ASSESSMENT_MODES.has(restored.mode)){
+        const known=attemptRevisions.get(restored.assessment_attempt_id);
+        if(known!==undefined&&known!==restored.attempt_revision){
+          throw new Error('attempt_revision does not match current local revision chain');
+        }
+        attemptRevisions.set(restored.assessment_attempt_id,restored.attempt_revision);
+      }
       activities.set(id,restored);
       return restored;
     }
@@ -155,6 +180,15 @@ export function createEvidenceRecorder({
     return out;
   }
 
+  function assertFrozenFormItem(activity,itemVersionId){
+    if(ASSESSMENT_MODES.has(activity.mode)){
+      const allowed=activity.assessment_snapshot?.item_version_ids;
+      if(!Array.isArray(allowed)||!allowed.includes(itemVersionId)){
+        throw new Error('item_version_id is not part of the frozen assessment form snapshot');
+      }
+    }
+  }
+
   function resolveInteraction(input,activity){
     const id=requiredString(input?.item_interaction_id,'item_interaction_id');
     const existing=interactions.get(id);
@@ -164,11 +198,13 @@ export function createEvidenceRecorder({
       return existing;
     }
     if(input?.item_context){
+      const item_version_id=requiredString(input.item_context.item_version_id,'item_version_id');
+      assertFrozenFormItem(activity,item_version_id);
       const restored=deepFreeze({
         activity_id:activity.activity_id,
         item_interaction_id:id,
         question_family_id:requiredString(input.item_context.question_family_id,'question_family_id'),
-        item_version_id:requiredString(input.item_context.item_version_id,'item_version_id'),
+        item_version_id,
         objective_id:requiredString(input.item_context.objective_id,'objective_id'),
         domain_id:requiredString(input.item_context.domain_id,'domain_id')
       });
@@ -194,6 +230,9 @@ export function createEvidenceRecorder({
     if(activities.has(activity.activity_id))throw new Error('activity_id is already active');
     const payload=input.source===undefined?{}:{source:requiredString(input.source,'source')};
     const result=await capture('learner.activity.started',{...baseEvent(activity),payload});
+    if(ASSESSMENT_MODES.has(activity.mode)){
+      attemptRevisions.set(activity.assessment_attempt_id,activity.attempt_revision);
+    }
     activities.set(activity.activity_id,activity);
     return result;
   }
@@ -201,9 +240,7 @@ export function createEvidenceRecorder({
   async function presentItem(input){
     const activity=resolveActivity(input);
     const item_version_id=requiredString(input.item_version_id,'item_version_id');
-    if(ASSESSMENT_MODES.has(activity.mode)&&!activity.assessment_snapshot?.item_version_ids?.includes(item_version_id)){
-      throw new Error('item_version_id is not part of the frozen assessment form snapshot');
-    }
+    assertFrozenFormItem(activity,item_version_id);
     const item_interaction_id=input.item_interaction_id??uuidV4(crypto);
     if(interactions.has(item_interaction_id))throw new Error('item_interaction_id is already recorded');
     const interaction=deepFreeze({
@@ -224,19 +261,33 @@ export function createEvidenceRecorder({
     const activity=resolveActivity(input);
     const interaction=resolveInteraction(input,activity);
     if(!input.response||typeof input.response!=='object')throw new TypeError('response is required');
-    if(ASSESSMENT_MODES.has(activity.mode)){
-      const base=input.base_attempt_revision;
-      const proposed=input.proposed_attempt_revision;
-      if(!Number.isInteger(base)||base<0||!Number.isInteger(proposed)||proposed!==base+1){
-        throw new Error('Strict assessment response requires base_attempt_revision and proposed_attempt_revision = base_attempt_revision + 1');
-      }
-    }
     const eventInput=copyOptional(
       {...itemEvent(activity,interaction),payload:clone(input.response)},
       input,
       ['elapsed_ms','base_attempt_revision','proposed_attempt_revision']
     );
-    return capture('learner.response.recorded',eventInput);
+    if(!ASSESSMENT_MODES.has(activity.mode)){
+      return capture('learner.response.recorded',eventInput);
+    }
+
+    const base=input.base_attempt_revision;
+    const proposed=input.proposed_attempt_revision;
+    if(!Number.isSafeInteger(base)||base<0||!Number.isSafeInteger(proposed)||proposed!==base+1){
+      throw new Error('Strict assessment response requires base_attempt_revision and proposed_attempt_revision = base_attempt_revision + 1');
+    }
+    const attemptId=activity.assessment_attempt_id;
+    const previous=attemptRevisionTails.get(attemptId)??Promise.resolve();
+    const operation=previous.catch(()=>{}).then(async()=>{
+      const current=attemptRevisions.get(attemptId);
+      if(!Number.isSafeInteger(current)||base!==current){
+        throw new Error('base_attempt_revision does not match the current local revision chain');
+      }
+      const result=await capture('learner.response.recorded',eventInput);
+      attemptRevisions.set(attemptId,proposed);
+      return result;
+    });
+    attemptRevisionTails.set(attemptId,operation.then(()=>undefined,()=>undefined));
+    return operation;
   }
 
   async function recordConfidence(input){
