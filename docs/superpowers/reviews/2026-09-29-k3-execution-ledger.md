@@ -385,3 +385,6 @@ Scope from BASE is exactly two declared additions (`src/assessment/assessmentSna
 Task result before durable checkpoint/ledger: `IMPLEMENTED_NOT_CHECKPOINTED` with only `DURABLE_EVIDENCE_MISSING`. Rerun result validation after this ledger/checkpoint exists; promote CURRENT-STATE only if it returns `TASK_RESULT_ACCEPTED`.
 
 Task 28 — Browser EvidenceRuntime manager — is NEXT only after Task 27 acceptance/integration and is NOT STARTED.
+
+
+Task 27 result validation after durable checkpoint/ledger: `TASK_RESULT_ACCEPTED`, zero failures. Accepted RED digest revalidated as `2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`. No RED mutation, scope, main/state/branch/source, task-base, finding, GREEN/regression, or Product commit-message failure remains. CURRENT-STATE may now promote Task 27 completion; Task 28 remains NOT STARTED pending Task 27 review/integration boundary.
