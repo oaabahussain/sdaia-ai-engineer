@@ -65,3 +65,45 @@ test('platform kernel re-exports shared snapshot logic and browser createExam at
   assert.match(app,/assessment_snapshot/);
   assert.match(app,/evidence_mode/);
 });
+
+
+test('persisted assessment snapshot is rehydrated as an immutable snapshot',async()=>{
+  const {createBrowserAssessmentContext,rehydrateAssessmentFormSnapshot}=await loadSharedSnapshotApi();
+  assert.equal(typeof rehydrateAssessmentFormSnapshot,'function','snapshot rehydration behavior is missing');
+  const original=createBrowserAssessmentContext(runtimeInput('full')).assessment_snapshot;
+  const persisted=JSON.parse(JSON.stringify(original));
+  assert.equal(Object.isFrozen(persisted),false);
+  const restored=rehydrateAssessmentFormSnapshot(persisted);
+  assert.equal(Object.isFrozen(restored),true);
+  assert.equal(Object.isFrozen(restored.item_version_ids),true);
+  assert.equal(Object.isFrozen(restored.option_orders),true);
+  assert.deepEqual(restored,original);
+});
+
+test('fresh install seeds the browser assessment module for the first offline reload',async()=>{
+  const {cacheAssessmentSnapshotModuleForOffline}=await loadSharedSnapshotApi();
+  assert.equal(typeof cacheAssessmentSnapshotModuleForOffline,'function','offline assessment module cache behavior is missing');
+  const calls=[];
+  let readyResolved=false;
+  const serviceWorker={ready:Promise.resolve().then(()=>{readyResolved=true;})};
+  const cache={add:async url=>{calls.push(['add',url,readyResolved]);}};
+  const cachesApi={open:async name=>{calls.push(['open',name,readyResolved]);return cache;}};
+  const ok=await cacheAssessmentSnapshotModuleForOffline({
+    serviceWorker,
+    cachesApi,
+    cacheName:'learning-platform-runtime-v1',
+    moduleUrl:'/src/assessment/assessmentSnapshot.js'
+  });
+  assert.equal(ok,true);
+  assert.deepEqual(calls,[
+    ['open','learning-platform-runtime-v1',true],
+    ['add','/src/assessment/assessmentSnapshot.js',true]
+  ]);
+});
+
+test('browser app wires offline seeding and snapshot rehydration without changing learner mode labels',()=>{
+  const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  assert.match(app,/cacheAssessmentSnapshotModuleForOffline/);
+  assert.match(app,/rehydrateAssessmentFormSnapshot/);
+  assert.match(app,/mode===['"]full['"]/);
+});
