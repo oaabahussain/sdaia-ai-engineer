@@ -80,25 +80,43 @@ test('persisted assessment snapshot is rehydrated as an immutable snapshot',asyn
   assert.deepEqual(restored,original);
 });
 
-test('fresh install seeds the browser assessment module for the first offline reload',async()=>{
+test('fresh install seeds the browser assessment module without waiting on service-worker activation',async()=>{
   const {cacheAssessmentSnapshotModuleForOffline}=await loadSharedSnapshotApi();
   assert.equal(typeof cacheAssessmentSnapshotModuleForOffline,'function','offline assessment module cache behavior is missing');
   const calls=[];
-  let readyResolved=false;
-  const serviceWorker={ready:Promise.resolve().then(()=>{readyResolved=true;})};
-  const cache={add:async url=>{calls.push(['add',url,readyResolved]);}};
-  const cachesApi={open:async name=>{calls.push(['open',name,readyResolved]);return cache;}};
+  let readyRead=false;
+  const serviceWorker={};
+  Object.defineProperty(serviceWorker,'ready',{get(){readyRead=true;return new Promise(()=>{});}});
+  const cache={add:async url=>{calls.push(['add',url]);}};
+  const cachesApi={open:async name=>{calls.push(['open',name]);return cache;}};
   const ok=await cacheAssessmentSnapshotModuleForOffline({
     serviceWorker,
     cachesApi,
-    cacheName:'learning-platform-runtime-v1',
+    cacheName:'learning-platform-shell-v1',
     moduleUrl:'/src/assessment/assessmentSnapshot.js'
   });
   assert.equal(ok,true);
+  assert.equal(readyRead,false);
   assert.deepEqual(calls,[
-    ['open','learning-platform-runtime-v1',true],
-    ['add','/src/assessment/assessmentSnapshot.js',true]
+    ['open','learning-platform-shell-v1'],
+    ['add','/src/assessment/assessmentSnapshot.js']
   ]);
+});
+
+test('offline assessment cache failure falls back to ordinary online startup',async()=>{
+  const {cacheAssessmentSnapshotModuleForOffline}=await loadSharedSnapshotApi();
+  const cache={add:async()=>{throw new Error('cache seed failed');}};
+  const cachesApi={open:async()=>cache};
+  let outcome='rejected';
+  try{
+    outcome=await cacheAssessmentSnapshotModuleForOffline({
+      serviceWorker:{ready:Promise.resolve()},
+      cachesApi,
+      cacheName:'learning-platform-shell-v1',
+      moduleUrl:'/src/assessment/assessmentSnapshot.js'
+    });
+  }catch{}
+  assert.equal(outcome,false,'offline cache failure must not block normal online startup');
 });
 
 test('browser app wires offline seeding and snapshot rehydration without changing learner mode labels',()=>{
