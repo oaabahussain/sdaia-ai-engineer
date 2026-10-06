@@ -15,9 +15,8 @@ function requiredString(value,name){
   if(typeof value!=='string'||!value.trim())throw new TypeError(`${name} is required`);
   return value;
 }
-function optionalString(value,name){
-  if(value===undefined)return undefined;
-  return requiredString(value,name);
+function assessmentProfileRef(snapshot){
+  return `${requiredString(snapshot?.exam_profile_id,'assessment_snapshot.exam_profile_id')}@${requiredString(snapshot?.exam_profile_version,'assessment_snapshot.exam_profile_version')}`;
 }
 function nowIso(clock){
   const value=typeof clock==='function'?clock():clock?.now?.();
@@ -80,8 +79,7 @@ export function createEvidenceRecorder({
     const snapshot=deepFreeze(clone(raw));
     requiredString(snapshot.form_id,'assessment_snapshot.form_id');
     requiredString(snapshot.content_release_id,'assessment_snapshot.content_release_id');
-    requiredString(snapshot.exam_profile_id,'assessment_snapshot.exam_profile_id');
-    requiredString(snapshot.exam_profile_version,'assessment_snapshot.exam_profile_version');
+    assessmentProfileRef(snapshot);
     requiredString(snapshot.scoring_policy_version,'assessment_snapshot.scoring_policy_version');
     if(snapshot.content_release_id!==releaseId)throw new Error('Assessment snapshot content release mismatch');
     if(snapshot.locale!==undefined&&snapshot.locale!==locale)throw new Error('Assessment snapshot locale mismatch');
@@ -114,7 +112,7 @@ export function createEvidenceRecorder({
       ...(form_id?{form_id}:{}),
       ...(assessment_snapshot?{
         assessment_snapshot,
-        exam_profile_ref:`${assessment_snapshot.exam_profile_id}@${assessment_snapshot.exam_profile_version}`,
+        exam_profile_ref:assessmentProfileRef(assessment_snapshot),
         scoring_policy_ref:assessment_snapshot.scoring_policy_version
       }:{})
     });
@@ -130,7 +128,7 @@ export function createEvidenceRecorder({
       if(input.assessment_snapshot){
         mismatch(input.assessment_snapshot.content_release_id,existing.content_release_id,'content_release_id');
         mismatch(input.assessment_snapshot.form_id,existing.form_id,'form_id');
-        mismatch(input.assessment_snapshot.exam_profile_id,existing.exam_profile_ref,'exam_profile_ref');
+        mismatch(assessmentProfileRef(input.assessment_snapshot),existing.exam_profile_ref,'exam_profile_ref');
         mismatch(input.assessment_snapshot.scoring_policy_version,existing.scoring_policy_ref,'scoring_policy_ref');
       }
       return existing;
@@ -202,13 +200,17 @@ export function createEvidenceRecorder({
 
   async function presentItem(input){
     const activity=resolveActivity(input);
+    const item_version_id=requiredString(input.item_version_id,'item_version_id');
+    if(ASSESSMENT_MODES.has(activity.mode)&&!activity.assessment_snapshot?.item_version_ids?.includes(item_version_id)){
+      throw new Error('item_version_id is not part of the frozen assessment form snapshot');
+    }
     const item_interaction_id=input.item_interaction_id??uuidV4(crypto);
     if(interactions.has(item_interaction_id))throw new Error('item_interaction_id is already recorded');
     const interaction=deepFreeze({
       activity_id:activity.activity_id,
       item_interaction_id,
       question_family_id:requiredString(input.question_family_id,'question_family_id'),
-      item_version_id:requiredString(input.item_version_id,'item_version_id'),
+      item_version_id,
       objective_id:requiredString(input.objective_id,'objective_id'),
       domain_id:requiredString(input.domain_id,'domain_id')
     });
