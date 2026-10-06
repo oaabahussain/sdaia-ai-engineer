@@ -107,3 +107,10 @@ test('browser app wires offline seeding and snapshot rehydration without changin
   assert.match(app,/rehydrateAssessmentFormSnapshot/);
   assert.match(app,/mode===['"]full['"]/);
 });
+
+
+test('browser init awaits offline assessment seeding before becoming ready',()=>{
+  const app=fs.readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  assert.doesNotMatch(app,/void\s+cacheAssessmentSnapshotModuleForOffline\(\)/);
+  assert.match(app,/async function init\(\)\{try\{await cacheAssessmentSnapshotModuleForOffline\(\);/);
+});
