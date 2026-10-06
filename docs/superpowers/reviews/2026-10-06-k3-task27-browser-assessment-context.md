@@ -451,3 +451,30 @@ On exact fix head `0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb`:
 The valid RED tests at `748acc...` remain unchanged after the fix, so the replacement evidence is frozen.
 
 Task result acceptance must be rerun with replacement digest `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf` after the review finding is closed. All earlier Task 27 acceptance claims are superseded until that revalidation succeeds.
+
+
+## Final durable Task 27 acceptance after service-worker readiness correction
+
+After the final service-worker-readiness P1 was fixed and its review thread closed, Task 27 result validation was rerun against the frozen execution state revision 54.
+
+Final Accepted RED digest:
+
+`8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf`
+
+Validation results:
+
+- Accepted RED: `ACCEPTED_RED_VALID`;
+- Product scope: `TASK_SCOPE_VALID`;
+- Task result: `TASK_RESULT_ACCEPTED`;
+- failures: `0`.
+
+Validated Product paths from Task BASE are exactly:
+
+- modified: `src/app.js`;
+- added: `src/assessment/assessmentSnapshot.js`;
+- modified: `src/platform-kernel/release/assessmentSnapshot.js`;
+- added: `tests/k3-runtime-assessment-context.test.js`.
+
+The live main remained `41a9b91e176877277837bfa18d3a459aa641cd3e`. No RED mutation, scope expansion, main drift, frozen-state drift, execution-branch drift, plan/spec mismatch, open finding, or required Product commit-message mismatch remained.
+
+Task 27 is eligible for CURRENT-STATE promotion. Task 28 remains NOT STARTED. Merge remains a separate exact-head high-reasoning gate.

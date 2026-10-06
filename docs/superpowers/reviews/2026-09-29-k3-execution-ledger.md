@@ -466,3 +466,8 @@ Fix `0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb`: cache the assessment module dire
 Exact fix evidence: quality #887 SUCCESS; Node/process/state/application/service-worker/Pages/browser checks PASS; server/adapter #2012 SUCCESS.
 
 Task 27 must be result-revalidated with the final replacement RED after closing this finding. Task 28 remains NOT STARTED.
+
+
+Task 27 final durable acceptance after service-worker-readiness correction: Accepted RED `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf` = VALID; Product scope = VALID; `TASK_RESULT_ACCEPTED`; zero failures. Live main remained `41a9b91e176877277837bfa18d3a459aa641cd3e`; Product scope is exactly `src/app.js`, new shared assessment snapshot module, platform-kernel re-export, and Task 27 runtime assessment-context test. All Task 27 review findings are closed.
+
+CURRENT-STATE may promote Task 27 complete / Task 28 next. Task 28 remains NOT STARTED pending exact-head review, merge, and post-merge verification.
