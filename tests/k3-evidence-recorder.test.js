@@ -354,3 +354,148 @@ test('strict assessment presentation rejects items outside the frozen form snaps
   );
   assert.equal(store.calls.length,1,'out-of-form presentation must not enter durable local capture');
 });
+
+
+test('strict same-origin responses preserve the locally committed attempt revision chain', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T17:01:00Z',
+    crypto:deterministicCrypto()
+  });
+  const started=await recorder.startActivity({
+    learner_id:'learner:p1',
+    mode:'mock',
+    locale:'en',
+    assessment_snapshot:assessmentSnapshot()
+  });
+  const presented=await recorder.presentItem({
+    activity_id:started.event.activity_id,
+    question_family_id:'family-1',
+    item_version_id:'item-1.v1',
+    objective_id:'objective-1',
+    domain_id:'domain-1'
+  });
+  const base={
+    activity_id:started.event.activity_id,
+    item_interaction_id:presented.event.item_interaction_id,
+    response:{response_version:1,response_kind:'OPTION',response:{option_index:2}}
+  };
+  await recorder.recordResponse({...base,base_attempt_revision:0,proposed_attempt_revision:1});
+  await assert.rejects(
+    ()=>recorder.recordResponse({...base,base_attempt_revision:0,proposed_attempt_revision:1}),
+    /revision.*chain|current.*revision|base_attempt_revision/i
+  );
+  await recorder.recordResponse({...base,base_attempt_revision:1,proposed_attempt_revision:2});
+  assert.equal(store.calls.filter(call=>call.eventInput.definition_id==='learner.response.recorded@1').length,2);
+});
+
+test('failed strict response persistence does not advance the local provisional revision', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const calls=[];
+  let failNextResponse=true;
+  const store={
+    async captureLocal(args){
+      if(args.eventInput.definition_id==='learner.response.recorded@1'&&failNextResponse){
+        failNextResponse=false;
+        throw new Error('simulated durable response failure');
+      }
+      calls.push(structuredClone(args));
+      return {event:structuredClone(args.eventInput),receipt:{disposition:'ACCEPTED'}};
+    }
+  };
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T17:02:00Z',
+    crypto:deterministicCrypto()
+  });
+  const started=await recorder.startActivity({
+    learner_id:'learner:p1',
+    mode:'section',
+    locale:'en',
+    assessment_snapshot:assessmentSnapshot()
+  });
+  const presented=await recorder.presentItem({
+    activity_id:started.event.activity_id,
+    question_family_id:'family-1',
+    item_version_id:'item-1.v1',
+    objective_id:'objective-1',
+    domain_id:'domain-1'
+  });
+  const input={
+    activity_id:started.event.activity_id,
+    item_interaction_id:presented.event.item_interaction_id,
+    response:{response_version:1,response_kind:'OPTION',response:{option_index:2}},
+    base_attempt_revision:0,
+    proposed_attempt_revision:1
+  };
+  await assert.rejects(()=>recorder.recordResponse(input),/simulated durable response failure/);
+  await recorder.recordResponse(input);
+  assert.equal(calls.filter(call=>call.eventInput.definition_id==='learner.response.recorded@1').length,1);
+});
+
+test('strict activity rejects explicit form_id that disagrees with its frozen snapshot', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T17:03:00Z',
+    crypto:deterministicCrypto()
+  });
+  await assert.rejects(
+    ()=>recorder.startActivity({
+      learner_id:'learner:p1',
+      mode:'mock',
+      locale:'en',
+      form_id:'form:other',
+      assessment_snapshot:assessmentSnapshot()
+    }),
+    /form_id|frozen.*form|snapshot/i
+  );
+  assert.equal(store.calls.length,0);
+});
+
+test('resumed strict interaction cannot bypass frozen-form membership through item_context', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T17:04:00Z',
+    crypto:deterministicCrypto()
+  });
+  await assert.rejects(
+    ()=>recorder.recordResponse({
+      activity_id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      activity_context:{
+        learner_id:'learner:p1',
+        mode:'mock',
+        locale:'en',
+        assessment_attempt_id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        form_id:'form:exam-1',
+        assessment_snapshot:assessmentSnapshot(),
+        attempt_revision:0
+      },
+      item_interaction_id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      item_context:{
+        question_family_id:'family-outside',
+        item_version_id:'item-outside.v1',
+        objective_id:'objective-outside',
+        domain_id:'domain-outside'
+      },
+      response:{response_version:1,response_kind:'OPTION',response:{option_index:2}},
+      base_attempt_revision:0,
+      proposed_attempt_revision:1
+    }),
+    /frozen.*form|assessment.*snapshot|item_version_id/i
+  );
+  assert.equal(store.calls.length,0);
+});
