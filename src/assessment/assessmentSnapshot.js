@@ -32,14 +32,16 @@ export function rehydrateAssessmentFormSnapshot(input){
 }
 
 export async function cacheAssessmentSnapshotModuleForOffline({
- serviceWorker=globalThis.navigator?.serviceWorker,
  cachesApi=globalThis.caches,
- cacheName='learning-platform-runtime-v1',
+ cacheName='learning-platform-shell-v1',
  moduleUrl=new URL('./assessmentSnapshot.js',import.meta.url).href
 }={}){
- if(!serviceWorker?.ready||!cachesApi?.open)return false;
- await serviceWorker.ready;
- const cache=await cachesApi.open(cacheName);
- await cache.add(moduleUrl);
- return true;
+ if(!cachesApi?.open)return false;
+ try{
+  const cache=await cachesApi.open(cacheName);
+  await cache.add(moduleUrl);
+  return true;
+ }catch{
+  return false;
+ }
 }
