@@ -149,3 +149,22 @@ After this checkpoint and matching ledger entry exist, Task result validation mu
 - perform exact-head merge-readiness check.
 
 Task 28 is NOT STARTED. This checkpoint does not authorize merge.
+
+
+## Durable result acceptance
+
+After the checkpoint and ledger evidence existed, the repository's actual Task result validation logic was rerun against the frozen Task 27 execution state and evidence.
+
+Result:
+
+`TASK_RESULT_ACCEPTED`
+
+Failures: `0`
+
+Validated Accepted RED digest:
+
+`2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`
+
+The validation found no RED mutation, scope expansion, main drift, state drift, execution-branch drift, packet/source drift, task-base checkpoint drift, open finding, GREEN/regression failure, or Product commit-message mismatch.
+
+Task 27 is therefore eligible for CURRENT-STATE promotion. This acceptance does not authorize merge and does not start Task 28.
