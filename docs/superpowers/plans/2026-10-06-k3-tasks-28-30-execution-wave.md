@@ -12,15 +12,16 @@
 
 ## Authority and purpose
 
-This file is an execution-wave aid. It does **not** amend the approved K3 product specification, the approved K3 implementation plan, or task packets.
+This file is an execution-wave aid. The approved K3 product specification and approved K3 implementation plan remain unchanged. A high-reasoning scope ruling at `docs/superpowers/reviews/2026-10-06-k3-task29-offline-scope-ruling.md` narrowly augments Task 29's generated packet scope to preserve the approved offline/service-worker compatibility baseline.
 
 Authority remains:
 
 1. approved K3 spec;
 2. approved K3 implementation plan;
-3. matching Task 28/29/30 packet;
-4. durable rulings/checkpoints;
-5. this operational wave plan.
+3. applicable durable high-reasoning scope ruling;
+4. matching Task 28/29/30 packet;
+5. durable checkpoints/ledger;
+6. this operational wave plan.
 
 Preparation source baseline: `main@7b30975a377e2b41b2841cde324410b38671791b`.
 
@@ -46,7 +47,7 @@ Execution MUST resolve then-live `main` again before binding Task 28. Do not har
 1. **SYSTEM evaluation authority:** `learner.response.evaluated` is SYSTEM evidence while current ordinary local capture deliberately rejects non-LEARNER definitions. Task 28/29 must not weaken this guard or fabricate an authority origin/sequence. Test fail-closed behavior and resolve the trusted-producer path explicitly.
 2. **Offline-first durability:** Task 28 recorder must durably capture locally with network absent; a sync outage must never block or erase local evidence.
 3. **Presentation/event duplication:** Task 29 must emit `item.presented` once per interaction episode, not per DOM rerender, and must emit a new response event only for a committed response/change.
-4. **Learner-visible regression:** Tasks 28–30 must preserve K1 bank digest, scoring, UI mode labels, AR/EN/RTL/LTR, keyboard navigation, StateV2 resume, and browser offline reload.
+4. **Learner-visible regression:** Tasks 28–30 must preserve K1 bank digest, scoring, UI mode labels, AR/EN/RTL/LTR, keyboard navigation, StateV2 resume, and browser offline reload. Task 29 must additionally prove service-worker update → first new-version navigation offline without prior online module warmup.
 5. **Authorization fail-closed:** Task 30 with no explicit EvidenceSync authorization provider/config remains local-only; no fallback to `X-Anon-Id` or a portable learner identifier is permitted.
 
 ---
@@ -123,8 +124,10 @@ Require `TASK_RESULT_ACCEPTED`, current-head Codex review, zero blocking threads
 **Files:**
 - Create: `src/evidence/appBridge.js`
 - Create: `tests/k3-app-evidence-integration.test.js`
-- Preserve/update only when tests require it: `tests/k1-current-runtime-regression.test.js`
 - Modify: `src/app.js`
+- Modify under governed offline scope ruling: `sw.js`
+- Modify under governed offline scope ruling: `scripts/browser_smoke.py`
+- Read/run-only regression: `tests/k1-current-runtime-regression.test.js` — do not modify it in Task 29; add new assertions to `tests/k3-app-evidence-integration.test.js`.
 
 **Interfaces:**
 - Consumes: Task 28 recorder, Task 27 frozen assessment snapshot/context, current `createExam/selectAnswer/setConfidence/move/jump/submitExam` flow.
@@ -153,7 +156,8 @@ Pin:
 - submit emits `learner.assessment.submitted` with exact form/release/profile/scoring-policy context;
 - evaluation evidence follows the Task 28 trusted-authority ruling and carries `response_event_id`, scoring-policy stable reference, evaluation status, and `authority_ref`;
 - resume preserves the K3 activity/attempt context needed to avoid fabricating a second activity start;
-- current scoring/result values remain byte/semantically unchanged.
+- current scoring/result values remain byte/semantically unchanged;
+- service-worker update followed by first new-version navigation offline succeeds without first warming the new evidence modules online.
 
 - [ ] **Step 3: Run exact RED**
 
@@ -167,11 +171,11 @@ Keep evidence orchestration in `src/evidence/appBridge.js`. Keep `src/app.js` a 
 
 - [ ] **Step 5: Instrument current handlers without behavior changes**
 
-Wire the bridge around the current exam lifecycle. Do not alter scoring, question selection, rendering, labels, keyboard controls, StateV2 history shape required by existing tests, or offline startup.
+Wire the bridge around the current exam lifecycle. Update the install-time offline boundary so every new same-origin module required by the Task 29 browser import graph is available before the first offline navigation after a service-worker update. Extend browser smoke to exercise update-before-offline without prior new-module warmup. Do not alter scoring, question selection, rendering, labels, keyboard controls, StateV2 history shape required by existing tests, or ordinary online startup.
 
 - [ ] **Step 6: Run exact GREEN and regressions**
 
-Run exact GREEN command, then `npm test`, browser smoke, and exact-head CI. Preserve the current 1,120-question digest and 200-question allocation.
+Run exact GREEN command, then `npm test`, the update-before-offline browser smoke scenario, and exact-head CI. Preserve the current 1,120-question digest and 200-question allocation. `tests/k1-current-runtime-regression.test.js` is read/run-only.
 
 - [ ] **Step 7: Commit**
 
@@ -190,7 +194,7 @@ Same exact-head high-reasoning gate as Task 28. Only after merged and post-merge
 - Modify: `src/storage/interface.js`
 - Modify: `src/config.js`
 - Create: `tests/k3-storage-sync-capability.test.js`
-- Preserve/update only when required: `tests/storage.api.test.js`
+- Read/run-only regression: `tests/storage.api.test.js` — do not modify it in Task 30; add new assertions to `tests/k3-storage-sync-capability.test.js`.
 
 **Interfaces:**
 - Consumes: existing `createEvidenceApiTransport`, `syncEvidence`, EvidenceStore/outbox, Task 28 recorder-produced local evidence.
