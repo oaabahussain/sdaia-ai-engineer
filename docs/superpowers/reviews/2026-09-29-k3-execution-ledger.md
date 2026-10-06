@@ -526,3 +526,23 @@ CURRENT-STATE after this checkpoint:
 Task 28 — Browser EvidenceRuntime manager — is NEXT and NOT STARTED.
 
 The historical branch `impl/k3-task27-browser-assessment-context` must not be reused as the active Task 28 workspace. Task 28 startup must bind a fresh isolated workspace to then-live main before RED.
+
+
+## Tasks 28–30 execution wave PREPARED — 2026-10-06
+
+Preparation source baseline: `main@7b30975a377e2b41b2841cde324410b38671791b`.
+
+Prepared operational artifacts:
+
+- `docs/superpowers/plans/2026-10-06-k3-tasks-28-30-execution-wave.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task28-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task29-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-task30-launch.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-preparation-checkpoint.md`;
+- `docs/superpowers/reviews/2026-10-06-k3-tasks-28-30-handoff.md`.
+
+Authoritative Task 28/29/30 packets remain byte-unchanged. Dependency order is 28 → 29 → 30; each task requires its own fresh branch, RED/GREEN/result/review/merge/post-merge closure before the next begins.
+
+Known gate retained explicitly: Task 28/29 evaluation evidence is SYSTEM/authority-sensitive while ordinary local capture is learner-only. Execution must not weaken `assertOrdinaryEvidenceProducer` or fabricate origin sequence; inspect then-live main and record a high-reasoning `Ruling:`/scope amendment if no authorized producer path exists.
+
+No Task 28/29/30 Product implementation or RED execution occurred during preparation. Task 28 remains next and NOT STARTED. Task 31 remains outside the prepared wave.
