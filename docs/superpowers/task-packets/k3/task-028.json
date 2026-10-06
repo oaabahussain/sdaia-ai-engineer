@@ -61,7 +61,8 @@
     "allowed_delete": [],
     "allowed_modify": [
       "src/storage/interface.js",
-      "src/storage/browser.js"
+      "src/storage/browser.js",
+      "src/evidence/indexedDbStore.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_28"
