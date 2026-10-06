@@ -86,7 +86,7 @@ test('fresh install seeds the browser assessment module without waiting on servi
   const calls=[];
   let readyRead=false;
   const serviceWorker={};
-  Object.defineProperty(serviceWorker,'ready',{get(){readyRead=true;return new Promise(()=>{});}});
+  Object.defineProperty(serviceWorker,'ready',{get(){readyRead=true;return Promise.resolve();}});
   const cache={add:async url=>{calls.push(['add',url]);}};
   const cachesApi={open:async name=>{calls.push(['open',name]);return cache;}};
   const ok=await cacheAssessmentSnapshotModuleForOffline({
