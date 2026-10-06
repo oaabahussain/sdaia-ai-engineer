@@ -418,3 +418,25 @@ Ruling: repair first-offline-reload availability inside Task 27's declared `src/
 Exact review-fix evidence: quality #874 SUCCESS; Node 765/765; process 73/73; app parse / service-worker asset check / Pages / browser smoke PASS; server/adapter #1999 SUCCESS.
 
 Task 27 must be result-revalidated with the replacement Accepted RED after closing the three review findings. Task 28 remains NOT STARTED.
+
+
+## Task 27 final current-head review race correction
+
+Codex final re-review on `4fbfee6ff752a4493dfb82ba90a6936af79424a1` found one valid P1: the assessment-module CacheStorage seed was detached with `void`, so application readiness could race `cache.add()` on the first offline reload. CURRENT-STATE revision 58 revoked Task 27 acceptance while this finding remained open.
+
+Final review RED `eb661650c7f247519b3b857362a202420970bc88`: hosted quality #880 = 766 total / 765 PASS / 1 intended behavioral FAIL, solely `browser init awaits offline assessment seeding before becoming ready`; no import/setup/environment failure.
+
+Final review RED hashes:
+
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `32b37ab071d8407c401f2156eeb6d6643ce7b3b37ecf9e0d4e547d906096e462`.
+
+Ruling: replace the prior Task 27 review RED only to add the final current-head offline-readiness race regression; preserve every earlier Task 27 assertion and command.
+
+Final replacement Accepted RED digest = `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`, replacing `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`.
+
+Fix `14b5e71b680b23e0ae472f3b57c7eabb9318a101`: remove the detached seed call and await `cacheAssessmentSnapshotModuleForOffline()` as the first browser `init()` readiness step. The helper already waits for `serviceWorker.ready` and `cache.add()`; failures now remain inside the application's init error boundary rather than allowing false-ready continuation. No `sw.js` scope expansion.
+
+Exact fix evidence: quality #881 SUCCESS; Node 766/766; process 73/73; adversarial 15/15; state validation revision 58 PASS; app parse / service-worker assets / Pages / browser smoke PASS; server/adapter #2006 SUCCESS.
+
+Task 27 remains unaccepted until the final review thread is closed and Task result is revalidated with this final replacement RED. Task 28 remains NOT STARTED.

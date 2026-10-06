@@ -287,3 +287,74 @@ The revalidation found no RED mutation, GREEN/regression failure, scope expansio
 All three review findings are closed with exact-head GREEN evidence on `ff706e34eee7647e21afba1452b41beef49d6095`.
 
 Task 27 is eligible again for durable CURRENT-STATE promotion. Task 28 remains NOT STARTED and merge remains a separate high-reasoning gate.
+
+
+## Final current-head review correction — awaited offline readiness
+
+Codex final re-review of `4fbfee6ff752a4493dfb82ba90a6936af79424a1` found one valid in-scope P1: although the assessment module was seeded after `navigator.serviceWorker.ready`, the browser call site detached that promise with `void`. A learner could therefore reach a first offline reload after worker readiness but before `cache.add()` completed, or after that second fetch failed, while the app had already continued as ready.
+
+CURRENT-STATE revision 58 explicitly revoked the prior Task 27 acceptance while this finding was open: completed through Task 26, Task 27 next, status REVIEW, one open important finding.
+
+### Final review regression RED
+
+Review RED commit:
+
+`eb661650c7f247519b3b857362a202420970bc88`
+
+It added exactly one regression assertion requiring browser `init()` to await the assessment-module offline seed instead of detaching it.
+
+Hosted quality #880 produced:
+
+- 766 tests total;
+- 765 PASS;
+- 1 intended behavioral FAIL;
+- the sole failure was `browser init awaits offline assessment seeding before becoming ready`;
+- no unrelated import/setup/environment failure.
+
+Raw final-review RED SHA-256 values:
+
+- `tests/assessment-snapshot.test.js`: `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`
+- `tests/k3-runtime-assessment-context.test.js`: `32b37ab071d8407c401f2156eeb6d6643ce7b3b37ecf9e0d4e547d906096e462`
+
+Ruling: replace the prior Task 27 review RED only to add the final current-head offline-readiness race regression; preserve every earlier Task 27 assertion and command.
+
+Final replacement Accepted RED:
+
+- replaces: `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`
+- replacement digest: `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`
+
+### Final race fix
+
+Fix commit:
+
+`14b5e71b680b23e0ae472f3b57c7eabb9318a101` — `fix: await Task 27 offline readiness seed`
+
+Root-cause correction:
+
+- the detached top-level `void cacheAssessmentSnapshotModuleForOffline()` call was removed;
+- `init()` now awaits `cacheAssessmentSnapshotModuleForOffline()` as its first readiness step;
+- the helper already awaits both `serviceWorker.ready` and `cache.add()`;
+- cache failures now flow through the existing `init()` error boundary rather than being reduced to a warning while the application continues;
+- browsers without the service-worker/cache capability still receive the helper's existing `false` no-op result and continue through the existing compatibility path.
+
+This keeps the fix inside Task 27's declared `src/app.js` / shared-module scope and does not modify `sw.js`.
+
+### Final race-fix verification
+
+On exact fix head `14b5e71b680b23e0ae472f3b57c7eabb9318a101`:
+
+- quality #881 — SUCCESS;
+- Node project suite — 766/766 PASS;
+- deterministic/process tests — 73/73 PASS;
+- adversarial readiness — 15/15 fail closed;
+- state validation — PASS at review state revision 58;
+- current-bank factory import — PASS, 1120 items / 140 objectives;
+- application parse — PASS;
+- service-worker asset verification — PASS;
+- Pages artifact assembly — PASS;
+- browser smoke — PASS, including offline cached reload;
+- server/adapter #2006 — SUCCESS.
+
+The final review RED test remains unchanged after `eb661650...`, so the final replacement RED hashes are frozen.
+
+Task result acceptance must be rerun with the final replacement Accepted RED after the final review thread is closed. All earlier Task 27 acceptance claims are superseded until that revalidation succeeds.
