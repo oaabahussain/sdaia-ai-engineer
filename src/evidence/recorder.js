@@ -114,7 +114,7 @@ export function createEvidenceRecorder({
       ...(form_id?{form_id}:{}),
       ...(assessment_snapshot?{
         assessment_snapshot,
-        exam_profile_ref:assessment_snapshot.exam_profile_id,
+        exam_profile_ref:`${assessment_snapshot.exam_profile_id}@${assessment_snapshot.exam_profile_version}`,
         scoring_policy_ref:assessment_snapshot.scoring_policy_version
       }:{})
     });
@@ -222,6 +222,13 @@ export function createEvidenceRecorder({
     const activity=resolveActivity(input);
     const interaction=resolveInteraction(input,activity);
     if(!input.response||typeof input.response!=='object')throw new TypeError('response is required');
+    if(ASSESSMENT_MODES.has(activity.mode)){
+      const base=input.base_attempt_revision;
+      const proposed=input.proposed_attempt_revision;
+      if(!Number.isInteger(base)||base<0||!Number.isInteger(proposed)||proposed!==base+1){
+        throw new Error('Strict assessment response requires base_attempt_revision and proposed_attempt_revision = base_attempt_revision + 1');
+      }
+    }
     const eventInput=copyOptional(
       {...itemEvent(activity,interaction),payload:clone(input.response)},
       input,
