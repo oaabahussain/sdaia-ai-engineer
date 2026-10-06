@@ -355,3 +355,33 @@ Phase E is COMPLETE.
 Task 27 — Make AssessmentFormSnapshot browser-safe and release-bound — is NEXT and NOT STARTED.
 
 The historical branch `impl/k3-task26-statev2-transition` must not be reused as the active Task 27 workspace. Task 27 startup must resolve then-live main, create a fresh isolated execution branch/workspace, bind that exact main SHA, validate packet/spec/plan authority and preflight, and only then enter RED.
+
+
+## Task 27 — browser-safe release-bound AssessmentFormSnapshot
+
+Task 27 Product candidate: COMPLETE at Product scope, pending final metadata promotion/current-head review/integration.
+
+- BASE: `fe0db5349a82119f4bc3a1b2b60b1fd5042cddda`
+- Behavioral RED: `3fc631f74dd6f8d7b929cbd8210191222ce44d52`
+- Required Product GREEN: `55e901b427926be3daf5a1672d49774029503263` — `refactor: expose frozen assessment context to browser`
+- Syntax-only verification correction: `fbd3ca15496166b4934643868f6c650d06f9d5ef`
+- Base main: `41a9b91e176877277837bfa18d3a459aa641cd3e`
+- Checkpoint: `docs/superpowers/reviews/2026-10-06-k3-task27-browser-assessment-context.md`
+
+RED: exact focused command produced 2 PASS / 3 intended behavioral FAIL; hosted quality #865 failed at Node tests as intended and server/adapter #1990 succeeded. Accepted RED test hashes are `da79632629132939c9f2545dbdd9f20d8b2bccbe38cb9a240190b5793ac87d44` for `tests/assessment-snapshot.test.js` and `66d4a7e414c383344ceb9fc3845cf9ace4d1a246bbca958f45f83b9ef0eab307` for `tests/k3-runtime-assessment-context.test.js`; accepted digest `2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`.
+
+GREEN: shared browser-safe snapshot logic is exported from `src/assessment/assessmentSnapshot.js`; the prior platform-kernel path re-exports it; new strict browser exams freeze exact release, item IDs, option order, exam profile, scoring-policy stable reference, locale, form identity, and start time. Learner-facing `full` remains `full` while evidence mode is `mock`; section remains `section`.
+
+Ruling: current UI mode `full` remains learner-visible and maps only to K3 evidence mode `mock`; the existing runtime `scoring_policy_ref` is frozen into AssessmentFormSnapshotV1's established `scoring_policy_version` stable-reference field. Cost if wrong: later evidence instrumentation may require an explicit policy-ID/version split, but Task 27 must not change learner-visible labels or scoring semantics.
+
+Systematic-debugging: quality #866 proved Node/process/state behavior green but application parse failed because the generated import separator contained literal backslash+n characters. Commit `fbd3ca15496166b4934643868f6c650d06f9d5ef` fixes only that syntax serialization error; tests and Accepted RED remained unchanged.
+
+Final current-Product-head evidence: quality #867 SUCCESS with Node 762/762, process 73/73, application parse, service-worker, Pages artifact, current-bank, state validation, and browser smoke all PASS; server/adapter #1992 SUCCESS.
+
+Ruling: the connected harness cannot directly invoke the focused GREEN command from a native dependency-complete live clone. Both exact test files named by the command execute and pass inside the full Node suite on the identical current head, and the exact focused command produced intended RED before implementation. Cost if wrong: a focused-invocation-only ordering difference could be missed; the full suite is broader and runs both files on the actual branch head.
+
+Scope from BASE is exactly two declared additions (`src/assessment/assessmentSnapshot.js`, `tests/k3-runtime-assessment-context.test.js`) and two declared modifications (`src/platform-kernel/release/assessmentSnapshot.js`, `src/app.js`). No undeclared Product path changed.
+
+Task result before durable checkpoint/ledger: `IMPLEMENTED_NOT_CHECKPOINTED` with only `DURABLE_EVIDENCE_MISSING`. Rerun result validation after this ledger/checkpoint exists; promote CURRENT-STATE only if it returns `TASK_RESULT_ACCEPTED`.
+
+Task 28 — Browser EvidenceRuntime manager — is NEXT only after Task 27 acceptance/integration and is NOT STARTED.
