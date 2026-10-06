@@ -289,3 +289,68 @@ test('strict assessment response enforces optimistic revision preconditions befo
 
   assert.equal(store.calls.length,2,'only activity.started and item.presented may persist before a valid strict response');
 });
+
+
+test('resupplied identical assessment snapshot matches the frozen versioned profile context', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  assert.equal(typeof createEvidenceRecorder,'function','createEvidenceRecorder behavior is missing');
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T16:47:00Z',
+    crypto:deterministicCrypto()
+  });
+  const started=await recorder.startActivity({
+    learner_id:'learner:p1',
+    mode:'mock',
+    locale:'en',
+    assessment_snapshot:assessmentSnapshot()
+  });
+  const submitted=await recorder.submitAssessment({
+    activity_id:started.event.activity_id,
+    assessment_snapshot:assessmentSnapshot()
+  });
+  assert.equal(submitted.event.payload.exam_profile_ref,'sdaia-ai-engineer.project-reference.v1@1');
+
+  const changed=assessmentSnapshot();
+  changed.exam_profile_version='2';
+  await assert.rejects(
+    ()=>recorder.submitAssessment({
+      activity_id:started.event.activity_id,
+      assessment_snapshot:changed
+    }),
+    /exam_profile_ref|profile.*context/i
+  );
+});
+
+test('strict assessment presentation rejects items outside the frozen form snapshot', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  assert.equal(typeof createEvidenceRecorder,'function','createEvidenceRecorder behavior is missing');
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T16:48:00Z',
+    crypto:deterministicCrypto()
+  });
+  const started=await recorder.startActivity({
+    learner_id:'learner:p1',
+    mode:'section',
+    locale:'en',
+    assessment_snapshot:assessmentSnapshot()
+  });
+  await assert.rejects(
+    ()=>recorder.presentItem({
+      activity_id:started.event.activity_id,
+      question_family_id:'family-outside',
+      item_version_id:'item-outside.v1',
+      objective_id:'objective-outside',
+      domain_id:'domain-outside'
+    }),
+    /frozen.*form|assessment.*snapshot|item_version_id/i
+  );
+  assert.equal(store.calls.length,1,'out-of-form presentation must not enter durable local capture');
+});
