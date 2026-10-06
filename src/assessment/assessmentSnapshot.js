@@ -25,3 +25,21 @@ export function createBrowserAssessmentContext(input){
  });
  return deepFreeze({ui_mode:uiMode,evidence_mode:evidenceMode,assessment_snapshot:assessmentSnapshot});
 }
+
+
+export function rehydrateAssessmentFormSnapshot(input){
+ return createAssessmentFormSnapshot(input);
+}
+
+export async function cacheAssessmentSnapshotModuleForOffline({
+ serviceWorker=globalThis.navigator?.serviceWorker,
+ cachesApi=globalThis.caches,
+ cacheName='learning-platform-runtime-v1',
+ moduleUrl=new URL('./assessmentSnapshot.js',import.meta.url).href
+}={}){
+ if(!serviceWorker?.ready||!cachesApi?.open)return false;
+ await serviceWorker.ready;
+ const cache=await cachesApi.open(cacheName);
+ await cache.add(moduleUrl);
+ return true;
+}
