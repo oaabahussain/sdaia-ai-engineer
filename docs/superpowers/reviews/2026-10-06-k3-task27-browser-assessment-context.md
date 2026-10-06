@@ -378,3 +378,76 @@ Validation results:
 The validator found no RED mutation, GREEN/regression failure, scope expansion, main drift, frozen execution-state drift, execution-branch drift, plan/spec/source drift, task-base checkpoint drift, open finding, Product commit-message mismatch, or durable-evidence failure.
 
 All final-review findings are closed. Task 27 is eligible for durable CURRENT-STATE promotion again. Task 28 remains NOT STARTED and merge remains a separate high-reasoning exact-head gate.
+
+
+## Service-worker readiness deadlock correction
+
+Codex exact-head review of `f2a070638fa29da7d0a467f649aecf46a96c4461` found one valid P1: awaiting `navigator.serviceWorker.ready` during ordinary application initialization can remain pending forever when registration or worker installation fails, because the existing registration helper handles its own rejection. That would make an otherwise usable online application remain blank because an offline-cache optimization failed.
+
+CURRENT-STATE revision 60 explicitly revoked Task 27 acceptance while this finding was open.
+
+### Invalid exploratory RED and repaired behavioral RED
+
+An initial review test commit `c86188bc461960cf3394e5bd356c0e95c42919b5` used a never-settling `serviceWorker.ready` promise. Hosted quality #885 terminated with cancelled tests rather than behavioral assertion failures. This evidence is explicitly INVALID as Accepted RED and is retained only as debugging history.
+
+The test harness was repaired without changing Product code:
+
+`748acc187f1c85c806a233a1f67fb7493440badc` — `test: make Task 27 readiness RED observable`
+
+Hosted quality #886 then produced valid behavioral RED:
+
+- 767 tests total;
+- 765 PASS;
+- 2 FAIL;
+- 0 cancelled;
+- failures only for:
+  - reading/waiting on service-worker activation when seeding the assessment module;
+  - rejecting cache failure instead of falling back to ordinary online startup.
+
+No import/setup/environment failure was accepted.
+
+Raw valid final-review RED SHA-256 values:
+
+- `tests/assessment-snapshot.test.js`: `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`
+- `tests/k3-runtime-assessment-context.test.js`: `30d4b495d86db0f0bf5bef6652c3b4ec19ba1ff41eae2fa0af144a50b32f38ae`
+
+Ruling: replace the prior Task 27 final-review RED to remove the unsafe service-worker-ready precondition and add the online-startup fallback regression; preserve all Task 27 behavioral requirements while keeping the fix inside declared app/shared-module scope.
+
+Final replacement Accepted RED:
+
+- replaces: `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`
+- replacement digest: `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf`
+
+### Final service-worker readiness fix
+
+Fix commit:
+
+`0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb` — `fix: avoid service-worker readiness deadlock`
+
+Root-cause correction stays inside Task 27's declared shared-module scope:
+
+- the cache helper no longer reads or awaits `serviceWorker.ready`;
+- the default cache is the existing shell cache `learning-platform-shell-v1`, which worker activation preserves;
+- CacheStorage seeding is attempted directly;
+- successful cache seeding is still awaited by browser `init()`, closing the first-reload race;
+- cache-open/add failure is caught and returns `false`, so ordinary online startup continues instead of hanging or failing;
+- no `sw.js` or service-worker registration code is changed.
+
+### Final verification for this correction
+
+On exact fix head `0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb`:
+
+- quality #887 — SUCCESS;
+- all Node tests — PASS;
+- deterministic/process control plane — PASS;
+- state validation — PASS at review state revision 60;
+- current-bank migration — PASS;
+- application parse — PASS;
+- service-worker asset verification — PASS;
+- Pages artifact — PASS;
+- browser smoke — PASS;
+- server/adapter #2012 — SUCCESS.
+
+The valid RED tests at `748acc...` remain unchanged after the fix, so the replacement evidence is frozen.
+
+Task result acceptance must be rerun with replacement digest `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf` after the review finding is closed. All earlier Task 27 acceptance claims are superseded until that revalidation succeeds.

@@ -445,3 +445,24 @@ Task 27 remains unaccepted until the final review thread is closed and Task resu
 Task 27 final-review result revalidation after closing the offline-readiness race: final Accepted RED digest `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`; `ACCEPTED_RED_VALID`; `TASK_SCOPE_VALID`; `TASK_RESULT_ACCEPTED`; zero failures. Validation used frozen Task 27 execution state revision 54, exact packet/source authority, unchanged live main, declared Product paths only, quality #881 / server #2006 GREEN evidence, required Product commit message, and durable checkpoint/ledger evidence.
 
 All Task 27 review findings are closed. CURRENT-STATE may promote completed-through Task 27 / Task 28 next. Task 28 remains NOT STARTED pending Task 27 exact-head review/integration.
+
+
+## Task 27 service-worker readiness deadlock correction
+
+Codex exact-head review of `f2a070638fa29da7d0a467f649aecf46a96c4461` found one valid P1: browser startup awaited `navigator.serviceWorker.ready`, which can remain pending forever when registration/install fails even though ordinary online use could continue. CURRENT-STATE revision 60 revoked Task 27 acceptance while this finding was open.
+
+Exploratory RED `c86188bc461960cf3394e5bd356c0e95c42919b5` is INVALID as Accepted RED because its never-settling promise caused test cancellation. The harness-only repair `748acc187f1c85c806a233a1f67fb7493440badc` produced valid RED in quality #886: 767 total / 765 PASS / 2 FAIL / 0 cancelled, only the service-worker-readiness dependency and cache-failure fallback assertions.
+
+Valid final-review RED hashes:
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `30d4b495d86db0f0bf5bef6652c3b4ec19ba1ff41eae2fa0af144a50b32f38ae`.
+
+Ruling: replace the prior Task 27 final-review RED to remove the unsafe service-worker-ready precondition and add the online-startup fallback regression; preserve all Task 27 behavioral requirements while keeping the fix inside declared app/shared-module scope.
+
+Final replacement Accepted RED digest = `8ad777935112843393e61cc081d9460169f4deea6f44a222871077b0493b2eaf`, replacing `66233840e878ee1b18be12a546cff6b3238b9dbdefe95464dd9d3a42cccd0379`.
+
+Fix `0b2b030a0c03504cd48617fdb7da67d6d1f8bbbb`: cache the assessment module directly in `learning-platform-shell-v1` without reading `serviceWorker.ready`; await only the cache operation itself; return `false` on cache failure so normal online startup proceeds. No `sw.js` scope expansion.
+
+Exact fix evidence: quality #887 SUCCESS; Node/process/state/application/service-worker/Pages/browser checks PASS; server/adapter #2012 SUCCESS.
+
+Task 27 must be result-revalidated with the final replacement RED after closing this finding. Task 28 remains NOT STARTED.
