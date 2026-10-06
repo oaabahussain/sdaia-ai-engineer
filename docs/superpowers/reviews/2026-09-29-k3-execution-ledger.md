@@ -388,3 +388,33 @@ Task 28 — Browser EvidenceRuntime manager — is NEXT only after Task 27 accep
 
 
 Task 27 result validation after durable checkpoint/ledger: `TASK_RESULT_ACCEPTED`, zero failures. Accepted RED digest revalidated as `2d34bf67f1ff6b9ee769912ab519378f761907b98921a32396f6b8150e8cbdc9`. No RED mutation, scope, main/state/branch/source, task-base, finding, GREEN/regression, or Product commit-message failure remains. CURRENT-STATE may now promote Task 27 completion; Task 28 remains NOT STARTED pending Task 27 review/integration boundary.
+
+
+## Task 27 current-head review correction
+
+Codex review on `055e8e1cdb167d970a45c74528ccf7230dee28a7` found three valid findings: first-offline-reload availability for the newly imported assessment module, loss of deep freeze after JSON resume, and incorrect previously recorded raw RED hashes. CURRENT-STATE revision 56 revoked Task 27 acceptance while all three findings were open.
+
+Corrected raw initial RED hashes at `3fc631f74dd6f8d7b929cbd8210191222ce44d52`:
+
+- `tests/assessment-snapshot.test.js` = `be721da1bd425999bf50efbca4e890cd63d097a073bc8ea8aceb3ba718544196`;
+- `tests/k3-runtime-assessment-context.test.js` = `9b3e4d7f9c0ded125f292bb14cd5c48b768aece94c746d9e1faabe1a27ae7af1`;
+- corrected initial Accepted RED digest = `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`.
+
+The earlier Task 27 hash/digest values are superseded; the initial RED behavior itself is unchanged.
+
+Review RED `ad2830452ce01d95294c85a07155a7e5b540d624` added only offline/resume/app-wiring regressions. Hosted quality #873: 765 total, 762 PASS, 3 intended behavioral FAIL, no import/setup/environment failure. Review-RED runtime-test raw hash = `ad896a689c62957fe4c6a9c283db59538f39aa7c5c93f122479dfbea9a64a30b`; assessment snapshot test hash remains `be721da1...`.
+
+Ruling: replace the corrected initial Task 27 RED only to add current-head review regressions for first-offline-reload caching and persisted snapshot re-freezing; preserve every original Task 27 assertion and command.
+
+Replacement Accepted RED digest = `08e124a9d409c3953f26941746a5da3b4e1ee97cf7c5acb4e1e849c17a7f163d`, replacing `3085d4b720b44341c3a2bd0a9188a91e5b3046b447085c83c37985df6456c4e7`.
+
+Review fix `ff706e34eee7647e21afba1452b41beef49d6095` preserves Task 27 scope:
+
+- after `navigator.serviceWorker.ready`, the app seeds the already-loaded assessment module into dedicated CacheStorage; existing service-worker `caches.match(event.request)` resolves it across caches for the first subsequent offline reload;
+- resumed evidence-backed assessments rehydrate their JSON-parsed snapshot through the same frozen snapshot constructor.
+
+Ruling: repair first-offline-reload availability inside Task 27's declared `src/app.js` + shared snapshot-module scope rather than expanding the packet into `sw.js`. Cost if wrong: a future service-worker implementation that no longer performs cross-cache matching must explicitly absorb this asset into its shell manifest or replace the cache adapter.
+
+Exact review-fix evidence: quality #874 SUCCESS; Node 765/765; process 73/73; app parse / service-worker asset check / Pages / browser smoke PASS; server/adapter #1999 SUCCESS.
+
+Task 27 must be result-revalidated with the replacement Accepted RED after closing the three review findings. Task 28 remains NOT STARTED.
