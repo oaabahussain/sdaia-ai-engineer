@@ -292,3 +292,66 @@ Current-head re-review found that the review-RED test hash in the prior metadata
 The corrected accepted-RED replacement digest is `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`. Re-running the actual Task result validation logic with the corrected evidence returns `TASK_RESULT_ACCEPTED`, zero failures.
 
 Ruling: supersede only the erroneous evidence hash/digest in the prior Task 26 metadata revision; Product code, review RED behavior, review fix, and Task BASE remain unchanged.
+
+
+## Task 26 COMPLETE — post-merge closure — 2026-10-06
+
+Task 26 — StateV2 transition compatibility — is COMPLETE, merged, and post-merge verified.
+
+Final Product integration:
+
+- Product PR #41 final reviewed head: `5ce00ee5980ef80609e0b3bcd8591a28f7bffdba`.
+- PR #41 merge commit / durable Tasks 1-26 Product baseline: `69d944be534fee79d5eee0c7e4c2d149882f1b7e`.
+- Final PR-head tree and merge tree are identical: `b1744cc4d550c8822683879be88e3dee1058e2d7`.
+- Comparing final reviewed PR head to merged `main` yields one merge commit and zero file differences.
+
+Final exact-head pre-merge evidence on `5ce00ee5980ef80609e0b3bcd8591a28f7bffdba`:
+
+- quality gate #861 attempt 2 — SUCCESS;
+- Node project tests — 759/759 PASS;
+- deterministic/process tests — 73/73 PASS;
+- adversarial readiness — 15/15 fail closed;
+- K3 execution state validation — PASS;
+- governed current-bank migration — PASS;
+- application parse, service-worker, Pages artifact, and browser smoke — PASS;
+- server/adapter #1984 — SUCCESS;
+- Codex final current-head re-review — no major issues;
+- unresolved review threads — 0;
+- live-main drift before merge — 0.
+
+Quality #861 attempt 1 was an infrastructure cancellation before any workflow step began and produced no job logs. The exact same job was rerun at the unchanged PR head; attempt 2 executed normally and passed. No code or evidence was changed to bypass that cancellation.
+
+Task 26 review closure:
+
+- original behavioral RED: `cf0b6e84c1904eb8d19720ae6de4e9a0254a3cb1`;
+- review regression RED: `ba0cc3356f90e7685f28addab275021f26f4a759`;
+- submitted-legacy-history fix: `604c7ad4a046f6140668221f6e884320eca0b2d9`;
+- exact focused Task 26 command after review fix: 7/7 PASS;
+- committed raw SHA-256 for `tests/k3-state-transition.test.js`: `6db018f28cd3dd791e6d852d6341e444dd0c96bd3930ced507f65d5fcc558a8e`;
+- committed raw SHA-256 for `tests/state-migration.test.js`: `45282ef855f191da0dcd8167f2f3d8fedaba7abcfa84e54cd1e1bc012e223ee2`;
+- corrected accepted-RED replacement digest: `022426f5135708e277f5ee3e2da0ab596fdc35985dbc6cfa02701619d72286e4`;
+- final Task result validation: `TASK_RESULT_ACCEPTED`, zero failures.
+
+Post-merge evidence on `main@69d944be534fee79d5eee0c7e4c2d149882f1b7e`:
+
+- server/adapter #1985 — SUCCESS;
+- Validate and deploy GitHub Pages #43 — SUCCESS;
+- live release verification inside Pages #43 — SUCCESS;
+- main resolves exactly to the Product merge SHA;
+- merge tree equals the final reviewed Product tree.
+
+Durable checkpoint:
+
+- `docs/superpowers/reviews/2026-10-06-k3-task26-post-merge-verification.md`;
+- CURRENT-STATE revision 53;
+- `completed_through_task=26`;
+- `next_task=27`;
+- Phase F / `PHASE_GATE`;
+- `base_main_sha=null` while `low_model_ready=false`;
+- `ACTIVE_REF_RESOLUTION_VALID=PENDING` until a fresh Task 27 execution workspace binds then-live main.
+
+Phase E is COMPLETE.
+
+Task 27 — Make AssessmentFormSnapshot browser-safe and release-bound — is NEXT and NOT STARTED.
+
+The historical branch `impl/k3-task26-statev2-transition` must not be reused as the active Task 27 workspace. Task 27 startup must resolve then-live main, create a fresh isolated execution branch/workspace, bind that exact main SHA, validate packet/spec/plan authority and preflight, and only then enter RED.
