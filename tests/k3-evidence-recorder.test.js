@@ -139,7 +139,7 @@ test('recorder emits ordered learner evidence with UUIDv4 runtime identities and
   assert.equal(submitted.event.content_release_id,'sdaia-ai-engineer.bootstrap.v1');
   assert.equal(submitted.event.assessment_attempt_id,attemptId);
   assert.deepEqual(submitted.event.payload,{
-    exam_profile_ref:'sdaia-ai-engineer.project-reference.v1',
+    exam_profile_ref:'sdaia-ai-engineer.project-reference.v1@1',
     scoring_policy_ref:'sdaia-ai-engineer.scoring.v1'
   });
 
@@ -239,4 +239,53 @@ test('recorder rejects non-UUIDv4 runtime identity generation before local captu
     /UUIDv4/i
   );
   assert.equal(store.calls.length,0);
+});
+
+
+test('strict assessment response enforces optimistic revision preconditions before local capture', async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  assert.equal(typeof createEvidenceRecorder,'function','createEvidenceRecorder behavior is missing');
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({
+    store,
+    outbox:null,
+    runtimeContext:runtimeContext(),
+    clock:()=> '2026-10-06T16:46:00Z',
+    crypto:deterministicCrypto()
+  });
+  const started=await recorder.startActivity({
+    learner_id:'learner:p1',
+    mode:'mock',
+    locale:'en',
+    assessment_snapshot:assessmentSnapshot()
+  });
+  const presented=await recorder.presentItem({
+    activity_id:started.event.activity_id,
+    question_family_id:'family-1',
+    item_version_id:'item-1.v1',
+    objective_id:'objective-1',
+    domain_id:'domain-1'
+  });
+
+  await assert.rejects(
+    ()=>recorder.recordResponse({
+      activity_id:started.event.activity_id,
+      item_interaction_id:presented.event.item_interaction_id,
+      response:{response_version:1,response_kind:'OPTION',response:{option_index:2}}
+    }),
+    /base_attempt_revision|proposed_attempt_revision|revision/i
+  );
+
+  await assert.rejects(
+    ()=>recorder.recordResponse({
+      activity_id:started.event.activity_id,
+      item_interaction_id:presented.event.item_interaction_id,
+      response:{response_version:1,response_kind:'OPTION',response:{option_index:2}},
+      base_attempt_revision:3,
+      proposed_attempt_revision:7
+    }),
+    /base_attempt_revision|proposed_attempt_revision|revision/i
+  );
+
+  assert.equal(store.calls.length,2,'only activity.started and item.presented may persist before a valid strict response');
 });
