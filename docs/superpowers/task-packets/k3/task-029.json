@@ -63,7 +63,8 @@
     "allowed_modify": [
       "src/app.js",
       "sw.js",
-      "scripts/browser_smoke.py"
+      "scripts/browser_smoke.py",
+      "scripts/build_pages_artifact.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_29"
