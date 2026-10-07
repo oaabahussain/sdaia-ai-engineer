@@ -584,3 +584,30 @@ Integration PR #49 merged the complete clean wave to `main` as `ac3e3ecfd9ba12cc
 Post-merge verification on `main@ac3e3ecfd9ba12cc1c70a3073c379553da5c06a4`: server/adapter #2065 SUCCESS; Pages #48 SUCCESS; live learner evidence context PASS; live content model PASS (7 domains, contract v4); live track registry PASS; live service-worker contract PASS.
 
 Tasks 28, 29, and 30 are durably COMPLETE. Task 31 is NEXT and NOT STARTED.
+
+
+## Tasks 31–33 clean-wave execution COMPLETE — 2026-10-07
+
+User-approved batch cadence remained in force: Tasks 31 → 32 → 33 were prepared from one clean source, executed sequentially from each predecessor's accepted exact head, and integrated to `main` only after one combined review. No intermediate Product merge to `main` occurred.
+
+Task 31 — LearningEventExchangePort hardening — complete. Clean RED prep `cca8adfc21a2bc85a632f568d557586f1c8925ea` corrected the existing-test packet scope and introduced the common mapping-report contract. Initial RED quality #938 failed only on missing `assertLearningEventExchangeResult`. Product head `b9b5d00a6cf2dd85203f07bbfa49786b6f2e4226` (`feat: harden learning event exchange port`) passed quality #939 and server/adapter #2069. Final combined review later hardened omission/rejection auditability so every disposition requires both `source_id` and `reason_code`; review RED `b6c9f8557953bd95ed052e378110eed9ccd3ab85` produced 811 PASS / 1 FAIL and fix `0dfd9b8cac00126f9f075d104291193196b431e4` restored full GREEN.
+
+Task 31: Ruling: `tests/interoperability-ports.test.js` pre-existed although the generated packet treated all plan `test` paths as create-only. The deterministic packet compiler now classifies that exact Task 31 path as allowed modify while leaving the new K3 exchange test as allowed create. Cost if wrong: future plan authors should use explicit create/modify wording to avoid requiring another narrow compiler correction.
+
+Task 32 — xAPI 2.0 adapter — complete. RED head `41b7863f6de6fdc7b8cf04254c0411043a17057a` / quality #941 produced 793 PASS / 8 expected xAPI failures; server #2071 passed. The RED explicitly requires strict section/mock imports to carry a trusted base/proposed revision chain rather than inventing revisions. Product head `a5999ea1957d14ba10cd28c0e3dc2f3af4c5c391` (`feat: add xAPI K3 adapter`) passed quality #942 and server #2072.
+
+Task 32 mapping boundary: versioned `xapi-k3.v1`; pseudonymous xAPI Agent account only; K3 `occurred_at` preserved as xAPI `timestamp`; assessment attempt may map to registration; supported OPTION responses map to `answered`; exact graded evaluation may map to pass/fail without merging it into the learner response; unsupported/lossy semantics are explicit omissions; canonical import requires explicit K3 context and importer origin/sequence; missing context or strict revision context is staged/abstained. No LRS client/store was introduced.
+
+Task 33 — Caliper 1.2 adapter — complete. Initial RED on `d47e253174b140657abf4ce94eebe9ea4eeebea3` / quality #943 produced 801 PASS / 9 expected Caliper failures. Product `773885aad108371d3df5a07b92c7a415bc534605` (`feat: add Caliper K3 adapter`) implemented versioned Caliper mapping. Final review found one semantic overreach: non-assessment K3 modes could have been represented as Caliper Assessment/AssessmentItem events. Review RED `77ad21c3bd6765ac4e8e8053b949770624e9efab` produced 810 PASS / 1 FAIL; fix `1b5ddaa2a008600e1baac6035e96fabda7599427` restricts the current Caliper mapping to strict `section/mock` assessment context. Quality #946 and server #2076 passed.
+
+Task 33 mapping boundary: Assessment Started/Submitted preserve Attempt; AssessmentItem Started preserves Attempt; Skipped never fabricates Attempt/Response; recorded OPTION response maps to Completed with generated Response and target Attempt; K3 occurrence time is preserved as Caliper `eventTime`; unsupported semantics are explicit omissions; canonical import is fail-closed without exact K3 context and strict revision chain.
+
+Final privacy regression `23da4089c630ac13bebe0b1b4ae18d7ccde30dee` explicitly pins rejection of IP-like direct learner identifiers in both xAPI and Caliper. It did not produce a new RED because the existing adapter PII regex already rejected that value; no unnecessary Product edit followed.
+
+Combined reviewed head `23da4089c630ac13bebe0b1b4ae18d7ccde30dee`: quality #949 SUCCESS; server/adapter #2079 SUCCESS; process/state/Pages/browser gates PASS; zero open review threads. The immediately preceding full hardened Product head `0dfd9b8cac00126f9f075d104291193196b431e4` recorded Node 812/812 PASS, process 73/73 PASS, deterministic packet compiler PASS, Pages artifact PASS, and browser smoke PASS. The final privacy-regression-only head remained fully GREEN.
+
+Integration PR #53 merged the complete clean wave to `main` as `aa0d868271897c178a6d37a3cb19fa2469d009b1`. Reviewed head tree and merge tree are identical: `4338ec36ffe7e59c9ba477cbf149ddbfce2dd7e9`.
+
+Post-merge on `main@aa0d868271897c178a6d37a3cb19fa2469d009b1`: server/adapter #2080 SUCCESS; Pages #50 SUCCESS; Node/browser/artifact/deploy/live-release verification SUCCESS.
+
+Tasks 31, 32, and 33 are durably COMPLETE. Task 34 is NEXT and NOT STARTED.
