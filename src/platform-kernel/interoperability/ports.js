@@ -9,7 +9,7 @@ function mappedRows(value){
 }
 function dispositionRows(value,label){
   for(const row of rows(value,label)){
-    if(row?.source_id!==undefined)nonEmptyString(row.source_id,`${label} source_id`);
+    nonEmptyString(row?.source_id,`${label} source_id`);
     nonEmptyString(row?.reason_code,`${label} reason_code`);
   }
 }
