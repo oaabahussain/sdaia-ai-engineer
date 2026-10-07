@@ -57,7 +57,8 @@
     "allowed_create": [
       "src/evidence/appBridge.js",
       "tests/k3-app-evidence-integration.test.js",
-      "tests/k1-current-runtime-regression.test.js"
+      "tests/k1-current-runtime-regression.test.js",
+      "data/evidence/sdaia-ai-engineer.objectives-v1.json"
     ],
     "allowed_delete": [],
     "allowed_modify": [
