@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "mapping_version": "xapi-k3.v1",
+  "adapter_id": "xapi",
+  "adapter_version": "1",
+  "standard": "xAPI",
+  "standard_version": "2.0",
+  "actor_account_home_page": "https://automizelab.net/k3/learners",
+  "activity_base_iri": "https://automizelab.net/k3/activities/",
+  "item_base_iri": "https://automizelab.net/k3/items/",
+  "verbs": {
+    "learner.activity.started@1": "http://adlnet.gov/expapi/verbs/initialized",
+    "learner.activity.completed@1": "http://adlnet.gov/expapi/verbs/completed",
+    "learner.item.presented@1": "http://adlnet.gov/expapi/verbs/experienced",
+    "learner.item.skipped@1": "http://adlnet.gov/expapi/verbs/skipped",
+    "learner.response.recorded@1": "http://adlnet.gov/expapi/verbs/answered",
+    "evaluation_passed": "http://adlnet.gov/expapi/verbs/passed",
+    "evaluation_failed": "http://adlnet.gov/expapi/verbs/failed"
+  }
+}
