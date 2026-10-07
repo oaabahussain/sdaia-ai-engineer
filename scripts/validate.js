@@ -89,12 +89,15 @@ export function validateK3ReleaseArtifacts(artifactRoot=root,schemaRoot=artifact
 
   for(const name of K3_RELEASE_SCHEMA_FILES){
     const schema=readK3Json(schemaRoot,`data/schema/${name}`,`K3 schema ${name}`);
-    try{localAjv.compile(schema)}
+    try{localAjv.addSchema(schema,name)}
+    catch(error){throw new Error(`K3 schema ${name}: ${error.message}`)}
+  }
+  for(const name of K3_RELEASE_SCHEMA_FILES){
+    try{if(!localAjv.getSchema(name))throw new Error('schema did not compile')}
     catch(error){throw new Error(`K3 schema ${name}: ${error.message}`)}
   }
 
-  const definitionSchema=readK3Json(schemaRoot,'data/schema/event-definition-v2.schema.json');
-  const validateDefinition=localAjv.compile(definitionSchema);
+  const validateDefinition=localAjv.getSchema('event-definition-v2.schema.json');
   const definitions=readK3Json(artifactRoot,'data/evidence/event-definitions-v1.json','K3 event definitions');
   if(!Array.isArray(definitions)||!definitions.length)throw new Error('K3 event definitions must be a non-empty array');
 
@@ -110,8 +113,7 @@ export function validateK3ReleaseArtifacts(artifactRoot=root,schemaRoot=artifact
     catch(error){throw new Error(`K3 payload schema ${ref}: ${error.message}`)}
   }
 
-  const runtimeSchema=readK3Json(schemaRoot,'data/schema/runtime-evidence-context-v1.schema.json');
-  const validateRuntime=localAjv.compile(runtimeSchema);
+  const validateRuntime=localAjv.getSchema('runtime-evidence-context-v1.schema.json');
   const runtime=readK3Json(artifactRoot,'data/evidence/sdaia-ai-engineer.runtime-v1.json','K3 runtime evidence context');
   if(!validateRuntime(runtime))throw new Error(`K3 runtime evidence context: ${localAjv.errorsText(validateRuntime.errors)}`);
 
