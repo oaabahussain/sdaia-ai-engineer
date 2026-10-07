@@ -618,3 +618,16 @@ Tasks 31, 32, and 33 are durably COMPLETE. Task 34 is NEXT and NOT STARTED.
 Ruling: Task 34 is temporarily BLOCKED after a post-merge Important finding in Tasks 32/33 import validation. The xAPI/Caliper adapters required an explicit K3 context but did not yet prove the external item/attempt identifiers agreed with that context. Cost if wrong: a caller could attach a valid external response to the wrong K3 item or assessment attempt while still satisfying the prior context-presence checks.
 
 RED-first corrective branch: `impl/k3-interoperability-exact-import-context`, based on `main@90c0e267ab0e490c67a1aef98b0f0cf0c3c6f21a`. Task 34 must not start until the finding is closed and post-fix verification is durable.
+
+
+## K3 interoperability exact-import context finding CLOSED — 2026-10-07
+
+Post-merge review after Tasks 31–33 discovered one Important finding: xAPI/Caliper canonical import trusted the supplied K3 context without proving the external item/attempt identity agreed with it.
+
+Corrective RED on `impl/k3-interoperability-exact-import-context` / quality #953 produced 812 PASS / 2 FAIL, exactly the xAPI and Caliper mismatch regressions; server #2085 passed.
+
+The fix binds xAPI object + strict registration and Caliper AssessmentItem + strict Attempt target to the supplied governed K3 context. Missing/conflicting identities are explicit rejections, not staged retries. A first GREEN attempt over-constrained xAPI actor account homePage; quality #954 exposed the existing interoperability regression (813 PASS / 1 FAIL), so that unsupported constraint was removed.
+
+Review then hardened missing-identity cases and rejection classification. Final head `4d695715c32f75c4cc7c952c3fe6047e7a83441e` passed quality #956 and server #2088 with both review threads resolved.
+
+PR #56 merged as `a43e102893cf7550d81133f61909821a39c98f93`. Post-merge server #2089 and Pages/live #52 passed. Important findings return to zero. Task 34 is next and not started.
