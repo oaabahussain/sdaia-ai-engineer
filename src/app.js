@@ -66,9 +66,7 @@ function resetToHome(){showScreen('home');renderHome()}
 $('langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';save();applyLanguage()};$('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');$('homeBtn').onclick=resetToHome;$('startFullBtn').onclick=()=>runUiAction(startFull);$('resumeBtn').onclick=()=>runUiAction(async()=>{if(activeExam){showScreen('exam');renderExam();await ensureCurrentItemEvidence()}});$('prevBtn').onclick=()=>runUiAction(()=>move(-1));$('nextBtn').onclick=()=>runUiAction(()=>move(1));$('flagBtn').onclick=toggleFlag;$('submitBtn').onclick=()=>runUiAction(submitExam);$('newExamBtn').onclick=resetToHome;document.querySelectorAll('.confBtn').forEach(b=>b.onclick=()=>runUiAction(()=>setConfidence(b.dataset.confidence)));
 window.addEventListener('keydown',e=>{if(!$('exam').classList.contains('active')||!activeExam)return;if(['1','2','3','4'].includes(e.key)){const q=qById(activeExam.questionIds[activeExam.index]);const order=activeExam.optionOrders[q.id]||[0,1,2,3];runUiAction(()=>selectAnswer(order[Number(e.key)-1]))}else if(e.key==='ArrowRight')runUiAction(()=>move(lang==='ar'?-1:1));else if(e.key==='ArrowLeft')runUiAction(()=>move(lang==='ar'?1:-1))});
 
-async function init(){
- try{
-  await cacheAssessmentSnapshotModuleForOffline();
+async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
   const fetchJson=async url=>{const response=await fetch(url,{cache:'no-cache'});if(!response.ok)throw new Error(`Failed to load ${url}: ${response.status}`);return response.json()};
   const registry=await loadTrackRegistry(fetchJson);
   const selectedTrackId=resolveActiveTrackId({registry,savedTrackId:readSavedTrackId()});
