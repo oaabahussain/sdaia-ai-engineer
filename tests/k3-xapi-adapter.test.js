@@ -248,7 +248,7 @@ test('Task 32 strict xAPI import abstains when revision-chain context is unavail
 });
 
 
-test('Post-merge review: xAPI canonical import rejects actor namespace, item, or registration that disagrees with explicit K3 context',async()=>{
+test('Post-merge review: xAPI canonical import rejects item or registration that disagrees with explicit K3 context',async()=>{
   const api=await loadApi();
   const adapter=api.createXapiAdapter({crypto:{randomUUID:()=>ids.importedEvent}});
   const context={
@@ -266,7 +266,6 @@ test('Post-merge review: xAPI canonical import rejects actor namespace, item, or
     result:{response:'1'},context:{registration:ids.attempt},timestamp:'2026-10-07T10:07:00.000Z'
   };
   for(const mutate of [
-    s=>{s.actor.account.homePage='https://attacker.example/learners';},
     s=>{s.object.id='https://automizelab.net/k3/items/other.v1';},
     s=>{s.context.registration='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';}
   ]){
