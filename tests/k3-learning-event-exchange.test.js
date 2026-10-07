@@ -74,3 +74,16 @@ test('Task 31 allows adapters to add standard-specific payloads without changing
   assert.equal(p.assertLearningEventExchangeResult(xapi),xapi);
   assert.equal(p.assertLearningEventExchangeResult(caliper),caliper);
 });
+
+
+test('Task 31 requires source identity on every omission and rejection for auditability',async()=>{
+  const p=await ports();
+  assert.throws(
+    ()=>p.assertLearningEventExchangeResult(validReport({omissions:[{reason_code:'UNSUPPORTED_SEMANTICS'}]})),
+    /omission.*source|source_id/i
+  );
+  assert.throws(
+    ()=>p.assertLearningEventExchangeResult(validReport({rejections:[{reason_code:'INVALID_REQUIRED_CONTEXT'}]})),
+    /rejection.*source|source_id/i
+  );
+});
