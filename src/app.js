@@ -88,7 +88,7 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
   if(BANK.evidence){
    const [eventDefinitions,objectiveCatalog]=await Promise.all([
     fetchJson(`./${BANK.evidence.event_definitions_ref}`),
-    fetchJson('./data/factory/knowledge/objectives.json')
+    fetchJson('./data/evidence/sdaia-ai-engineer.objectives-v1.json')
    ]);
    OBJECTIVE_CATALOG=objectiveCatalog;
    const evidenceStore=createIndexedDbEvidenceStore({dbName:`learning-platform.evidence.v1.${BANK.track.id}`,storeId:`browser-evidence:${BANK.track.id}`,indexedDB:globalThis.indexedDB});
