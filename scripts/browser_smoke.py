@@ -68,6 +68,45 @@ def wait_until(fn,timeout=15,label='condition'):
         time.sleep(.2)
     raise RuntimeError(f'timeout waiting for {label}: {last}')
 
+def durable_evidence_definitions(session):
+    required={
+        'learner.activity.started@1',
+        'learner.item.presented@1',
+        'learner.response.recorded@1',
+        'learner.confidence.recorded@1'
+    }
+    state=execute(session,"return window.__k3EvidenceSmoke||null")
+    if state and state.get('done'):
+        definitions=state.get('definitions') or []
+        if required.issubset(set(definitions)):
+            return definitions
+    execute(session,"""
+      window.__k3EvidenceSmoke={done:false,definitions:[],error:null};
+      const openRequest=indexedDB.open('learning-platform.evidence.v1.'+arguments[0],2);
+      openRequest.onerror=()=>{window.__k3EvidenceSmoke={done:true,definitions:[],error:String(openRequest.error||'open failed')};};
+      openRequest.onsuccess=()=>{
+        const db=openRequest.result;
+        try{
+          const tx=db.transaction('events','readonly');
+          const all=tx.objectStore('events').getAll();
+          all.onerror=()=>{window.__k3EvidenceSmoke={done:true,definitions:[],error:String(all.error||'getAll failed')};db.close();};
+          all.onsuccess=()=>{
+            window.__k3EvidenceSmoke={
+              done:true,
+              definitions:(all.result||[]).map(row=>row.definition_id),
+              error:null
+            };
+            db.close();
+          };
+        }catch(error){
+          window.__k3EvidenceSmoke={done:true,definitions:[],error:String(error)};
+          db.close();
+        }
+      };
+      return true;
+    """,[TRACK_ID])
+    return None
+
 def start_server():
     return subprocess.Popen([sys.executable,'-m','http.server','4173','--bind','127.0.0.1'],cwd=ROOT,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
 
@@ -126,6 +165,15 @@ def main():
         opts=finds(session,'#options .option'); assert len(opts)==4
         first_option_text=text(session,opts[0]); click(session,opts[0])
         click(session,find(session,'.confBtn[data-confidence="high"]'))
+        # Acceptance gate: prove fine-grained durable learner evidence reached the governed IndexedDB store.
+        evidence_defs=wait_until(lambda:durable_evidence_definitions(session),timeout=20,label='durable learner evidence')
+        for definition in [
+            'learner.activity.started@1',
+            'learner.item.presented@1',
+            'learner.response.recorded@1',
+            'learner.confidence.recorded@1'
+        ]:
+            assert definition in evidence_defs, (definition,evidence_defs)
         next_ok=execute(session,"const b=document.getElementById('nextBtn'); if(!b||b.disabled) return false; b.click(); return true;")
         assert next_ok is True
         click(session,find(session,'#flagBtn'))
@@ -189,7 +237,7 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
-        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
+        print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
             try:req('DELETE',f'/session/{session}')

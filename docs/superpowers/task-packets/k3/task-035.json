@@ -55,9 +55,7 @@
   "schema_version": 1,
   "scope": {
     "allowed_create": [
-      "tests/k3-release-boundary.test.js",
-      "tests/release-contract.test.js",
-      "tests/service-worker-contract.test.js"
+      "tests/k3-release-boundary.test.js"
     ],
     "allowed_delete": [],
     "allowed_modify": [
@@ -66,7 +64,9 @@
       ".github/workflows/pages.yml",
       "scripts/verify_sw_assets.js",
       "scripts/verify_live_release.js",
-      "sw.js"
+      "sw.js",
+      "tests/release-contract.test.js",
+      "tests/service-worker-contract.test.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_35"

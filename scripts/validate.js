@@ -60,3 +60,82 @@ export function validateK2GovernanceArtifacts(artifactRoot, schemaRoot=artifactR
 
 validateK2GovernanceArtifacts(root,root);
 console.log('k2 governance artifacts: PASS');
+
+
+const K3_RELEASE_SCHEMA_FILES=Object.freeze([
+  'learner-evidence-event-v2.schema.json',
+  'event-definition-v2.schema.json',
+  'evidence-storage-receipt-v1.schema.json',
+  'evidence-batch-result-v1.schema.json',
+  'evidence-outbox-record-v1.schema.json',
+  'evidence-export-record-v1.schema.json',
+  'activity-projection-v1.schema.json',
+  'attempt-projection-v1.schema.json',
+  'assessment-form-snapshot-v1.schema.json',
+  'runtime-evidence-context-v1.schema.json',
+  'learner-identity-link-record-v1.schema.json'
+]);
+
+function readK3Json(rootDir,relative,label=relative){
+  const file=path.join(rootDir,relative);
+  if(!fs.existsSync(file))throw new Error(`Missing K3 release artifact: ${relative}`);
+  try{return JSON.parse(fs.readFileSync(file,'utf8'))}
+  catch(error){throw new Error(`${label}: invalid JSON: ${error.message}`)}
+}
+
+export function validateK3ReleaseArtifacts(artifactRoot=root,schemaRoot=artifactRoot){
+  const localAjv=new Ajv({allErrors:true,strict:false});
+  addFormats(localAjv);
+
+  for(const name of K3_RELEASE_SCHEMA_FILES){
+    const schema=readK3Json(schemaRoot,`data/schema/${name}`,`K3 schema ${name}`);
+    try{localAjv.addSchema(schema,name)}
+    catch(error){throw new Error(`K3 schema ${name}: ${error.message}`)}
+  }
+  for(const name of K3_RELEASE_SCHEMA_FILES){
+    try{if(!localAjv.getSchema(name))throw new Error('schema did not compile')}
+    catch(error){throw new Error(`K3 schema ${name}: ${error.message}`)}
+  }
+
+  const validateDefinition=localAjv.getSchema('event-definition-v2.schema.json');
+  const definitions=readK3Json(artifactRoot,'data/evidence/event-definitions-v1.json','K3 event definitions');
+  if(!Array.isArray(definitions)||!definitions.length)throw new Error('K3 event definitions must be a non-empty array');
+
+  for(const definition of definitions){
+    if(!validateDefinition(definition)){
+      throw new Error(`K3 event definition ${definition?.event_name??'unknown'}: ${localAjv.errorsText(validateDefinition.errors)}`);
+    }
+    if(definition.plane!=='LEARNER_EVIDENCE')throw new Error('K3 event definition must remain on LEARNER_EVIDENCE plane');
+    const ref=definition.payload_schema_ref;
+    if(typeof ref!=='string'||!ref)throw new Error('K3 event definition payload schema reference is required');
+    const payloadSchema=readK3Json(artifactRoot,ref,`K3 payload schema ${ref}`);
+    try{localAjv.compile(payloadSchema)}
+    catch(error){throw new Error(`K3 payload schema ${ref}: ${error.message}`)}
+  }
+
+  const validateRuntime=localAjv.getSchema('runtime-evidence-context-v1.schema.json');
+  const runtime=readK3Json(artifactRoot,'data/evidence/sdaia-ai-engineer.runtime-v1.json','K3 runtime evidence context');
+  if(!validateRuntime(runtime))throw new Error(`K3 runtime evidence context: ${localAjv.errorsText(validateRuntime.errors)}`);
+
+  const scoring=readK3Json(artifactRoot,'data/evidence/sdaia-ai-engineer.scoring-v1.json','K3 scoring policy');
+  if(scoring.id!==runtime.scoring_policy_ref)throw new Error('K3 scoring policy reference mismatch');
+
+  for(const [label,relative,mappingVersion,standard,standardVersion] of [
+    ['xAPI','data/evidence/mappings/xapi-v1.json','xapi-k3.v1','xAPI','2.0'],
+    ['Caliper','data/evidence/mappings/caliper-v1.json','caliper-k3.v1','Caliper','1.2']
+  ]){
+    const mapping=readK3Json(artifactRoot,relative,`${label} mapping`);
+    if(
+      mapping.schema_version!==1||
+      mapping.mapping_version!==mappingVersion||
+      mapping.standard!==standard||
+      mapping.standard_version!==standardVersion||
+      typeof mapping.adapter_id!=='string'||!mapping.adapter_id||
+      typeof mapping.adapter_version!=='string'||!mapping.adapter_version
+    )throw new Error(`${label} mapping version/governance mismatch`);
+  }
+  return true;
+}
+
+validateK3ReleaseArtifacts(root,root);
+console.log('k3 release artifacts: PASS');
