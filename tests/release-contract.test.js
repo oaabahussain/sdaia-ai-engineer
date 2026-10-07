@@ -97,3 +97,30 @@ test('synthetic track fixtures are excluded from release artifact inputs',()=>{f
 
 
 test('factory governance artifacts stay outside public Pages assembly',()=>{for(const workflow of [pages,ci]){assert.doesNotMatch(workflow,/cp\s+-[rR]\s+data\/factory/)} });
+
+
+test('Task 35 PR and Pages gates execute Python server contracts in addition to Node and browser smoke', () => {
+  for (const workflow of [ci,pages]) {
+    assert.match(workflow,/actions\/setup-python@/);
+    assert.match(workflow,/pip install -r server\/requirements\.txt/);
+    assert.match(workflow,/pytest -q server\/tests|python3? -m pytest .*server\/tests/);
+    assert.match(workflow,/python3 scripts\/browser_smoke\.py/);
+  }
+});
+
+test('Task 35 public Pages artifact excludes private K3 interoperability and server evidence state', () => {
+  for (const forbidden of [
+    'data/evidence/mappings',
+    'data/factory',
+    'data/legacy',
+    'server',
+    'src/platform-kernel'
+  ]) {
+    assert.equal(pagesBuilder.includes(`'${forbidden}'`),false,`must not copy private path ${forbidden}`);
+  }
+  for (const required of [
+    'data/evidence/sdaia-ai-engineer.runtime-v1.json',
+    'data/evidence/event-definitions-v1.json',
+    'data/evidence/payload-schemas'
+  ]) assert.ok(pagesBuilder.includes(`'${required}'`),required);
+});
