@@ -611,3 +611,10 @@ Integration PR #53 merged the complete clean wave to `main` as `aa0d868271897c17
 Post-merge on `main@aa0d868271897c178a6d37a3cb19fa2469d009b1`: server/adapter #2080 SUCCESS; Pages #50 SUCCESS; Node/browser/artifact/deploy/live-release verification SUCCESS.
 
 Tasks 31, 32, and 33 are durably COMPLETE. Task 34 is NEXT and NOT STARTED.
+
+
+## Post-merge K3 interoperability finding — 2026-10-07
+
+Ruling: Task 34 is temporarily BLOCKED after a post-merge Important finding in Tasks 32/33 import validation. The xAPI/Caliper adapters required an explicit K3 context but did not yet prove the external item/attempt identifiers agreed with that context. Cost if wrong: a caller could attach a valid external response to the wrong K3 item or assessment attempt while still satisfying the prior context-presence checks.
+
+RED-first corrective branch: `impl/k3-interoperability-exact-import-context`, based on `main@90c0e267ab0e490c67a1aef98b0f0cf0c3c6f21a`. Task 34 must not start until the finding is closed and post-fix verification is durable.
