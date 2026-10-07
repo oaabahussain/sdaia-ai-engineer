@@ -136,6 +136,9 @@ test('Task 32 rejects direct PII-like learner identifiers at the actor boundary'
   assert.equal(out.statements.length,0);
   assert.equal(out.rejections.length,1);
   assert.match(out.rejections[0].reason_code,/PII|PSEUDONYM/i);
+  const ip=adapter.exportEvents([responseEvent({learner_id:'192.168.1.20'})]);
+  assert.equal(ip.statements.length,0);
+  assert.equal(ip.rejections.length,1);
 });
 
 test('Task 32 import abstains when exact K3 canonical context is unavailable',async()=>{

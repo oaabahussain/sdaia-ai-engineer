@@ -152,6 +152,9 @@ test('Task 33 uses pseudonymous actor identity and rejects direct PII-like learn
   assert.equal(bad.events.length,0);
   assert.equal(bad.rejections.length,1);
   assert.match(bad.rejections[0].reason_code,/PII|PSEUDONYM/i);
+  const ip=adapter.exportEvents([base('learner.activity.started@1',{learner_id:'192.168.1.20'})]);
+  assert.equal(ip.events.length,0);
+  assert.equal(ip.rejections.length,1);
 });
 
 test('Task 33 import stages when exact K3 context is absent and maps only with explicit context',async()=>{
