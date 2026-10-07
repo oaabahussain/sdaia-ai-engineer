@@ -68,11 +68,14 @@ def wait_until(fn,timeout=15,label='condition'):
         time.sleep(.2)
     raise RuntimeError(f'timeout waiting for {label}: {last}')
 
+def start_server():
+    return subprocess.Popen([sys.executable,'-m','http.server','4173','--bind','127.0.0.1'],cwd=ROOT,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+
 def main():
     chromedriver=shutil.which('chromedriver')
     if not chromedriver:
         raise RuntimeError('chromedriver not found on runner')
-    server=subprocess.Popen([sys.executable,'-m','http.server','4173','--bind','127.0.0.1'],cwd=ROOT,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+    server=start_server()
     driver=subprocess.Popen([chromedriver,'--port=9515','--allowed-ips='],stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
     session=None
     try:
@@ -80,6 +83,18 @@ def main():
         value=req('POST','/session',{'capabilities':{'alwaysMatch':{'browserName':'chrome','goog:chromeOptions':{'args':['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--window-size=1400,1000']}}}},timeout=60)
         session=value['sessionId'] if isinstance(value,dict) and 'sessionId' in value else None
         if not session: raise RuntimeError(f'no webdriver session id: {value}')
+        # Install the new service worker from feedback.html so app/evidence modules are not warmed by page execution.
+        # Then prove the first new-version navigation can boot fully offline from the install-time cache.
+        req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html?sw-install=1'})
+        wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='feedback-only service-worker install page')
+        wait_until(lambda:execute(session,"return !!navigator.serviceWorker && !!navigator.serviceWorker.controller"),timeout=20,label='service worker controller before first app navigation')
+        server.terminate()
+        server.wait(timeout=5)
+        req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?first-new-version-navigation-offline=1'})
+        wait_until(lambda:execute(session,"return document.getElementById('bankCount')?.textContent")==str(EXPECTED_BANK),timeout=20,label='first new-version navigation offline')
+        assert execute(session,"return document.getElementById('errorBox').classList.contains('show')") is False
+        server=start_server()
+        wait_http(BASE+'/index.html')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
         execute(session,"localStorage.setItem('learning-platform.track-id.v1','stale-fixture-track')")
         req('POST',f'/session/{session}/refresh',{})
