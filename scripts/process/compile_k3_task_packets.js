@@ -89,6 +89,14 @@ function parseFiles(section, taskId) {
     allowedCreate.push('data/evidence/sdaia-ai-engineer.objectives-v1.json');
     allowedModify.push('sw.js', 'scripts/browser_smoke.py', 'scripts/build_pages_artifact.js');
   }
+  // Task 31 reuses an existing interoperability port regression file.
+  // The plan's "test" wording permits extending this existing test, while the new K3 exchange test is created fresh.
+  if (taskId === 31) {
+    const existing = 'tests/interoperability-ports.test.js';
+    const index = allowedCreate.indexOf(existing);
+    if (index >= 0) allowedCreate.splice(index, 1);
+    allowedModify.push(existing);
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),

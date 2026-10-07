@@ -55,12 +55,12 @@
   "schema_version": 1,
   "scope": {
     "allowed_create": [
-      "tests/interoperability-ports.test.js",
       "tests/k3-learning-event-exchange.test.js"
     ],
     "allowed_delete": [],
     "allowed_modify": [
-      "src/platform-kernel/interoperability/ports.js"
+      "src/platform-kernel/interoperability/ports.js",
+      "tests/interoperability-ports.test.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_31"
