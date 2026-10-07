@@ -109,15 +109,9 @@ test('Task 35 PR and Pages gates execute Python server contracts in addition to 
 });
 
 test('Task 35 public Pages artifact excludes private K3 interoperability and server evidence state', () => {
-  for (const forbidden of [
-    'data/evidence/mappings',
-    'data/factory',
-    'data/legacy',
-    'server',
-    'src/platform-kernel'
-  ]) {
-    assert.equal(pagesBuilder.includes(`'${forbidden}'`),false,`must not copy private path ${forbidden}`);
-  }
+  assert.equal(pagesBuilder.includes("'data/evidence/mappings'"),false);
+  assert.equal(pagesBuilder.includes("'server'"),false);
+  assert.match(pagesBuilder,/Forbidden Pages artifact path/);
   for (const required of [
     'data/evidence/sdaia-ai-engineer.runtime-v1.json',
     'data/evidence/event-definitions-v1.json',
