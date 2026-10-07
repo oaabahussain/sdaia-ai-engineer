@@ -53,6 +53,7 @@ function exportOne(event,mapping){
   const who=actor(event,mapping);
   if(!who)return {kind:'reject',reason_code:'PII_OR_INVALID_PSEUDONYM'};
   if(!nonEmpty(event.occurred_at))return {kind:'reject',reason_code:'INVALID_REQUIRED_CONTEXT'};
+  if(!STRICT_MODES.has(event.mode))return {kind:'omit',reason_code:'NOT_ASSESSMENT_CONTEXT'};
   const rule=mapping.events[event.definition_id];
   if(!rule)return {kind:'omit',reason_code:'UNSUPPORTED_SEMANTICS'};
   const base={
