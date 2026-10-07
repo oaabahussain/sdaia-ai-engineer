@@ -186,7 +186,9 @@ test('Task 32 canonical import uses explicit K3 context and marks importer seque
     question_family_id:'family-1',
     item_version_id:'item.v1',
     objective_id:'objective-1',
-    domain_id:'core-ai'
+    domain_id:'core-ai',
+    base_attempt_revision:0,
+    proposed_attempt_revision:1
   };
   const out=adapter.importEvents([statement],{
     contextByExternalId:{[statement.id]:context},
@@ -204,4 +206,40 @@ test('Task 32 canonical import uses explicit K3 context and marks importer seque
   assert.equal(out.mapped_ids[0].target_id,ids.importedEvent);
   assert.equal(out.mapped_ids[0].source_occurred_at,statement.timestamp);
   assert.equal(out.mapped_ids[0].importer_order_only,true);
+});
+
+
+test('Task 32 strict xAPI import abstains when revision-chain context is unavailable',async()=>{
+  const api=await loadApi();
+  assert.equal(typeof api.createXapiAdapter,'function','Task 32 xAPI adapter behavior is missing');
+  const adapter=api.createXapiAdapter({crypto:{randomUUID:()=>ids.importedEvent}});
+  const statement={
+    id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+    actor:{objectType:'Agent',account:{homePage:'https://automizelab.net/learners',name:'learner:pseudonym-42'}},
+    verb:{id:'http://adlnet.gov/expapi/verbs/answered'},
+    object:{objectType:'Activity',id:'https://automizelab.net/k3/items/item.v1'},
+    result:{response:'2'},
+    context:{registration:ids.attempt},
+    timestamp:'2026-10-07T10:06:00.000Z'
+  };
+  const incomplete={
+    learner_id:'learner:pseudonym-42',
+    activity_id:ids.activity,
+    track_id:'sdaia-ai-engineer',
+    content_release_id:'sdaia-ai-engineer.bootstrap.v1',
+    mode:'mock',
+    locale:'en',
+    assessment_attempt_id:ids.attempt,
+    form_id:'form:fixture',
+    item_interaction_id:ids.interaction,
+    item_version_id:'item.v1'
+  };
+  const out=adapter.importEvents([statement],{
+    contextByExternalId:{[statement.id]:incomplete},
+    importerOriginId:ids.importerOrigin,
+    nextOriginSeq:()=>8
+  });
+  assert.equal(out.events.length,0);
+  assert.equal(out.staged.length,1);
+  assert.match(out.staged[0].reason_code,/REVISION|CONTEXT/i);
 });
