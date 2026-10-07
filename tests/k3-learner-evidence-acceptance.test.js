@@ -27,7 +27,7 @@ const criteria=[
   {id:18,status:'PINNED',evidence:['tests/k3-activity-projection.test.js','tests/k3-attempt-projection.test.js','tests/k3-evidence-replay.test.js']},
   {id:19,status:'PINNED',evidence:['tests/k3-xapi-adapter.test.js','tests/k3-caliper-adapter.test.js','tests/k3-learning-event-exchange.test.js']},
   {id:20,status:'PINNED',evidence:['tests/k3-xapi-adapter.test.js','tests/k3-caliper-adapter.test.js']},
-  {id:21,status:'PINNED',evidence:['tests/documentation-contract.test.js']},
+  {id:21,status:'FUTURE_GATE',owner_task:37},
   {id:22,status:'FUTURE_GATE',owner_task:38},
   {id:23,status:'FUTURE_GATE',owner_task:39},
   {id:24,status:'FUTURE_GATE',owner_task:40},
@@ -41,7 +41,8 @@ test('Task 36 covers spec section 47 one-for-one without declaring future gates 
     assert.ok(Array.isArray(row.evidence)&&row.evidence.length,row.id);
     for(const path of row.evidence) assert.equal(exists(path),true,`criterion ${row.id} missing executable evidence file: ${path}`);
   }
-  assert.deepEqual(criteria.slice(21).map(x=>({id:x.id,status:x.status,owner_task:x.owner_task})),[
+  assert.deepEqual(criteria.slice(20).map(x=>({id:x.id,status:x.status,owner_task:x.owner_task})),[
+    {id:21,status:'FUTURE_GATE',owner_task:37},
     {id:22,status:'FUTURE_GATE',owner_task:38},
     {id:23,status:'FUTURE_GATE',owner_task:39},
     {id:24,status:'FUTURE_GATE',owner_task:40},
