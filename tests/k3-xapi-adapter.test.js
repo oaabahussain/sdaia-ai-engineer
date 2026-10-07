@@ -246,3 +246,47 @@ test('Task 32 strict xAPI import abstains when revision-chain context is unavail
   assert.equal(out.staged.length,1);
   assert.match(out.staged[0].reason_code,/REVISION|CONTEXT/i);
 });
+
+
+test('Wave review: xAPI canonical import rejects actor namespace, item, or registration that disagrees with explicit K3 context',async()=>{
+  const api=await loadApi();
+  const adapter=api.createXapiAdapter({crypto:{randomUUID:()=>ids.importedEvent}});
+  const context={
+    learner_id:'learner:pseudonym-42',
+    activity_id:ids.activity,
+    track_id:'sdaia-ai-engineer',
+    content_release_id:'sdaia-ai-engineer.bootstrap.v1',
+    mode:'mock',
+    locale:'en',
+    assessment_attempt_id:ids.attempt,
+    form_id:'form:fixture',
+    item_interaction_id:ids.interaction,
+    item_version_id:'item.v1',
+    base_attempt_revision:0,
+    proposed_attempt_revision:1
+  };
+  const baseStatement={
+    id:'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+    actor:{objectType:'Agent',account:{homePage:'https://automizelab.net/k3/learners',name:'learner:pseudonym-42'}},
+    verb:{id:'http://adlnet.gov/expapi/verbs/answered'},
+    object:{objectType:'Activity',id:'https://automizelab.net/k3/items/item.v1'},
+    result:{response:'1'},
+    context:{registration:ids.attempt},
+    timestamp:'2026-10-07T10:07:00.000Z'
+  };
+  for(const mutate of [
+    s=>{s.actor.account.homePage='https://attacker.example/learners';},
+    s=>{s.object.id='https://automizelab.net/k3/items/other.v1';},
+    s=>{s.context.registration='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';}
+  ]){
+    const statement=structuredClone(baseStatement);
+    mutate(statement);
+    const out=adapter.importEvents([statement],{
+      contextByExternalId:{[statement.id]:context},
+      importerOriginId:ids.importerOrigin,
+      nextOriginSeq:()=>9
+    });
+    assert.equal(out.events.length,0,'mismatched external identity/context must not canonicalize');
+    assert.ok(out.rejections.length+out.staged.length>=1);
+  }
+});
