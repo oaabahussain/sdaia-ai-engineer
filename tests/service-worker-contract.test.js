@@ -50,3 +50,14 @@ test('presentation and feedback runtime assets are part of the offline shell', (
   const verifier = read('../scripts/verify_sw_assets.js');
   assert.match(verifier, /presentation\.json/);
 });
+
+
+test('Task 35 service worker keeps browser-required K3 evidence runtime assets but not interoperability mappings', () => {
+  const sw=read('../sw.js');
+  for(const asset of [
+    './data/evidence/sdaia-ai-engineer.runtime-v1.json',
+    './data/evidence/event-definitions-v1.json'
+  ]) assert.ok(sw.includes(`'${asset}'`),asset);
+  assert.doesNotMatch(sw,/data\/evidence\/mappings/);
+  assert.doesNotMatch(sw,/src\/platform-kernel/);
+});

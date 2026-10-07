@@ -97,6 +97,14 @@ function parseFiles(section, taskId) {
     if (index >= 0) allowedCreate.splice(index, 1);
     allowedModify.push(existing);
   }
+  // Task 35 extends two existing release-boundary regression files.
+  if (taskId === 35) {
+    for (const existing of ['tests/release-contract.test.js', 'tests/service-worker-contract.test.js']) {
+      const index = allowedCreate.indexOf(existing);
+      if (index >= 0) allowedCreate.splice(index, 1);
+      allowedModify.push(existing);
+    }
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
