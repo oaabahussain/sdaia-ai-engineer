@@ -203,7 +203,7 @@ test('Task 29 browser wiring persists evidence runtime for resume and seeds the 
   const smoke=readFileSync(new URL('../scripts/browser_smoke.py',import.meta.url),'utf8');
   assert.match(app,/evidence\/appBridge\.js/);
   assert.match(app,/evidence_runtime/,'active exam must persist K3 runtime IDs for resume');
-  assert.match(app,/objectives\.json/,'browser integration must use the canonical objective registry');
+  assert.match(app,/data\/evidence\/sdaia-ai-engineer\.objectives-v1\.json/,'browser integration must use the governed public objective projection');
   for(const asset of [
     './src/evidence/appBridge.js',
     './src/evidence/recorder.js',
