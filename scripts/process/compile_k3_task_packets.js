@@ -85,7 +85,10 @@ function parseFiles(section, taskId) {
   if (taskId === 28) allowedModify.push('src/evidence/indexedDbStore.js');
   // Task 29 introduces new browser modules that must be present for the first offline reload after a service-worker update.
   // High-reasoning scope ruling: preserve the approved behavior while allowing its existing offline release boundary to move with it.
-  if (taskId === 29) allowedModify.push('sw.js', 'scripts/browser_smoke.py', 'scripts/build_pages_artifact.js');
+  if (taskId === 29) {
+    allowedCreate.push('data/evidence/sdaia-ai-engineer.objectives-v1.json');
+    allowedModify.push('sw.js', 'scripts/browser_smoke.py', 'scripts/build_pages_artifact.js');
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
