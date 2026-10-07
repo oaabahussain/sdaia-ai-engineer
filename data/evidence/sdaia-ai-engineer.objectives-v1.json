@@ -1,0 +1,1686 @@
+{
+  "schema_version": 1,
+  "track_id": "sdaia-ai-engineer",
+  "objectives": [
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.async-i-o.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.async-i-o"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.queue.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.queue"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.idempotency.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.idempotency"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.retry.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.retry"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.exponential-backoff.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.exponential-backoff"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.circuit-breaker.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.circuit-breaker"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.timeout.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.timeout"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.rate-limiting.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.rate-limiting"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.caching.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.caching"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.authentication.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.authentication"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.authorization.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.authorization"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.secret-management.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.secret-management"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.api-versioning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.api-versioning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.unit-testing.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.unit-testing"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.integration-testing.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.integration-testing"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.contract-testing.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.contract-testing"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.structured-logging.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.structured-logging"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.schema-validation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.schema-validation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.distributed-tracing.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.distributed-tracing"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.ai-software-engineering.graceful-degradation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "ai-software-engineering",
+      "concept_ids": [
+        "ai-software-engineering.graceful-degradation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.horizontal-scaling.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.horizontal-scaling"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.vertical-scaling.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.vertical-scaling"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.stateless-service.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.stateless-service"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.load-balancer.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.load-balancer"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.cache.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.cache"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.message-queue.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.message-queue"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.batching.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.batching"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.throughput.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.throughput"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.latency.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.latency"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.gpu-acceleration.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.gpu-acceleration"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.autoscaling.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.autoscaling"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.replication.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.replication"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.high-availability.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.high-availability"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.rto.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.rto"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.rpo.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.rpo"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.cdn.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.cdn"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.database-replication.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.database-replication"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.sharding.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.sharding"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.backpressure.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.backpressure"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.architecture-infrastructure.capacity-planning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "architecture-infrastructure",
+      "concept_ids": [
+        "architecture-infrastructure.capacity-planning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.business-kpi.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.business-kpi"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.model-metric.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.model-metric"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.build-vs-buy.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.build-vs-buy"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.sla.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.sla"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.use-case-definition.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.use-case-definition"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.stakeholder-alignment.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.stakeholder-alignment"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.cost-benefit-analysis.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.cost-benefit-analysis"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.total-cost-of-ownership.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.total-cost-of-ownership"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.roi.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.roi"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.change-management.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.change-management"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.human-escalation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.human-escalation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.risk-appetite.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.risk-appetite"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.acceptance-criteria.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.acceptance-criteria"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.pilot.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.pilot"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.a-b-test.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.a-b-test"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.vendor-lock-in.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.vendor-lock-in"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.business-continuity.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.business-continuity"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.operating-model.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.operating-model"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.documentation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.documentation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.business-professional-practice.technical-communication.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "business-professional-practice",
+      "concept_ids": [
+        "business-professional-practice.technical-communication"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.activation-function.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.activation-function"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.backpropagation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.backpropagation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.learning-rate.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.learning-rate"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.epoch.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.epoch"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.mini-batch.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.mini-batch"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.cnn.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.cnn"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.rnn.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.rnn"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.lstm.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.lstm"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.attention.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.attention"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.self-attention.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.self-attention"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.transformer.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.transformer"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.embedding.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.embedding"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.tokenization.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.tokenization"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.positional-encoding.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.positional-encoding"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.pretraining.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.pretraining"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.fine-tuning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.fine-tuning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.rag.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.rag"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.reranking.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.reranking"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.grounding.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.grounding"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.core-ai.tool-calling.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "core-ai",
+      "concept_ids": [
+        "core-ai.tool-calling"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.accuracy.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.accuracy"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.precision.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.precision"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.recall-sensitivity.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.recall-sensitivity"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.f1-score.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.f1-score"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.roc-auc.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.roc-auc"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.pr-auc.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.pr-auc"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.confusion-matrix.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.confusion-matrix"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.train-validation-test-split.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.train-validation-test-split"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.cross-validation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.cross-validation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.data-leakage.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.data-leakage"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.overfitting.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.overfitting"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.underfitting.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.underfitting"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.regularization.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.regularization"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.class-imbalance.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.class-imbalance"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.threshold-tuning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.threshold-tuning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.standardization.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.standardization"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.min-max-scaling.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.min-max-scaling"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.one-hot-encoding.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.one-hot-encoding"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.pca.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.pca"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.data-ml.calibration.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "data-ml",
+      "concept_ids": [
+        "data-ml.calibration"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.experiment-tracking.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.experiment-tracking"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.model-registry.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.model-registry"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.lineage.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.lineage"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.dataset-versioning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.dataset-versioning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.reproducibility.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.reproducibility"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.continuous-integration.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.continuous-integration"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.continuous-delivery.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.continuous-delivery"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.continuous-training.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.continuous-training"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.canary-deployment.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.canary-deployment"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.blue-green-deployment.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.blue-green-deployment"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.shadow-deployment.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.shadow-deployment"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.rollback.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.rollback"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.latency-monitoring.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.latency-monitoring"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.data-drift.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.data-drift"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.concept-drift.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.concept-drift"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.training-serving-skew.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.training-serving-skew"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.feature-store.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.feature-store"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.prompt-versioning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.prompt-versioning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.golden-evaluation-set.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.golden-evaluation-set"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.mlops-llmops.observability.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "mlops-llmops",
+      "concept_ids": [
+        "mlops-llmops.observability"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.fairness.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.fairness"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.bias.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.bias"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.explainability.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.explainability"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.transparency.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.transparency"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.accountability.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.accountability"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.data-minimization.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.data-minimization"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.pii-protection.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.pii-protection"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.human-oversight.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.human-oversight"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.audit-trail.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.audit-trail"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.model-system-card.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.model-system-card"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.prompt-injection.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.prompt-injection"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.indirect-prompt-injection.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.indirect-prompt-injection"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.data-model-poisoning.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.data-model-poisoning"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.excessive-agency.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.excessive-agency"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.least-privilege.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.least-privilege"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.output-validation.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.output-validation"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.supply-chain-security.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.supply-chain-security"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.red-teaming.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.red-teaming"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.access-control.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.access-control"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    },
+    {
+      "schema_version": 1,
+      "objective_id": "sdaia-ai-engineer.objective.responsible-ai-security-governance.incident-response.v1",
+      "track_id": "sdaia-ai-engineer",
+      "domain_id": "responsible-ai-security-governance",
+      "concept_ids": [
+        "responsible-ai-security-governance.incident-response"
+      ],
+      "version": 1,
+      "status": "provisional",
+      "origin": "migration-derived"
+    }
+  ]
+}
