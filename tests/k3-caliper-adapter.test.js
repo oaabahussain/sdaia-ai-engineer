@@ -265,3 +265,39 @@ test('Task 33 abstains from Caliper Assessment semantics for non-assessment K3 m
   assert.equal(out.omissions.length,2);
   assert.ok(out.omissions.every(row=>/NOT_ASSESSMENT|UNSUPPORTED/.test(row.reason_code)));
 });
+
+
+test('Post-merge review: Caliper canonical import rejects item or Attempt identity that disagrees with explicit K3 context',async()=>{
+  const api=await loadApi();
+  const adapter=api.createCaliperAdapter({crypto:{randomUUID:()=>ids.importedEvent}});
+  const context={
+    learner_id:'learner:pseudonym-42',activity_id:ids.activity,track_id:'sdaia-ai-engineer',
+    content_release_id:'sdaia-ai-engineer.bootstrap.v1',mode:'mock',locale:'en',
+    assessment_attempt_id:ids.attempt,form_id:'form:fixture',
+    item_interaction_id:ids.interaction,item_version_id:'item.v1',
+    base_attempt_revision:0,proposed_attempt_revision:1
+  };
+  const baseExternal={
+    '@context':'http://purl.imsglobal.org/ctx/caliper/v1p2',
+    id:'urn:uuid:eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+    type:'AssessmentItemEvent',
+    actor:{id:'https://automizelab.net/k3/learners/learner%3Apseudonym-42',type:'Person'},
+    action:'Completed',
+    object:{id:'https://automizelab.net/k3/items/item.v1',type:'AssessmentItem'},
+    target:{id:'https://automizelab.net/k3/attempts/'+ids.attempt,type:'Attempt'},
+    generated:{id:'urn:uuid:ffffffff-ffff-4fff-8fff-ffffffffffff',type:'Response',value:'1'},
+    eventTime:'2026-10-07T10:27:00.000Z'
+  };
+  for(const mutate of [
+    e=>{e.object.id='https://automizelab.net/k3/items/other.v1';},
+    e=>{e.target.id='https://automizelab.net/k3/attempts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';}
+  ]){
+    const external=structuredClone(baseExternal); mutate(external);
+    const out=adapter.importEvents([external],{
+      contextByExternalId:{[external.id]:context},
+      importerOriginId:ids.importerOrigin,nextOriginSeq:()=>13
+    });
+    assert.equal(out.events.length,0,'mismatched external identity/context must not canonicalize');
+    assert.ok(out.rejections.length+out.staged.length>=1);
+  }
+});
