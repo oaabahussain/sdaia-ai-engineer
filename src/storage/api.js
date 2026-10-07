@@ -1,4 +1,4 @@
-import { API_BASE } from '../config.js';import { getOrCreateAnonId } from './identity.js';
+import { API_BASE } from '../config.js';import { getOrCreateAnonId } from './identity.js';import { createEvidenceApiTransport } from '../evidence/apiTransport.js';
 const VERSION=new Map();const base=()=>(globalThis.__SDAIA_API_BASE__||API_BASE).replace(/\/$/,'');
 async function request(path,options={},includeAnon=true){const id=getOrCreateAnonId();const headers={'Content-Type':'application/json',...(includeAnon?{'X-Anon-Id':id}:{}),...(options.headers||{})};const response=await fetch(`${base()}${path}`,{...options,headers});return{response,id}}
 export async function loadState(){const id=getOrCreateAnonId();const{response}=await request(`/progress/${id}`);if(response.status===404)return null;if(!response.ok)throw new Error(`Progress load failed: ${response.status}`);VERSION.set(id,Number(response.headers.get('etag')||0));return response.json()}
