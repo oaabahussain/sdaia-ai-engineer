@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-07
 **Severity:** Important / P1
-**Status:** OPEN RED / Task 34 BLOCKED
+**Status:** CLOSED / FIX GREEN / Task 34 BLOCKED UNTIL POST-MERGE VERIFY
 
 ## Finding
 
@@ -30,3 +30,19 @@ RED tests are added before Product edits. Task 34 remains blocked until:
 4. CURRENT-STATE returns to PHASE_GATE with zero Important findings.
 
 RED trigger head is intentionally documentation-only before Product repair.
+
+
+## Closure evidence
+
+- RED quality #953: 814 total / 812 PASS / 2 FAIL, exactly the xAPI and Caliper identity-context mismatch regressions.
+- Server/adapter #2085: PASS during RED.
+- First GREEN attempt #954 exposed one over-constraint: xAPI external actor account `homePage` is an interoperability namespace and must not be forced to the internal K3 namespace.
+- Corrected GREEN head preserved pseudonymous actor matching while constraining governed item + registration/attempt identity.
+- Reviewer P1: missing external identities must reject, not only alternate mismatched identities — fixed.
+- Reviewer P2: explicit identity conflicts must be permanent rejections, not staged retry records — fixed.
+- Final head `4d695715c32f75c4cc7c952c3fe6047e7a83441e`:
+  - Quality #956 PASS;
+  - Server/Adapter #2088 PASS;
+  - review threads: 0 unresolved.
+
+The Important finding is closed on the review branch. Task 34 remains blocked until this exact reviewed fix is merged to `main` and post-merge verification passes.

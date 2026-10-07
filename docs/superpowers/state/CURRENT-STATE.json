@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 67,
+  "state_revision": 68,
   "programme": "K3",
   "phase": "G",
   "status": "REVIEW",
@@ -15,8 +15,8 @@
   "ledger_path": "docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md",
   "checkpoint_path": "docs/superpowers/reviews/2026-10-07-k3-tasks31-33-post-merge-verification.md",
   "open_critical_findings": 0,
-  "open_important_findings": 1,
-  "last_verified_scope": "K3_TASKS_1_33_MERGED_POSTMERGE_IMPORT_CONTEXT_P1_OPEN_TASK34_BLOCKED",
+  "open_important_findings": 0,
+  "last_verified_scope": "K3_TASKS_1_33_POSTMERGE_IMPORT_CONTEXT_FIX_GREEN_READY_TO_MERGE_TASK34_BLOCKED_UNTIL_POSTMERGE",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
@@ -48,5 +48,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-07T14:30:00Z"
+  "updated_at": "2026-10-07T16:28:00Z"
 }
