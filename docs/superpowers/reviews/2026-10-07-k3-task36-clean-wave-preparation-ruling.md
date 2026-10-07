@@ -18,3 +18,8 @@ GREEN must add an observable browser check that reads the governed evidence DB a
 - learner.confidence.recorded@1
 
 No Product semantics may be changed to satisfy this acceptance test.
+
+
+## Combined-review finding
+
+Criterion 21 of spec §47 ("repository documentation is updated with zero tribal knowledge") is owned by Task 37 in the approved implementation plan. Task 36 must not mark it PINNED before Task 37 has executed. The acceptance matrix must therefore keep criteria 21–25 as explicit future gates owned by Tasks 37–41.
