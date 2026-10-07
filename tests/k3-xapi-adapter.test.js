@@ -267,14 +267,17 @@ test('Post-merge review: xAPI canonical import rejects item or registration that
   };
   for(const mutate of [
     s=>{s.object.id='https://automizelab.net/k3/items/other.v1';},
-    s=>{s.context.registration='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';}
+    s=>{delete s.object.id;},
+    s=>{s.context.registration='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';},
+    s=>{delete s.context.registration;}
   ]){
     const statement=structuredClone(baseStatement); mutate(statement);
     const out=adapter.importEvents([statement],{
       contextByExternalId:{[statement.id]:context},
       importerOriginId:ids.importerOrigin,nextOriginSeq:()=>9
     });
-    assert.equal(out.events.length,0,'mismatched external identity/context must not canonicalize');
-    assert.ok(out.rejections.length+out.staged.length>=1);
+    assert.equal(out.events.length,0,'mismatched or missing external identity/context must not canonicalize');
+    assert.equal(out.rejections.length,1,'identity conflicts are invalid, not retryable staged records');
+    assert.equal(out.staged.length,0);
   }
 });
