@@ -224,3 +224,34 @@ test('Task 28 atomically coordinates one strict revision chain across two record
   assert.equal(results.filter(result=>result.status==='fulfilled').length,1,'only one 0 -> 1 mutation may commit for one browser origin/attempt');
   assert.equal(results.filter(result=>result.status==='rejected').length,1,'the competing same-base mutation must fail closed');
 });
+
+
+test('Task 28 rejects locale drift from the frozen assessment snapshot',async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({store,runtimeContext:runtimeContext(),crypto:deterministicCrypto()});
+  await assert.rejects(
+    ()=>recorder.startActivity({learner_id:'learner:clean-wave',mode:'mock',locale:'ar',assessment_snapshot:snapshot()}),
+    /locale|snapshot|frozen/i
+  );
+  assert.equal(store.calls.length,0);
+});
+
+test('Task 28 refuses to redefine an existing activity through resumed context',async()=>{
+  const {createEvidenceRecorder}=await loadRecorderApi();
+  const store=recordingStore();
+  const recorder=createEvidenceRecorder({store,runtimeContext:runtimeContext(),crypto:deterministicCrypto()});
+  const snap=snapshot();
+  const started=await recorder.startActivity({learner_id:'learner:clean-wave',mode:'mock',locale:'en',assessment_snapshot:snap});
+  const conflicting=activityContext(started,snap);
+  conflicting.assessment_attempt_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  await assert.rejects(()=>recorder.recordResponse({
+    activity_id:started.event.activity_id,
+    activity_context:conflicting,
+    item_interaction_id:'99999999-9999-4999-8999-999999999999',
+    item_context:itemContext(),
+    response:{response_version:1,response_kind:'OPTION',response:{option_index:0}},
+    base_attempt_revision:0,proposed_attempt_revision:1
+  }),/activity|context|attempt|mismatch|frozen/i);
+  assert.equal(store.calls.length,1);
+});
