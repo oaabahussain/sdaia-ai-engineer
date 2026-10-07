@@ -104,3 +104,9 @@ test('Task 36 browser acceptance observes fine-grained learner evidence durably 
   ]) assert.ok(smoke.includes(definition),definition);
   assert.match(smoke,/durable learner evidence/i);
 });
+
+
+test('Wave review: documentation acceptance remains a Task 37 future gate',()=>{
+  const row=criteria.find(x=>x.id===21);
+  assert.deepEqual(row,{id:21,status:'FUTURE_GATE',owner_task:37});
+});
