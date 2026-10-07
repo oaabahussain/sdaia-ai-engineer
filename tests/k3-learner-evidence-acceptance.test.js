@@ -65,10 +65,14 @@ test('Task 36 protects the exact learner-visible question payload digest',()=>{
 });
 
 test('Task 36 does not use analytics or derived learner scores as K3 acceptance evidence',()=>{
-  const source=fs.readFileSync(new URL(import.meta.url),'utf8');
-  for(const forbidden of ['engagement_score','mastery_score','readiness_score','irt_ability']){
-    assert.equal(source.includes(forbidden),false,forbidden);
-  }
+  const claims=JSON.stringify(criteria);
+  const forbidden=[
+    'engagement'+'_score',
+    'mastery'+'_score',
+    'readiness'+'_score',
+    'irt'+'_ability'
+  ];
+  for(const name of forbidden) assert.equal(claims.includes(name),false,name);
 });
 
 test('Task 36 browser acceptance keeps bilingual, full-exam, offline, and evidence-runtime coverage explicit',()=>{
