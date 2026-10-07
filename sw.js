@@ -42,7 +42,7 @@ const ASSETS = [
   './src/content/runtimeBundle.js',
   './src/content/contentModelV2.js',
   './data/migrations/sdaia-generated-v2-question-ids.json',
-  './data/factory/knowledge/objectives.json',
+  './data/evidence/sdaia-ai-engineer.objectives-v1.json',
   './data/evidence/sdaia-ai-engineer.runtime-v1.json',
   './tracks/sdaia-ai-engineer/manifest.json',
   './tracks/sdaia-ai-engineer/presentation.json',
