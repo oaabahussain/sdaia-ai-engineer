@@ -125,6 +125,16 @@ function importResponse(external,context,{mapping,crypto,importerOriginId,nextOr
   if(!strictContext(context))return {kind:'stage',reason_code:'MISSING_REVISION_CONTEXT'};
   const learner=actorLearner(external,mapping);
   if(!learner||learner!==context.learner_id)return {kind:'reject',reason_code:'PII_OR_LEARNER_CONTEXT_MISMATCH'};
+  const expectedItemId=iri(mapping.bases.item,context.item_version_id);
+  if(external?.object?.type!=='AssessmentItem'||external.object.id!==expectedItemId){
+    return {kind:'reject',reason_code:'EXTERNAL_CONTEXT_MISMATCH'};
+  }
+  if(STRICT_MODES.has(context.mode)){
+    const expectedAttemptId=iri(mapping.bases.attempt,context.assessment_attempt_id);
+    if(external?.target?.type!=='Attempt'||external.target.id!==expectedAttemptId){
+      return {kind:'reject',reason_code:'EXTERNAL_CONTEXT_MISMATCH'};
+    }
+  }
   if(!nonEmpty(external.eventTime))return {kind:'stage',reason_code:'MISSING_SOURCE_TIMESTAMP'};
   const optionIndex=responseIndex(external);
   if(optionIndex===null)return {kind:'omit',reason_code:'UNSUPPORTED_SEMANTICS'};

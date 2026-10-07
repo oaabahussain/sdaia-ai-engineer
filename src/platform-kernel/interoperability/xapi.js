@@ -113,11 +113,21 @@ function answerIndex(statement){
   const n=Number(raw);
   return Number.isSafeInteger(n) ? n : null;
 }
-function importAnswered(statement, context, {crypto, importerOriginId, nextOriginSeq}){
+function importAnswered(statement, context, {mapping, crypto, importerOriginId, nextOriginSeq}){
   if(!requiredContext(context)) return {kind:'stage',reason_code:'MISSING_K3_CONTEXT'};
   if(!strictContext(context)) return {kind:'stage',reason_code:'MISSING_REVISION_CONTEXT'};
   const learner=actorLearner(statement);
   if(!learner || learner !== context.learner_id) return {kind:'reject',reason_code:'PII_OR_LEARNER_CONTEXT_MISMATCH'};
+  const expectedObjectId=iri(mapping.item_base_iri,context.item_version_id);
+  if(statement?.object?.objectType !== 'Activity' || statement.object.id !== expectedObjectId){
+    return {kind:'reject',reason_code:'EXTERNAL_CONTEXT_MISMATCH'};
+  }
+  if(STRICT_MODES.has(context.mode) && statement?.context?.registration !== context.assessment_attempt_id){
+    return {kind:'reject',reason_code:'EXTERNAL_CONTEXT_MISMATCH'};
+  }
+  if(nonEmpty(statement?.context?.registration) && nonEmpty(context.assessment_attempt_id) && statement.context.registration !== context.assessment_attempt_id){
+    return {kind:'reject',reason_code:'EXTERNAL_CONTEXT_MISMATCH'};
+  }
   if(!nonEmpty(statement.timestamp)) return {kind:'stage',reason_code:'MISSING_SOURCE_TIMESTAMP'};
   const optionIndex=answerIndex(statement);
   if(optionIndex === null) return {kind:'omit',reason_code:'UNSUPPORTED_RESPONSE_ENCODING'};
@@ -194,6 +204,7 @@ export function createXapiAdapter({mapping=DEFAULT_MAPPING,crypto={randomUUID}}=
           return;
         }
         const result=importAnswered(statement,context,{
+          mapping:governed,
           crypto,
           importerOriginId:options.importerOriginId,
           nextOriginSeq:options.nextOriginSeq
