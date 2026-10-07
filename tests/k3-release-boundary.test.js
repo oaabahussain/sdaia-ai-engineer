@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, cpSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, cpSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,13 +57,13 @@ test('Task 35 assembled Pages artifact contains runtime evidence but excludes pr
       'data/evidence/sdaia-ai-engineer.runtime-v1.json',
       'data/evidence/event-definitions-v1.json',
       'data/evidence/payload-schemas'
-    ]) assert.doesNotThrow(()=>readFileSync(join(out,required)));
+    ]) assert.equal(existsSync(join(out,required)),true,required);
     for(const forbidden of [
       'data/evidence/mappings/xapi-v1.json',
       'data/evidence/mappings/caliper-v1.json',
       'data/factory/knowledge/objectives.json',
       'server/app/main.py',
       'src/platform-kernel/interoperability/xapi.js'
-    ]) assert.throws(()=>readFileSync(join(out,forbidden)));
+    ]) assert.equal(existsSync(join(out,forbidden)),false,forbidden);
   }finally{rmSync(out,{recursive:true,force:true});}
 });
