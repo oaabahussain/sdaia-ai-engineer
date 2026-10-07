@@ -1,0 +1,20 @@
+# K3 Task 36 clean-wave RED ruling
+
+**Date:** 2026-10-07
+**Status:** RED PREPARED / PRODUCT SEMANTICS UNCHANGED
+
+Task 36 maps spec §47 one-for-one.
+
+- Criteria 1–21 require executable evidence now.
+- Criterion 21 is pinned by the existing documentation contract baseline; Task 37 may still update final durable K3 documentation without making criterion 21 a fake future gate.
+- Criteria 22–25 remain explicit FUTURE_GATE items owned by Tasks 38–41.
+
+The Task 36 RED gap is browser acceptance evidence, not missing application behavior: the current browser smoke exercises assessments but does not independently inspect the K3 IndexedDB event store and prove that a real interaction persisted fine-grained learner evidence.
+
+GREEN must add an observable browser check that reads the governed evidence DB and verifies at least:
+- learner.activity.started@1
+- learner.item.presented@1
+- learner.response.recorded@1
+- learner.confidence.recorded@1
+
+No Product semantics may be changed to satisfy this acceptance test.
