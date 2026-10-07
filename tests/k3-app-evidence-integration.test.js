@@ -212,3 +212,18 @@ test('Task 29 browser wiring persists evidence runtime for resume and seeds the 
   ]) assert.ok(sw.includes(asset),'service worker must pre-cache '+asset);
   assert.match(smoke,/first new-version navigation|update-before-offline|service worker update/i);
 });
+
+
+test('Task 29 publishes an exact public objective projection without exposing factory paths',()=>{
+  const canonical=JSON.parse(readFileSync(new URL('../data/factory/knowledge/objectives.json',import.meta.url),'utf8'));
+  const runtime=JSON.parse(readFileSync(new URL('../data/evidence/sdaia-ai-engineer.objectives-v1.json',import.meta.url),'utf8'));
+  assert.deepEqual(runtime,canonical,'public objective projection must stay byte-semantically aligned with the canonical registry');
+  const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+  const builder=readFileSync(new URL('../scripts/build_pages_artifact.js',import.meta.url),'utf8');
+  assert.match(app,/data\/evidence\/sdaia-ai-engineer\.objectives-v1\.json/);
+  assert.match(sw,/\.\/data\/evidence\/sdaia-ai-engineer\.objectives-v1\.json/);
+  assert.doesNotMatch(sw,/\.\/data\/factory\/knowledge\/objectives\.json/);
+  assert.match(builder,/data\/evidence\/sdaia-ai-engineer\.objectives-v1\.json/);
+  assert.doesNotMatch(builder,/['"]data\/factory\/knowledge\/objectives\.json['"]/);
+});
