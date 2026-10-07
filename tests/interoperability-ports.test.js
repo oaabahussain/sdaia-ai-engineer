@@ -1,2 +1,18 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-test('interoperability ports are adapters around internal JSON contracts',async()=>{const p=await import('../src/platform-kernel/interoperability/ports.js');assert.throws(()=>p.assertAssessmentExchangePort({}),/exportAssessment/);assert.doesNotThrow(()=>p.assertAssessmentExchangePort({exportAssessment(){},importAssessment(){}}));assert.throws(()=>p.assertCompetencyExchangePort({}),/exportCompetencies/);assert.doesNotThrow(()=>p.assertCompetencyExchangePort({exportCompetencies(){},importCompetencies(){}}));assert.throws(()=>p.assertLearningEventExchangePort({}),/exportEvents/);assert.doesNotThrow(()=>p.assertLearningEventExchangePort({exportEvents(){},importEvents(){}}))});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+test('interoperability ports remain adapters around internal JSON contracts',async()=>{
+  const p=await import('../src/platform-kernel/interoperability/ports.js');
+  assert.throws(()=>p.assertAssessmentExchangePort({}),/exportAssessment/);
+  assert.doesNotThrow(()=>p.assertAssessmentExchangePort({exportAssessment(){},importAssessment(){}}));
+  assert.throws(()=>p.assertCompetencyExchangePort({}),/exportCompetencies/);
+  assert.doesNotThrow(()=>p.assertCompetencyExchangePort({exportCompetencies(){},importCompetencies(){}}));
+  assert.throws(()=>p.assertLearningEventExchangePort({}),/exportEvents/);
+  assert.doesNotThrow(()=>p.assertLearningEventExchangePort({exportEvents(){},importEvents(){}}));
+});
+
+test('LearningEventExchangePort hardening preserves existing method-only adapters',async()=>{
+  const p=await import('../src/platform-kernel/interoperability/ports.js');
+  const legacy={exportEvents(){return[]},importEvents(){return[]}};
+  assert.equal(p.assertLearningEventExchangePort(legacy),legacy);
+});

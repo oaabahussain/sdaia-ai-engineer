@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "mapping_version": "caliper-k3.v1",
+  "adapter_id": "caliper",
+  "adapter_version": "1",
+  "standard": "Caliper",
+  "standard_version": "1.2",
+  "context": "http://purl.imsglobal.org/ctx/caliper/v1p2",
+  "bases": {
+    "learner": "https://automizelab.net/k3/learners/",
+    "assessment": "https://automizelab.net/k3/assessments/",
+    "item": "https://automizelab.net/k3/items/",
+    "attempt": "https://automizelab.net/k3/attempts/",
+    "response": "https://automizelab.net/k3/responses/"
+  },
+  "events": {
+    "learner.activity.started@1": {
+      "type": "AssessmentEvent",
+      "action": "Started",
+      "generated": "Attempt"
+    },
+    "learner.assessment.submitted@1": {
+      "type": "AssessmentEvent",
+      "action": "Submitted",
+      "generated": "Attempt"
+    },
+    "learner.item.presented@1": {
+      "type": "AssessmentItemEvent",
+      "action": "Started",
+      "generated": "Attempt"
+    },
+    "learner.item.skipped@1": {
+      "type": "AssessmentItemEvent",
+      "action": "Skipped"
+    },
+    "learner.response.recorded@1": {
+      "type": "AssessmentItemEvent",
+      "action": "Completed",
+      "generated": "Response"
+    }
+  }
+}
