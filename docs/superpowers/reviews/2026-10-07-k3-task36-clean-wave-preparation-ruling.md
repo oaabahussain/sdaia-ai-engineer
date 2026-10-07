@@ -5,8 +5,8 @@
 
 Task 36 maps spec §47 one-for-one.
 
-- Criteria 1–21 require executable evidence now.
-- Criterion 21 is pinned by the existing documentation contract baseline; Task 37 may still update final durable K3 documentation without making criterion 21 a fake future gate.
+- Criteria 1–20 require executable evidence now.
+- Criterion 21 remains an explicit FUTURE_GATE owned by Task 37 because final K3 documentation/zero-tribal-knowledge closure has not yet executed.
 - Criteria 22–25 remain explicit FUTURE_GATE items owned by Tasks 38–41.
 
 The Task 36 RED gap is browser acceptance evidence, not missing application behavior: the current browser smoke exercises assessments but does not independently inspect the K3 IndexedDB event store and prove that a real interaction persisted fine-grained learner evidence.
