@@ -88,6 +88,10 @@ def main():
         req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html?sw-install=1'})
         wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='feedback-only service-worker install page')
         wait_until(lambda:execute(session,"return !!navigator.serviceWorker && !!navigator.serviceWorker.controller"),timeout=20,label='service worker controller before first app navigation')
+        # Simulate the already-used current content cache without warming any new K3 app/evidence module.
+        runtime_content=[*MANIFEST['content']['concept_files'],MANIFEST['content']['learn'],MANIFEST['content']['cases']]
+        warmed=execute(session,"return Promise.all(arguments[0].map(path=>fetch('./'+path,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(path+':'+r.status);return r.status;})))",[runtime_content])
+        assert len(warmed)==len(runtime_content), warmed
         server.terminate()
         server.wait(timeout=5)
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?first-new-version-navigation-offline=1'})
