@@ -34,7 +34,7 @@ function eventDefinition(runtimeContext, definitionId) {
   return definition;
 }
 
-function assertSnapshot(snapshot, { formId, contentReleaseId } = {}) {
+function assertSnapshot(snapshot, { formId, contentReleaseId, locale } = {}) {
   if (!snapshot || typeof snapshot !== 'object') throw new TypeError('frozen assessment snapshot is required');
   requireString(snapshot.form_id, 'assessment snapshot form_id');
   requireString(snapshot.content_release_id, 'assessment snapshot content_release_id');
@@ -47,6 +47,9 @@ function assertSnapshot(snapshot, { formId, contentReleaseId } = {}) {
   if (formId !== undefined && formId !== snapshot.form_id) throw new Error('form_id disagrees with frozen assessment snapshot');
   if (contentReleaseId !== undefined && contentReleaseId !== snapshot.content_release_id) {
     throw new Error('content_release_id disagrees with frozen assessment snapshot');
+  }
+  if (locale !== undefined && locale !== snapshot.locale) {
+    throw new Error('locale disagrees with frozen assessment snapshot');
   }
   return clone(snapshot);
 }
@@ -88,11 +91,13 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     if (!supplied) return activities.get(input?.activity_id);
     const activityId = requireUuid(input.activity_id ?? supplied.activity_id, 'activity_id');
     if (supplied.activity_id && supplied.activity_id !== activityId) throw new Error('activity context identity mismatch');
+    const existing = activities.get(activityId);
     const mode = requireString(supplied.mode, 'activity mode');
     const strict = STRICT_MODES.has(mode);
     const snapshot = strict ? assertSnapshot(supplied.assessment_snapshot, {
       formId: supplied.form_id,
-      contentReleaseId: supplied.content_release_id
+      contentReleaseId: supplied.content_release_id,
+      locale: supplied.locale
     }) : null;
     const activity = {
       learner_id: requireString(supplied.learner_id, 'learner_id'),
@@ -110,6 +115,19 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     };
     if (activity.track_id !== runtimeContext.track.id) throw new Error('activity track does not match runtime track');
     if (activity.content_release_id !== runtimeContext.evidence.content_release_id) throw new Error('activity release does not match runtime release');
+    if (existing) {
+      const immutableMismatch =
+        existing.learner_id !== activity.learner_id ||
+        existing.track_id !== activity.track_id ||
+        existing.content_release_id !== activity.content_release_id ||
+        existing.mode !== activity.mode ||
+        existing.locale !== activity.locale ||
+        existing.assessment_attempt_id !== activity.assessment_attempt_id ||
+        existing.form_id !== activity.form_id ||
+        JSON.stringify(existing.assessment_snapshot ?? null) !== JSON.stringify(activity.assessment_snapshot ?? null);
+      if (immutableMismatch) throw new Error('activity context conflicts with frozen recorder state');
+      return existing;
+    }
     activities.set(activity.activity_id, activity);
     if (strict && !localAttemptRevisions.has(activity.assessment_attempt_id)) {
       localAttemptRevisions.set(activity.assessment_attempt_id, activity.attempt_revision);
@@ -208,14 +226,15 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     const releaseId = input.content_release_id ?? runtimeContext.evidence.content_release_id;
     if (trackId !== runtimeContext.track.id) throw new Error('track_id does not match runtime track');
     if (releaseId !== runtimeContext.evidence.content_release_id) throw new Error('content_release_id does not match runtime release');
-    const snapshot = strict ? assertSnapshot(input.assessment_snapshot, { formId: input.form_id, contentReleaseId: releaseId }) : null;
+    const locale = requireString(input.locale ?? input.assessment_snapshot?.locale, 'locale');
+    const snapshot = strict ? assertSnapshot(input.assessment_snapshot, { formId: input.form_id, contentReleaseId: releaseId, locale }) : null;
     const activity = {
       learner_id: requireString(input.learner_id, 'learner_id'),
       activity_id: input.activity_id ? requireUuid(input.activity_id, 'activity_id') : uuid('activity_id'),
       track_id: trackId,
       content_release_id: releaseId,
       mode,
-      locale: requireString(input.locale ?? snapshot?.locale, 'locale'),
+      locale,
       ...(strict ? {
         assessment_attempt_id: input.assessment_attempt_id ? requireUuid(input.assessment_attempt_id, 'assessment_attempt_id') : uuid('assessment_attempt_id'),
         form_id: snapshot.form_id,
