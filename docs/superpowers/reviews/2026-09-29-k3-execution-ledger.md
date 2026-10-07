@@ -631,3 +631,18 @@ The fix binds xAPI object + strict registration and Caliper AssessmentItem + str
 Review then hardened missing-identity cases and rejection classification. Final head `4d695715c32f75c4cc7c952c3fe6047e7a83441e` passed quality #956 and server #2088 with both review threads resolved.
 
 PR #56 merged as `a43e102893cf7550d81133f61909821a39c98f93`. Post-merge server #2089 and Pages/live #52 passed. Important findings return to zero. Task 34 is next and not started.
+
+
+## Tasks 34–36 clean-wave execution COMPLETE — 2026-10-07
+
+Tasks 34 → 35 → 36 were prepared together and executed sequentially without intermediate Product merge to `main`.
+
+Task 34 — governed Product Analytics bridge — complete. RED `683001aad3575960d2140fef9c5587354f962cef` / quality #958 failed as intended while server #2092 passed. Product head `f07cb6db612c1917dd8a0d482ae36cd7c1b541da` passed quality #959 and server #2093. The bridge applies learner-evidence privacy before explicit analytics mapping, generates a separate analytics UUID, emits only registry-validated Product Analytics events, and has no Telemetry side effect.
+
+Task 35 — K3 release boundary — complete. Corrected RED `e807406564590c5fad148f5017ff34daeeaec00a` / quality #962 produced four intended failures: missing focused K3 release validator and missing Python/server contracts inside PR/Pages gates; server #2096 stayed green. The first GREEN exposed a validator implementation defect: relative JSON-schema references were compiled without a shared schema registry. The fix preloads governed K3 schemas into Ajv before resolving `$ref`. Final head `bc23e103ea8e21d660a06b9480ad979343ff448b` passed quality #966 and server #2100. Public Pages/SW boundaries remain minimal and exclude private K3 interoperability mappings/server/factory operational state.
+
+Task 36 — executable learner-evidence acceptance — complete. After repairing one self-referential test-harness bug, RED `b1da8a08d8264ea5ddd17899f6a96924ac995227` / quality #969 produced 835 total / 834 PASS / 1 intended FAIL: browser acceptance did not yet observe durable evidence in IndexedDB; server #2103 passed. Browser smoke now reads `learning-platform.evidence.v1.<track>` / `events` and proves activity-started, item-presented, response-recorded, and confidence-recorded persistence. Combined review then found criterion 21 documentation closure belongs to Task 37; review RED #972 produced 836 total / 835 PASS / 1 FAIL. Final matrix keeps criteria 1–20 executable and 21–25 future-gated to Tasks 37–41. Final reviewed head `b284024fbc8f3733393ca776591f77a9cc46c1ed` passed quality #974 (836/836 Node; process 73/73; K3 release artifacts; Pages; browser smoke with durable_learner_evidence=PASS) and server #2108 with zero unresolved review threads.
+
+PR #60 merged the combined wave to `main` as `1930f844a5de9a8c50bf42b1a0e027528218b8e9`. Reviewed and merged tree are identical: `2d37a834e0d3b2f823af151dcc3eab357458d09e`. Post-merge server #2109 and Pages/live #54 passed.
+
+Tasks 34, 35, and 36 are durably COMPLETE. Task 37 is NEXT and NOT STARTED.
