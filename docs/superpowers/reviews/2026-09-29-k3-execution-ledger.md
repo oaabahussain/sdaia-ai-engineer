@@ -561,3 +561,26 @@ Ruling: `docs/superpowers/reviews/2026-10-06-k3-task29-offline-scope-ruling.md`.
 Task 28/30 packets are unchanged. Task 29 packet is regenerated deterministically with scope augmentation only; approved spec/plan hashes and learner-visible behavior remain unchanged.
 
 No Task 28/29/30 Product implementation or RED execution occurred. Task 28 remains NOT STARTED; Task 31 remains out of scope.
+
+
+## Tasks 28–30 clean-wave execution COMPLETE — 2026-10-07
+
+User-approved operational ruling: execute Tasks 28 → 29 → 30 as one clean stacked wave without intermediate installation/merge to `main`, while preserving dependency order and exact-head verification. Each later task was based only on the accepted head of its predecessor. No Product commit from historical PR #46 was used as an execution base. Cost if wrong: an integration defect could span task boundaries, so the final Task 30 head was required to pass the complete repository/process/browser/server suite before the single integration merge.
+
+Task 28: complete (clean RED prep `3220a92976ecfca64b532288082722bf93f31462`; quality #912 FAIL as intended with five missing-recorder assertions; review RED `4b238c47cf07272dd6ccafe17f686379a8babdeb`; quality #914 FAIL as intended for resume/frozen-context hardening; final accepted head `de9dd087fdaf657df83f6a05e01b2cc8323f5947`; quality #915 SUCCESS; server/adapter #2043 SUCCESS). Product: browser evidence recorder, SYSTEM evaluation fail-closed, frozen assessment-context validation, and atomic strict-attempt revision coordination through the IndexedDB storage boundary.
+
+Task 28: Ruling: strict same-origin assessment revision coordination cannot be correct with recorder-local maps alone; Task 28 scope was narrowly augmented to `src/evidence/indexedDbStore.js` so the base→proposed revision precondition is checked and committed in the same IndexedDB transaction as the learner response. Cost if wrong: storage adapters that later support browser strict capture must provide equivalent atomic coordination rather than relying on recorder memory.
+
+Task 29: complete (behavioral RED trigger `ea342a188811072fe5b2e9fa90aeebb33b2c65e0`; quality #916 FAIL as intended; server/adapter #2044 SUCCESS; final accepted head `ce8618e2a040e8967bcba05b81bc6fd5ba9a4885`; quality #931 SUCCESS; server/adapter #2059 SUCCESS). Product: pure assessment evidence bridge, persisted resume evidence runtime, canonical objective linkage, exact public objective projection, service-worker/offline update coverage, and no fabricated browser SYSTEM evaluation authority.
+
+Task 29: Ruling: the browser must not publish private factory governance paths. The canonical factory objective registry is projected byte-semantically to `data/evidence/sdaia-ai-engineer.objectives-v1.json`, included in the public Pages artifact and service-worker cache, and used by the app bridge. Audit on the combined head resolved all 140 concepts to exactly one objective (0 missing, 0 multiple), covering all 1,120 generated questions. Cost if wrong: any future objective-registry change must update the governed public projection atomically or runtime evidence linkage will fail closed.
+
+Task 30: complete (RED head `89483072cba9e225fd1d200a07e670d7255a3125`; quality #932 FAIL as intended; server/adapter #2060 SUCCESS; final accepted head `d2517c5d4762eaf3060a670b77d33b90dafac7bd`; quality #936 SUCCESS; server/adapter #2064 SUCCESS). Product: optional `createEvidenceSyncCapability`, request-scoped authorization-provider injection, local-only default, no credential persistence, and explicit rejection of `X-Anon-Id` as learner-evidence authorization.
+
+Combined wave verification on reviewed head `d2517c5d4762eaf3060a670b77d33b90dafac7bd`: Node 788/788 PASS; process 73/73 PASS; packet compiler deterministic PASS; Pages artifact PASS; browser smoke PASS with bank=1120, bilingual/RTL-LTR, full_exam=200, offline cached reload, feedback URLs and presentation; zero open review threads. Final review was self-review because no subagent review tool was available in this harness.
+
+Integration PR #49 merged the complete clean wave to `main` as `ac3e3ecfd9ba12cc1c70a3073c379553da5c06a4`. The reviewed head tree and merge tree are identical: `2a3fa64154412730a00355e74353a1908e0b379c`.
+
+Post-merge verification on `main@ac3e3ecfd9ba12cc1c70a3073c379553da5c06a4`: server/adapter #2065 SUCCESS; Pages #48 SUCCESS; live learner evidence context PASS; live content model PASS (7 domains, contract v4); live track registry PASS; live service-worker contract PASS.
+
+Tasks 28, 29, and 30 are durably COMPLETE. Task 31 is NEXT and NOT STARTED.
