@@ -29,3 +29,5 @@ RED tests are added before Product edits. Task 34 remains blocked until:
 2. xAPI/Caliper adapters reject mismatches;
 3. full regression/Pages/browser/server gates are green;
 4. CURRENT-STATE returns to PHASE_GATE with zero Important findings.
+
+RED trigger head is intentionally documentation-only before Product repair.
