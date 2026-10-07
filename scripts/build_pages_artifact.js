@@ -35,6 +35,7 @@ for (const relative of [
   'data/migrations',
   'data/learn.json',
   'data/cases.json',
+  'data/evidence/sdaia-ai-engineer.objectives-v1.json',
   'data/evidence/sdaia-ai-engineer.runtime-v1.json',
   'data/evidence/sdaia-ai-engineer.scoring-v1.json',
   'data/evidence/event-definitions-v1.json',
@@ -47,6 +48,9 @@ for (const forbidden of ['data/legacy', 'data/factory', 'src/platform-kernel']) 
   }
 }
 
+if (!existsSync(join(output, 'data/evidence/sdaia-ai-engineer.objectives-v1.json'))) {
+  throw new Error('Missing Pages K3 objective runtime projection');
+}
 if (!existsSync(join(output, 'tracks/registry.json'))) {
   throw new Error('Missing Pages track registry');
 }

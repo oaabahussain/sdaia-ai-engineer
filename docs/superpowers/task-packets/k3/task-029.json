@@ -57,13 +57,15 @@
     "allowed_create": [
       "src/evidence/appBridge.js",
       "tests/k3-app-evidence-integration.test.js",
-      "tests/k1-current-runtime-regression.test.js"
+      "tests/k1-current-runtime-regression.test.js",
+      "data/evidence/sdaia-ai-engineer.objectives-v1.json"
     ],
     "allowed_delete": [],
     "allowed_modify": [
       "src/app.js",
       "sw.js",
-      "scripts/browser_smoke.py"
+      "scripts/browser_smoke.py",
+      "scripts/build_pages_artifact.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_29"

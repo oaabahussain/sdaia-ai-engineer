@@ -250,6 +250,48 @@ export function createIndexedDbEvidenceStore({ dbName, storeId, indexedDB }) {
       captureTail = job.then(() => undefined, () => undefined);
       return job;
     },
+    captureLocalStrict({ eventInput, runtimeContext, outbox: requestedOutbox, assessmentAttemptId, baseAttemptRevision, proposedAttemptRevision }) {
+      if (requestedOutbox != null && requestedOutbox !== outbox) throw new TypeError('capture requires the same store-bound outbox');
+      if (typeof assessmentAttemptId !== 'string' || !assessmentAttemptId) throw new TypeError('assessmentAttemptId is required');
+      if (!Number.isSafeInteger(baseAttemptRevision) || baseAttemptRevision < 0) throw new TypeError('baseAttemptRevision must be a non-negative integer');
+      if (!Number.isSafeInteger(proposedAttemptRevision) || proposedAttemptRevision !== baseAttemptRevision + 1) throw new TypeError('proposedAttemptRevision must equal baseAttemptRevision + 1');
+      const input = structuredClone(eventInput);
+      if (input.assessment_attempt_id !== assessmentAttemptId) throw new Error('assessment attempt identity mismatch');
+      if (input.base_attempt_revision !== baseAttemptRevision || input.proposed_attempt_revision !== proposedAttemptRevision) throw new Error('assessment revision envelope mismatch');
+      assertOrdinaryEvidenceProducer(input.definition_id);
+      const storage = runtimeContext?.originStorage;
+      const context = structuredClone({ track: runtimeContext?.track, evidence: runtimeContext?.evidence, eventDefinitions: runtimeContext?.eventDefinitions });
+      const syncEnabled = requestedOutbox != null;
+      const operation = async () => {
+        for (;;) {
+          const head = await transact(['events', 'meta'], 'readonly', tx => localHead(tx, storage));
+          if (!Number.isSafeInteger(head.origin_seq) || head.origin_seq >= Number.MAX_SAFE_INTEGER) throw new Error('capture origin sequence overflow');
+          const event = createLearnerEvidenceEvent({ ...input, origin_id: head.origin_id, origin_seq: head.origin_seq + 1 }, context);
+          assertEvidenceAcceptance(event);
+          const fingerprint = await fingerprintEvent(event);
+          const captured = await transact(['events', 'receipts', 'meta', 'outbox'], 'readwrite', async tx => {
+            const current = await localHead(tx, storage);
+            if (current.origin_id !== head.origin_id || current.origin_seq !== head.origin_seq) return null;
+            const meta = tx.objectStore('meta');
+            const revisionKey = `attempt_revision:${assessmentAttemptId}`;
+            const savedRevision = await requestResult(meta.get(revisionKey));
+            const currentRevision = savedRevision?.value ?? 0;
+            if (!Number.isSafeInteger(currentRevision) || currentRevision < 0) throw new Error('invalid assessment attempt revision');
+            if (currentRevision !== baseAttemptRevision) throw new Error(`stale assessment attempt revision: expected ${currentRevision}, received ${baseAttemptRevision}`);
+            const receipt = await appendInTransaction(tx, event, fingerprint);
+            if (receipt.disposition !== 'ACCEPTED') throw new Error(`Local evidence not durably recorded: ${receipt.disposition}`);
+            meta.put({ key: 'capture_origin', value: { origin_id: event.origin_id, origin_seq: event.origin_seq } });
+            meta.put({ key: revisionKey, value: proposedAttemptRevision });
+            if (syncEnabled) tx.objectStore('outbox').add(pendingOutboxRecord(event.event_id));
+            return { event, receipt };
+          });
+          if (captured) return captured;
+        }
+      };
+      const job = captureTail.then(operation, operation);
+      captureTail = job.then(() => undefined, () => undefined);
+      return job;
+    },
     async getById(eventId) {
       return transact(['events'], 'readonly', async tx => (await requestResult(tx.objectStore('events').get(eventId)))?.event ?? null);
     },
