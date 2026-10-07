@@ -88,10 +88,9 @@ function exportOne(event,mapping){
   return {kind:'map',value:statement};
 }
 
-function actorLearner(statement,mapping){
+function actorLearner(statement){
   const actor=statement?.actor;
   if(actor?.objectType !== 'Agent' || !nonEmpty(actor?.account?.name) || !nonEmpty(actor?.account?.homePage)) return null;
-  if(actor.account.homePage !== mapping.actor_account_home_page) return null;
   if(actor.mbox !== undefined || actor.name !== undefined || obviousPii(actor.account.name)) return null;
   return actor.account.name;
 }
@@ -117,7 +116,7 @@ function answerIndex(statement){
 function importAnswered(statement, context, {mapping, crypto, importerOriginId, nextOriginSeq}){
   if(!requiredContext(context)) return {kind:'stage',reason_code:'MISSING_K3_CONTEXT'};
   if(!strictContext(context)) return {kind:'stage',reason_code:'MISSING_REVISION_CONTEXT'};
-  const learner=actorLearner(statement,mapping);
+  const learner=actorLearner(statement);
   if(!learner || learner !== context.learner_id) return {kind:'reject',reason_code:'PII_OR_LEARNER_CONTEXT_MISMATCH'};
   const expectedObjectId=iri(mapping.item_base_iri,context.item_version_id);
   if(statement?.object?.objectType !== 'Activity' || statement.object.id !== expectedObjectId){
