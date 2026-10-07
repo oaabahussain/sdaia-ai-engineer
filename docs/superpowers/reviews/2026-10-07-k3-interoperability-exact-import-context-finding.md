@@ -14,13 +14,12 @@ That allowed a caller with an explicit context object to canonicalize an externa
 
 Canonical import must fail closed unless the external record agrees with the supplied governed K3 context:
 
-- xAPI actor account namespace must equal the governed actor account home page;
 - xAPI object ID must equal the governed K3 item IRI for `context.item_version_id`;
 - xAPI registration must equal the strict K3 `assessment_attempt_id`;
 - Caliper object ID must equal the governed K3 AssessmentItem IRI;
 - Caliper target must be the governed Attempt IRI for the K3 attempt.
 
-This is not a request to infer K3 context from external IDs. The supplied K3 context remains authoritative; the external record is only checked for consistency.
+This is not a request to infer K3 context from external IDs. The supplied K3 context remains authoritative; the external record is only checked for consistency. xAPI actor account homePage may be an external namespace; canonicalization still requires a pseudonymous account name matching the governed learner context.
 
 ## TDD boundary
 
