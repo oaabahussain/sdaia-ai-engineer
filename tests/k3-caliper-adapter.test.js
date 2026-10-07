@@ -186,7 +186,9 @@ test('Task 33 import stages when exact K3 context is absent and maps only with e
     question_family_id:'family-1',
     item_version_id:'item.v1',
     objective_id:'objective-1',
-    domain_id:'core-ai'
+    domain_id:'core-ai',
+    base_attempt_revision:0,
+    proposed_attempt_revision:1
   };
   const mapped=adapter.importEvents([external],{
     contextByExternalId:{[external.id]:context},
@@ -201,4 +203,42 @@ test('Task 33 import stages when exact K3 context is absent and maps only with e
   assert.equal(mapped.mapped_ids[0].source_id,external.id);
   assert.equal(mapped.mapped_ids[0].source_occurred_at,external.eventTime);
   assert.equal(mapped.mapped_ids[0].importer_order_only,true);
+});
+
+
+test('Task 33 strict Caliper import abstains when revision-chain context is unavailable',async()=>{
+  const api=await loadApi();
+  assert.equal(typeof api.createCaliperAdapter,'function','Task 33 Caliper adapter behavior is missing');
+  const adapter=api.createCaliperAdapter({crypto:{randomUUID:()=>ids.importedEvent}});
+  const external={
+    '@context':'http://purl.imsglobal.org/ctx/caliper/v1p2',
+    id:'urn:uuid:cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+    type:'AssessmentItemEvent',
+    actor:{id:'https://automizelab.net/k3/learners/learner%3Apseudonym-42',type:'Person'},
+    action:'Completed',
+    object:{id:'https://automizelab.net/k3/items/item.v1',type:'AssessmentItem'},
+    target:{id:'https://automizelab.net/k3/attempts/'+ids.attempt,type:'Attempt'},
+    generated:{id:'urn:uuid:dddddddd-dddd-4ddd-8ddd-dddddddddddd',type:'Response',value:'3'},
+    eventTime:'2026-10-07T10:26:00.000Z'
+  };
+  const incomplete={
+    learner_id:'learner:pseudonym-42',
+    activity_id:ids.activity,
+    track_id:'sdaia-ai-engineer',
+    content_release_id:'sdaia-ai-engineer.bootstrap.v1',
+    mode:'mock',
+    locale:'en',
+    assessment_attempt_id:ids.attempt,
+    form_id:'form:fixture',
+    item_interaction_id:ids.interaction,
+    item_version_id:'item.v1'
+  };
+  const out=adapter.importEvents([external],{
+    contextByExternalId:{[external.id]:incomplete},
+    importerOriginId:ids.importerOrigin,
+    nextOriginSeq:()=>12
+  });
+  assert.equal(out.events.length,0);
+  assert.equal(out.staged.length,1);
+  assert.match(out.staged[0].reason_code,/REVISION|CONTEXT/i);
 });
