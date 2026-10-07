@@ -290,14 +290,17 @@ test('Post-merge review: Caliper canonical import rejects item or Attempt identi
   };
   for(const mutate of [
     e=>{e.object.id='https://automizelab.net/k3/items/other.v1';},
-    e=>{e.target.id='https://automizelab.net/k3/attempts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';}
+    e=>{delete e.object.id;},
+    e=>{e.target.id='https://automizelab.net/k3/attempts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';},
+    e=>{delete e.target.id;}
   ]){
     const external=structuredClone(baseExternal); mutate(external);
     const out=adapter.importEvents([external],{
       contextByExternalId:{[external.id]:context},
       importerOriginId:ids.importerOrigin,nextOriginSeq:()=>13
     });
-    assert.equal(out.events.length,0,'mismatched external identity/context must not canonicalize');
-    assert.ok(out.rejections.length+out.staged.length>=1);
+    assert.equal(out.events.length,0,'mismatched or missing external identity/context must not canonicalize');
+    assert.equal(out.rejections.length,1,'identity conflicts are invalid, not retryable staged records');
+    assert.equal(out.staged.length,0);
   }
 });
