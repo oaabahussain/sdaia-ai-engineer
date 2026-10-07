@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-07
 **Severity:** Important / P1
-**Status:** OPEN RED / Task 34 BLOCKED
+**Status:** CLOSED / POST-MERGE VERIFIED
 
 ## Finding
 
@@ -23,10 +23,12 @@ This is not a request to infer K3 context from external IDs. The supplied K3 con
 
 ## TDD boundary
 
-RED tests are added before Product edits. Task 34 remains blocked until:
-1. RED reproduces the mismatch;
-2. xAPI/Caliper adapters reject mismatches;
-3. full regression/Pages/browser/server gates are green;
-4. CURRENT-STATE returns to PHASE_GATE with zero Important findings.
+RED tests are added before Product edits. Closure evidence:
+1. RED quality #953 reproduced exactly two identity-context failures (812 PASS / 2 FAIL).
+2. xAPI/Caliper adapters now reject mismatched or missing external item/attempt identities before canonicalization.
+3. Review hardening requires conflicts to be explicit rejections rather than staged retry records.
+4. Final PR quality #956 and server/adapter #2088 passed.
+5. Post-merge Pages/live #52 and server/adapter #2089 passed.
+6. Task 34 may proceed only after this closure checkpoint is itself validated and merged.
 
 RED trigger head is intentionally documentation-only before Product repair.
