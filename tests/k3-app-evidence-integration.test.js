@@ -208,7 +208,7 @@ test('Task 29 browser wiring persists evidence runtime for resume and seeds the 
     './src/evidence/appBridge.js',
     './src/evidence/recorder.js',
     './src/evidence/localCapture.js',
-    './data/factory/knowledge/objectives.json'
+    './data/evidence/sdaia-ai-engineer.objectives-v1.json'
   ]) assert.ok(sw.includes(asset),'service worker must pre-cache '+asset);
   assert.match(smoke,/first new-version navigation|update-before-offline|service worker update/i);
 });
