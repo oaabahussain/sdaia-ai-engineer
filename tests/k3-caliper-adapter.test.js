@@ -242,3 +242,23 @@ test('Task 33 strict Caliper import abstains when revision-chain context is unav
   assert.equal(out.staged.length,1);
   assert.match(out.staged[0].reason_code,/REVISION|CONTEXT/i);
 });
+
+
+test('Task 33 abstains from Caliper Assessment semantics for non-assessment K3 modes',async()=>{
+  const api=await loadApi();
+  const adapter=api.createCaliperAdapter();
+  const learning=base('learner.activity.started@1',{
+    mode:'learn',
+    assessment_attempt_id:undefined,
+    form_id:undefined
+  });
+  const practiceItem=item('learner.item.presented@1',{
+    mode:'practice',
+    assessment_attempt_id:undefined,
+    form_id:undefined
+  });
+  const out=adapter.exportEvents([learning,practiceItem]);
+  assert.equal(out.events.length,0);
+  assert.equal(out.omissions.length,2);
+  assert.ok(out.omissions.every(row=>/NOT_ASSESSMENT|UNSUPPORTED/.test(row.reason_code)));
+});
