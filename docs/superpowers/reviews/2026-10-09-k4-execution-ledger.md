@@ -40,3 +40,12 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - GREEN `d82646d5bf6d80dbff35976b5f00c90f84642051`: [Quality #37857672200](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857672200) **SUCCESS** and [Server #37857672048](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857672048) **SUCCESS**. New `tests/k4-policy.test.js` asserts exact 48/24/96/720 baseline, fail-closed immutable safety, mode exclusions, no FSRS, deep-frozen return and unknown settings denied.
 - Task 02 complete on code GREEN evidence; K4 state revision 3, `completed_through_task=2`, `next_task=3` at checkpoint `d5cf71c58398eb56bcbfff7e4b6381713646464d`. Existing strict exam and content preserved.
 - Ruling: keep browser runtime validator dependency-free; a fixed v1 schema and matching pure-JS invariant checker are needed because Node/Ajv modules are not bundled into GitHub Pages. Future policy changes require new version and schema/contract review.
+
+## Task 03 — completed
+
+- RED commit: ffdb56a06e0f500c5f1af8779adb466a6ffbcc1d. Quality run 37857903384: 856 passed, 1 expected missing-module failure for publicCatalog.js.
+- GREEN commit: b2cbb561e4247ed2c1ce208ab196078a1277e544. Quality 37858034328 SUCCESS; Server 37858034329 SUCCESS.
+- K2 post-merge documentation verifies 1,120 public learner-visible bootstrap questions; checked migration blob 6e1626cb53038aa5fa48c4de7537f640b1e36e7f, objectives blob 2bfa076d2c133a92bb3cd0baecc8223adc57fc49, runtime version and matching SHA256. Every current public version resolved uniquely to an objective.
+- Output: an explicit catalog of 1,120 public current family/item IDs, with release/digest checks, no answer content in candidate outputs, and rejection of protected or unavailable identities.
+- State revision 4, completed_through_task 3, next_task 4.
+- Ruling: derive initial allowlist exclusively from verified published bootstrap metadata. Newly generated private items are not enrolled. An incorrect classification could expose restricted study content; strict release checks are mandatory.
