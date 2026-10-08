@@ -27,3 +27,8 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Task 01 complete (RED `2ca62b1` to GREEN `6ef7a2f`); checked actual K4 state revision advanced to **2**, `completed_through_task=1`, `next_task=2` on follow-up commit `b5ab43ca6e432f36269034627807c1715e01fbd5`.
 - Additional CLI-proof test `tests/k4-state.test.js` updated commit `e1b38d371fb0fa5b57ea5e242787127f829edf5f`, checks actual K4 manifest via `node scripts/process/validate_k4_state.js` with Git HEAD spec/plan blobs. **Final checkpoint exact-head CI must be checked separately** before Task 02 is started.
 - No K3 `CURRENT-STATE.json` or Product question-bank changes.
+
+## Task 01 — final checkpoint verification
+
+- Final checkpoint/head `cff483db959d3ff57d6f778ddcf74ea61d977f7a` CI [Quality #37857351502](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857351502): SUCCESS; [Server & Adapter #37857351496](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857351496): SUCCESS.
+- The actual K4 manifest CLI preflight test added in `tests/k4-state.test.js` ran as part of Node tests at that commit. K4 Task 01 is **COMPLETE** and current state points to Task 02; K3 state preserved. Never equate this with K4 whole feature complete.
