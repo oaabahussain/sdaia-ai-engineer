@@ -1,0 +1,40 @@
+name: K3 Task 39 exact checkpoint Git bundle import
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+    paths:
+      - 'transfers/k3-task39-checkpoint.bundle.b64'
+      - '.github/workflows/k3-task39-checkpoint-import.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+      - name: Verify exact SHA, ancestor, and unchanged approved main
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=ec7b24b54e466452a0b359b4828389e3289bbbe0
+          expected=828b57f6f1fbf7ea45791cd833cbba2d24a889b6
+          tree=58fef098976f46096666f99d32851d2e913866f9
+          main=5b7453407def933037c4c254cd0fca5e5f3f1591
+          transfer=transfers/k3-task39-checkpoint.bundle.b64
+          test -s "$transfer"
+          base64 --decode "$transfer" > /tmp/k3-task39-checkpoint.bundle
+          echo '5181d83b04c87189a383ef1625904f4a5c7428c1dfef083642c5a7ceae3656d0  /tmp/k3-task39-checkpoint.bundle' | sha256sum --check --status
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$main"
+          git cat-file -e "$base^{commit}"
+          git bundle verify /tmp/k3-task39-checkpoint.bundle
+          git fetch /tmp/k3-task39-checkpoint.bundle 'refs/heads/impl/k3-tasks37-39-clean-wave:refs/heads/k3-task39-checkpoint-verified'
+          test "$(git rev-parse refs/heads/k3-task39-checkpoint-verified)" = "$expected"
+          test "$(git rev-parse "$expected^{tree}")" = "$tree"
+          git merge-base --is-ancestor "$base" "$expected"
+          remote_sha=$(git ls-remote origin refs/heads/impl/k3-tasks37-39-clean-wave | cut -f1)
+          test "$remote_sha" = "$base"
+          git push origin "$expected:refs/heads/impl/k3-tasks37-39-clean-wave"
+          echo "EXACT_CHECKPOINT_HEAD=$expected"
