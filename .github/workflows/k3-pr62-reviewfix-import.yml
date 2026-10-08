@@ -1,0 +1,39 @@
+name: K3 PR62 reviewed finding repair import
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+    paths:
+      - 'transfers/k3-pr62-reviewfix.bundle.b64'
+      - '.github/workflows/k3-pr62-reviewfix-import.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+      - name: Fail closed on all drift, verify unchanged Task39 ancestor, transport reviewed fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=828b57f6f1fbf7ea45791cd833cbba2d24a889b6
+          expected=ebd7a7afc2af2a611cda63fcce9282b39c17e26b
+          expected_tree=0b3c058faacd4fca1bedac93eeeb1106f73c6a9c
+          main=5b7453407def933037c4c254cd0fca5e5f3f1591
+          transport=transfers/k3-pr62-reviewfix.bundle.b64
+          test -s "$transport"
+          base64 --decode "$transport" > /tmp/k3-pr62-reviewfix.bundle
+          echo '29deaaa43888a3187613be342d740d57cc75f3dff2596a6f3246d80033abd25b  /tmp/k3-pr62-reviewfix.bundle' | sha256sum --check --status
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$main"
+          test "$(git ls-remote origin refs/heads/impl/k3-tasks37-39-clean-wave | cut -f1)" = "82b1bfd93c9ba6e3a117f01f1a5bdd1050ed53ed"
+          git bundle verify /tmp/k3-pr62-reviewfix.bundle
+          git fetch /tmp/k3-pr62-reviewfix.bundle HEAD:refs/heads/k3-pr62-reviewfix-verified
+          test "$(git rev-parse refs/heads/k3-pr62-reviewfix-verified)" = "$expected"
+          test "$(git rev-parse "$expected^{tree}")" = "$expected_tree"
+          git merge-base --is-ancestor "$base" "$expected"
+          test "$(git rev-parse "$expected^")" = "$base"
+          git push origin "$expected:refs/heads/impl/k3-tasks37-39-clean-wave"
+          echo "K3_REVIEW_FIX_IMPORTED_HEAD=$expected"
