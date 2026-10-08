@@ -1,0 +1,90 @@
+name: K3 merged-main exact SHA postmerge check
+on:
+  push:
+    branches:
+      - wave/k3-tasks37-39-readonly-prep-2026-10-08
+    paths:
+      - .github/workflows/k3-merged-main-postmerge-check.yml
+permissions:
+  contents: read
+  actions: write
+jobs:
+  exact-merge-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EXPECTED_MERGE: b5edc4461d92b4e9848b291adb14ea8fea76f164
+      EXPECTED_TREE: 0b3c058faacd4fca1bedac93eeeb1106f73c6a9c
+      REPO: oaabahussain/sdaia-ai-engineer
+      DB_URL: sqlite:///./server-ci.db
+      PYTHONPATH: server
+    steps:
+      - name: Checkout exact merged-main SHA with no write credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: b5edc4461d92b4e9848b291adb14ea8fea76f164
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: server/requirements.txt
+      - name: Verify exact merge SHA, parentage and unchanged reviewed tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_MERGE"
+          test "$(git rev-parse HEAD^{tree})" = "$EXPECTED_TREE"
+          test "$(git rev-parse HEAD^2)" = "5f0cec624caf2e55cb434e7a18473fe8fe6de803"
+          test "$(gh api "repos/$REPO/branches/main" --jq .commit.sha)" = "$EXPECTED_MERGE"
+          test -z "$(git status --porcelain)"
+          echo "EXACT_MERGED_HEAD=$EXPECTED_MERGE"
+          echo "REVIEWED_TREE_UNCHANGED=$EXPECTED_TREE"
+      - name: Install current locked dependencies
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          python -m pip install -r server/requirements.txt
+      - name: Validate release, bank fingerprint, Node, process and server contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run validate
+          npm test
+          npm run process:verify
+          npm run verify:sw
+          npm run verify:factory-import
+          PYTHONPATH=server python3 -m pytest server/tests -q
+          python3 scripts/db_smoke.py
+          node scripts/contract_test.js browser
+          node --input-type=module -e "import fs from 'node:fs'; const d=JSON.parse(fs.readFileSync('data/evidence/sdaia-ai-engineer.runtime-v1.json','utf8')); if (d.question_payload_sha256 !== '5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9') process.exit(2); console.log('K3_QUESTION_PAYLOAD_SHA256='+d.question_payload_sha256);"
+      - name: Build exactly as Pages, verify local live release, and browser AR/EN/RTL/offline/evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build_pages_artifact.js _site
+          node --check _site/src/app.js
+          node scripts/verify_html.js _site/index.html
+          node scripts/verify_sw_assets.js _site
+          python3 -m http.server 4174 --bind 127.0.0.1 --directory _site > /tmp/k3-pages-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:4174/index.html >/dev/null; then break; fi
+            if [ "$attempt" -eq 20 ]; then cat /tmp/k3-pages-preview.log; exit 1; fi
+            sleep 1
+          done
+          node scripts/verify_live_release.js http://127.0.0.1:4174
+          python3 scripts/browser_smoke.py
+      - name: Trigger existing official Pages workflow for exact merged main SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/branches/main" --jq .commit.sha)" = "$EXPECTED_MERGE"
+          gh workflow run pages.yml --repo "$REPO" --ref main
+          echo "OFFICIAL_PAGES_WORKFLOW_DISPATCHED_ON_MERGED_MAIN=$EXPECTED_MERGE"
