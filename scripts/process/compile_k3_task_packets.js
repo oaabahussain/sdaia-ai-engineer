@@ -188,7 +188,7 @@ function parseStopConditions(section, taskId) {
 }
 
 function parseCommit(section, title) {
-  const commits = [...section.matchAll(/Commit\s+`([^`]+)`/g)].map((m) => m[1].trim());
+  const commits = [...section.matchAll(/\b[Cc]ommit(?:\s+it)?(?:\s+as)?\s+`([^`]+)`/g)].map((m) => m[1].trim());
   return commits.length ? commits.at(-1) : title;
 }
 

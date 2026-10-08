@@ -130,3 +130,10 @@ test('Task 38 review may correct only the identified existing K3 acceptance gate
   ]);
   assert.equal(packet.merge_authority, false);
 });
+
+
+test('Task 39 extracts the exact approved documentation commit message from the normative step', () => {
+  const packet = compileTaskPacket({ taskId: 39, ...ARGS });
+  assert.equal(packet.commit.message, 'docs: record K3 exact-head verification');
+  assert.equal(packet.authority.task_source_digest, taskSourceDigest(extractTask(PLAN, 39)));
+});
