@@ -1,0 +1,39 @@
+name: K3 exact Git bundle import
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+    paths:
+      - 'transfers/k3-task38.bundle.b64'
+      - '.github/workflows/k3-exact-bundle-import.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+      - name: Verify Git bundle identity and import exact commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline=5b7453407def933037c4c254cd0fca5e5f3f1591
+          expected=44e4e647f0faa21a8934199d065464a265bb32b3
+          tree=e1ca6886c00aa1192e8b53acb5fe0e8f315cf08f
+          transfer=transfers/k3-task38.bundle.b64
+          test -s "$transfer"
+          base64 --decode "$transfer" > /tmp/k3-task38.bundle
+          echo '477fe6792eb1ecb5009f9f10529a5592a51ef669c720f03b2584ac4b7125e170  /tmp/k3-task38.bundle' | sha256sum --check --status
+          git cat-file -e "$baseline^{commit}"
+          git bundle verify /tmp/k3-task38.bundle
+          git fetch /tmp/k3-task38.bundle 'refs/heads/impl/k3-tasks37-39-clean-wave:refs/heads/k3-verified-import'
+          test "$(git rev-parse refs/heads/k3-verified-import)" = "$expected"
+          test "$(git rev-parse "$expected^{tree}")" = "$tree"
+          git merge-base --is-ancestor "$baseline" "$expected"
+          remote_sha=$(git ls-remote origin refs/heads/impl/k3-tasks37-39-clean-wave | cut -f1)
+          test "$remote_sha" = "$baseline"
+          git push origin "$expected:refs/heads/impl/k3-tasks37-39-clean-wave"
+          echo "IMPORTED_EXACT_HEAD=$expected"
