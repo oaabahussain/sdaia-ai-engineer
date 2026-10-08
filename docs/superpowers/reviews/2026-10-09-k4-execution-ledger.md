@@ -66,3 +66,10 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Task 05 only projects exposures: due_at is null pending separately tested UTC due-time Task 06. This is not a completed scheduler.
 - K4 revision 6, next_task 6, K3 state unchanged.
 - Ruling: Browser event authority cannot independently prove a trusted SYSTEM evaluation merely from authority_ref; initial K4 projections deliberately remain EXPOSURE_ONLY. Acceptance case for verified SYSTEM fixture cannot be claimed until a separate genuine producer-verification boundary is proven.
+
+## Task 06 — UTC due times, complete
+
+- RED ae232b60dd402239098b058766bc33fc82567652: Quality run 37859039648 — 873 PASS, 1 expected missing clock.js failure.
+- GREEN 0bf019c87287ef350eb31bc9e07a61d556b4e473: Quality run 37859210000 SUCCESS; Server run 37859209931 SUCCESS.
+- Validates ISO instants, rejects invalid/calendar-only/future clock, computes +48h exposure due, supports test-only +24h wrong and +96h correct trusted-grade contract. Projection now recomputes UTC due from accepted timestamp without persisting recommended actions.
+- K4 state revision 7, completed task 06, next task 07. This is uncalibrated fixed intervals; no claimed empirical SDAIA retention benefit or actual graded SYSTEM producer.
