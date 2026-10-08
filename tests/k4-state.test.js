@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { validateK4State } from '../scripts/process/validate_k4_state.js';
 
 const MAIN = '9e55881e9480b4a02d8ef5d92a0b21a9313492f1';
@@ -87,4 +88,15 @@ test('closed K3 state remains untouched by K4 and is not an execution grant', ()
   assert.equal(old.state_revision, 76);
   assert.equal(old.low_model_ready, false);
   assert.equal(old.gates.ACTIVE_REF_RESOLUTION_VALID, 'PENDING');
+});
+
+test('actual K4 manifest validates through K4 preflight CLI with Git blob pins', () => {
+  const state = JSON.parse(readFileSync(new URL('../docs/superpowers/state/K4-CURRENT-STATE.json', import.meta.url), 'utf8'));
+  const main = state.status === 'COMPLETE' ? state.merged_main_sha : state.base_main_sha;
+  const executionRef = state.status === 'COMPLETE' ? 'main' : state.execution_branch;
+  const result = execFileSync(process.execPath, [
+    'scripts/process/validate_k4_state.js',
+    '--live-main-sha',main,'--source-ref',executionRef,'--json'
+  ], { encoding:'utf8' }).trim();
+  assert.equal(JSON.parse(result).code, 'STATE_VALID', result);
 });
