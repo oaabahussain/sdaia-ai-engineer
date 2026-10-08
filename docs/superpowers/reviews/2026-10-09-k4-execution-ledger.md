@@ -49,3 +49,11 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Output: an explicit catalog of 1,120 public current family/item IDs, with release/digest checks, no answer content in candidate outputs, and rejection of protected or unavailable identities.
 - State revision 4, completed_through_task 3, next_task 4.
 - Ruling: derive initial allowlist exclusively from verified published bootstrap metadata. Newly generated private items are not enrolled. An incorrect classification could expose restricted study content; strict release checks are mandatory.
+
+## Task 04 — complete
+
+- RED 38ecfb76a2f08e6e9783b5ad879af279a230c4e7: Quality 37858261601, 861 PASS, 1 expected missing sourceReader.js.
+- GREEN a841811f906f23bbfe869d0766b46c06b61fe5bd: Quality 37858384987 SUCCESS; Server 37858384916 SUCCESS.
+- Additive K3 API getSourceHead() reads the local committed source sequence, not its sync cursor; sourceReader preserves source/learner/track/release filters and K3 fingerprint checks. Cold start at zero does not invoke invalid replay(toSeq=0). Existing tests and browser passed.
+- K4 state revision 5; completed_through_task 4; next_task 5. K3 append-only event acceptance logic unchanged.
+- Ruling: read-only local source head uses the existing K3 store metadata transaction, not the independently governed sync cursor. Source ID is local, not server-authenticated.
