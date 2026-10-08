@@ -1,0 +1,26 @@
+name: K3 browser driver recovery
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+permissions:
+  contents: read
+jobs:
+  browser-driver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch exact Chromium 144 driver from official Chrome for Testing
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --output /tmp/chromedriver-linux64.zip \
+            https://storage.googleapis.com/chrome-for-testing-public/144.0.7559.96/linux64/chromedriver-linux64.zip
+          unzip -q /tmp/chromedriver-linux64.zip -d /tmp/k3-driver
+          chmod +x /tmp/k3-driver/chromedriver-linux64/chromedriver
+          /tmp/k3-driver/chromedriver-linux64/chromedriver --version
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: k3-chromedriver-144-linux64
+          path: /tmp/chromedriver-linux64.zip
+          retention-days: 1
+          if-no-files-found: error
