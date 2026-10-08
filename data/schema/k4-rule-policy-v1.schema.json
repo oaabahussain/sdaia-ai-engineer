@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://automizelab.net/sdaia/k4/k4-rule-policy-v1.schema.json",
+  "title": "K4 deterministic rules v1 (versioned fixed baseline, not calibrated)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "algorithm",
+    "first_review_delay_hours",
+    "trusted_incorrect_delay_hours",
+    "trusted_correct_delay_hours",
+    "max_review_delay_hours",
+    "max_action_items",
+    "include_modes",
+    "exclude_modes",
+    "allow_provisional_objectives_for_labels",
+    "allow_provisional_objectives_for_prerequisites",
+    "fsrs_enabled",
+    "protected_candidates_allowed",
+    "untrusted_correctness_allowed",
+    "unavailable_content_behavior"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "const": "K4.RULES.v1"
+    },
+    "algorithm": {
+      "const": "DETERMINISTIC_RULES"
+    },
+    "first_review_delay_hours": {
+      "const": 48
+    },
+    "trusted_incorrect_delay_hours": {
+      "const": 24
+    },
+    "trusted_correct_delay_hours": {
+      "const": 96
+    },
+    "max_review_delay_hours": {
+      "const": 720
+    },
+    "max_action_items": {
+      "const": 1
+    },
+    "include_modes": {
+      "const": [
+        "learn",
+        "practice"
+      ]
+    },
+    "exclude_modes": {
+      "const": [
+        "check",
+        "mock",
+        "section",
+        "full"
+      ]
+    },
+    "allow_provisional_objectives_for_labels": {
+      "const": true
+    },
+    "allow_provisional_objectives_for_prerequisites": {
+      "const": false
+    },
+    "fsrs_enabled": {
+      "const": false
+    },
+    "protected_candidates_allowed": {
+      "const": false
+    },
+    "untrusted_correctness_allowed": {
+      "const": false
+    },
+    "unavailable_content_behavior": {
+      "const": "SAFE_FALLBACK"
+    }
+  }
+}
