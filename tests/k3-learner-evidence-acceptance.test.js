@@ -87,42 +87,7 @@ test('Task 36 browser acceptance keeps bilingual, full-exam, offline, and eviden
 });
 
 // A finalization proof is a positive, unqualified ledger line, not a mention or provisional claim.
-const ledgerClaimsFinalizationComplete=(ledger,task)=>new RegExp('^Task '+task+': complete\\s+—\\s+[^\\r\\n]+
-  const state=JSON.parse(read('docs/superpowers/state/CURRENT-STATE.json'));
-  assert.ok(state.completed_through_task >= 36 && state.completed_through_task <= 41, 'K3 completed task must be in Phase H');
-  assert.equal(state.next_task,state.completed_through_task+1,'K3 tasks must advance one-at-a-time');
-  const ledger=read('docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md');
-  for(let n=37;n<=state.completed_through_task;n+=1){
-    assert.ok(ledgerClaimsFinalizationComplete(ledger,n),`Finalization task ${n} lacks durable completion evidence`);
-  }
-  if(state.status==='COMPLETE'){
-    assert.equal(state.completed_through_task,41,'K3 COMPLETE requires Task 41 and post-merge verification');
-    assert.equal(state.next_task,42,'No K4 work is authorized just by K3 completion');
-  }else{
-    assert.ok(state.next_task>=37 && state.next_task<=41,'Unclosed K3 cannot skip past finalization gates');
-  }
-});
-
-
-test('Task 36 browser acceptance observes fine-grained learner evidence durably stored in IndexedDB',()=>{
-  const smoke=read('scripts/browser_smoke.py');
-  assert.match(smoke,/learning-platform\.evidence\.v1\./,'browser smoke must open the governed K3 evidence database');
-  assert.match(smoke,/objectStore\(['"]events['"]\).*getAll|objectStore\(['"]events['"]\)[\s\S]*getAll/,'browser smoke must read durable evidence rows');
-  for(const definition of [
-    'learner.activity.started@1',
-    'learner.item.presented@1',
-    'learner.response.recorded@1',
-    'learner.confidence.recorded@1'
-  ]) assert.ok(smoke.includes(definition),definition);
-  assert.match(smoke,/durable learner evidence/i);
-});
-
-
-test('Wave review: documentation acceptance remains a Task 37 future gate',()=>{
-  const row=criteria.find(x=>x.id===21);
-  assert.deepEqual(row,{id:21,status:'FUTURE_GATE',owner_task:37});
-});
-,'mi').test(ledger);
+const ledgerClaimsFinalizationComplete=(ledger,task)=>new RegExp('^Task '+task+': complete\\s+—\\s+[^\\r\\n]+$','mi').test(ledger);
 
 test('finalization completion guard rejects negative, provisional, and misleading evidence',()=>{
   for(const statement of [
@@ -142,7 +107,7 @@ test('K3 finalization cannot skip documented/review/integration gates or close e
   assert.equal(state.next_task,state.completed_through_task+1,'K3 tasks must advance one-at-a-time');
   const ledger=read('docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md');
   for(let n=37;n<=state.completed_through_task;n+=1){
-    assert.match(ledger,new RegExp('Task '+n+': complete\\b','i'),`Finalization task ${n} lacks durable completion evidence`);
+    assert.ok(ledgerClaimsFinalizationComplete(ledger,n),`Finalization task ${n} lacks durable completion evidence`);
   }
   if(state.status==='COMPLETE'){
     assert.equal(state.completed_through_task,41,'K3 COMPLETE requires Task 41 and post-merge verification');
