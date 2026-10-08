@@ -35,7 +35,7 @@
 
 The fourteen tasks below own their exact paths. New `tests/k4-*.test.js` and `src/recommendations/*` paths are **proposals**, not existing files. Keep new pure modules independent of `src/app.js`; only browser Controller accesses DOM, and only Source Reader accesses K3 IndexedDB. Task 04 adds a backward-compatible read-only head API to K3 storage; it must not alter acceptance, fingerprinting or mutation authority.
 
-At future execution, first verify fresh main, exact approved spec/plan Git blobs, independent K4 manifest/preflight, isolated worktree. Use native inline `executing-plans` if this host still lacks real subagent dispatch (the user requested consecutive execution in one response); otherwise offer real subagent-driven mode if available. Each task has required RED→GREEN→full regression→commit/ledger evidence, and no normal between-task confirmation.
+At future execution, first verify fresh main, exact approved spec/plan Git blobs, independent K4 manifest/preflight, isolated worktree. For test-first implementation tasks, a failure to import a missing new module may count as initial RED only if the test harness itself is valid and the expected missing contract is the sole failure; unexpected test/environment errors never count as accepted RED. Use native inline `executing-plans` if this host still lacks real subagent dispatch (the user requested consecutive execution in one response); otherwise offer real subagent-driven mode if available. Tasks 01–13 require RED→GREEN→full regression→commit/ledger evidence. Task 14 is a code-free, real GitHub integration gate with proof checks instead of fabricated RED/GREEN, and there is no normal between-task confirmation.
 
 ### Task 01: K4 governance state + preflight
 
@@ -221,17 +221,17 @@ At future execution, first verify fresh main, exact approved spec/plan Git blobs
 
 ### Task 14: Independent review, exact-head landing and post-merge proof
 
-**Files:** `docs/superpowers/reviews/k4-final-review.md`, `docs/superpowers/reviews/k4-post-merge-verification.md`, `docs/superpowers/state/K4-CURRENT-STATE.json (only after real proof)`
+**Files:** `docs/superpowers/reviews/k4-final-review.md`, `docs/superpowers/reviews/k4-post-merge-verification.md`, `docs/superpowers/state/K4-CURRENT-STATE.json` (update only after actual merge and live proof).
 
-**Interfaces:** `landing gate: PR/currentHead SHA + independent reviewer disposition + exact-head CI + explicit separate user merge authorization`
+**Interfaces:** This is an **operational integration and release gate, not new program behavior**: `{productPr, currentHeadSha, exactHeadChecks, independentReview, userLandingApproval, mergedMainSha, pagesDeploymentSha} -> durable audit report`. Never simulate a merge or treat a fixture-only script as authoritative GitHub proof.
 
-**Dependencies:** 13; external merge authorization remains distinct
+**Dependencies:** All Tasks 01–13 pass on an actual implementation branch; no unresolved Critical/Important; actual independent reviewer when available; a separate per-PR exact-head landing approval.
 
-- [ ] **Step 1: Write the failing test** in `tests/k4-release-acceptance.test.js` using `node:test` and `node:assert/strict`. Explicit assertions: no open Critical/Important, verified final PR SHA, no admin/force/shortcut merge, actual merge SHA and fresh merged-main Node/Python/Pages checks, K4 COMPLETE only post-release; K5 not begun. Include an inverse case that would be broken by a wrong implementation.
-- [ ] **Step 2: Verify RED** — run `node --test tests/k4-release-acceptance.test.js`; expected: precisely named behavior FAIL due to missing K4 behavior (not syntax/config flakiness). Save error/exit status in K4 ledger.
-- [ ] **Step 3: Write minimal implementation** strictly in owned files for the interface above. Keep K3 unchanged except Task 04's additive read-only accessor; handle specified negative cases.
-- [ ] **Step 4: Verify GREEN and regressions** — run `node --test tests/k4-release-acceptance.test.js` (expected exit 0), then `npm test` (expected exit 0). Run listed K3 test files when edited; use systematic-debugging on actual failures, never silently weaken tests.
-- [ ] **Step 5: Checkpoint/commit** — record BASE/HEAD, acceptance RED and GREEN logs, reviewer result if available, scoped diff and full-suite outcome. Commit only named files; stop on non-PASS preflight, undefined approval, Critical/Important, or missing evidence.
+- [ ] **Step 1: Verify implementation head and independent review.** Resolve live GitHub PR HEAD and main; examine reviews, unresolved threads and protected-path checks on that HEAD. Any mismatch/failure -> document `BLOCKED`; do not proceed or claim approval.
+- [ ] **Step 2: Verify exact-head CI and complete regression.** Query Quality Gate and Server & Adapter runs for the current Product PR HEAD; confirm all required jobs `success`. Record exact run IDs, commit SHA, test counts, bank checksum, and any missing independent-review capability. Do not reuse research PR #64 documentation checks as K4 implementation evidence.
+- [ ] **Step 3: Obtain separate exact-head landing authorization.** Present the Product PR URL, full SHA, remaining limitations and merge strategy to the user; stop until explicit per-PR authorization exists. Do not force/admin/auto-merge without authorization.
+- [ ] **Step 4: Verify *real* merge and production release.** After authorized landing, fetch merged main SHA/parents, rerun full Node/Python/browser/Pages checks against merged main, and inspect the actual deployment workflow and live asset/index digests; fail closed if any differs.
+- [ ] **Step 5: Durable closure (no fake TDD claims).** Save review and post-merge reports, update only new K4 state/ledger to COMPLETE after proving release, and leave K3 state unchanged. If interrupted/blocked, keep K4 IN_PROGRESS/BLOCKED with exact recovery refs; do not begin K5.
 
 ## Acceptance coverage by task
 
