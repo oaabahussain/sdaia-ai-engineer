@@ -26,6 +26,21 @@ For durable paths, read `DURABLE-FILE-MAP.md`.
 
 Do not reconstruct progress from chat memory or from the historical snapshot below.
 
+## K3 post-merge programme closure — 2026-10-08
+
+**Current K3 Product implementation:** all 41 task acceptance requirements have execution evidence after the reviewed PR #62 merge; the immutable product tree on merged `main@b5edc4461d92b4e9848b291adb14ea8fea76f164` equals the reviewed tree `0b3c058faacd4fca1bedac93eeeb1106f73c6a9c`.
+
+- Task 40 integration: PR [#62](https://github.com/oaabahussain/sdaia-ai-engineer/pull/62), exact reviewed head `5f0cec624caf2e55cb434e7a18473fe8fe6de803`, two parents verified, merge commit `b5edc4461d92b4e9848b291adb14ea8fea76f164`.
+- Task 41 acceptance: [independent post-merge verification #37780148215](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37780148215) SUCCESS, 844 Node, 117 Python, 76 process assertions, bank digest, local Pages, AR/EN/RTL/offline/durable evidence browser smoke. [Official Pages deploy #37780283439](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37780283439) SUCCESS on merged SHA, live release verified, public index checksum matched source.
+- Durable K3 Task 41 artifact: `docs/superpowers/reviews/2026-09-29-k3-post-merge-verification.md`. Task 40 checkpoint: `docs/superpowers/reviews/2026-10-08-k3-task40-reviewed-integration.md`. See active `CURRENT-STATE.json` for the recorded phase/status; this handoff is navigation only.
+- Public site: https://oaabahussain.github.io/sdaia-ai-engineer/ . Learner bank 1,120 questions across 7 domains, full exam 200 questions, frozen SHA-256 `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`, current contract RuntimeBundleV4.
+- K3 includes governed local-first immutable evidence, durable offline capture, replay/projections, explicit strict assessment conflict semantics, privacy and standards adapters. These are IMPLEMENTED AND VERIFIED by the evidence above. Live production authenticated cross-device sync is **not deployed/verified** by these contract tests; do not claim it.
+- Future K4–K9 scope is not part of K3; **K4 NOT STARTED** and requires its own separate research/design/authorization.
+
+**Re-run after future Product modifications:** validate exact new Git SHA/tree; run `npm ci --ignore-scripts && npm run validate && npm test && npm run process:verify && npm run verify:sw && npm run verify:factory-import`; run `PYTHONPATH=server python3 -m pytest server/tests -q` plus `python3 scripts/browser_smoke.py`; assemble Pages with `node scripts/build_pages_artifact.js _site`, verify service worker, serve locally and execute `node scripts/verify_live_release.js http://127.0.0.1:4174`; require final exact-SHA GitHub Actions and live Pages release. Keep K3 data-plane protections intact. Never treat this dated handoff as an active execution manifest.
+
+---
+
 ## K3 verified implementation and remaining gates (8 October 2026)
 
 This is a **dated navigation note**, not the current task manifest. The live authority remains Git refs, the approved spec/plan, the durable ledger and `docs/superpowers/state/CURRENT-STATE.json`. At the Task 37 starting baseline, Tasks 1–36 were merged and post-merge verified on `main@5b7453407def933037c4c254cd0fca5e5f3f1591`. Task 37 had not yet completed; Tasks 38–41 remained PENDING. Check the manifest again before acting.
