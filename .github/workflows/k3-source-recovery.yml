@@ -1,0 +1,49 @@
+name: K3 scoped source recovery snapshot
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+permissions:
+  contents: read
+jobs:
+  verified-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: 5b7453407def933037c4c254cd0fca5e5f3f1591
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Verify immutable checkout and install offline runtime inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "5b7453407def933037c4c254cd0fca5e5f3f1591"
+          git status --porcelain
+          npm ci --ignore-scripts
+          mkdir -p .offline-wheelhouse
+          python -m pip download --dest .offline-wheelhouse -r server/requirements.txt
+          printf 'RECOVERY_MAIN_SHA=%s\n' "$(git rev-parse HEAD)"
+          printf 'RECOVERY_TREE_SHA=%s\n' "$(git rev-parse HEAD^{tree})"
+          printf 'RECOVERY_NODE=%s\n' "$(node --version)"
+          printf 'RECOVERY_PYTHON=%s\n' "$(python --version)"
+      - name: Package exact Git checkout and offline dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar --exclude='./.git/hooks' -czf "$RUNNER_TEMP/sdaia-k3-main-exact.tgz" .
+          sha256sum "$RUNNER_TEMP/sdaia-k3-main-exact.tgz"
+          ls -lh "$RUNNER_TEMP/sdaia-k3-main-exact.tgz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sdaia-k3-main-source-recovery
+          path: ${{ runner.temp }}/sdaia-k3-main-exact.tgz
+          retention-days: 1
+          if-no-files-found: error
