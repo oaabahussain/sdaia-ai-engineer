@@ -1,0 +1,65 @@
+name: K3 PR62 approved exact-head landing
+on:
+  push:
+    branches:
+      - wave/k3-tasks37-39-readonly-prep-2026-10-08
+    paths:
+      - .github/workflows/k3-pr62-approved-landing.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  protected-landing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EXPECTED_MAIN: 5b7453407def933037c4c254cd0fca5e5f3f1591
+      EXPECTED_HEAD: 5f0cec624caf2e55cb434e7a18473fe8fe6de803
+      REPO: oaabahussain/sdaia-ai-engineer
+      PR: https://github.com/oaabahussain/sdaia-ai-engineer/pull/62
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Recheck approved PR and current main without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/branches/main" --jq .commit.sha)" = "$EXPECTED_MAIN"
+          gh pr view "$PR" --json headRefOid,baseRefOid,state,isDraft,mergeable > /tmp/k3-pr.json
+          python3 - <<'PY'
+          import json,os
+          v=json.load(open('/tmp/k3-pr.json',encoding='utf-8'))
+          assert v['headRefOid']==os.environ['EXPECTED_HEAD'],v
+          assert v['baseRefOid']==os.environ['EXPECTED_MAIN'],v
+          assert v['state']=='OPEN' and not v['isDraft'] and v['mergeable']=='MERGEABLE',v
+          print('APPROVED_PR_HEAD_AND_BASE_VERIFIED')
+          PY
+      - name: Official PR-completion readiness plan, then authorized exact-head landing
+        shell: bash
+        run: |
+          set -euo pipefail
+          helper=.task-ops/pr-completion/pr_land.py
+          test -s "$helper"
+          python3 "$helper" --repo "$GITHUB_WORKSPACE" --pr "$PR" --head "$EXPECTED_HEAD" --mode auto --method merge --no-config > /tmp/k3-landing-plan.json
+          cat /tmp/k3-landing-plan.json
+          digest=$(python3 - <<'PY'
+          import json,os
+          v=json.load(open('/tmp/k3-landing-plan.json',encoding='utf-8'))
+          assert v['state']=='confirmation_required' and v['requiresConfirmation'] is True
+          assert v['headSha']==os.environ['EXPECTED_HEAD'] and v['method']=='merge'
+          assert v['pr']['number']==62
+          print(v['readinessPolicyDigest'])
+          PY
+          )
+          # Explicit user confirmation: 2026-10-08, "ادمج" for PR #62 exact HEAD.
+          python3 "$helper" --repo "$GITHUB_WORKSPACE" --pr "$PR" --head "$EXPECTED_HEAD" --mode auto --method merge --no-config --policy-digest "$digest" --confirm > /tmp/k3-landing-result.json
+          cat /tmp/k3-landing-result.json
+          python3 - <<'PY'
+          import json
+          v=json.load(open('/tmp/k3-landing-result.json',encoding='utf-8'))
+          assert v['state']=='landing_requested',v
+          print('GITHUB_LANDING_REQUEST_ACCEPTED; VERIFY_MERGE_SEPARATELY')
+          PY
