@@ -105,6 +105,26 @@ function parseFiles(section, taskId) {
       allowedModify.push(existing);
     }
   }
+  // Task 37 extends the already-shipped Programme A documentation contract test.
+  // The approved plan explicitly says Add/adjust, not create a replacement.
+  // Keep this a deterministic exact-path ruling rather than opening wider scopes.
+  if (taskId === 37) {
+    const existing = 'tests/documentation-contract.test.js';
+    const index = allowedCreate.indexOf(existing);
+    if (index >= 0) allowedCreate.splice(index, 1);
+    allowedModify.push(existing);
+  }
+  // Task 38 reviews completed K3 work and fixes Important findings under TDD.
+  // Existing Task 36 acceptance test incorrectly locks next_task to <=37, even
+  // after Task 37 was accepted. Permit ONLY this identified existing test,
+  // not a wildcard review-fix scope; the guarded task sequence stays required.
+  if (taskId === 38) {
+    allowedModify.push(
+      'tests/k3-learner-evidence-acceptance.test.js',
+      'api/openapi.yaml',
+      'tests/documentation-contract.test.js'
+    );
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
@@ -168,7 +188,7 @@ function parseStopConditions(section, taskId) {
 }
 
 function parseCommit(section, title) {
-  const commits = [...section.matchAll(/Commit\s+`([^`]+)`/g)].map((m) => m[1].trim());
+  const commits = [...section.matchAll(/\b[Cc]ommit(?:\s+it)?(?:\s+as)?\s+`([^`]+)`/g)].map((m) => m[1].trim());
   return commits.length ? commits.at(-1) : title;
 }
 

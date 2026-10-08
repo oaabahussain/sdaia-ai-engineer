@@ -2,7 +2,12 @@ openapi: 3.1.0
 info:
   title: SDAIA AI Engineer Study Space API
   version: 1.0.0
-  description: Future private backend contract. No server is deployed by this repository.
+  description: |
+    Public site plus an optional local/test FastAPI backend; this repository does not deploy a production API.
+    K3 learner-evidence routes use the trusted learner authorization port (server/app/evidence_auth.py).
+    DenyLearnerAuthorization is the default; X-Anon-Id and caller learner_id are identifiers, not authorization.
+    The deployment must provide an authorized resolver and any trusted SYSTEM producer grants explicitly;
+    the published GitHub Pages site makes no live cross-device synchronization claim.
   license: { name: MIT, identifier: MIT }
 servers:
   - url: /v1
@@ -177,6 +182,11 @@ paths:
           required: false
           description: Requested page size, bounded by configured server policy.
           schema: { type: integer, minimum: 1, default: 100 }
+        - name: source_store_id
+          in: query
+          required: false
+          description: A nonzero after_store_seq requires source_store_id matching the authoritative evidence store; mismatches return 409.
+          schema: { type: string, minLength: 1 }
       responses:
         '200':
           description: Ordered learner evidence page
@@ -184,12 +194,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [events, next_store_seq]
+                required: [store_id, events, next_store_seq]
                 additionalProperties: false
                 properties:
+                  store_id: { type: string, minLength: 1 }
                   events:
                     type: array
                     items: { $ref: ../data/schema/learner-evidence-event-v2.schema.json }
                   next_store_seq: { type: integer, minimum: 0 }
         '400': { $ref: '#/components/responses/Error' }
         '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }

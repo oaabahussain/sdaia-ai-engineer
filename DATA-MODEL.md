@@ -1,6 +1,6 @@
 # Data Model
 
-This document lists **implemented Programme A objects only**. Future learner-engine, competency/objective authoring, calibration, protected-bank, and advanced question-family contracts remain future architecture work unless separately implemented.
+This document preserves the implemented Programme A contracts and records the separately implemented K2 and K3 contracts. Read `docs/superpowers/state/CURRENT-STATE.json` for live K3 task position; the approved specification governs semantics. Full competency authoring, calibrated mastery/readiness, protected assessment delivery, and advanced question-family generation remain distinct programmes.
 
 ## TrackManifestV1
 
@@ -84,3 +84,20 @@ Programme A does **not** claim implementation of:
 - protected assessment delivery;
 - authentication/authorization;
 - multi-tenant/SaaS data contracts.
+
+
+## K3 Learner Evidence Engine (implemented through Task 36)
+
+Canonical schema: `data/schema/learner-evidence-event-v2.schema.json` (`LearnerEvidenceEventV2`). Event definitions, their governed payload contracts and runtime context are validated in `src/evidence/acceptance.js`, generated validators in `src/evidence/generatedValidators.js`, and the `RuntimeEvidenceContextV1` runtime bundle context. **Raw evidence is immutable observation**, never a mastery/readiness estimate. Existing `LearnerEventV1` and `StateV2` remain valid for their historical use; legacy imports are explicitly marked coarse/partial and must **not invent legacy events, order or answers**.
+
+- `LearnerEvidenceEventV2`: pseudonymous `learner_id`, `event_id` (UUIDv4), `definition_id`, `actor_kind`/producer context, `origin_id` and monotonic `origin_seq`, activity/attempt linkage, exact track, release/form/item version and the governed definition payload. Client occurrence timestamps are evidence, **not** global ordering. Ordinary browser capture may only create LEARNER events; trusted SYSTEM evaluation needs distinct producer authority.
+- `EvidenceStorageReceiptV1` / `EvidenceBatchResultV1`: `event_id`, canonical RFC 8785/JCS SHA-256 `event_fingerprint`, immutable `store_id`, accepted timestamp, optional authoritative `store_seq`, and explicit `ACCEPTED`, `DUPLICATE`, `CONFLICT`, `REJECTED` disposition. Same event ID+same bytes is idempotent; same event ID+different bytes must not overwrite persisted history.
+- `EvidenceOutboxRecordV1`: local-first durable pending/in-flight/receipt state; retry preserves original event ID and body, with monotonic server cursor scoped to `store_id`. Offline events remain available in IndexedDB until sync is authorized and acknowledged. No Background Sync prerequisite is assumed.
+- `RuntimeEvidenceContextV1`: content release, form snapshot, item version, scoring policy and definition registry contexts. `learner_id` **is not authorization**; `X-Anon-Id` is not learner evidence authentication. Backend evidence reads/writes require a trusted learner authorization port and use deny-by-default authorization.
+- `ActivityProjectionV1` and `AttemptProjectionV1`: versioned, rebuildable projections keyed by source `store_id` and `store_seq` high watermark. `src/evidence/replay.js` validates ranges, unique event identity, store identity and bounded authoritative sequence before passing cloned events into projection functions; a projected result never changes raw events.
+- `LearnerIdentityLinkRecordV1`, `EvidenceExportRecordV1` and privacy policy: pseudonymous principals, governed export, privacy erasure/tombstone provenance and restricted sensitive response fields are separate from correction semantics. Corrections are append-only, auditable evidence, not history rewrite. Never claim complete replay after policy-driven erasure unless the retained evidence supports it.
+- `xAPI` 2.0 (`xapi-k3.v1`) and `Caliper` 1.2 (`caliper-k3.v1`) mappings are explicitly versioned adapters, not canonical storage or evidence authority. Unsupported semantics are omitted/abstained; imports reject external item/attempt identity conflicting with the supplied exact K3 context.
+
+Evidence is persisted by browser IndexedDB, JSONL, Python SQLite and API adapters using the shared conformance corpus. Exact field definitions live in `data/schema/`, `src/evidence/`, `scripts/platform-kernel/` and `server/app/evidence_store.py`; this document is navigation, not a second schema.
+
+**Not K3:** K4 next-best-action/spaced practice, K5 mastery/readiness, K6 psychometric calibration and K8 CAT/adaptive assessment. K3 does not implement those derivations. Authentication provider, retention schedule and production cross-device synchronization are deployment/policy decisions **not yet implemented** by the public GitHub Pages release.

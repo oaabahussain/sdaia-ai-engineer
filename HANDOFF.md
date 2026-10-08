@@ -26,6 +26,20 @@ For durable paths, read `DURABLE-FILE-MAP.md`.
 
 Do not reconstruct progress from chat memory or from the historical snapshot below.
 
+## K3 verified implementation and remaining gates (8 October 2026)
+
+This is a **dated navigation note**, not the current task manifest. The live authority remains Git refs, the approved spec/plan, the durable ledger and `docs/superpowers/state/CURRENT-STATE.json`. At the Task 37 starting baseline, Tasks 1–36 were merged and post-merge verified on `main@5b7453407def933037c4c254cd0fca5e5f3f1591`. Task 37 had not yet completed; Tasks 38–41 remained PENDING. Check the manifest again before acting.
+
+- **Task 37:** durable documentation and executable documentation-contract test + checkpoint. The existing `tests/documentation-contract.test.js` is **modified**, not created; the exact-path scope ruling and deterministic Task 037 packet live in the process ledger/packet compiler.
+- **Task 38:** whole-plan Critical/Important findings review and, if required, bounded TDD fixes. Lack of an independent reviewer must be documented truthfully.
+- **Task 39:** exact-head freeze, Node/Python/browser/Pages verification and verified final branch SHA (not an old CI SHA).
+- **Task 40:** merge only the reviewed exact head after supported integration authorization; do not merge tasks separately.
+- **Task 41:** verify merged main and deployed Pages/browser/server release, then mark K3 COMPLETE and close with a durable handoff. **Do not start K4** before that gate.
+
+Reproducible local verification commands from the project root: `npm ci --ignore-scripts`, `npm run validate`, `npm test`, `npm run verify:sw`, `npm run process:verify`, `PYTHONPATH=server python3 -m pytest server/tests -q`, `python3 scripts/browser_smoke.py`, followed by the exact CI Pages build and `scripts/verify_live_release.js` against a locally served `_site` artifact. `node scripts/validate_current_state.js --live-main-sha <live-main-sha> --source-ref <branch>` and the official task envelope/preflight must run before product edits. Historical paragraphs mentioning K3 design `NOT STARTED` below are retained **only as dated audit history**.
+
+Current learner-visible bank is 1,120 questions, 7 domains, and a 200-question full exam. The stable question payload SHA-256 must remain `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`. Arabic/English, RTL/LTR, keyboard behavior and cached offline reload are required release checks. K3 adds local-first, immutable evidence and optional deny-by-default authenticated sync; it does **not** claim deployed production cross-device synchronization or K4/K5/K6/K8 derived learner truth.
+
 ---
 
 ## Historical snapshot — retained for audit only

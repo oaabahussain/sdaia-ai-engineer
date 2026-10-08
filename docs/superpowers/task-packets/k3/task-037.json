@@ -55,8 +55,7 @@
   "schema_version": 1,
   "scope": {
     "allowed_create": [
-      "docs/superpowers/reviews/2026-09-29-k3-implementation-checkpoint.md",
-      "tests/documentation-contract.test.js"
+      "docs/superpowers/reviews/2026-09-29-k3-implementation-checkpoint.md"
     ],
     "allowed_delete": [],
     "allowed_modify": [
@@ -64,7 +63,8 @@
       "ARCHITECTURE.md",
       "api/openapi.yaml",
       "HANDOFF.md",
-      "docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md"
+      "docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md",
+      "tests/documentation-contract.test.js"
     ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_37"

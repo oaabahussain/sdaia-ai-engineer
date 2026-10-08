@@ -9,7 +9,7 @@
     "task_source_digest": "9f155d27a3fed4ca4a6613c720441b1a7be0a35a99986b0fef69dbc13843d61a"
   },
   "commit": {
-    "message": "Exact-head verification"
+    "message": "docs: record K3 exact-head verification"
   },
   "dependencies": [
     38

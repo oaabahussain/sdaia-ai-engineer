@@ -86,10 +86,35 @@ test('Task 36 browser acceptance keeps bilingual, full-exam, offline, and eviden
   assert.match(smoke,/document\.documentElement\.dir/);
 });
 
-test('Task 36 repository state must not claim K3 complete before Tasks 37-41',()=>{
+// A finalization proof is a positive, unqualified ledger line, not a mention or provisional claim.
+const ledgerClaimsFinalizationComplete=(ledger,task)=>new RegExp('^Task '+task+': complete\\s+—\\s+[^\\r\\n]+$','mi').test(ledger);
+
+test('finalization completion guard rejects negative, provisional, and misleading evidence',()=>{
+  for(const statement of [
+    'Task 39: not complete',
+    'Task 39: incomplete',
+    'Task 39: complete=false',
+    'Task 39: complete (LOCAL/PRODUCT-CI proof, NOT final SHA CI)',
+    'Task 39: complete? CI still pending'
+  ]) assert.equal(ledgerClaimsFinalizationComplete(statement,39),false,statement);
+  assert.equal(ledgerClaimsFinalizationComplete('Task 39: complete — exact-final-SHA CI PASS',39),true);
+  assert.equal(ledgerClaimsFinalizationComplete('Some discussion says Task 39: complete — but no ledger proof',39),false);
+});
+
+test('K3 finalization cannot skip documented/review/integration gates or close early',()=>{
   const state=JSON.parse(read('docs/superpowers/state/CURRENT-STATE.json'));
-  assert.notEqual(state.status,'COMPLETE');
-  assert.ok(state.next_task<=37,'Task 36 cannot skip documentation/review/finalization gates');
+  assert.ok(state.completed_through_task >= 36 && state.completed_through_task <= 41, 'K3 completed task must be in Phase H');
+  assert.equal(state.next_task,state.completed_through_task+1,'K3 tasks must advance one-at-a-time');
+  const ledger=read('docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md');
+  for(let n=37;n<=state.completed_through_task;n+=1){
+    assert.ok(ledgerClaimsFinalizationComplete(ledger,n),`Finalization task ${n} lacks durable completion evidence`);
+  }
+  if(state.status==='COMPLETE'){
+    assert.equal(state.completed_through_task,41,'K3 COMPLETE requires Task 41 and post-merge verification');
+    assert.equal(state.next_task,42,'No K4 work is authorized just by K3 completion');
+  }else{
+    assert.ok(state.next_task>=37 && state.next_task<=41,'Unclosed K3 cannot skip past finalization gates');
+  }
 });
 
 
