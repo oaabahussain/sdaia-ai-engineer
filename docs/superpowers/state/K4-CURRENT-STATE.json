@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 7,
+  "state_revision": 8,
   "programme": "K4",
   "phase": "A",
   "status": "EXECUTING",
@@ -18,8 +18,8 @@
     "status": "APPROVED",
     "git_blob_sha": "edda6ef11fb353d7403098d79400fc783e2f21f1"
   },
-  "completed_through_task": 6,
-  "next_task": 7,
+  "completed_through_task": 7,
+  "next_task": 8,
   "open_critical_findings": 0,
   "open_important_findings": 0,
   "gates": {
@@ -31,5 +31,5 @@
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "merged_main_sha": null,
   "release_evidence_ref": null,
-  "updated_at": "2026-10-08T23:34:00Z"
+  "updated_at": "2026-10-08T23:40:00Z"
 }
