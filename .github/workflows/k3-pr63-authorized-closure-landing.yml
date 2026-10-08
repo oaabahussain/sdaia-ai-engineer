@@ -1,0 +1,64 @@
+name: K3 PR63 exact-head approved closure landing
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+    paths: [.github/workflows/k3-pr63-authorized-closure-landing.yml]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  protected-landing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EXPECTED_MAIN: b5edc4461d92b4e9848b291adb14ea8fea76f164
+      EXPECTED_HEAD: fb21c705b80f012047bbaaf28bed1f3de5c2846e
+      REPO: oaabahussain/sdaia-ai-engineer
+      PR: https://github.com/oaabahussain/sdaia-ai-engineer/pull/63
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Validate approved exact PR head and main again
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/branches/main" --jq .commit.sha)" = "$EXPECTED_MAIN"
+          gh pr view "$PR" --json headRefOid,baseRefOid,state,isDraft,mergeable > /tmp/k3-pr63.json
+          python3 - <<'PY'
+          import json,os
+          p=json.load(open('/tmp/k3-pr63.json',encoding='utf-8'))
+          assert p['headRefOid']==os.environ['EXPECTED_HEAD'],p
+          assert p['baseRefOid']==os.environ['EXPECTED_MAIN'],p
+          assert p['state']=='OPEN' and not p['isDraft'] and p['mergeable']=='MERGEABLE',p
+          print('PR63_LANDING_SHA_BOUND_AND_CLEAN')
+          PY
+      - name: Official policy watcher and digest-bound PR landing
+        shell: bash
+        run: |
+          set -euo pipefail
+          helper=.task-ops/pr-completion/pr_land.py
+          test -s "$helper"
+          python3 "$helper" --repo "$GITHUB_WORKSPACE" --pr "$PR" --head "$EXPECTED_HEAD" --mode auto --method merge --no-config > /tmp/k3-pr63-plan.json
+          cat /tmp/k3-pr63-plan.json
+          digest=$(python3 - <<'PY'
+          import json,os
+          p=json.load(open('/tmp/k3-pr63-plan.json',encoding='utf-8'))
+          assert p['state']=='confirmation_required'
+          assert p['headSha']==os.environ['EXPECTED_HEAD']
+          assert p['pr']['number']==63
+          assert p['method']=='merge'
+          print(p['readinessPolicyDigest'])
+          PY
+          )
+          # User follow-up expressly directed continuation to completion immediately
+          # after presentation of PR #63's exact SHA and merge method.
+          python3 "$helper" --repo "$GITHUB_WORKSPACE" --pr "$PR" --head "$EXPECTED_HEAD" --mode auto --method merge --no-config --policy-digest "$digest" --confirm > /tmp/k3-pr63-result.json
+          cat /tmp/k3-pr63-result.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/k3-pr63-result.json',encoding='utf-8'))
+          assert r['state']=='landing_requested',r
+          print('PR63_LANDING_REQUEST_ACCEPTED_VERIFY_MERGED_SEPARATELY')
+          PY
