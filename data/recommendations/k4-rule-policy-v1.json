@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "policy_id": "K4.RULES.v1",
+  "algorithm": "DETERMINISTIC_RULES",
+  "first_review_delay_hours": 48,
+  "trusted_incorrect_delay_hours": 24,
+  "trusted_correct_delay_hours": 96,
+  "max_review_delay_hours": 720,
+  "max_action_items": 1,
+  "include_modes": [
+    "learn",
+    "practice"
+  ],
+  "exclude_modes": [
+    "check",
+    "mock",
+    "section",
+    "full"
+  ],
+  "allow_provisional_objectives_for_labels": true,
+  "allow_provisional_objectives_for_prerequisites": false,
+  "fsrs_enabled": false,
+  "protected_candidates_allowed": false,
+  "untrusted_correctness_allowed": false,
+  "unavailable_content_behavior": "SAFE_FALLBACK"
+}
