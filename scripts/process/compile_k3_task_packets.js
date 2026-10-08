@@ -105,6 +105,15 @@ function parseFiles(section, taskId) {
       allowedModify.push(existing);
     }
   }
+  // Task 37 extends the already-shipped Programme A documentation contract test.
+  // The approved plan explicitly says Add/adjust, not create a replacement.
+  // Keep this a deterministic exact-path ruling rather than opening wider scopes.
+  if (taskId === 37) {
+    const existing = 'tests/documentation-contract.test.js';
+    const index = allowedCreate.indexOf(existing);
+    if (index >= 0) allowedCreate.splice(index, 1);
+    allowedModify.push(existing);
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),

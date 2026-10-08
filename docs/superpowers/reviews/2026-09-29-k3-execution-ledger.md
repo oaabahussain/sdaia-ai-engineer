@@ -646,3 +646,10 @@ Task 36 — executable learner-evidence acceptance — complete. After repairing
 PR #60 merged the combined wave to `main` as `1930f844a5de9a8c50bf42b1a0e027528218b8e9`. Reviewed and merged tree are identical: `2d37a834e0d3b2f823af151dcc3eab357458d09e`. Post-merge server #2109 and Pages/live #54 passed.
 
 Tasks 34, 35, and 36 are durably COMPLETE. Task 37 is NEXT and NOT STARTED.
+
+
+## K3 Task 37 clean-wave preflight / deterministic scope ruling — 2026-10-08
+
+Ruling: The approved Task 37 `Files: ... test tests/documentation-contract.test.js` refers to an EXISTING test (main blob `cc65f661292ad31bcd6443e300a48ce6a0457f2d`). The packet compiler incorrectly classified it as create-only. Classify exactly this file as `scope.allowed_modify` and not `scope.allowed_create` for Task 37 only; freeze unchanged approved spec/plan SHA and preserve all other scope restrictions. The task will extend the existing contract tests using RED→GREEN. Cost if wrong: test ownership drift or an incorrect scope exception could conceal unrelated changes. No product changes authorized until execution preflight PASS.
+
+PREPARATION ONLY: Original main `5b7453407def933037c4c254cd0fca5e5f3f1591`, clean execution branch `impl/k3-tasks37-39-clean-wave` zero commits ahead/behind on live GitHub at bind time. Task 37 not yet begun and not yet GREEN. Baseline logs exist in execution environment (Node 836/836, Python 117/117, process and SW green). State 70 binds main/ref, while `low_model_ready=false` until the fresh official Task 37 execution envelope and preflight pass.

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "state_revision": 69,
+  "state_revision": 70,
   "programme": "K3",
   "phase": "H",
   "status": "PHASE_GATE",
-  "execution_branch": "impl/k3-task36-clean-wave",
-  "base_main_sha": null,
+  "execution_branch": "impl/k3-tasks37-39-clean-wave",
+  "base_main_sha": "5b7453407def933037c4c254cd0fca5e5f3f1591",
   "completed_through_task": 36,
   "next_task": 37,
   "spec_path": "docs/superpowers/specs/2026-09-29-k3-learner-evidence-engine-design.md",
@@ -25,7 +25,7 @@
     "PROCESS_GUARDS_READY": "PASS",
     "ISOLATED_WORKSPACE_READY": "PASS",
     "BASELINE_GREEN": "PASS",
-    "ACTIVE_REF_RESOLUTION_VALID": "PENDING",
+    "ACTIVE_REF_RESOLUTION_VALID": "PASS",
     "K3_TASK_BRIEFS_SELF_CONTAINED": "PASS",
     "PROJECT_BOOTSTRAP_CURRENT": "PASS",
     "PROCESS_FAILURE_RULES_VALID": "PASS",
@@ -48,5 +48,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-07T17:26:00Z"
+  "updated_at": "2026-10-08T08:22:46Z"
 }

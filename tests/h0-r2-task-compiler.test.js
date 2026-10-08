@@ -109,3 +109,11 @@ test('all approved K3 Tasks 5-41 compile without interpretation gaps', () => {
   assert.equal(packets.length, 37);
   assert.deepEqual(packets.map((packet) => packet.task_id), Array.from({ length: 37 }, (_, i) => i + 5));
 });
+
+test('Task 37 reuses existing documentation-contract test as a modification, never a creation', () => {
+  const packet = compileTaskPacket({ taskId: 37, ...ARGS });
+  assert.equal(packet.scope.allowed_create.includes('tests/documentation-contract.test.js'), false);
+  assert.equal(packet.scope.allowed_modify.includes('tests/documentation-contract.test.js'), true);
+  assert.ok(packet.scope.allowed_create.includes('docs/superpowers/reviews/2026-09-29-k3-implementation-checkpoint.md'));
+  assert.equal(packet.authority.task_source_digest, taskSourceDigest(extractTask(PLAN, 37)));
+});
