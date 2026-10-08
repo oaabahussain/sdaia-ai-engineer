@@ -74,3 +74,21 @@ The written spec has 12 sections, 18 acceptance cases, contracts for `K4.RULES.v
 - Reviewer approval currently **not observed**. GitHub bot/human review submissions and threads: 0.
 
 **Final decision:** `SPEC_REVIEW_PENDING` / `PLAN_NOT_AUTHORIZED` / `PRODUCT_CODE_BLOCKED`; continue with user-facing spec review only.
+
+## Subsequent draft-spec clarification (same day; supersedes open ambiguities above)
+
+**Reviewed spec correction commit:** `7ee311c8410db2396359f648126c84f50cc03244`  
+**Latest reviewed spec blob:** `d732ac22161d4b007a8f869cbc928ec6737a40a8`  
+**Review status:** `DRAFT_FOR_EXPLICIT_SPEC_REVIEW` unchanged. This later edit is a proposed clarification, **not** approval and **not** a K4 implementation plan.
+
+Eight documentation-only contract clarifications were made after the baseline Skill review:
+1. Disable `RecommendationV1` caching in first release; recompute when clock or preferences change, so due/snooze expiry cannot leave stale results at an unchanged watermark.
+2. Correct `source-bound local` K3 store wording; it cannot claim authenticated/server identity.
+3. Define the projection-level integrity enum `COMPLETE|INCOMPLETE|CONFLICTED`.
+4. Bound item-level provenance to five deterministic event IDs with a named truncation boolean.
+5. Replace example JSON containing strings that look like union alternatives with one concrete valid `NO_ELIGIBLE_ACTION` example.
+6. Define status/reason/action combination rules and provenance truncation semantics, including trusted grading prohibited for first browser release.
+7. Replace fallback navigation to non-existent `learn` browser route with actual public home navigation.
+8. Add a focused regression acceptance for clock/snooze boundary without a new evidence event.
+
+**Historical note:** the earlier list of ambiguities above reflects the pre-clarification spec blob; these items are now addressed in the **revised draft**, not open blockers by themselves. Still pending: explicit written-spec approval, plan authoring/approval, real independent K4 review, source-eligibility proof in implementation, TDD/release evidence and exact-SHA merge authorization. CI checks are keyed to commit HEAD and cannot be inferred from the old `32873ba...` runs.
