@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 73,
+  "state_revision": 74,
   "programme": "K3",
   "phase": "H",
   "status": "PHASE_GATE",
@@ -16,7 +16,7 @@
   "checkpoint_path": "docs/superpowers/reviews/2026-09-29-k3-final-verification.md",
   "open_critical_findings": 0,
   "open_important_findings": 0,
-  "last_verified_scope": "K3_TASKS_1_39_LOCAL_AND_PRODUCT_HEAD_CI_VERIFIED_FINAL_BRANCH_SHA_CI_PENDING",
+  "last_verified_scope": "K3_TASKS_1_39_CI_VERIFIED_ON_82B1_REVIEW_REMEDIATION_SHA_CI_PENDING_TASK40_NOT_STARTED",
   "gates": {
     "REPO_CONTEXT_READY": "PASS",
     "STATE_MANIFEST_VALID": "PASS",
@@ -48,5 +48,5 @@
   "low_model_ready": false,
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "project_bootstrap_revision": "k3-h0-r2-v1",
-  "updated_at": "2026-10-08T09:11:05Z"
+  "updated_at": "2026-10-08T09:45:19Z"
 }
