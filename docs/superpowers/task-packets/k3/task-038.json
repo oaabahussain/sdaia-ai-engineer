@@ -58,7 +58,9 @@
       "docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md"
     ],
     "allowed_delete": [],
-    "allowed_modify": [],
+    "allowed_modify": [
+      "tests/k3-learner-evidence-acceptance.test.js"
+    ],
     "forbidden_paths": [],
     "product_scope": "K3_TASK_38"
   },

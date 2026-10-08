@@ -117,3 +117,12 @@ test('Task 37 reuses existing documentation-contract test as a modification, nev
   assert.ok(packet.scope.allowed_create.includes('docs/superpowers/reviews/2026-09-29-k3-implementation-checkpoint.md'));
   assert.equal(packet.authority.task_source_digest, taskSourceDigest(extractTask(PLAN, 37)));
 });
+
+test('Task 38 review may correct only the identified existing K3 acceptance gate regression', () => {
+  const packet = compileTaskPacket({ taskId: 38, ...ARGS });
+  assert.deepEqual(packet.scope.allowed_create, [
+    'docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md'
+  ]);
+  assert.deepEqual(packet.scope.allowed_modify, ['tests/k3-learner-evidence-acceptance.test.js']);
+  assert.equal(packet.merge_authority, false);
+});

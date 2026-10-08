@@ -114,6 +114,13 @@ function parseFiles(section, taskId) {
     if (index >= 0) allowedCreate.splice(index, 1);
     allowedModify.push(existing);
   }
+  // Task 38 reviews completed K3 work and fixes Important findings under TDD.
+  // Existing Task 36 acceptance test incorrectly locks next_task to <=37, even
+  // after Task 37 was accepted. Permit ONLY this identified existing test,
+  // not a wildcard review-fix scope; the guarded task sequence stays required.
+  if (taskId === 38) {
+    allowedModify.push('tests/k3-learner-evidence-acceptance.test.js');
+  }
   return {
     allowed_create: unique(allowedCreate),
     allowed_modify: unique(allowedModify),
