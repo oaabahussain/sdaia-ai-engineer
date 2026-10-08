@@ -32,3 +32,11 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 
 - Final checkpoint/head `cff483db959d3ff57d6f778ddcf74ea61d977f7a` CI [Quality #37857351502](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857351502): SUCCESS; [Server & Adapter #37857351496](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857351496): SUCCESS.
 - The actual K4 manifest CLI preflight test added in `tests/k4-state.test.js` ran as part of Node tests at that commit. K4 Task 01 is **COMPLETE** and current state points to Task 02; K3 state preserved. Never equate this with K4 whole feature complete.
+
+## Task 02 — RulePolicyV1 strict baseline — complete
+
+- Preflight: live main `9e55881e9480b4a02d8ef5d92a0b21a9313492f1`, K4 state revision 2 `next_task=2`, approvals intact.
+- RED `1e96f29c4e6ef81877d84a5bed91a82026c102a9`: [Quality #37857548633](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857548633), **851 PASS / 1 FAIL**; exact `ERR_MODULE_NOT_FOUND` for `src/recommendations/policy.js`, expected missing versioned contract. No unrelated test failures.
+- GREEN `d82646d5bf6d80dbff35976b5f00c90f84642051`: [Quality #37857672200](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857672200) **SUCCESS** and [Server #37857672048](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37857672048) **SUCCESS**. New `tests/k4-policy.test.js` asserts exact 48/24/96/720 baseline, fail-closed immutable safety, mode exclusions, no FSRS, deep-frozen return and unknown settings denied.
+- Task 02 complete on code GREEN evidence; K4 state revision 3, `completed_through_task=2`, `next_task=3` at checkpoint `d5cf71c58398eb56bcbfff7e4b6381713646464d`. Existing strict exam and content preserved.
+- Ruling: keep browser runtime validator dependency-free; a fixed v1 schema and matching pure-JS invariant checker are needed because Node/Ajv modules are not bundled into GitHub Pages. Future policy changes require new version and schema/contract review.
