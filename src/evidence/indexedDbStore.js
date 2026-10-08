@@ -183,6 +183,15 @@ export function createIndexedDbEvidenceStore({ dbName, storeId, indexedDB }) {
   return {
     store_id: storeId,
     outbox,
+    async getSourceHead() {
+      return transact(['meta'], 'readonly', async tx => {
+        const saved = await requestResult(tx.objectStore('meta').get('next_store_seq'));
+        const next = saved?.value ?? 1;
+        if (!Number.isSafeInteger(next) || next < 1)
+          throw new Error('Invalid local evidence source head');
+        return { store_id: storeId, through_store_seq: next - 1 };
+      });
+    },
     async getSyncCursor() {
       return transact(['meta'], 'readonly', async tx => (await requestResult(tx.objectStore('meta').get('sync_cursor')))?.value ?? null);
     },
