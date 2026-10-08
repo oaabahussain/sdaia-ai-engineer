@@ -73,3 +73,11 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - GREEN 0bf019c87287ef350eb31bc9e07a61d556b4e473: Quality run 37859210000 SUCCESS; Server run 37859209931 SUCCESS.
 - Validates ISO instants, rejects invalid/calendar-only/future clock, computes +48h exposure due, supports test-only +24h wrong and +96h correct trusted-grade contract. Projection now recomputes UTC due from accepted timestamp without persisting recommended actions.
 - K4 state revision 7, completed task 06, next task 07. This is uncalibrated fixed intervals; no claimed empirical SDAIA retention benefit or actual graded SYSTEM producer.
+
+## Task 07 — deterministic public next action, complete
+
+- RED eae1887eb512e4a858560e37424029857714377c. Quality 37859432793: 879 PASS, 1 expected missing src/recommendations/ranker.js.
+- GREEN 89a624fb404c1e52da174e376681ef31f549ea11. Quality 37859545758 SUCCESS; Server 37859545834 SUCCESS.
+- Emits one public PRACTICE_ONE recommendation at most, prioritizing due-now exposure over unseen family, stable codepoint ordering, source-invalid fail-closed, and explicit skip/snooze expiry re-evaluation with unchanged K3 watermark. Browser TRUSTED_GRADED evidence cannot be promoted by input text.
+- K4 revision 8, completed task 07, next task 08. Policy is deterministic and uncalibrated.
+- Ruling: with no due/new eligible family, use the spec's NO_ELIGIBLE_ACTION/CONTENT_UNAVAILABLE enum (no new unapproved code) despite its broad wording; do not tell the learner an unavailable asset exists. At UI integration, unavailable runtime assets must be checked before linking.
