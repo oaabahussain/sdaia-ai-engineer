@@ -119,7 +119,11 @@ function parseFiles(section, taskId) {
   // after Task 37 was accepted. Permit ONLY this identified existing test,
   // not a wildcard review-fix scope; the guarded task sequence stays required.
   if (taskId === 38) {
-    allowedModify.push('tests/k3-learner-evidence-acceptance.test.js');
+    allowedModify.push(
+      'tests/k3-learner-evidence-acceptance.test.js',
+      'api/openapi.yaml',
+      'tests/documentation-contract.test.js'
+    );
   }
   return {
     allowed_create: unique(allowedCreate),

@@ -123,6 +123,10 @@ test('Task 38 review may correct only the identified existing K3 acceptance gate
   assert.deepEqual(packet.scope.allowed_create, [
     'docs/superpowers/reviews/2026-09-29-k3-whole-plan-review.md'
   ]);
-  assert.deepEqual(packet.scope.allowed_modify, ['tests/k3-learner-evidence-acceptance.test.js']);
+  assert.deepEqual(packet.scope.allowed_modify, [
+    'tests/k3-learner-evidence-acceptance.test.js',
+    'api/openapi.yaml',
+    'tests/documentation-contract.test.js'
+  ]);
   assert.equal(packet.merge_authority, false);
 });
