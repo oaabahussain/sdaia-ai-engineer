@@ -693,3 +693,10 @@ The preceding LOCAL/PRODUCT-CI-only entry is retained as historical evidence, no
 Task 39: complete — final-head CI SUCCESS on `82b1bfd93c9ba6e3a117f01f1a5bdd1050ed53ed`, Quality #37755198624 PASS, Server #37755198643 PASS, exact released tree `58fef098976f46096666f99d32851d2e913866f9`; acceptance limited to this exact verified SHA/tree.
 
 **Codex PR #62 correction boundary:** an additional acceptance-regression test and review-evidence documentation are being made AFTER that validated head to close two late reviewer findings. Therefore this newly edited branch head MUST obtain new exact-head CI PASS before integration Task 40; old checks are *not* evidence of any subsequent head. Task 40 landing cannot rely on the legacy partial line, the earlier action_required runs, or a SHA mismatch. Task 41 remains pending.
+
+
+## Task 40 — reviewed PR #62 merge and verified main — 2026-10-08
+
+Task 40: complete — merged PR #62 approved head `5f0cec624caf2e55cb434e7a18473fe8fe6de803` as `b5edc4461d92b4e9848b291adb14ea8fea76f164`; tree `0b3c058faacd4fca1bedac93eeeb1106f73c6a9c` equals reviewed tree; final-head PR Quality #37771005642 PASS, Server #37771005665 PASS, merged-head independent tests #37780148215 PASS, official Pages/live #37780283439 PASS; 0 unresolved Codex threads. K4 not started.
+
+Ruling: The GitHub Actions bot merge did not generate regular push runs on main. The approved recovery used a separate read-only workflow checking out the exact merge SHA and dispatching the official Pages workflow on that SHA, rather than treating old PR checks as post-merge checks. Cost if wrong: mistaken live-merge identity; guarded by exact parents/tree/main SHA assertions and live artifact checksum equality.
