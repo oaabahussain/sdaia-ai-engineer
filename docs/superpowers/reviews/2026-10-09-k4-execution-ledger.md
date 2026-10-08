@@ -57,3 +57,12 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Additive K3 API getSourceHead() reads the local committed source sequence, not its sync cursor; sourceReader preserves source/learner/track/release filters and K3 fingerprint checks. Cold start at zero does not invoke invalid replay(toSeq=0). Existing tests and browser passed.
 - K4 state revision 5; completed_through_task 4; next_task 5. K3 append-only event acceptance logic unchanged.
 - Ruling: read-only local source head uses the existing K3 store metadata transaction, not the independently governed sync cursor. Source ID is local, not server-authenticated.
+
+## Task 05 — correction-aware exposure projection, complete
+
+- RED commit 4533d262afaea80a5b48a13d82c133fd33d0cce2; Quality 37858674449: 866 PASS, 1 expected missing-module failure for projection.js.
+- GREEN commit 26d3736018b167588b2df8eb0ef45c9e9c729de7; Quality 37858856244 SUCCESS, Server & Adapter 37858856234 SUCCESS.
+- Reuses K3 resolveCurrentEvidence for VOID/SUPERSEDE/conflicts; quarantines affected public families; counts distinct accepted item interactions and bounds evidence IDs; rejects invalid source/learner/release/watermark and untrusted grade promotion. Strict exam modes do not rank public practice.
+- Task 05 only projects exposures: due_at is null pending separately tested UTC due-time Task 06. This is not a completed scheduler.
+- K4 revision 6, next_task 6, K3 state unchanged.
+- Ruling: Browser event authority cannot independently prove a trusted SYSTEM evaluation merely from authority_ref; initial K4 projections deliberately remain EXPOSURE_ONLY. Acceptance case for verified SYSTEM fixture cannot be claimed until a separate genuine producer-verification boundary is proven.
