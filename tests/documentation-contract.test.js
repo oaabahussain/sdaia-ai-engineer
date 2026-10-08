@@ -139,3 +139,15 @@ test('current K3 handoff, tracker, API, and checkpoint are explicit and evidence
   const checkpoint = read(checkpointPath);
   for (const term of ['Task 36', 'Task 37', '836', '117', 'main', 'PENDING']) assert.ok(checkpoint.includes(term), `Checkpoint missing ${term}`);
 });
+
+
+test('K3 OpenAPI evidence pull documents the server cursor identity, full response, and source conflicts', () => {
+  const api = read('../api/openapi.yaml');
+  const pull = api.split('  /learner-evidence:\n')[1];
+  assert.ok(pull, 'expected K3 evidence GET route');
+  assert.match(pull, /- name: source_store_id/);
+  assert.match(pull, /nonzero.*source_store_id/i);
+  assert.match(pull, /required: \[store_id, events, next_store_seq\]/);
+  assert.match(pull, /store_id: \{ type: string/);
+  assert.match(pull, /'409': \{ \$ref: '#\/components\/responses\/Error' \}/);
+});

@@ -86,10 +86,20 @@ test('Task 36 browser acceptance keeps bilingual, full-exam, offline, and eviden
   assert.match(smoke,/document\.documentElement\.dir/);
 });
 
-test('Task 36 repository state must not claim K3 complete before Tasks 37-41',()=>{
+test('K3 finalization cannot skip documented/review/integration gates or close early',()=>{
   const state=JSON.parse(read('docs/superpowers/state/CURRENT-STATE.json'));
-  assert.notEqual(state.status,'COMPLETE');
-  assert.ok(state.next_task<=37,'Task 36 cannot skip documentation/review/finalization gates');
+  assert.ok(state.completed_through_task >= 36 && state.completed_through_task <= 41, 'K3 completed task must be in Phase H');
+  assert.equal(state.next_task,state.completed_through_task+1,'K3 tasks must advance one-at-a-time');
+  const ledger=read('docs/superpowers/reviews/2026-09-29-k3-execution-ledger.md');
+  for(let n=37;n<=state.completed_through_task;n+=1){
+    assert.match(ledger,new RegExp('Task '+n+': complete\\b','i'),`Finalization task ${n} lacks durable completion evidence`);
+  }
+  if(state.status==='COMPLETE'){
+    assert.equal(state.completed_through_task,41,'K3 COMPLETE requires Task 41 and post-merge verification');
+    assert.equal(state.next_task,42,'No K4 work is authorized just by K3 completion');
+  }else{
+    assert.ok(state.next_task>=37 && state.next_task<=41,'Unclosed K3 cannot skip past finalization gates');
+  }
 });
 
 
