@@ -1,0 +1,37 @@
+name: K3 Task 39 documentation Git bundle import
+on:
+  push:
+    branches: [wave/k3-tasks37-39-readonly-prep-2026-10-08]
+    paths:
+      - 'transfers/k3-task39-doc.bundle.b64'
+      - '.github/workflows/k3-task39-doc-import.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+      - name: Verify product ancestry and push doc-only K3 Task 39 commits
+        run: |
+          set -euo pipefail
+          base=44e4e647f0faa21a8934199d065464a265bb32b3
+          target=ec7b24b54e466452a0b359b4828389e3289bbbe0
+          tree=e6185047734adca47df2b0ffcac95588e339d895
+          transfer=transfers/k3-task39-doc.bundle.b64
+          test -s "$transfer"
+          base64 --decode "$transfer" > /tmp/k3-task39-doc.bundle
+          echo '7e78ba06c4f16948262c1a610de545a736147625b890eaf56404dd65762bc924  /tmp/k3-task39-doc.bundle' | sha256sum --check --status
+          git cat-file -e "$base^{commit}"
+          git bundle verify /tmp/k3-task39-doc.bundle
+          git fetch /tmp/k3-task39-doc.bundle 'refs/heads/impl/k3-tasks37-39-clean-wave:refs/heads/k3-task39-import'
+          test "$(git rev-parse refs/heads/k3-task39-import)" = "$target"
+          test "$(git rev-parse "$target^{tree}")" = "$tree"
+          git merge-base --is-ancestor "$base" "$target"
+          remote_sha=$(git ls-remote origin refs/heads/impl/k3-tasks37-39-clean-wave | cut -f1)
+          test "$remote_sha" = "$base"
+          git push origin "$target:refs/heads/impl/k3-tasks37-39-clean-wave"
+          echo "IMPORTED_EXACT_HEAD=$target"
