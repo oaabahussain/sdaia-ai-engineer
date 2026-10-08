@@ -1,3 +1,11 @@
+# K3 programme closure — verified merged Product (2026-10-08)
+
+**Verified K3 programme state:** `COMPLETE / MERGED / POST_MERGE_VERIFIED` according to [PR #62](https://github.com/oaabahussain/sdaia-ai-engineer/pull/62), exact reviewed/merged tree `0b3c058faacd4fca1bedac93eeeb1106f73c6a9c`, merged SHA `b5edc4461d92b4e9848b291adb14ea8fea76f164`, [postmerge test run #37780148215](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37780148215) SUCCESS and [official Pages/live run #37780283439](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37780283439) SUCCESS. All 41 K3 task evidence checkpoints have been assembled, including [Task 41 final report](./2026-09-29-k3-post-merge-verification.md). This entry is dated navigation, not a second source of truth; always read the current `CURRENT-STATE.json` from live Git.
+
+Product acceptance: 1,120 questions, 7 domains, full exam 200; AR/EN, RTL/LTR, offline reload, IndexedDB durable fine-grained evidence and 12 K3 learner evidence definitions verified. Authenticated production cross-device sync is **not deployed/verified**, despite passing server/API contract tests. K4–K9 remain separately scoped; **K4 has not started**.
+
+---
+
 # Live programme navigation — K3 current implementation status
 
 **Dated checkpoint:** 2026-10-08 (not a live state store). The approved K3 specification and plan exist; Tasks 1–36 are merged and post-merge verified on `main@5b7453407def933037c4c254cd0fca5e5f3f1591`. Task 37 was pending at the launch baseline; Task 38 / Task 39 / Task 40 / Task 41 remain PENDING until their durable proof exists. The sole live authority is `docs/superpowers/state/CURRENT-STATE.json` plus Git and the ledger; check this first on every resume.
