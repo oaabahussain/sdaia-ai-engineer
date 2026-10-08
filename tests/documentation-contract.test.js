@@ -92,3 +92,50 @@ test('handoff is zero-tribal-knowledge and changelog does not claim release', ()
   assert.match(changelog, /Programme A.*merged.*verified/i);
   assert.match(changelog, /K2.*Coverage Expansion.*implementation/i);
 });
+
+
+test('K3 data model documents implemented learner evidence, storage, privacy, replay, and deferred derivations', () => {
+  const doc = read('../DATA-MODEL.md');
+  for (const term of [
+    'LearnerEvidenceEventV2', 'EvidenceStorageReceiptV1', 'EvidenceBatchResultV1',
+    'EvidenceOutboxRecordV1', 'RuntimeEvidenceContextV1', 'ActivityProjectionV1',
+    'AttemptProjectionV1', 'LearnerIdentityLinkRecordV1', 'EvidenceExportRecordV1',
+    'event_fingerprint', 'origin_seq', 'store_seq', 'StateV2', 'xAPI', 'Caliper',
+    'K4', 'K5', 'K6', 'K8'
+  ]) assert.ok(doc.includes(term), `Missing current K3 data model: ${term}`);
+  assert.match(doc, /immutable.*evidence|evidence.*immutable/i);
+  assert.match(doc, /authorization.*not.*learner_id|learner_id.*not.*authorization/i);
+  assert.match(doc, /legacy.*not.*invent|not.*invent.*legacy/i);
+  assert.match(doc, /privacy.*erasure|erasure.*privacy/i);
+});
+
+test('K3 architecture documents operational ports, offline capture, fail-closed sync, and Pages boundary', () => {
+  const doc = read('../ARCHITECTURE.md');
+  for (const term of [
+    'src/evidence/recorder.js', 'src/evidence/indexedDbStore.js',
+    'src/evidence/sync.js', 'src/evidence/replay.js', 'src/evidence/legacy.js',
+    'server/app/evidence_auth.py', 'server/app/evidence_store.py',
+    'tests/k3-learner-evidence-acceptance.test.js', 'scripts/browser_smoke.py',
+    'K4', 'K5', 'K6', 'K8'
+  ]) assert.ok(doc.includes(term), `Missing current K3 architecture: ${term}`);
+  assert.match(doc, /default.*den(y|ied)|den(y|ied).*default/i);
+  assert.match(doc, /IndexedDB.*offline|offline.*IndexedDB/i);
+  assert.match(doc, /Product Analytics.*Telemetry|Telemetry.*Product Analytics/i);
+});
+
+test('current K3 handoff, tracker, API, and checkpoint are explicit and evidence-backed', () => {
+  const handoff = read('../HANDOFF.md').split('## Historical snapshot')[0];
+  const tracker = read('../docs/superpowers/reviews/2026-09-27-platform-programme-tracker.md').split('## Historical snapshot')[0];
+  const api = read('../api/openapi.yaml');
+  const checkpointPath = '../docs/superpowers/reviews/2026-09-29-k3-implementation-checkpoint.md';
+  for (const term of ['Task 37', 'Task 38', 'Task 39', 'CURRENT-STATE.json', '5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9']) {
+    assert.ok(handoff.includes(term), `Current handoff missing ${term}`);
+    assert.ok(tracker.includes(term), `Current tracker missing ${term}`);
+  }
+  assert.match(api, /learner-evidence.*authorized|authorized.*learner-evidence/i);
+  assert.match(api, /DenyLearnerAuthorization/);
+  assert.match(api, /X-Anon-Id.*not.*authoriz/i);
+  assert.equal(exists(checkpointPath), true);
+  const checkpoint = read(checkpointPath);
+  for (const term of ['Task 36', 'Task 37', '836', '117', 'main', 'PENDING']) assert.ok(checkpoint.includes(term), `Checkpoint missing ${term}`);
+});

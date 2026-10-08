@@ -1,3 +1,18 @@
+# Live programme navigation — K3 current implementation status
+
+**Dated checkpoint:** 2026-10-08 (not a live state store). The approved K3 specification and plan exist; Tasks 1–36 are merged and post-merge verified on `main@5b7453407def933037c4c254cd0fca5e5f3f1591`. Task 37 was pending at the launch baseline; Task 38 / Task 39 / Task 40 / Task 41 remain PENDING until their durable proof exists. The sole live authority is `docs/superpowers/state/CURRENT-STATE.json` plus Git and the ledger; check this first on every resume.
+
+- Task 37: documentation-contract tests, current Data Model / Architecture / API / Handoff / tracker, and durable implementation checkpoint.
+- Task 38: fresh whole-plan code review and zero open Critical/Important findings.
+- Task 39: exact-head full Node/Python/browser/Pages release checks and protected question payload SHA-256 `5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9`.
+- Tasks 40–41: reviewed combined merge, then merged-main runtime/Pages/offline/evidence checks; **K4 not started**.
+
+Latest completed evidence: `docs/superpowers/reviews/2026-10-07-k3-tasks34-36-post-merge-verification.md`; approved source spec/plan as located by CURRENT-STATE. The statements about `K3 DESIGN NOT STARTED` below were true at the historical 2026-09-27 checkpoint but are no longer current.
+
+---
+
+## Historical snapshot — original 2026-09-27 programme tracker (not execution authority)
+
 # Learning Platform — Historical Programme Tracker / Index
 
 **Date:** 2026-09-28  
