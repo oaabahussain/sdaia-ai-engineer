@@ -1,6 +1,7 @@
 import { resolveCurrentEvidence } from '../evidence/corrections.js';
 import { eligiblePublicItems } from './publicCatalog.js';
 import { validateRulePolicy } from './policy.js';
+import { assertInstant, computeDueAt } from './clock.js';
 
 const cmp=(a,b)=>a<b?-1:a>b?1:0;
 const instant=(value)=>typeof value==='string' &&
@@ -14,6 +15,7 @@ export function computeScheduleProjection({
   policy,nowIso,acceptedContentCatalog
 }={}) {
   validateRulePolicy(policy);
+  assertInstant(nowIso);
   if (![learnerId,sourceStoreId,activeReleaseId].every(x=>typeof x==='string'&&x.length>0) ||
       !Number.isSafeInteger(throughStoreSeq) || throughStoreSeq<0 ||
       !Array.isArray(events) || instant(nowIso)===null)
@@ -80,8 +82,9 @@ export function computeScheduleProjection({
     if(item.interactions.has(e.item_interaction_id))continue;
     item.interactions.add(e.item_interaction_id);
     item.events.push(e);
-    const when=instant(e.accepted_at);
-    if(when===null || when>instant(nowIso))item.badTime=true;
+    let when;
+    try { when=assertInstant(e.accepted_at); } catch { item.badTime=true; continue; }
+    if(when>assertInstant(nowIso))item.badTime=true;
   }
   for(const family of affectedFamilies) {
     if(byFamily.has(family))continue;
@@ -95,15 +98,17 @@ export function computeScheduleProjection({
     const provenance=found.slice(-5).map(e=>e.event_id);
     const conflicted=affectedFamilies.has(row.candidate.question_family_id);
     const invalid=conflicted||row.badTime;
-    const times=found.map(e=>instant(e.accepted_at)).filter(x=>x!==null&&x<=instant(nowIso));
+    const times=found.map(e=>{try{return assertInstant(e.accepted_at)}catch{return null}}).filter(x=>x!==null&&x<=assertInstant(nowIso));
+    const lastExposureAt=!invalid&&times.length?new Date(times.reduce((a,b)=>Math.max(a,b),-Infinity)).toISOString():null;
+    const dueAt=invalid?null:computeDueAt({lastExposureAt,lastTrustedGradeAt:null,gradeEvidence:found.length?'EXPOSURE_ONLY':'NONE',correct:null,nowIso,policy});
     return {
       question_family_id:row.candidate.question_family_id,
       latest_item_version_id:row.candidate.item_version_id,
       objective_id:row.candidate.objective_id,
-      last_exposure_at:!invalid&&times.length ? new Date(Math.max(...times)).toISOString():null,
+      last_exposure_at:lastExposureAt,
       last_graded_at:null,
       grade_evidence:found.length>0?'EXPOSURE_ONLY':'NONE',
-      due_at:null,
+      due_at:dueAt,
       exposure_count:row.interactions.size,
       source_event_ids:provenance,
       source_event_ids_truncated:found.length>5,
