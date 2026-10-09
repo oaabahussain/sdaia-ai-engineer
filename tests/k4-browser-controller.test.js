@@ -196,3 +196,17 @@ test('late answer from a closed session cannot mark a new practice item as saved
     'receipt from retired session must not falsely mark new question as answered');
   assert.equal(root.children.find(c=>c.tagName==='BUTTON'&&c.textContent==='A').disabled,false);
 });
+
+
+test('missing public question asset fails closed without rendering clickable Start',async()=>{
+  const {controller,document,calls}=make({loading:async()=>({recommendation,question:null})});
+  const result=await controller.renderHome();
+  const card=document.getElementById('k4HomeCard');
+  assert.equal(result.status,'NO_ELIGIBLE_ACTION',
+    'an unavailable runtime question must not be advertised as an ACTION');
+  assert.equal(card.getAttribute('data-k4-family-id'),'');
+  assert.equal(card.children.some(child=>child.tagName==='BUTTON'),false,
+    'an unavailable question must not render a clickable practice Start');
+  await assert.rejects(()=>controller.openPractice(),/unavailable|question/i);
+  assert.deepEqual(calls,[]);
+});
