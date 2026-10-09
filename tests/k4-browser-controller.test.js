@@ -6,7 +6,7 @@ import { createK4BrowserController } from '../src/recommendations/browserControl
 function element(id=''){
   let text='';
   return {
-    id,children:[],events:{},disabled:false,
+    id,children:[],events:{},disabled:false,attrs:new Map(),setAttribute(name,value){this.attrs.set(name,String(value))},getAttribute(name){return this.attrs.get(name)??null},
     get textContent(){return text},set textContent(value){text=String(value);this.children=[]},
     append(...children){this.children.push(...children)},
     replaceChildren(...children){this.children=[...children]},
@@ -111,4 +111,33 @@ test('active practice remains bound to its original item across asynchronous hom
   await option.click();
   assert.equal(recorded,'item-a.v1');
   assert.match(current(),/Response recorded/);
+});
+
+test('latest async home request wins; older completion cannot restore prior recommendation',async()=>{
+  let pendingResolve;
+  const second={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  let call=0;
+  const {document,controller}=make({loading:async()=>{
+    call++;
+    if(call===1)return {recommendation,question};
+    if(call===2)return new Promise(resolve=>{pendingResolve=resolve});
+    return {recommendation:second,question:{...question,id:'item-b.v1',question_en:'Updated'}};
+  }});
+  await controller.renderHome();
+  const stale=controller.renderHome();
+  await controller.renderHome();
+  pendingResolve({recommendation,question});
+  await stale;
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+});
+
+test('two concurrent practice start clicks open only one K3 evidence session',async()=>{
+  let release;
+  const pause=new Promise(resolve=>{release=resolve});
+  const {controller,calls}=make({start:async()=>{await pause;return {candidate:recommendation.action}}});
+  await controller.renderHome();
+  const one=controller.openPractice(),two=controller.openPractice();
+  release();
+  await Promise.all([one,two]);
+  assert.deepEqual(calls,['start']);
 });
