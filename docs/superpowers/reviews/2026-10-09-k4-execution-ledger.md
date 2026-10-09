@@ -81,3 +81,10 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Emits one public PRACTICE_ONE recommendation at most, prioritizing due-now exposure over unseen family, stable codepoint ordering, source-invalid fail-closed, and explicit skip/snooze expiry re-evaluation with unchanged K3 watermark. Browser TRUSTED_GRADED evidence cannot be promoted by input text.
 - K4 revision 8, completed task 07, next task 08. Policy is deterministic and uncalibrated.
 - Ruling: with no due/new eligible family, use the spec's NO_ELIGIBLE_ACTION/CONTENT_UNAVAILABLE enum (no new unapproved code) despite its broad wording; do not tell the learner an unavailable asset exists. At UI integration, unavailable runtime assets must be checked before linking.
+
+## Task 09 — durable non-strict practice adapter
+
+- RED `2cb51babecb6eecd2e90a132703db5e9dc5f57aa`: Quality 37895973094; 890 other Node tests passed and missing `src/recommendations/practiceSession.js` failed as expected.
+- GREEN `ff9f9d7762ffcb1143bd0e897950b1c9b89bf058`: Quality 37896064431 SUCCESS; Server & Adapter 37896064377 SUCCESS.
+- New session adapter records K3 practice activity/presentation/one canonical answer and verifies accepted durable receipts; never submits assessment or writes SYSTEM grading. Tests include duplicate calls, failures and source/locale/option bounds.
+- K4 state revision 10: Task 09 complete; next Task 10. Test scope is adapter contract, not yet a live browser route; browser Task 10 must prove integration and proper candidate binding.
