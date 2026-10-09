@@ -12,7 +12,7 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
-  let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null;
+  let homeGeneration=0,openPromise=null,outstandingWrite=null,practiceGeneration=0,lastPracticeFamily=null;
   function invalidatePractice(){
     // Navigation retires any in-flight Start; a late receipt must not restore
     // a view whose user intent has already been superseded.
@@ -133,7 +133,11 @@ export function createK4BrowserController({
       return view;
     })();
     openPromise=work;
-    try{return await work}finally{if(openPromise===work)openPromise=null}
+    outstandingWrite=work;
+    try{return await work}finally{
+      if(openPromise===work)openPromise=null;
+      if(outstandingWrite===work)outstandingWrite=null;
+    }
   }
   async function another(){
     const family=current?.recommendation?.action?.question_family_id??lastPracticeFamily;
@@ -184,7 +188,7 @@ export function createK4BrowserController({
   function leavePractice(){
     // The durable presentation write may still be pending when Home is clicked.
     // Retire the UI synchronously but return its settlement barrier to the app.
-    const pending=openPromise;
+    const pending=outstandingWrite??openPromise;
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
     homeGeneration++;
