@@ -42,3 +42,18 @@ This report does not authorize or schedule a merge.
 - Additional source-risk challenge verified public-version versus holdout sibling (synthetic fixture), durable preference receipt surviving a failed subsequent recommendation refresh (RED→GREEN), and Chromium simulated storage-denial UI; no private pool or actual production writes.
 - GitHub PR #65 still has no actual independent review approval. **Self-audit is not independent review.** `AC-02` producer authentication, `AC-17` external review and `AC-18` real authorized deployment remain hard blockers; physical quota exhaustion remains only partially covered.
 - New documentation commit will change HEAD; do not reuse earlier code-run IDs as **exact post-documentation-head** CI until new checks finish. No merge permission or deployment permission is implied.
+
+## Separate review-gate continuation — 2026-10-09
+
+This is a **same-executor scoped source audit, NOT a genuinely independent code review or GitHub review approval**. PR #65 changed-file list contains 50 paths (including a large 8,970-line public catalog). The reviewer inspected critical K4 contracts in `src/recommendations/{browserController,practiceSession,preferencesStore,projection,sourceReader,publicCatalog,ranker,clock,policy}.js`, relevant K3 evidence producer/store/replay/corrections boundaries, `src/app.js`, SW/Pages verifier, and corresponding K4 tests; this does **not** certify exhaustive line-by-line independent inspection of all changed content.
+
+Two new material async UI findings I2/I3 were reproduced by GitHub-run failing regression tests and repaired without modifying K3; full proof with exact commit/run IDs is in `2026-10-09-k4-execution-ledger.md`. Last tested **code** commit: `c118edb43c7f8b847f2586ca7e57e321f2b50a2c`; [Quality 37941284560](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37941284560) SUCCESS (920/920 Node, 76/76 Python, Chromium and offline, Pages preview, 63 public SW assets), [Server 37941284675](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37941284675) SUCCESS. A later documentation commit is **not** covered until exact-head checks pass on that newer SHA.
+
+Remaining gates, fail closed:
+- **AC-02 BLOCKED:** K3 `recordEvaluation` intentionally refuses local SYSTEM evidence. No separately authenticated producer fixture was obtained. K4 browser continues exposure-only, with no mastery, official readiness, calibrated FSRS or trusted correctness claim. Treat full producer-backed AC-02 as unproven, not implicitly passed.
+- **AC-09 PARTIAL:** synthetic published-versus-protected sibling validated, but governed production holdout inventory was not accessed or verified.
+- **AC-13 PARTIAL:** actual Chromium controlled IndexedDB-open refusal verified, not physical quota exhaustion.
+- **AC-17 BLOCKED:** no independent reviewer or external review submission, and no independent approval tied to current head; this same-session source audit and successful CI do not satisfy it. Full remaining-contract review must be performed independently and its findings addressed.
+- **AC-18 BLOCKED:** per-PR explicit full-current-SHA landing approval not granted. PR #65 remains DRAFT/unmerged; no merged main Actions or live Pages post-merge evidence is possible yet.
+
+Decision: **NOT RELEASE QUALIFIED.** Keep K4 `K4-CURRENT-STATE.json` revision 14 / task 14 REVIEW, K3 `CURRENT-STATE.json` COMPLETE unchanged, PR #64 design-only, and K5 not started. Do not mark completion or request landing approval while the independent review/release gates are unfulfilled. Obtain independent review, resolve actionable findings, run exact-head GitHub CI, then request single new exact-head user authorization at landing gate.
