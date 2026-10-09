@@ -181,6 +181,12 @@ export function createK4BrowserController({
     if(current)return renderHome();
     return null;
   }
+  function leavePractice(){
+    lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
+    invalidatePractice();
+    homeGeneration++;
+    displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+  }
   async function close(){
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
@@ -193,5 +199,5 @@ export function createK4BrowserController({
       return false;
     }
   }
-  return {renderHome,openPractice,showReason,close,refreshLocale,nextAction,another,snooze};
+  return {renderHome,openPractice,showReason,close,leavePractice,refreshLocale,nextAction,another,snooze};
 }
