@@ -159,6 +159,35 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
+        # K4_BROWSER_ACCEPTANCE: test the real single-question screen, not a stub.
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 public card')
+        assert 'Practice one question' in text(session,find(session,'#k4HomeCard'))
+        assert execute(session,"return document.documentElement.dir")=='ltr'
+        assert execute(session,"const b=document.querySelector('#k4HomeCard button');b.focus();return document.activeElement===b"), 'K4 keyboard focus must work'
+        click(session,find(session,'#k4HomeCard button'))
+        wait_until(lambda:execute(session,"return document.getElementById('k4Practice').classList.contains('active')"),label='K4 practice screen')
+        assert len(finds(session,'#k4Practice .option'))==4
+        assert 'Practice one question' in text(session,find(session,'#k4Practice'))
+        assert 'readiness' not in text(session,find(session,'#k4Practice')).lower()
+        click(session,find(session,'#k4Practice .option'))
+        wait_until(lambda:'Response saved locally' in text(session,find(session,'#k4Practice')),label='K4 durable response receipt')
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
+        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
+        assert len(finds(session,'#k4Practice .option'))==4
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
+        click(session,find(session,'#k4Practice button:last-child'))
+        wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
+        click(session,find(session,'#k4HomeCard button:nth-of-type(3)'))
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 another action')
+        click(session,find(session,'#k4HomeCard button'))
+        wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
+        click(session,find(session,'#k4Practice button:last-child'))
+        req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
+        assert execute(session,"return window.innerWidth<=450"), 'K4 mobile viewport'
+        assert execute(session,"return document.getElementById('k4HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K4 responsive card'
+        req('POST',f'/session/{session}/window/rect',{'width':1400,'height':1000})
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
         wait_until(lambda:f'1 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='profile-sized full exam')
@@ -210,6 +239,12 @@ def main():
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),timeout=20,label='offline cached home reload')
         assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
         assert text(session,find(session,'.domainCard h3'))==PRESENTATION['locales']['en']['domain_labels'][first_domain]
+        # K4_OFFLINE_ACCEPTANCE: new public policy and modules work from the installed cache.
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 offline public card')
+        click(session,find(session,'#k4HomeCard button'))
+        wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 offline practice view')
+        click(session,find(session,'#k4Practice button:last-child'))
+
         req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html'})
         wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='three feedback cards')
         wait_until(lambda:text(session,find(session,'#feedbackBrand'))==PRESENTATION['locales']['en']['brand'],label='feedback presentation brand')
