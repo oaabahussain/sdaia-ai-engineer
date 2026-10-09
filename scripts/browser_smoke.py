@@ -179,9 +179,20 @@ def main():
         wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
+        previous_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
+        assert previous_family
         click(session,find(session,'#k4HomeCard button:nth-of-type(3)'))
-        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 another action')
-        click(session,find(session,'#k4HomeCard button'))
+        alternate_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 alternate family ID assigned'
+        )
+        wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")!=previous_family,
+            label='K4 alternate public family selection completed'
+        )
+        alternate_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
+        assert alternate_family and alternate_family!=previous_family, 'K4 another must choose a different public family'
+        assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
         wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
         click(session,find(session,'#k4Practice button:last-child'))
         req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
