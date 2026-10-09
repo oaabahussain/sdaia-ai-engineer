@@ -76,10 +76,17 @@ export function createK4BrowserController({
     const rec=result?.recommendation;
     const title=make('h2',label('k4Title'));
     if(rec?.status!=='ACTION'||rec.action?.action_type!=='PRACTICE_ONE'||
-       rec.action?.route_mode!=='practice'||!VALID_REASONS.has(rec.reason_code)){
+       rec.action?.route_mode!=='practice'||!VALID_REASONS.has(rec.reason_code)||
+       result?.question?.id!==rec.action?.item_version_id){
+      // A recommendation without its exact public question is not actionable.
+      // Do not expose a Start link or return an ACTION to the caller.
+      const safe=rec?.status==='ACTION'
+        ? {...rec,status:'NO_ELIGIBLE_ACTION',action:null,reason_code:'CONTENT_UNAVAILABLE'}
+        : rec??{status:'INSUFFICIENT_EVIDENCE'};
+      current={recommendation:safe,question:null};
       home.setAttribute?.('data-k4-family-id','');
       home.replaceChildren(title,make('p',label('k4Unavailable')));
-      return rec??{status:'INSUFFICIENT_EVIDENCE'};
+      return safe;
     }
     home.setAttribute?.('data-k4-family-id',rec.action.question_family_id);
     home.replaceChildren(title,button('k4Start',()=>openPractice(),'btn primary'),
