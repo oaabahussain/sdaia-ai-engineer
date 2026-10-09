@@ -164,3 +164,23 @@ test('missing correction target leaves source invalid rather than allowing new a
   assert.equal(result.integrity_status,'INCOMPLETE');
   assert.deepEqual(result.items,[]);
 });
+
+
+test('excluded mock correction conflicts do not enter K4 public projection',()=>{
+  const a=event(1,'learner.item.presented@1',{mode:'mock'});
+  const b=event(2,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:a.event_id,reason_code:'ADMIN_CORRECTION'}});
+  const c=event(3,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:a.event_id,reason_code:'ADMIN_CORRECTION'}});
+  const result=calc([a,b,c]);
+  assert.equal(result.integrity_status,'COMPLETE');
+  assert.deepEqual(result.items,[]);
+});
+test('correction conflict targeting a forged item version remains globally unsafe',()=>{
+  const a=event(1,'learner.item.presented@1',{item_version_id:'unpublished.v1'});
+  const b=event(2,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:a.event_id,reason_code:'ADMIN_CORRECTION'}});
+  const c=event(3,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:a.event_id,reason_code:'ADMIN_CORRECTION'}});
+  assert.notEqual(calc([a,b,c]).integrity_status,'COMPLETE');
+});
