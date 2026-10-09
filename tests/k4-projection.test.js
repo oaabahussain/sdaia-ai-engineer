@@ -184,3 +184,16 @@ test('correction conflict targeting a forged item version remains globally unsaf
     authority_ref:'authority:test',payload:{action:'VOID',target_event_id:a.event_id,reason_code:'ADMIN_CORRECTION'}});
   assert.notEqual(calc([a,b,c]).integrity_status,'COMPLETE');
 });
+
+
+test('excluded mock SUPERSEDE target suppresses missing replacement for K4 only',()=>{
+  const target=event(1,'learner.item.presented@1',{mode:'mock'});
+  const correction=event(2,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',
+    payload:{action:'SUPERSEDE',target_event_id:target.event_id,
+      superseding_event_id:'not-present',reason_code:'ADMIN_CORRECTION'}
+  });
+  const result=calc([target,correction]);
+  assert.equal(result.integrity_status,'COMPLETE');
+  assert.deepEqual(result.items,[]);
+});
