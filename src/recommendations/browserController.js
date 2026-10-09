@@ -182,10 +182,14 @@ export function createK4BrowserController({
     return null;
   }
   function leavePractice(){
+    // The durable presentation write may still be pending when Home is clicked.
+    // Retire the UI synchronously but return its settlement barrier to the app.
+    const pending=openPromise;
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
     homeGeneration++;
     displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+    return pending??Promise.resolve();
   }
   async function close(){
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
