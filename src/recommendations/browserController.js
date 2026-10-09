@@ -64,9 +64,11 @@ export function createK4BrowserController({
     const title=make('h2',label('k4Title'));
     if(rec?.status!=='ACTION'||rec.action?.action_type!=='PRACTICE_ONE'||
        rec.action?.route_mode!=='practice'||!VALID_REASONS.has(rec.reason_code)){
+      home.setAttribute?.('data-k4-family-id','');
       home.replaceChildren(title,make('p',label('k4Unavailable')));
       return rec??{status:'INSUFFICIENT_EVIDENCE'};
     }
+    home.setAttribute?.('data-k4-family-id',rec.action.question_family_id);
     home.replaceChildren(title,button('k4Start',()=>openPractice(),'btn primary'),
       button('k4Reason',showReason),
       button('k4Another',()=>another()),
