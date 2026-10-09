@@ -111,7 +111,11 @@ export function createK4BrowserController({
     return rec.reason_code;
   }
   async function openPractice(){
-    if(session){const view=renderPractice();onViewChange('k4Practice');return view}
+    if(session){
+      if(session.candidate?.item_version_id!==current?.recommendation?.action?.item_version_id)
+        invalidatePractice();
+      else {const view=renderPractice();onViewChange('k4Practice');return view}
+    }
     if(openPromise)return openPromise;
     const selected=current,generation=practiceGeneration;
     if(!selected?.question || selected.question.id!==selected.recommendation?.action?.item_version_id)
