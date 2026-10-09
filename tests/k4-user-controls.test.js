@@ -6,7 +6,7 @@ const a={question_family_id:'sdaia-ai-engineer.core-ai.alpha.def',item_version_i
   action_type:'PRACTICE_ONE',route_mode:'practice',release_id:'sdaia-ai-engineer.bootstrap.v1',
   objective_id:'objective-a',track_id:'sdaia-ai-engineer',domain_id:'core-ai'};
 const b={...a,question_family_id:'sdaia-ai-engineer.core-ai.beta.def',item_version_id:'sdaia-ai-engineer.core-ai.beta.def.v1'};
-function node(){return {children:[],events:{},textContent:'',classList:{add(){},remove(){}},
+function node(){return {children:[],events:{},textContent:'',attrs:new Map(),setAttribute(k,v){this.attrs.set(k,String(v))},getAttribute(k){return this.attrs.get(k)??null},classList:{add(){},remove(){}},
   replaceChildren(...a){this.children=a},append(...a){this.children.push(...a)},
   addEventListener(type,cb){this.events[type]=cb},click(){return this.events.click?.()}}}
 function doc(){
@@ -70,4 +70,15 @@ test('close keeps strict exam untouched, no implicit preference mutation',async(
   const t=setup();await t.controller.renderHome();t.controller.close();
   assert.equal(t.reads.length,0);
   assert.equal(t.document.practice.children.length,0);
+});
+
+test('another publishes a changed family identity only after replacement is rendered',async()=>{
+  const t=setup();
+  await t.controller.renderHome();
+  const before=t.document.home.getAttribute('data-k4-family-id');
+  assert.equal(before,a.question_family_id);
+  await t.controller.another();
+  const after=t.document.home.getAttribute('data-k4-family-id');
+  assert.equal(after,b.question_family_id);
+  assert.notEqual(after,before);
 });
