@@ -227,3 +227,25 @@ test('closing a presented question recalculates the home next action from fresh 
   assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
   assert.equal(document.getElementById('k4Practice').children.length,0);
 });
+
+
+test('header Home refresh cannot reopen the previously presented session as a new action',async()=>{
+  let loads=0;
+  const next={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const newQuestion={...question,id:'item-b.v1',question_en:'Question after header Home'};
+  const launched=[];
+  const {controller,document}=make({
+    loading:async()=>++loads===1?{recommendation,question}:{recommendation:next,question:newQuestion},
+    start:async({recommendation:chosen})=>{
+      launched.push(chosen.action.item_version_id);
+      return {candidate:chosen.action};
+    }
+  });
+  await controller.renderHome();
+  await controller.openPractice();
+  await controller.renderHome(); // app's header Home refreshes, but does not call close()
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+  await controller.openPractice();
+  assert.deepEqual(launched,['item-a.v1','item-b.v1']);
+  assert.match(document.getElementById('k4Practice').children.map(c=>c.textContent).join(' '),/Question after header Home/);
+});
