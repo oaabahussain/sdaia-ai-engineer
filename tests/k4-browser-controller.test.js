@@ -249,3 +249,36 @@ test('header Home refresh cannot reopen the previously presented session as a ne
   assert.deepEqual(launched,['item-a.v1','item-b.v1']);
   assert.match(document.getElementById('k4Practice').children.map(c=>c.textContent).join(' '),/Question after header Home/);
 });
+
+
+test('header Home hides prior Start synchronously while source refresh is pending',async()=>{
+  let resolveRefresh;
+  const future=new Promise(resolve=>{resolveRefresh=resolve});
+  const next={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const nextQuestion={...question,id:'item-b.v1',question_en:'Next after delayed refresh'};
+  const launched=[];
+  let calls=0;
+  const {document,controller}=make({
+    loading:async()=>{
+      calls++;
+      return calls===1?{recommendation,question}:future;
+    },
+    start:async({recommendation:rec})=>{launched.push(rec.action.item_version_id);return {candidate:rec.action}}
+  });
+  await controller.renderHome();
+  await controller.openPractice();
+  controller.leavePractice(); // Header Home must retire old action *before* awaiting fetch
+  const pending=controller.renderHome();
+  const home=document.getElementById('k4HomeCard');
+  assert.equal(home.getAttribute('data-k4-family-id'),'');
+  assert.equal(home.children.some(child=>child.tagName==='BUTTON'),false);
+  await assert.rejects(()=>controller.openPractice(),/unavailable/i);
+  resolveRefresh({recommendation:next,question:nextQuestion});
+  await pending;
+  await controller.openPractice();
+  assert.deepEqual(launched,['item-a.v1','item-b.v1']);
+  assert.match(document.getElementById('k4Practice').children.map(x=>x.textContent).join(' '),/Next after delayed refresh/);
+  const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  assert.match(app,/function resetToHome\(\)\{[^}]*K4_CONTROLLER\.leavePractice\(\)/,
+    'header Home must retire the old K4 session before triggering renderHome');
+});
