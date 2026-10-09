@@ -279,7 +279,7 @@ test('header Home hides prior Start synchronously while source refresh is pendin
   assert.deepEqual(launched,['item-a.v1','item-b.v1']);
   assert.match(document.getElementById('k4Practice').children.map(x=>x.textContent).join(' '),/Next after delayed refresh/);
   const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
-  assert.match(app,/function resetToHome\(\)\{[^}]*K4_CONTROLLER\.leavePractice\(\)/,
+  assert.match(app,/function resetToHome\(\)\{[^}]*K4_CONTROLLER\?\.leavePractice\(\)/,
     'header Home must retire the old K4 session before triggering renderHome');
 });
 
