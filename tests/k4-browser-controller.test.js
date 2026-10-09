@@ -84,3 +84,31 @@ test('home is integrated as a separate screen; existing exam route remains',()=>
   assert.match(html,/id="exam"/);
   assert.match(app,/createK4BrowserController/);
 });
+
+test('active practice remains bound to its original item across asynchronous home refresh',async()=>{
+  let calls=0, recorded=null;
+  const second={
+    ...recommendation,
+    action:{...recommendation.action,item_version_id:'item-b.v1',question_family_id:'item-b'}
+  };
+  const secondQuestion={...question,id:'item-b.v1',question_en:'Different second question'};
+  const {controller,document}=make({
+    loading:async()=>++calls===1?{recommendation,question}:{recommendation:second,question:secondQuestion},
+    start:async({recommendation:chosen})=>({candidate:chosen.action}),
+    respond:async({session})=>{
+      recorded=session.candidate.item_version_id;
+      return {receipt:{disposition:'ACCEPTED'}};
+    }
+  });
+  await controller.renderHome();
+  await controller.openPractice();
+  await controller.renderHome(); // happens after language change while K3 recorder keeps original session
+  await controller.refreshLocale();
+  const current=()=>document.getElementById('k4Practice').children.map(x=>x.textContent).join(' ');
+  assert.match(current(),/What is a safe example/);
+  assert.doesNotMatch(current(),/Different second question/);
+  const option=document.getElementById('k4Practice').children.find(x=>x.tagName==='BUTTON'&&x.textContent==='A');
+  await option.click();
+  assert.equal(recorded,'item-a.v1');
+  assert.match(current(),/Response recorded/);
+});
