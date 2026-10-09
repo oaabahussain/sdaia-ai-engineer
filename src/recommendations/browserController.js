@@ -12,7 +12,7 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
-  let homeGeneration=0,openPromise=null,practiceGeneration=0;
+  let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null;
   function invalidatePractice(){
     // Navigation retires any in-flight Start; a late receipt must not restore
     // a view whose user intent has already been superseded.
@@ -132,12 +132,13 @@ export function createK4BrowserController({
     try{return await work}finally{if(openPromise===work)openPromise=null}
   }
   async function another(){
-    const family=current?.recommendation?.action?.question_family_id;
+    const family=current?.recommendation?.action?.question_family_id??lastPracticeFamily;
     if(!family)return renderHome();
     invalidatePractice();
     const generation=++homeGeneration;
     const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
     if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
+    lastPracticeFamily=null;
     return displayHome(result);
   }
   async function nextAction(){
@@ -177,6 +178,7 @@ export function createK4BrowserController({
     return null;
   }
   async function close(){
+    lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
     // Never offer a stale family while K3's durable presentation is re-read.
     displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
