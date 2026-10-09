@@ -179,8 +179,11 @@ def main():
         wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
-        previous_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
-        assert previous_family
+        previous_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 refreshed action after first practice close'
+        )
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 refreshed alternative controls')
         click(session,find(session,'#k4HomeCard button:nth-of-type(3)'))
         alternate_family=wait_until(
             lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
