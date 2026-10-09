@@ -88,3 +88,11 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - GREEN `ff9f9d7762ffcb1143bd0e897950b1c9b89bf058`: Quality 37896064431 SUCCESS; Server & Adapter 37896064377 SUCCESS.
 - New session adapter records K3 practice activity/presentation/one canonical answer and verifies accepted durable receipts; never submits assessment or writes SYSTEM grading. Tests include duplicate calls, failures and source/locale/option bounds.
 - K4 state revision 10: Task 09 complete; next Task 10. Test scope is adapter contract, not yet a live browser route; browser Task 10 must prove integration and proper candidate binding.
+
+## Task 10 — bilingual browser card + practice screen, complete
+
+- RED `c1572297982bf693e43010f33c0e8bc9d94bb101`: Quality 37896256275, 895 PASS, 1 expected missing module failure for browserController.js.
+- First GREEN candidate `5ccb620225375a218530d10152a34dd641bfc69e`: Quality 37896544397 FAIL browser smoke (first offline navigation timed out); Node/Python/Pages verifiers green, Server 37896544432 green. Root cause: optional K4 static imports in app.js were omitted from K3's existing offline cache graph. Not accepted as Task 10 GREEN.
+- Fix `5ee68956a177ec872217b067d3e4c64da4d946c1`: K4 modules loaded dynamically and errors safely isolated from existing K3 bootstrap. Quality 37896751441 SUCCESS including offline browser smoke; Server 37896751450 SUCCESS. No increases to smoke timeout and no weakening of checks.
+- Public home card and separate practice screen, AR/EN safe textContent, accessible buttons, K3 strict exam route unchanged. New K4 requires Pages caching in Task 12 to be fully offline, but offline K3 shell remains functional now.
+- State revision 11; Task 10 complete; next Task 11. Ruling: optional dynamic K4 import is required as an intermediate compatibility boundary before K4 asset precache. Wrong assumption here would disable offline historical functionality.
