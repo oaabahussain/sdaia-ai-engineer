@@ -176,10 +176,16 @@ export function createK4BrowserController({
     if(current)return renderHome();
     return null;
   }
-  function close(){
+  async function close(){
     invalidatePractice();
+    // Never offer a stale family while K3's durable presentation is re-read.
+    displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
     onViewChange('home');
-    return true;
+    try { await renderHome(); return true; }
+    catch {
+      displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+      return false;
+    }
   }
   return {renderHome,openPractice,showReason,close,refreshLocale,nextAction,another,snooze};
 }
