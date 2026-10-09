@@ -282,3 +282,31 @@ test('header Home hides prior Start synchronously while source refresh is pendin
   assert.match(app,/function resetToHome\(\)\{[^}]*K4_CONTROLLER\.leavePractice\(\)/,
     'header Home must retire the old K4 session before triggering renderHome');
 });
+
+
+test('Home during pending presentation reads recommendation only after durable Start settles',async()=>{
+  let release;
+  const pendingStart=new Promise(resolve=>{release=resolve});
+  let loads=0,started=false;
+  const next={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const nextQuestion={...question,id:'item-b.v1',question_en:'After durable presentation'};
+  const {controller,document}=make({
+    loading:async()=>{loads++;return started?{recommendation:next,question:nextQuestion}:{recommendation,question}},
+    start:async({recommendation:chosen})=>{await pendingStart;started=true;return {candidate:chosen.action}}
+  });
+  await controller.renderHome();
+  const oldStart=controller.openPractice();
+  const retirement=controller.leavePractice();
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  assert.equal(loads,1);
+  release();
+  await oldStart;
+  if(retirement)await retirement;
+  await controller.renderHome();
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+  assert.match(document.getElementById('k4HomeCard').children.map(x=>x.textContent).join(' '),/Start/);
+  const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  assert.match(app,/resetToHome\(\)\{[^}]*leavePractice\(\)/);
+  assert.match(app,/resetToHome\(\)[\s\S]{0,300}(?:\.then\(|await )/,
+    'header Home must defer source read until pending durable presentation settles');
+});
