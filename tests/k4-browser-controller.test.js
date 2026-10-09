@@ -141,3 +141,27 @@ test('two concurrent practice start clicks open only one K3 evidence session',as
   await Promise.all([one,two]);
   assert.deepEqual(calls,['start']);
 });
+
+
+test('stale pending Start cannot restore old practice after selecting Another',async()=>{
+  let release;
+  const wait=new Promise(resolve=>{release=resolve});
+  const other={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const otherQuestion={...question,id:'item-b.v1',question_en:'New alternate question'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>excludeFamilyId?{recommendation:other,question:otherQuestion}:{recommendation,question},
+    start:async({recommendation:chosen})=>{
+      if(chosen.action.question_family_id==='item-a')await wait;
+      return {candidate:chosen.action};
+    }
+  });
+  await controller.renderHome();
+  const staleStart=controller.openPractice();
+  await controller.another();
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+  release();
+  await staleStart;
+  assert.equal(document.getElementById('k4Practice').children.length,0,'superseded async Start must not reopen prior item');
+  await controller.openPractice();
+  assert.match(document.getElementById('k4Practice').children.map(c=>c.textContent).join(' '),/New alternate question/);
+});
