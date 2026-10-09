@@ -96,3 +96,10 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - Fix `5ee68956a177ec872217b067d3e4c64da4d946c1`: K4 modules loaded dynamically and errors safely isolated from existing K3 bootstrap. Quality 37896751441 SUCCESS including offline browser smoke; Server 37896751450 SUCCESS. No increases to smoke timeout and no weakening of checks.
 - Public home card and separate practice screen, AR/EN safe textContent, accessible buttons, K3 strict exam route unchanged. New K4 requires Pages caching in Task 12 to be fully offline, but offline K3 shell remains functional now.
 - State revision 11; Task 10 complete; next Task 11. Ruling: optional dynamic K4 import is required as an intermediate compatibility boundary before K4 asset precache. Wrong assumption here would disable offline historical functionality.
+
+## Task 11 — fresh next/another and persisted snooze, complete
+
+- RED `0d654d0d8a67688d341ffb691cbae097dc623fa8`, Quality 37896963749: 901 PASS / 4 expected failures due to absent `nextAction`, `another`, `snooze` methods.
+- GREEN `12da860dfbaad18c8912c7552a9dbfb5f2b0f9be`, Quality 37897119242 SUCCESS, Server & Adapter 37897119221 SUCCESS. Node, Python, browser and old exam regressions passed.
+- `nextAction` recomputes with fresh clock; `another` excludes current family temporarily without raw evidence mutation; `snooze` awaits durable save receipt/revision before reporting persisted state and recomputing. Denied storage returns `persisted:false` with visible local warning.
+- K4 state revision 12; completed task 11, next task 12. The UI's snooze button explicitly uses one-day choice; future optional multi-duration UX requires separate scoped design.
