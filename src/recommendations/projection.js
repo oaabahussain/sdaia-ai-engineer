@@ -64,7 +64,7 @@ export function computeScheduleProjection({
       const base=byEventId.get(id);
       const family=familyOf(base);
       if(family)affectedFamilies.add(family);
-      else if(!base)globalUnknown=true;
+      else if(!base || policy.include_modes.includes(base.mode))globalUnknown=true;
     }
   }
   for(const e of resolved.activeEvents) {
@@ -120,8 +120,10 @@ export function computeScheduleProjection({
     policy_id:policy.policy_id,source_store_id:sourceStoreId,
     through_store_seq:throughStoreSeq,content_release_id:activeReleaseId,
     learner_id:learnerId,generated_for_at:nowIso,
-    integrity_status:resolved.conflicts.length?'CONFLICTED':
-      (resolved.unresolved.length||globalUnknown||items.some(i=>i.data_quality_status==='INCOMPLETE')?'INCOMPLETE':'COMPLETE'),
+    // A known public family's conflicting evidence is quarantined at item level.
+    // Only an unscoped/unknown source finding invalidates all recommendations.
+    integrity_status:globalUnknown
+      ? (resolved.conflicts.length?'CONFLICTED':'INCOMPLETE') : 'COMPLETE',
     items
   };
 }
