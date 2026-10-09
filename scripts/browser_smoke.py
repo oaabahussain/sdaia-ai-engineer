@@ -197,8 +197,12 @@ def main():
         click(session,find(session,'#k4Practice button:last-child'))
         # AC-13: exercise denied K4 preference storage in the real browser,
         # rather than only a fake-IDB unit test. Restore the original method.
-        active_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
-        assert active_family
+        # Close now replays evidence asynchronously; wait for the new actionable card.
+        active_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 new action after closing alternative'
+        )
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 refreshed action controls')
         assert execute(session,"""
           window.__k4OriginalOpen=indexedDB.open;
           indexedDB.open=function(name,...args){
