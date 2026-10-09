@@ -210,3 +210,20 @@ test('missing public question asset fails closed without rendering clickable Sta
   await assert.rejects(()=>controller.openPractice(),/unavailable|question/i);
   assert.deepEqual(calls,[]);
 });
+
+
+test('closing a presented question recalculates the home next action from fresh evidence',async()=>{
+  let loads=0;
+  const next={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const alternate={...question,id:'item-b.v1',question_en:'New unseen question'};
+  const {controller,document}=make({
+    loading:async()=>++loads===1?{recommendation,question}:{recommendation:next,question:alternate},
+    start:async({recommendation:chosen})=>({candidate:chosen.action})
+  });
+  await controller.renderHome();
+  await controller.openPractice();
+  await controller.close();
+  assert.equal(loads,2,'return to home must re-read source after presentation was persisted');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+  assert.equal(document.getElementById('k4Practice').children.length,0);
+});
