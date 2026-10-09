@@ -195,6 +195,22 @@ def main():
         assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
         wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
         click(session,find(session,'#k4Practice button:last-child'))
+        # AC-13: exercise denied K4 preference storage in the real browser,
+        # rather than only a fake-IDB unit test. Restore the original method.
+        active_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
+        assert active_family
+        assert execute(session,"""
+          window.__k4OriginalOpen=indexedDB.open;
+          indexedDB.open=function(name,...args){
+            if(String(name).includes('.k4.preferences.'))throw new DOMException('K4 preference storage denied','QuotaExceededError');
+            return window.__k4OriginalOpen.call(this,name,...args);
+          };
+          return true;
+        """)
+        click(session,find(session,'#k4HomeCard button:nth-of-type(4)'))
+        wait_until(lambda:'Local preference storage failed' in text(session,find(session,'#k4HomeCard')),label='K4 browser denied IndexedDB without false save')
+        assert execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")==active_family
+        assert execute(session,"indexedDB.open=window.__k4OriginalOpen;delete window.__k4OriginalOpen;return true")
         req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
         assert execute(session,"return window.innerWidth<=450"), 'K4 mobile viewport'
         assert execute(session,"return document.getElementById('k4HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K4 responsive card'
