@@ -82,3 +82,34 @@ test('another publishes a changed family identity only after replacement is rend
   assert.equal(after,b.question_family_id);
   assert.notEqual(after,before);
 });
+
+test('confirmed snooze stays persisted if subsequent recommendation refresh fails',async()=>{
+  const document=doc();
+  let refreshCount=0,writeCount=0;
+  const prefs={learner_id:'learner:test',version:1,revision:0,snoozed_families:[],
+    dismissed_families:[],preferred_domain_id:null};
+  const controller=createK4BrowserController({
+    document,learnerId:'learner:test',clock:()=> '2026-10-09T12:00:00.000Z',
+    localize:k=>k,locale:()=> 'en',onViewChange:()=>{},
+    preferencesStore:{
+      read:async()=>({persisted:false,preferences:structuredClone(prefs)}),
+      save:async()=>{writeCount++;return {persisted:true,revision:1}}
+    },
+    loadRecommendation:async()=>{
+      if(++refreshCount>1)throw new Error('recommendation refresh temporarily unavailable');
+      return recommend(a);
+    },
+    startSession:async()=>({id:'unused'}),
+    respond:async()=>({receipt:{disposition:'ACCEPTED'}})
+  });
+  await controller.renderHome();
+  const saved=await controller.snooze({
+    familyId:a.question_family_id,untilAt:'2026-10-10T12:00:00.000Z'
+  });
+  assert.equal(writeCount,1);
+  assert.equal(saved.persisted,true,'do not misreport a committed preference as unsaved');
+  assert.equal(saved.revision,1);
+  assert.equal(document.home.getAttribute('data-k4-family-id'),'',
+    'do not retain stale click-through to a snoozed question');
+  assert.match(document.home.children.map(n=>n.textContent).join(' '),/k4Unavailable/);
+});
