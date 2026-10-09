@@ -1,7 +1,8 @@
+import { updateSchedulingPreferences } from './preferencesStore.js';
 // K4 browser-only controller; never mutates the strict assessment screens.
 const VALID_REASONS=new Set(['COLD_START','REVIEW_DUE','NEW_FAMILY','TRUSTED_ERROR_REVIEW']);
 export function createK4BrowserController({
-  document,loadRecommendation,startSession,respond,clock,localize,locale=()=> 'ar',onViewChange=()=>{}
+  document,loadRecommendation,startSession,respond,clock,localize,locale=()=> 'ar',onViewChange=()=>{},preferencesStore=null,learnerId=null
 }={}){
   if(!document?.getElementById||!document?.createElement ||
      !['loadRecommendation','startSession','respond','clock','localize','onViewChange']
@@ -54,6 +55,9 @@ export function createK4BrowserController({
   async function renderHome(){
     const nowIso=clock();
     const result=await loadRecommendation({nowIso});
+    return displayHome(result);
+  }
+  function displayHome(result){
     current=result;
     reasonVisible=false;
     const rec=result?.recommendation;
@@ -64,7 +68,12 @@ export function createK4BrowserController({
       return rec??{status:'INSUFFICIENT_EVIDENCE'};
     }
     home.replaceChildren(title,button('k4Start',()=>openPractice(),'btn primary'),
-      button('k4Reason',showReason));
+      button('k4Reason',showReason),
+      button('k4Another',()=>another()),
+      button('k4Snooze',()=>snooze({
+        familyId:rec.action.question_family_id,
+        untilAt:new Date(Date.parse(clock())+24*60*60*1000).toISOString()
+      })));
     return rec;
   }
   function showReason(){
@@ -92,6 +101,37 @@ export function createK4BrowserController({
     onViewChange('k4Practice');
     return view;
   }
+  async function another(){
+    const family=current?.recommendation?.action?.question_family_id;
+    if(!family)return renderHome();
+    session=null;selectedIndex=null;
+    const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
+    return displayHome(result);
+  }
+  async function nextAction(){
+    session=null;selectedIndex=null;
+    return renderHome();
+  }
+  async function snooze({familyId,untilAt}={}){
+    if(!preferencesStore?.read || !preferencesStore?.save ||
+       typeof learnerId!=='string'||!learnerId ||
+       familyId!==current?.recommendation?.action?.question_family_id)
+      return {persisted:false,reason:'SOURCE_INVALID'};
+    try {
+      const saved=await preferencesStore.read(learnerId);
+      const receipt=await updateSchedulingPreferences({
+        store:preferencesStore,nowIso:clock(),
+        request:{learnerId,expectedRevision:saved.preferences.revision,
+          action:'SNOOZE',familyId,untilAt}
+      });
+      if(!receipt?.persisted)throw new Error('K4 snooze commit was not persisted');
+      await nextAction();
+      return receipt;
+    }catch(error){
+      home.append(make('p',label('k4StorageUnavailable')));
+      return {persisted:false,reason:'STORAGE_UNAVAILABLE'};
+    }
+  }
   function refreshLocale(){
     if(session)return renderPractice();
     if(current)return renderHome();
@@ -103,5 +143,5 @@ export function createK4BrowserController({
     onViewChange('home');
     return true;
   }
-  return {renderHome,openPractice,showReason,close,refreshLocale};
+  return {renderHome,openPractice,showReason,close,refreshLocale,nextAction,another,snooze};
 }
