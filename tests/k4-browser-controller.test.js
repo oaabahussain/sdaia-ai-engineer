@@ -333,3 +333,18 @@ test('repeated Home clicks retain the same pending K3 presentation barrier',asyn
   await Promise.all([starting,first,second]);
   assert.equal(writes,1);
 });
+
+
+test('both full and section assessment entry retire pending K4 practice first',()=>{
+  const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+  const createStart=app.indexOf('async function createExam(');
+  const fullStart=app.indexOf('async function startFull()',createStart);
+  assert.ok(createStart>=0&&fullStart>createStart);
+  const body=app.slice(createStart,fullStart);
+  const retirement=body.indexOf('K4_CONTROLLER?.leavePractice()');
+  const evidence=body.indexOf('beginExamEvidence(');
+  assert.ok(retirement>=0 && evidence>retirement,
+    'full/section shared createExam must retire K4 before strict assessment evidence');
+  assert.match(body,/await\s+(?:Promise\.resolve\()?pendingK4/,
+    'exam must also await a pending K4 durable event before entering assessment');
+});
