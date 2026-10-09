@@ -9,14 +9,6 @@ import { readSavedTrackId, saveTrackId } from './tracks/selection.js';
 import { cacheAssessmentSnapshotModuleForOffline, createBrowserAssessmentContext, rehydrateAssessmentFormSnapshot } from './assessment/assessmentSnapshot.js';
 import { createEvidenceRecorder } from './evidence/recorder.js';
 import { createIndexedDbEvidenceStore } from './evidence/indexedDbStore.js';
-import { validateRulePolicy } from './recommendations/policy.js';
-import { validatePublicCatalog } from './recommendations/publicCatalog.js';
-import { readK4Evidence } from './recommendations/sourceReader.js';
-import { computeScheduleProjection } from './recommendations/projection.js';
-import { recommendNextAction } from './recommendations/ranker.js';
-import { createSchedulingPreferencesStore } from './recommendations/preferencesStore.js';
-import { createPracticeSession, presentPracticeItem, recordPracticeResponse } from './recommendations/practiceSession.js';
-import { createK4BrowserController } from './recommendations/browserController.js';
 import { beginExamEvidence, presentExamItemEvidence, recordExamAnswerEvidence, recordExamConfidenceEvidence, submitExamEvidence } from './evidence/appBridge.js';
 
 registerServiceWorker();
@@ -102,6 +94,26 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
    const evidenceStore=createIndexedDbEvidenceStore({dbName:`learning-platform.evidence.v1.${BANK.track.id}`,storeId:`browser-evidence:${BANK.track.id}`,indexedDB:globalThis.indexedDB});
    EVIDENCE_RECORDER=createEvidenceRecorder({store:evidenceStore,outbox:evidenceStore.outbox,runtimeContext:{track:BANK.track,evidence:BANK.evidence,eventDefinitions}});
    try {
+     // Optional K4 route: preserve the old K3 offline shell until approved
+     // K4 modules are precached as part of the separate Pages parity task.
+     const [pLib,cLib,sLib,prLib,rLib,prefLib,sessionLib,uiLib]=await Promise.all([
+       import('./recommendations/policy.js'),
+       import('./recommendations/publicCatalog.js'),
+       import('./recommendations/sourceReader.js'),
+       import('./recommendations/projection.js'),
+       import('./recommendations/ranker.js'),
+       import('./recommendations/preferencesStore.js'),
+       import('./recommendations/practiceSession.js'),
+       import('./recommendations/browserController.js')
+     ]);
+     const {validateRulePolicy}=pLib;
+     const {validatePublicCatalog}=cLib;
+     const {readK4Evidence}=sLib;
+     const {computeScheduleProjection}=prLib;
+     const {recommendNextAction}=rLib;
+     const {createSchedulingPreferencesStore}=prefLib;
+     const {createPracticeSession,presentPracticeItem,recordPracticeResponse}=sessionLib;
+     const {createK4BrowserController}=uiLib;
      const [catalogRaw,policyRaw]=await Promise.all([
        fetchJson('./data/recommendations/k4-public-catalog-v1.json'),
        fetchJson('./data/recommendations/k4-rule-policy-v1.json')
