@@ -47,9 +47,12 @@ export function createK4BrowserController({
       b.disabled=selectedIndex!==null;
       b.addEventListener('click',async()=>{
         if(selectedIndex!==null)return;
-        const recorded=await respond({session,optionIndex:i});
+        const answeredSession=session;
+        const recorded=await respond({session:answeredSession,optionIndex:i});
         if(!recorded?.receipt||!['ACCEPTED','DUPLICATE'].includes(recorded.receipt.disposition))
           throw new Error('K4 response durable receipt unavailable');
+        // The receipt belongs to the original interaction, never a newly opened one.
+        if(session!==answeredSession)return;
         selectedIndex=i;
         renderPractice();
       });
