@@ -110,7 +110,7 @@ test('competing correction quarantines affected public question family',()=>{
     authority_ref:'authority:test',payload:{action:'VOID',target_event_id:target.event_id,reason_code:'ADMIN_CORRECTION'}
   });
   const result=calc([target,c1,c2]);
-  assert.equal(result.integrity_status,'CONFLICTED');
+  assert.equal(result.integrity_status,'COMPLETE','known public family conflict is scoped');
   assert.equal(result.items[0].data_quality_status,'CONFLICTED');
   assert.equal(result.items[0].due_at,null);
 });
@@ -153,4 +153,14 @@ test('scoped correction conflict quarantines only known family without poisoning
   assert.equal(result.integrity_status,'COMPLETE','the source boundary remains valid when the known family is quarantined');
   assert.equal(result.items[0].data_quality_status,'CONFLICTED');
   assert.equal(result.items[0].due_at,null);
+});
+
+
+test('missing correction target leaves source invalid rather than allowing new actions',()=>{
+  const correction=event(1,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:'unknown-target',reason_code:'ADMIN_CORRECTION'}
+  });
+  const result=calc([correction]);
+  assert.equal(result.integrity_status,'INCOMPLETE');
+  assert.deepEqual(result.items,[]);
 });
