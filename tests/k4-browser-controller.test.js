@@ -297,6 +297,7 @@ test('Home during pending presentation reads recommendation only after durable S
   await controller.renderHome();
   const oldStart=controller.openPractice();
   const retirement=controller.leavePractice();
+  assert.ok(retirement&&typeof retirement.then==='function','header Home must receive pending durable Start promise');
   assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
   assert.equal(loads,1);
   release();
