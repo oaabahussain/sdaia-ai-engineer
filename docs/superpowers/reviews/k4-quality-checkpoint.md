@@ -6,7 +6,7 @@
 **Spec blob:** d732ac22161d4b007a8f869cbc928ec6737a40a8  
 **Plan blob:** edda6ef11fb353d7403098d79400fc783e2f21f1  
 **Main baseline:** 9e55881e9480b4a02d8ef5d92a0b21a9313492f1  
-**Product HEAD verification:** PENDING exact-head CI after this report and browser acceptance test.
+**Code checkpoint verified:** `bb34b507d3b6e684f1d2e2bd26398ffdbe59109a` — Quality [37934622333](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37934622333) SUCCESS, 918/918 Node, 76/76 Python, browser/offline smoke, Pages and SW checks; Server [37934622382](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37934622382) SUCCESS. Documentation-only HEAD after this report must be rechecked.
 
 Do not interpret a mapped test name as a PASS before its exact-head runner is green. Two-stage reporting: each feature test evidence and the final true GitHub/Pages operational result. The report intentionally includes known gaps. Final release cannot be claimed without explicit exact-head user landing approval.
 
@@ -14,20 +14,20 @@ Do not interpret a mapped test name as a PASS before its exact-head runner is gr
 | --- | --- | --- | --- |
 | AC-01 | Empty replay cold start, zero head | k4-source-reader.test.js, k4-ranking.test.js | TESTED_IN_UNIT |
 | AC-02 | Trusted graded SYSTEM fixture, authenticated producer | k4-clock.test.js verifies correct and incorrect due mathematics only; no actual verified SYSTEM producer in browser | BLOCKED_PRODUCER_VERIFICATION |
-| AC-03 | Browser response exposure only | k4-practice-session.test.js, k4-projection.test.js, browser_smoke.py | TESTED_IN_UNIT_BROWSER_PENDING |
+| AC-03 | Browser response exposure only | k4-practice-session.test.js, k4-projection.test.js, browser_smoke.py | VERIFIED_CODE_SHA_UNIT_BROWSER |
 | AC-04 | No stale/unresolved strict response promotion | K3 strict attempt projection regression, K4 source/ranker | TESTED_IN_UNIT; grading authority deferred |
 | AC-05 | VOID, supersession, conflicting corrections | k4-projection.test.js | TESTED_IN_UNIT |
 | AC-06 | Duplicate capture and page rerender | k4-practice-session.test.js, k4-projection.test.js | TESTED_IN_UNIT |
 | AC-07 | Provisional objectives label only | k4-public-catalog.test.js | TESTED_IN_UNIT |
 | AC-08 | Protected/unavailable candidates excluded | k4-public-catalog.test.js, k4-ranking.test.js | TESTED_IN_UNIT |
-| AC-09 | Same family with public and holdout versions | Public version-only catalog and release binder | PARTIAL_EXPLICIT_MIXED_VERSION_FIXTURE_PENDING |
-| AC-10 | Deterministic selection across locales | k4-ranking.test.js and browser_smoke.py | TESTED_IN_UNIT_BROWSER_PENDING |
+| AC-09 | Same family with public and holdout versions | k4-public-catalog.test.js: synthetic public v1 and holdout v2, selection excludes holdout | VERIFIED_SYNTHETIC_FIXTURE_ONLY; real protected-inventory review remains external |
+| AC-10 | Deterministic selection across locales | k4-ranking.test.js and browser_smoke.py | VERIFIED_CODE_SHA_UNIT_BROWSER |
 | AC-11 | UTC, DST, travel, device clock skew | k4-clock.test.js; future-skew quarantine | TESTED_IN_UNIT; simulated device clock manipulation not separately tested |
-| AC-12 | Snooze, skip, reload, offline | k4-preferences.test.js, k4-user-controls.test.js, browser_smoke.py | TESTED_IN_UNIT_BROWSER_PENDING |
-| AC-13 | IndexedDB quota and denial, no false persistence | k4-preferences.test.js, k4-user-controls.test.js | TESTED_IN_UNIT; physical quota browser fixture pending |
-| AC-14 | One-item non-strict vs unchanged full/section | k4-practice-session.test.js; K3 tests and browser_smoke.py | TESTED_IN_UNIT_BROWSER_PENDING |
-| AC-15 | Public bank digest, count, full exam | k4-release-acceptance.test.js, factory-import verifier, browser smoke | TESTED_IN_UNIT_BROWSER_PENDING |
-| AC-16 | AR/EN, RTL, keyboard, offline and mobile | browser_smoke.py includes first/second offline visit, language, keyboard focus and 390px viewport | BROWSER_PENDING |
+| AC-12 | Snooze, skip, reload, offline | k4-preferences.test.js, k4-user-controls.test.js, browser_smoke.py | VERIFIED_UNIT; browser offline public practice verified; save persistence browser denial covered |
+| AC-13 | IndexedDB quota and denial, no false persistence | k4-preferences.test.js, k4-user-controls.test.js, browser_smoke.py | VERIFIED_UNIT_AND_CHROMIUM_FAULT_INJECTION; physical quota exhaustion not tested |
+| AC-14 | One-item non-strict vs unchanged full/section | k4-practice-session.test.js; K3 tests and browser_smoke.py | VERIFIED_CODE_SHA_UNIT_BROWSER |
+| AC-15 | Public bank digest, count, full exam | k4-release-acceptance.test.js, factory-import verifier, browser smoke | VERIFIED_CODE_SHA_UNIT_BROWSER |
+| AC-16 | AR/EN, RTL, keyboard, offline and mobile | browser_smoke.py includes first/second offline visit, language, keyboard focus and 390px viewport | VERIFIED_CODE_SHA_CHROMIUM |
 | AC-17 | Independent whole-branch review and exact-head CI | k4-final-review.md, GitHub PR #65 final HEAD checks | BLOCKED_REVIEW_PENDING |
 | AC-18 | Actual authorized merge, merged-main CI and Pages proof | k4-post-merge-verification.md, GitHub deployment and live verifier | MERGE_BLOCKED_NO_EXACT_HEAD_APPROVAL |
 
@@ -44,3 +44,11 @@ Do not interpret a mapped test name as a PASS before its exact-head runner is gr
 ## Final evidence still required
 
 Exact current PR head, quality and server run IDs, deterministic acceptance and browser actual pass, final whole-branch review, Critical/Important findings, exact user approval, merged main SHA, live Pages verification. Any unresolved item must remain an explicit blocker rather than be reported as complete.
+
+## 2026-10-09 final scoped evidence addendum
+
+- Task13 code and regression fixes have successful current-code Github evidence at `bb34b507d3b6e684f1d2e2bd26398ffdbe59109a`: 918 Node, 76 Python, Quality 37934622333, Server 37934622382, browser AR/EN/RTL/keyboard/mobile/offline and strict full/section.
+- `0833fec115ce466424edf983742620d5b4fe0972` / Quality 37934128044 proved one RED regression (916 other PASS): a durable successful snooze was reported as unsaved when its later recommendation refresh failed. Code fix `3a87946454c31b8ee937b5a3b0ab59fb499c1a61` Quality 37934240638 and Server 37934240495 both SUCCESS; stale snoozed link is suppressed.
+- `71e051a042d92edac989e62f75f6c15a4e75304d` added AC-09 synthetic public+holdout sibling fixture; Quality 37934434106/Server 37934434147 PASS.
+- `bb34b507d3b6e684f1d2e2bd26398ffdbe59109a` added real Chromium IndexedDB-open denial injection and visible no-false-persistence assertion; this **does not** test physical quota exhaustion. Current-code CI above is GREEN.
+- AC-02 remains BLOCKED (no authenticated independently verified trusted SYSTEM producer); AC-17 remains BLOCKED (no independent reviewer); AC-18 remains BLOCKED (no per-exact-head merge authorization or merged-main/Pages live evidence). No K4 COMPLETE or K5 status change.

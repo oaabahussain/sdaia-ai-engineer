@@ -33,3 +33,12 @@
 **DO NOT MERGE, publish, close K4, alter K3 state, or start K5.** Keep Product PR #65 DRAFT. Before an exact-head approval request: secure an actual independent review, close material spec gaps or formally approved scope changes, and rerun all required checks on the live current SHA. Then obtain a **new explicit per-PR user authorization identifying the full current SHA**. Only after authorized merge may merged-main and live Pages proof be recorded as K4 COMPLETE.
 
 This report does not authorize or schedule a merge.
+
+## Additional exact-code checkpoint — 2026-10-09
+
+- **Latest tested code SHA:** `bb34b507d3b6e684f1d2e2bd26398ffdbe59109a`.
+- Quality workflow [37934622333](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37934622333) SUCCESS: 918/918 Node tests, 76/76 Python tests, Chromium browser smoke, SW public cache and Pages preview checks.
+- Server & Adapter [37934622382](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/37934622382) SUCCESS.
+- Additional source-risk challenge verified public-version versus holdout sibling (synthetic fixture), durable preference receipt surviving a failed subsequent recommendation refresh (RED→GREEN), and Chromium simulated storage-denial UI; no private pool or actual production writes.
+- GitHub PR #65 still has no actual independent review approval. **Self-audit is not independent review.** `AC-02` producer authentication, `AC-17` external review and `AC-18` real authorized deployment remain hard blockers; physical quota exhaustion remains only partially covered.
+- New documentation commit will change HEAD; do not reuse earlier code-run IDs as **exact post-documentation-head** CI until new checks finish. No merge permission or deployment permission is implied.
