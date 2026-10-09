@@ -103,3 +103,10 @@ Tasks 02–13 pending. Task 14 is the real external review/merge/postmerge gate;
 - GREEN `12da860dfbaad18c8912c7552a9dbfb5f2b0f9be`, Quality 37897119242 SUCCESS, Server & Adapter 37897119221 SUCCESS. Node, Python, browser and old exam regressions passed.
 - `nextAction` recomputes with fresh clock; `another` excludes current family temporarily without raw evidence mutation; `snooze` awaits durable save receipt/revision before reporting persisted state and recomputing. Denied storage returns `persisted:false` with visible local warning.
 - K4 state revision 12; completed task 11, next task 12. The UI's snooze button explicitly uses one-day choice; future optional multi-duration UX requires separate scoped design.
+
+## Task 12 — public Pages/offline bundle, complete
+
+- RED `a3b6e599b2d827948340e3870891af6b8c5c8c37`: Quality 37897342269 905 PASS / 3 expected failures: K4 SW precache missing, Pages catalog missing and release verifier missing K4 identity check.
+- GREEN `ea7bac5e0a9bfbda4592c6cfca4504221bcdf0ee`: Quality 37897493969 SUCCESS; Server 37897493960 SUCCESS including actual first-offline-navigation browser smoke.
+- Added 13 public K4 shell/replay/data assets, SW cache v2, Pages copy of public recommendation catalog and rule policy; no `data/factory`, `src/platform-kernel`, private governance schemas, or concept-bank precache. Verifiers inspect public catalog release/digest/status, policy FSRS disabled, and missing file negative case.
+- K4 state revision 13: completed Task 12, next Task 13. Browser end-to-end K4-specific interactions still await explicit acceptance in Task 13. Never conflate preview with live deployment.
