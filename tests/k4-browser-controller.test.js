@@ -165,3 +165,34 @@ test('stale pending Start cannot restore old practice after selecting Another',a
   await controller.openPractice();
   assert.match(document.getElementById('k4Practice').children.map(c=>c.textContent).join(' '),/New alternate question/);
 });
+
+
+test('late answer from a closed session cannot mark a new practice item as saved',async()=>{
+  let release;
+  const pause=new Promise(resolve=>{release=resolve});
+  const replacement={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const replacementQuestion={...question,id:'item-b.v1',question_en:'Unanswered replacement'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>excludeFamilyId?
+      {recommendation:replacement,question:replacementQuestion}:{recommendation,question},
+    start:async({recommendation:chosen})=>({candidate:chosen.action}),
+    respond:async({session:answerSession})=>{
+      if(answerSession.candidate.item_version_id==='item-a.v1')await pause;
+      return {receipt:{disposition:'ACCEPTED'}};
+    }
+  });
+  await controller.renderHome();
+  await controller.openPractice();
+  const root=document.getElementById('k4Practice');
+  const firstOption=root.children.find(c=>c.tagName==='BUTTON'&&c.textContent==='A');
+  const oldAnswer=firstOption.click();
+  controller.close();
+  await controller.another();
+  await controller.openPractice();
+  assert.match(root.children.map(c=>c.textContent).join(' '),/Unanswered replacement/);
+  release();
+  await oldAnswer;
+  assert.doesNotMatch(root.children.map(c=>c.textContent).join(' '),/Response recorded/,
+    'receipt from retired session must not falsely mark new question as answered');
+  assert.equal(root.children.find(c=>c.tagName==='BUTTON'&&c.textContent==='A').disabled,false);
+});
