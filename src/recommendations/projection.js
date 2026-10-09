@@ -54,6 +54,10 @@ export function computeScheduleProjection({
     return item.question_family_id;
   };
   for(const finding of [...resolved.conflicts,...resolved.unresolved]){
+    // K4 must not inspect an excluded strict-assessment correction's
+    // missing sibling: the entire finding is outside this scheduling mode.
+    const target=byEventId.get(finding.target_event_id);
+    if(target && !policy.include_modes.includes(target.mode))continue;
     const referenced=[
       finding.target_event_id,finding.superseding_event_id,
       ...(finding.event_ids??[])
