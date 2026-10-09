@@ -12,7 +12,14 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
-  let homeGeneration=0,openPromise=null;
+  let homeGeneration=0,openPromise=null,practiceGeneration=0;
+  function invalidatePractice(){
+    // Navigation retires any in-flight Start; a late receipt must not restore
+    // a view whose user intent has already been superseded.
+    practiceGeneration++;
+    session=null;practiceQuestion=null;selectedIndex=null;openPromise=null;
+    practice.replaceChildren();
+  }
   const label=k=>String(localize(k));
   const make=(tag,value,css)=>{
     const node=document.createElement(tag);
@@ -96,7 +103,7 @@ export function createK4BrowserController({
   async function openPractice(){
     if(session){const view=renderPractice();onViewChange('k4Practice');return view}
     if(openPromise)return openPromise;
-    const selected=current;
+    const selected=current,generation=practiceGeneration;
     if(!selected?.question || selected.question.id!==selected.recommendation?.action?.item_version_id)
       throw new Error('K4 public question unavailable');
     if(selected.recommendation.status!=='ACTION')
@@ -104,6 +111,7 @@ export function createK4BrowserController({
     const work=(async()=>{
       const started=await startSession({recommendation:selected.recommendation,question:selected.question,locale:locale()});
       if(!started)throw new Error('K4 practice start failed');
+      if(generation!==practiceGeneration)return null;
       practiceQuestion=structuredClone(selected.question);
       session=started;
       const view=renderPractice();
@@ -116,14 +124,14 @@ export function createK4BrowserController({
   async function another(){
     const family=current?.recommendation?.action?.question_family_id;
     if(!family)return renderHome();
-    session=null;practiceQuestion=null;selectedIndex=null;
+    invalidatePractice();
     const generation=++homeGeneration;
     const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
     if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
     return displayHome(result);
   }
   async function nextAction(){
-    session=null;practiceQuestion=null;selectedIndex=null;
+    invalidatePractice();
     return renderHome();
   }
   async function snooze({familyId,untilAt}={}){
@@ -159,8 +167,7 @@ export function createK4BrowserController({
     return null;
   }
   function close(){
-    session=null;practiceQuestion=null;selectedIndex=null;
-    practice.replaceChildren();
+    invalidatePractice();
     onViewChange('home');
     return true;
   }
