@@ -135,7 +135,9 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
        localize:key=>t(key),
        locale:()=>lang,
        onViewChange:id=>showScreen(id),
-       loadRecommendation:async({nowIso})=>{
+       preferencesStore:prefStore,
+       learnerId:state.anon_id,
+       loadRecommendation:async({nowIso,excludeFamilyId=null})=>{
          if(activeExam&&!activeExam.submitted)
            return {recommendation:{status:'NO_ELIGIBLE_ACTION'},question:null};
          const head=await evidenceStore.getSourceHead();
@@ -152,6 +154,14 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
          let preferences=localPreferences();
          try{preferences=(await prefStore.read(state.anon_id)).preferences}
          catch(error){console.warn('K4 local preference storage unavailable',error)}
+         if(excludeFamilyId){
+           preferences.dismissed_families=preferences.dismissed_families
+             .filter(entry=>entry.question_family_id!==excludeFamilyId);
+           preferences.dismissed_families.push({
+             question_family_id:excludeFamilyId,
+             until_at:new Date(Date.parse(nowIso)+60*1000).toISOString()
+           });
+         }
          const recommendation=recommendNextAction({
            scheduleProjection:projection,catalog:publicCatalog,policy:rulePolicy,
            nowIso,preferences
