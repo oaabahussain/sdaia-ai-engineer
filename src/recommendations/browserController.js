@@ -11,7 +11,7 @@ export function createK4BrowserController({
   const home=document.getElementById('k4HomeCard');
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
-  let current=null,session=null,selectedIndex=null,reasonVisible=false;
+  let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
   const label=k=>String(localize(k));
   const make=(tag,value,css)=>{
     const node=document.createElement(tag);
@@ -26,9 +26,9 @@ export function createK4BrowserController({
     return n;
   };
   function renderPractice(){
-    if(!current?.question || !session)throw new Error('K4 practice question unavailable');
-    const q=current.question;
-    if(q.id!==current.recommendation.action?.item_version_id)throw new Error('K4 public question mismatch');
+    if(!practiceQuestion || !session)throw new Error('K4 practice question unavailable');
+    const q=practiceQuestion;
+    if(session.candidate && q.id!==session.candidate.item_version_id)throw new Error('K4 practice session item mismatch');
     const ar=locale()==='ar',text=ar?q.question:q.question_en,options=ar?q.options:q.options_en;
     if(typeof text!=='string'||!Array.isArray(options)||options.length!==4||
        options.some(o=>typeof o!=='string'))throw new Error('K4 localized question unavailable');
@@ -89,13 +89,17 @@ export function createK4BrowserController({
     return rec.reason_code;
   }
   async function openPractice(){
-    if(!current?.question || current.question.id!==current.recommendation?.action?.item_version_id)
+    if(session){const view=renderPractice();onViewChange('k4Practice');return view}
+    const selected=current;
+    if(!selected?.question || selected.question.id!==selected.recommendation?.action?.item_version_id)
       throw new Error('K4 public question unavailable');
-    if(current.recommendation.status!=='ACTION')
+    if(selected.recommendation.status!=='ACTION')
       throw new Error('K4 public practice action unavailable');
     if(!session){
-      session=await startSession({recommendation:current.recommendation,question:current.question,locale:locale()});
-      if(!session)throw new Error('K4 practice start failed');
+      const started=await startSession({recommendation:selected.recommendation,question:selected.question,locale:locale()});
+      if(!started)throw new Error('K4 practice start failed');
+      practiceQuestion=structuredClone(selected.question);
+      session=started;
     }
     const view=renderPractice();
     onViewChange('k4Practice');
@@ -104,12 +108,12 @@ export function createK4BrowserController({
   async function another(){
     const family=current?.recommendation?.action?.question_family_id;
     if(!family)return renderHome();
-    session=null;selectedIndex=null;
+    session=null;practiceQuestion=null;selectedIndex=null;
     const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
     return displayHome(result);
   }
   async function nextAction(){
-    session=null;selectedIndex=null;
+    session=null;practiceQuestion=null;selectedIndex=null;
     return renderHome();
   }
   async function snooze({familyId,untilAt}={}){
@@ -138,7 +142,7 @@ export function createK4BrowserController({
     return null;
   }
   function close(){
-    session=null;selectedIndex=null;
+    session=null;practiceQuestion=null;selectedIndex=null;
     practice.replaceChildren();
     onViewChange('home');
     return true;
