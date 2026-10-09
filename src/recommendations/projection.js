@@ -46,13 +46,12 @@ export function computeScheduleProjection({
   let globalUnknown=false;
 
   const familyOf=(e)=>{
-    if(!e) return null;
-    if(typeof e.item_version_id==='string' && eligible.has(e.item_version_id))
-      return eligible.get(e.item_version_id).question_family_id;
-    if(typeof e.question_family_id==='string' &&
-       [...eligible.values()].some(i=>i.question_family_id===e.question_family_id))
-      return e.question_family_id;
-    return null;
+    if(!e || !policy.include_modes.includes(e.mode))return null;
+    const item=eligible.get(e.item_version_id);
+    if(!item || item.question_family_id!==e.question_family_id ||
+       item.objective_id!==e.objective_id || item.domain_id!==e.domain_id)
+      return null;
+    return item.question_family_id;
   };
   for(const finding of [...resolved.conflicts,...resolved.unresolved]){
     const referenced=[
@@ -62,9 +61,10 @@ export function computeScheduleProjection({
     if(!referenced.length)globalUnknown=true;
     for(const id of referenced){
       const base=byEventId.get(id);
+      if(base && !policy.include_modes.includes(base.mode))continue;
       const family=familyOf(base);
       if(family)affectedFamilies.add(family);
-      else if(!base || policy.include_modes.includes(base.mode))globalUnknown=true;
+      else globalUnknown=true;
     }
   }
   for(const e of resolved.activeEvents) {
