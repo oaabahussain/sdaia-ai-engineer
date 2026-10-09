@@ -4,7 +4,7 @@ export const CORE_DEFAULT_LOCALE = 'ar';
 export const CORE_I18N = {
   ar: {
     app: {
-      home:'الرئيسية',practiceLabel:'تدريب',feedback:'شارك رأيك',questions:'سؤال',domains:'مجالات',fullExam:'الاختبار الكامل',randomized:'خيارات عشوائية',
+      home:'الرئيسية',k4Title:'تدريب سؤال واحد',k4Start:'ابدأ الآن',k4Reason:'لماذا هذا السؤال؟',k4Close:'العودة',k4Saved:'تم حفظ الإجابة محلياً',k4Unavailable:'لا يوجد سؤال مؤهل للمراجعة حالياً',k4ReasonColdStart:'سؤال عام جديد للتدريب، وليس تقييماً رسمياً',k4ReasonDue:'حان وقت المراجعة وفق جدول تدريبي مبدئي',k4ReasonNew:'سؤال تدريبي لم تتدرب عليه بعد',k4StorageUnavailable:'تعذر حفظ التفضيلات على الجهاز',k4Another:'نشاط آخر',k4Snooze:'تأجيل المراجعة',practiceLabel:'تدريب',feedback:'شارك رأيك',questions:'سؤال',domains:'مجالات',fullExam:'الاختبار الكامل',randomized:'خيارات عشوائية',
       resumeAvailable:'لديك اختبار غير مكتمل',resume:'استأنف',rules:'قواعد الاختبار',rulesTitle:'مصمم لكسر الأنماط',
       rule1:'ترتيب الأسئلة يتغير مع كل محاولة.',rule2:'ترتيب A/B/C/D يتغير لكل سؤال مع كل محاولة.',
       rule3:'الثقة اختيارية ولا تمنع الانتقال أو التسليم.',rule4:'يمكنك تغيير اللغة أثناء الاختبار بدون فقد الإجابة.',
@@ -43,7 +43,7 @@ export const CORE_I18N = {
   },
   en: {
     app: {
-      home:'Home',practiceLabel:'Practice',feedback:'Feedback',questions:'Questions',domains:'Domains',fullExam:'Full exam',randomized:'Random options',
+      home:'Home',k4Title:'Practice one question',k4Start:'Start now',k4Reason:'Why this question?',k4Close:'Back',k4Saved:'Response saved locally',k4Unavailable:'No eligible practice question is available now',k4ReasonColdStart:'A new public practice question, not an official assessment',k4ReasonDue:'Review is due under provisional practice intervals',k4ReasonNew:'A public question you have not practiced',k4StorageUnavailable:'Local preference storage failed',k4Another:'Another activity',k4Snooze:'Snooze review',practiceLabel:'Practice',feedback:'Feedback',questions:'Questions',domains:'Domains',fullExam:'Full exam',randomized:'Random options',
       resumeAvailable:'You have an unfinished exam',resume:'Resume',rules:'Exam rules',rulesTitle:'Designed to break patterns',
       rule1:'Question order changes on every attempt.',rule2:'A/B/C/D order changes for every question on every attempt.',
       rule3:'Confidence is optional and never blocks navigation or submission.',rule4:'You can switch language during the exam without losing your answer.',
