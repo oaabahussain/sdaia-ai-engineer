@@ -12,6 +12,7 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
+  let homeGeneration=0,openPromise=null;
   const label=k=>String(localize(k));
   const make=(tag,value,css)=>{
     const node=document.createElement(tag);
@@ -53,8 +54,10 @@ export function createK4BrowserController({
     return practice;
   }
   async function renderHome(){
+    const generation=++homeGeneration;
     const nowIso=clock();
     const result=await loadRecommendation({nowIso});
+    if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
     return displayHome(result);
   }
   function displayHome(result){
@@ -92,26 +95,31 @@ export function createK4BrowserController({
   }
   async function openPractice(){
     if(session){const view=renderPractice();onViewChange('k4Practice');return view}
+    if(openPromise)return openPromise;
     const selected=current;
     if(!selected?.question || selected.question.id!==selected.recommendation?.action?.item_version_id)
       throw new Error('K4 public question unavailable');
     if(selected.recommendation.status!=='ACTION')
       throw new Error('K4 public practice action unavailable');
-    if(!session){
+    const work=(async()=>{
       const started=await startSession({recommendation:selected.recommendation,question:selected.question,locale:locale()});
       if(!started)throw new Error('K4 practice start failed');
       practiceQuestion=structuredClone(selected.question);
       session=started;
-    }
-    const view=renderPractice();
-    onViewChange('k4Practice');
-    return view;
+      const view=renderPractice();
+      onViewChange('k4Practice');
+      return view;
+    })();
+    openPromise=work;
+    try{return await work}finally{if(openPromise===work)openPromise=null}
   }
   async function another(){
     const family=current?.recommendation?.action?.question_family_id;
     if(!family)return renderHome();
     session=null;practiceQuestion=null;selectedIndex=null;
+    const generation=++homeGeneration;
     const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
+    if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
     return displayHome(result);
   }
   async function nextAction(){
