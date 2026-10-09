@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "state_revision": 13,
+  "state_revision": 14,
   "programme": "K4",
-  "phase": "A",
-  "status": "EXECUTING",
+  "phase": "REVIEW",
+  "status": "REVIEW",
   "execution_branch": "impl/k4-native-tdd-2026-10-09",
   "base_main_sha": "9e55881e9480b4a02d8ef5d92a0b21a9313492f1",
   "spec_path": "docs/superpowers/specs/2026-10-08-k4-next-best-action-spaced-practice-design.md",
@@ -18,8 +18,8 @@
     "status": "APPROVED",
     "git_blob_sha": "edda6ef11fb353d7403098d79400fc783e2f21f1"
   },
-  "completed_through_task": 12,
-  "next_task": 13,
+  "completed_through_task": 13,
+  "next_task": 14,
   "open_critical_findings": 0,
   "open_important_findings": 0,
   "gates": {
@@ -31,5 +31,5 @@
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "merged_main_sha": null,
   "release_evidence_ref": null,
-  "updated_at": "2026-10-09T07:21:00Z"
+  "updated_at": "2026-10-09T07:25:00Z"
 }
