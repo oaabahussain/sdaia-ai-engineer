@@ -139,3 +139,18 @@ test('replay provenance is capped to five most recent distinct source event IDs'
   assert.deepEqual(entry.source_event_ids,['event-3','event-4','event-5','event-6','event-7']);
   assert.equal(entry.source_event_ids_truncated,true);
 });
+
+
+test('scoped correction conflict quarantines only known family without poisoning source integrity',()=>{
+  const target=event(1);
+  const first=event(2,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:target.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  const competing=event(3,'learner.evidence.correction.recorded@1',{
+    authority_ref:'authority:test',payload:{action:'VOID',target_event_id:target.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  const result=calc([target,first,competing]);
+  assert.equal(result.integrity_status,'COMPLETE','the source boundary remains valid when the known family is quarantined');
+  assert.equal(result.items[0].data_quality_status,'CONFLICTED');
+  assert.equal(result.items[0].due_at,null);
+});
