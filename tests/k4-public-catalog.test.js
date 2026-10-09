@@ -66,3 +66,22 @@ test('exact frozen bootstrap list covers the current 1120 released public runtim
   assert.equal(result.question_payload_sha256,digest);
   assert.equal(eligiblePublicItems({catalog:result,releaseId:release,availableIds:ids}).length,1120);
 });
+
+test('AC-09: a protected sibling version in availability cannot replace the public item', () => {
+  const c=validatePublicCatalog(fixture());
+  const holdout=family+'.v2';
+  const result=eligiblePublicItems({
+    catalog:c,releaseId:release,availableIds:[holdout,version]
+  });
+  assert.deepEqual(result.map(x=>x.item_version_id),[version]);
+  assert.equal(JSON.stringify(result).includes(holdout),false);
+  assert.deepEqual(eligiblePublicItems({
+    catalog:c,releaseId:release,availableIds:[holdout]
+  }),[],'never fall back to protected sibling when public version unavailable');
+  const forbidden=fixture();
+  forbidden.catalog.items[0].item_version_id=holdout;
+  forbidden.catalog.items[0].visibility='HOLDOUT';
+  forbidden.publicQuestions[0].id=holdout;
+  assert.throws(()=>validatePublicCatalog(forbidden),
+    /public|protected|malformed/i);
+});
