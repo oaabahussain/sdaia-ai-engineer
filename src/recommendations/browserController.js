@@ -139,7 +139,14 @@ export function createK4BrowserController({
           action:'SNOOZE',familyId,untilAt}
       });
       if(!receipt?.persisted)throw new Error('K4 snooze commit was not persisted');
-      await nextAction();
+      // Commit is authoritative. A later recommendation refresh may fail, but
+      // it must not turn a durable successful write into a false save failure.
+      displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+      try { await nextAction(); }
+      catch {
+        // Preserve persisted receipt and a non-clickable unavailable card.
+        displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+      }
       return receipt;
     }catch(error){
       home.append(make('p',label('k4StorageUnavailable')));
