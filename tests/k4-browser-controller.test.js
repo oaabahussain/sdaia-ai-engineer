@@ -311,3 +311,25 @@ test('Home during pending presentation reads recommendation only after durable S
   assert.match(app,/resetToHome\(\)[\s\S]{0,300}(?:\.then\(|await )/,
     'header Home must defer source read until pending durable presentation settles');
 });
+
+
+test('repeated Home clicks retain the same pending K3 presentation barrier',async()=>{
+  let release;
+  const pendingStart=new Promise(resolve=>{release=resolve});
+  let writes=0;
+  const {controller,document}=make({
+    start:async({recommendation:chosen})=>{
+      await pendingStart;writes++;return {candidate:chosen.action};
+    }
+  });
+  await controller.renderHome();
+  const starting=controller.openPractice();
+  const first=controller.leavePractice();
+  const second=controller.leavePractice();
+  assert.ok(first&&typeof first.then==='function');
+  assert.strictEqual(second,first,'second Home must not discard the outstanding durable write barrier');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  release();
+  await Promise.all([starting,first,second]);
+  assert.equal(writes,1);
+});
