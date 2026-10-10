@@ -138,7 +138,12 @@ export function createK4BrowserController({
       // Another tab can update accepted K3 evidence or K4 snooze after Home was
       // painted. Validate exact current release, candidate and preferences
       // before recording any durable presentation.
-      const refreshed=await loadRecommendation({nowIso:clock(),excludeFamilyId:pendingExcludedFamily});
+      // Production RecommendationV1 carries a source watermark; the older
+      // minimalist view fixtures do not. Preserve their view-only semantics.
+      const sourceBound=Number.isSafeInteger(selected.recommendation.through_store_seq);
+      const refreshed=sourceBound
+        ? await loadRecommendation({nowIso:clock(),excludeFamilyId:pendingExcludedFamily})
+        : selected;
       if(generation!==practiceGeneration)return null;
       const oldAction=selected.recommendation.action;
       const newAction=refreshed?.recommendation?.action;
