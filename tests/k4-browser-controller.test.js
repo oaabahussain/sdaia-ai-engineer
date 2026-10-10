@@ -376,3 +376,55 @@ test('Home barrier includes two unresolved Starts when later Start finishes firs
   await Promise.all([startA,barrier]);
   assert.equal(settled,true);
 });
+
+
+test('Close waits for all older Starts before reloading fresh evidence',async()=>{
+  let releaseA,releaseB,loads=0;
+  const pauseA=new Promise(r=>releaseA=r),pauseB=new Promise(r=>releaseB=r);
+  const b={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const qB={...question,id:'item-b.v1'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>{loads++;return excludeFamilyId?{recommendation:b,question:qB}:{recommendation,question}},
+    start:async({recommendation:rec})=>{
+      await (rec.action.item_version_id==='item-a.v1'?pauseA:pauseB);
+      return {candidate:rec.action};
+    }
+  });
+  await controller.renderHome();
+  const oldA=controller.openPractice();
+  await controller.another();
+  const newB=controller.openPractice();
+  releaseB();await newB;
+  assert.equal(document.getElementById('k4Practice').children.length>0,true);
+  const closed=controller.close();
+  const before=loads;
+  for(let n=0;n<16;n++)await Promise.resolve();
+  assert.equal(loads,before,'Close must not read stale watermark while Start A is pending');
+  releaseA();
+  await Promise.all([oldA,closed]);
+  assert.equal(loads,before+1,'Close reloads only after all durable presentations settle');
+});
+test('third Another cannot recommend a family still being presented by older Start',async()=>{
+  let releaseA,releaseB,loads=0;
+  const pauseA=new Promise(r=>releaseA=r),pauseB=new Promise(r=>releaseB=r);
+  const b={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const qB={...question,id:'item-b.v1'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>{loads++;return excludeFamilyId?{recommendation:b,question:qB}:{recommendation,question}},
+    start:async({recommendation:rec})=>{
+      await(rec.action.item_version_id==='item-a.v1'?pauseA:pauseB);
+      return {candidate:rec.action};
+    }
+  });
+  await controller.renderHome();
+  const a=controller.openPractice();
+  await controller.another();
+  const bStart=controller.openPractice();
+  const third=controller.another();
+  const countBefore=loads;
+  for(let n=0;n<16;n++)await Promise.resolve();
+  assert.equal(loads,countBefore,'third Another cannot load a possibly stale family during two pending writes');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  releaseB();await bStart;
+  releaseA();await Promise.all([a,third]);
+});
