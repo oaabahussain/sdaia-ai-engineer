@@ -420,8 +420,8 @@ test('third Another cannot recommend a family still being presented by older Sta
   const a=controller.openPractice();
   await controller.another();
   const bStart=controller.openPractice();
-  const third=controller.another();
   const countBefore=loads;
+  const third=controller.another();
   for(let n=0;n<16;n++)await Promise.resolve();
   assert.equal(loads,countBefore,'third Another cannot load a possibly stale family during two pending writes');
   assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
