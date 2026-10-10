@@ -13,7 +13,7 @@ export function createK4BrowserController({
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
   let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null;
-  const pendingStarts=new Set();
+  const pendingStarts=new Set(),pendingStartFamilies=new Map();
   let pendingBarrier=null;
   function durableStartBarrier(){
     if(!pendingStarts.size)return Promise.resolve();
@@ -72,6 +72,11 @@ export function createK4BrowserController({
   }
   async function renderHome(){
     const generation=++homeGeneration;
+    if(pendingStarts.size){
+      displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+      await durableStartBarrier();
+      if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
+    }
     const nowIso=clock();
     const result=await loadRecommendation({nowIso});
     if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
@@ -141,15 +146,18 @@ export function createK4BrowserController({
     })();
     openPromise=work;
     pendingStarts.add(work);
+    pendingStartFamilies.set(work,selected.recommendation.action.question_family_id);
     pendingBarrier=null;
     try{return await work}finally{
       if(openPromise===work)openPromise=null;
       pendingStarts.delete(work);
+      pendingStartFamilies.delete(work);
       if(!pendingStarts.size)pendingBarrier=null;
     }
   }
   async function another(){
-    if(pendingStarts.size>1){
+    // A previously offered alternative cannot reselect an older unpublished family.
+    if([...pendingStartFamilies.values()].some(f=>f!==current?.recommendation?.action?.question_family_id)){
       // More than one durable presentation is not yet reflected in the source.
       // No single-family exclusion can safely pick a third candidate.
       invalidatePractice();
