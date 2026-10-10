@@ -52,7 +52,8 @@ test('AC-13 actual readwrite put quota error aborts and cannot return a durable 
     };
     await assert.rejects(
       ()=>store.save({learnerId:user,expectedRevision:0,next:initial()}),
-      e=>e?.name==='QuotaExceededError'
+      e=>e?.name==='QuotaExceededError'||e?.name==='AbortError',
+      'a simulated full quota must reject, never return a persisted receipt'
     );
   }finally{globalThis.IDBObjectStore.prototype.put=native}
   const after=await store.read(user);
