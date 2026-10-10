@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AC-13: bounded, real Chromium-on-small-RAM-disk quota integration test.
+"""AC-13: bounded physical Chromium quota test for K4 canonical preference persistence.
 
 This is NOT a CDP synthetic quota override. Mount and browser profile are
 disposable. Never execute against an existing user profile or a real disk.
@@ -58,7 +58,11 @@ def main():
           return (async()=>{
             const learner='learner:physical-quota-probe';
             const {createSchedulingPreferencesStore}=await import('./src/recommendations/preferencesStore.js');
-            const store=createSchedulingPreferencesStore({indexedDB,dbName:'k4-ac13-preferences'});
+            const {createIndexedDbEvidenceStore}=await import('./src/evidence/indexedDbStore.js');
+            const evidenceStore=createIndexedDbEvidenceStore({indexedDB,
+              dbName:'k4-ac13-canonical-evidence',storeId:'k4-ac13-source'});
+            const store=createSchedulingPreferencesStore({indexedDB,
+              dbName:'k4-ac13-preferences',evidenceStore});
             const initial=await store.read(learner);
             if(initial.persisted)throw Error('fresh profile already has saved learner state');
             const before=await navigator.storage.estimate();
@@ -92,7 +96,7 @@ def main():
               catch(error){quotaFailure=true;quotaError=error.name;break;}
             }
             if(!quotaFailure)throw Error('real RAM-disk profile quota not reached within bounded writes');
-            // Probe the exact K4 preferences transaction with a new,
+            // Probe the actual shared K4/K3 canonical preferences transaction with a new,
             // incompressible value larger than the remaining 1 MiB block.
             const random=new Uint8Array(2*1024*1024);
             for(let i=0;i<random.length;i+=65536)

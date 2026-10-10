@@ -146,3 +146,47 @@ test('K4 atomic preference migration preserves already saved legacy snoozes',asy
   assert.deepEqual(await anotherTab.read('learner:shared'),read,
     'the atomic source must retain migrated preferences even after the legacy database is deleted');
 });
+
+
+test('K4 simultaneous guarded practice pairs have exactly one winning presentation',async()=>{
+  const name='k4-pair-interleaving-'+(++nextDatabase);
+  const first=tab(name),second=tab(name);
+  const sourceHead=await first.store.getSourceHead();
+  const results=await Promise.allSettled([
+    presentPracticeItem({recorder:first.recorder,session:first.session,
+      expectedSourceHead:sourceHead,expectedPreferencesRevision:0}),
+    presentPracticeItem({recorder:second.recorder,session:second.session,
+      expectedSourceHead:sourceHead,expectedPreferencesRevision:0})
+  ]);
+  assert.equal(results.filter(v=>v.status==='fulfilled').length,1);
+  assert.equal(results.filter(v=>v.status==='rejected').length,1);
+  assert.match(String(results.find(v=>v.status==='rejected').reason),
+    /stale K4 practice source watermark/);
+  const head=await first.store.getSourceHead();
+  assert.equal(head.through_store_seq,2);
+  const events=await first.store.readRange({fromSeq:1,toSeq:2,learnerId:'learner:shared'});
+  assert.deepEqual(events.map(v=>v.definition_id),
+    ['learner.activity.started@1','learner.item.presented@1']);
+});
+
+test('K4 cleared preferences retain a canonical tombstone and cannot resurrect legacy snooze',async()=>{
+  const {createSchedulingPreferencesStore}=await import('../src/recommendations/preferencesStore.js');
+  const name='k4-clear-'+(++nextDatabase),first=tab(name),legacyName=name+'-legacy';
+  const original=createSchedulingPreferencesStore({indexedDB,dbName:legacyName});
+  const pref={learner_id:'learner:shared',version:1,revision:0,
+    snoozed_families:[{question_family_id:candidate.question_family_id,
+      until_at:'2026-10-15T10:00:00.000Z'}],
+    dismissed_families:[],preferred_domain_id:null};
+  await original.save({learnerId:'learner:shared',expectedRevision:0,next:pref});
+  const canonical=createSchedulingPreferencesStore({
+    indexedDB,dbName:legacyName,evidenceStore:first.store});
+  const imported=await canonical.read('learner:shared');
+  assert.equal(imported.preferences.revision,1);
+  await canonical.clear('learner:shared');
+  const after=await createSchedulingPreferencesStore({
+    indexedDB,dbName:legacyName,evidenceStore:tab(name).store
+  }).read('learner:shared');
+  assert.equal(after.persisted,false);
+  assert.deepEqual(after.preferences.snoozed_families,[]);
+  assert.ok(after.preferences.revision>imported.preferences.revision);
+});
