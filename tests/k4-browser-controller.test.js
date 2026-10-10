@@ -348,3 +348,31 @@ test('both full and section assessment entry retire pending K4 practice first',(
   assert.match(body,/await\s+(?:Promise\.resolve\()?pendingK4/,
     'exam must also await a pending K4 durable event before entering assessment');
 });
+
+
+test('Home barrier includes two unresolved Starts when later Start finishes first',async()=>{
+  let releaseA,releaseB;
+  const waitA=new Promise(resolve=>{releaseA=resolve});
+  const waitB=new Promise(resolve=>{releaseB=resolve});
+  const second={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const q2={...question,id:'item-b.v1',question_en:'Second item'};
+  const {controller}=make({
+    loading:async({excludeFamilyId}={})=>excludeFamilyId?{recommendation:second,question:q2}:{recommendation,question},
+    start:async({recommendation:rec})=>{
+      await(rec.action.item_version_id==='item-a.v1'?waitA:waitB);
+      return {candidate:rec.action};
+    }
+  });
+  await controller.renderHome();
+  const startA=controller.openPractice();
+  await controller.another();
+  const startB=controller.openPractice();
+  const barrier=controller.leavePractice();
+  let settled=false;
+  Promise.resolve(barrier).then(()=>{settled=true});
+  releaseB();await startB;await Promise.resolve();
+  assert.equal(settled,false,'settling B must not release the Home barrier while A is pending');
+  releaseA();
+  await Promise.all([startA,barrier]);
+  assert.equal(settled,true);
+});
