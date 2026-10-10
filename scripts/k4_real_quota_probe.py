@@ -116,7 +116,7 @@ def main():
             if(!k4Failure)throw Error('K4 write did not encounter actual storage pressure '+JSON.stringify(result));
             return result;
           })();
-        """, 'args': [MAX_FILL_MIB]}, timeout=250)['value']
+        """, 'args': [MAX_FILL_MIB]}, timeout=250)
         assert outcome['quotaFailure'] and not outcome['persistedReceipt']
         assert outcome['afterPersisted'] is False and outcome['afterRevision'] == 0
         assert outcome['k4Failure'], outcome
