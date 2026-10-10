@@ -58,7 +58,9 @@ test('source reader rejects invalid head, wrong releases and watermark',async()=
   await s.accept(event());
   await assert.rejects(()=>readK4Evidence({store:s,...args,throughStoreSeq:-1}));
   await assert.rejects(()=>readK4Evidence({store:s,...args,throughStoreSeq:2}));
-  await assert.rejects(()=>readK4Evidence({store:s,...args,releaseId:'different',throughStoreSeq:1}));
+  const older=await readK4Evidence({store:s,...args,releaseId:'different',throughStoreSeq:1});
+  assert.deepEqual(older.events,[],'historical release must not poison active-release recommendations');
+  assert.equal(older.through_store_seq,1,'global store watermark remains source-bound');
   await assert.rejects(()=>readK4Evidence({store:{...s,store_id:'foreign'},...args,throughStoreSeq:1}));
 });
 
@@ -72,4 +74,23 @@ test('learner filter does not mix another learner on same store',async()=>{
   const r=await readK4Evidence({store:s,...args,throughStoreSeq:2});
   assert.equal(r.events.length,1);
   assert.equal(r.events[0].learner_id,'learner:p1');
+});
+
+test('AC-09 source upgrade reads only the active public release while preserving validated historic K3 events',async()=>{
+  const s=store('release-upgrade');
+  await s.accept(event());
+  await s.accept(event({
+    event_id:'723e4567-e89b-42d3-a456-426614174010',
+    origin_seq:2,
+    item_interaction_id:'823e4567-e89b-42d3-a456-426614174011',
+    content_release_id:'release-2'
+  }));
+  const oldRelease=await readK4Evidence({store:s,...args,throughStoreSeq:2});
+  assert.equal(oldRelease.events.length,1);
+  assert.equal(oldRelease.events[0].content_release_id,'release-1');
+  const newer=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.equal(newer.events.length,1);
+  assert.equal(newer.events[0].content_release_id,'release-2');
+  assert.equal(newer.events[0].store_seq,2);
+  assert.equal(newer.through_store_seq,2);
 });
