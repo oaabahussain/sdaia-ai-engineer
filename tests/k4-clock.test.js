@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {spawnSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import { assertInstant, computeDueAt } from '../src/recommendations/clock.js';
 import { validateRulePolicy } from '../src/recommendations/policy.js';
@@ -80,4 +81,28 @@ test('exposure schedule projection is wired to UTC due calculation',()=>{
   const changed=computeScheduleProjection({...props,nowIso:'2026-10-07T00:00:00.000Z'});
   assert.equal(changed.items[0].due_at,null);
   assert.equal(changed.items[0].data_quality_status,'INCOMPLETE');
+});
+
+
+test('AC-11 real Node timezone settings do not drift absolute DST due instant',()=>{
+  const lastExposureAt='2026-03-08T01:30:00-05:00';
+  const nowIso='2026-03-08T08:00:00Z';
+  const expected='2026-03-10T06:30:00.000Z';
+  const childSource=`
+    import {computeDueAt} from './src/recommendations/clock.js';
+    const value=computeDueAt({
+      gradeEvidence:'EXPOSURE_ONLY',
+      lastExposureAt:${JSON.stringify(lastExposureAt)},
+      nowIso:${JSON.stringify(nowIso)},
+      policy:${JSON.stringify(policy)}
+    });
+    process.stdout.write(String(value));
+  `;
+  for(const tz of ['UTC','Asia/Riyadh','America/New_York','Pacific/Honolulu']){
+    const proc=spawnSync(process.execPath,['--input-type=module','-e',childSource],{
+      cwd:process.cwd(),env:{...process.env,TZ:tz},encoding:'utf8',timeout:10000
+    });
+    assert.equal(proc.status,0,`${tz}: ${proc.stderr}`);
+    assert.equal(proc.stdout,expected,`K4 due time drifted with TZ=${tz}`);
+  }
 });
