@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { validatePublicCatalog, eligiblePublicItems } from '../src/recommendations/publicCatalog.js';
 
 const release = 'sdaia-ai-engineer.bootstrap.v1';
@@ -84,4 +87,49 @@ test('AC-09: a protected sibling version in availability cannot replace the publ
   forbidden.publicQuestions[0].id=holdout;
   assert.throws(()=>validatePublicCatalog(forbidden),
     /public|protected|malformed/i);
+});
+
+test('AC-09 live factory RELEASE manifest has precisely the 1120 approved public IDs',()=>{
+  const manifest=JSON.parse(readFileSync(new URL('../data/factory/releases/sdaia-bootstrap-v1.manifest.json',import.meta.url),'utf8'));
+  const catalog=JSON.parse(readFileSync(new URL('../data/recommendations/k4-public-catalog-v1.json',import.meta.url),'utf8'));
+  assert.equal(manifest.release_id,catalog.content_release_id);
+  assert.equal(manifest.track_id,catalog.track_id);
+  assert.equal(manifest.item_version_ids.length,1120);
+  assert.equal(new Set(manifest.item_version_ids).size,1120);
+  assert.deepEqual([...manifest.item_version_ids].sort(),catalog.items.map(i=>i.item_version_id).sort());
+  assert.ok(catalog.items.every(i=>i.visibility==='PUBLIC'&&i.lifecycle==='ACTIVE'));
+  assert.equal(manifest.origin,'migrated-grandfathered');
+  // Not a real private/holdout corpus inventory: this release manifest is only the public migration.
+});
+test('AC-09 assembled Pages output excludes factory, legacy and protected governance trees',()=>{
+  const root=mkdtempSync(join(tmpdir(),'k4-public-boundary-'));
+  const site=join(root,'site');
+  try{
+    const built=spawnSync(process.execPath,['scripts/build_pages_artifact.js',site],{
+      cwd:process.cwd(),encoding:'utf8',timeout:45000
+    });
+    assert.equal(built.status,0,built.stderr||built.stdout);
+    for(const privatePath of ['data/factory','data/legacy','src/platform-kernel','.git','node_modules'])
+      assert.equal(existsSync(join(site,privatePath)),false,'Forbidden Pages subtree: '+privatePath);
+    const paths=[];
+    function walk(dir,rel=''){
+      for(const ent of readdirSync(dir,{withFileTypes:true})){
+        const child=join(rel,ent.name),target=join(dir,ent.name);
+        assert.equal(ent.isSymbolicLink(),false,'Pages cannot contain symlink: '+child);
+        if(ent.isDirectory())walk(target,child);
+        else{
+          assert.equal(ent.isFile(),true);
+          assert.ok(statSync(target).size>=0);
+          paths.push(child.replaceAll('\\','/'));
+        }
+      }
+    }
+    walk(site);
+    assert.ok(paths.length>40,'real assembled output inspected');
+    assert.ok(paths.every(path=>!/(^|\/)(factory|legacy|platform-kernel|holdout)(\/|$)/i.test(path)));
+    assert.ok(paths.every(path=>!path.endsWith('.ndjson')),'factory NDJSON may not enter Pages');
+    const shipped=JSON.parse(readFileSync(join(site,'data/recommendations/k4-public-catalog-v1.json'),'utf8'));
+    assert.equal(shipped.items.length,1120);
+    assert.ok(shipped.items.every(x=>x.visibility==='PUBLIC'));
+  }finally{rmSync(root,{recursive:true,force:true})}
 });
