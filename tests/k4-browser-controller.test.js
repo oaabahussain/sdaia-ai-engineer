@@ -428,3 +428,49 @@ test('third Another cannot recommend a family still being presented by older Sta
   releaseB();await bStart;
   releaseA();await Promise.all([a,third]);
 });
+
+
+test('second Another cannot return still-pending A after first alternate B',async()=>{
+  let releaseA,loads=0;
+  const pauseA=new Promise(r=>releaseA=r);
+  const b={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const qB={...question,id:'item-b.v1'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>{loads++;return excludeFamilyId?{recommendation:b,question:qB}:{recommendation,question}},
+    start:async({recommendation:rec})=>{await pauseA;return {candidate:rec.action}}
+  });
+  await controller.renderHome();
+  const startedA=controller.openPractice();
+  await controller.another();
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-b');
+  const countBefore=loads;
+  const second=controller.another();
+  for(let n=0;n<16;n++)await Promise.resolve();
+  assert.equal(loads,countBefore,'cannot read source again while A is unpublished and B was already offered');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  releaseA();
+  await Promise.all([startedA,second]);
+});
+test('language-triggered renderHome honors pending writes while Close waits',async()=>{
+  let releaseA,releaseB,loads=0;
+  const pauseA=new Promise(r=>releaseA=r),pauseB=new Promise(r=>releaseB=r);
+  const b={...recommendation,action:{...recommendation.action,question_family_id:'item-b',item_version_id:'item-b.v1'}};
+  const qB={...question,id:'item-b.v1'};
+  const {controller,document}=make({
+    loading:async({excludeFamilyId}={})=>{loads++;return excludeFamilyId?{recommendation:b,question:qB}:{recommendation,question}},
+    start:async({recommendation:rec})=>{await(rec.action.item_version_id==='item-a.v1'?pauseA:pauseB);return {candidate:rec.action}}
+  });
+  await controller.renderHome();
+  const a=controller.openPractice();
+  await controller.another();
+  const bStarted=controller.openPractice();
+  releaseB();await bStarted;
+  const closing=controller.close();
+  const countBefore=loads;
+  const localized=controller.renderHome();
+  for(let n=0;n<16;n++)await Promise.resolve();
+  assert.equal(loads,countBefore,'locale refresh must not read source before A settles');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  releaseA();
+  await Promise.all([a,closing,localized]);
+});
