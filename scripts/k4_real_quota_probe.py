@@ -108,19 +108,34 @@ def main():
             }catch(error){k4Failure=error.name}
             const after=await store.read(learner);
             database.close();
-            const result={quotaFailure,quotaError,storedMiB,
-              beforeQuota:before.quota,afterUsage:(await navigator.storage.estimate()).usage,
-              persistedReceipt,k4Failure,
-              afterPersisted:after.persisted,afterRevision:after.preferences.revision};
+            const usedWhileFull=(await navigator.storage.estimate()).usage;
             if(persistedReceipt||after.persisted||after.preferences.revision!==0)
-              throw Error('K4 FALSE PERSISTENCE UNDER REAL QUOTA '+JSON.stringify(result));
-            if(!k4Failure)throw Error('K4 write did not encounter actual storage pressure '+JSON.stringify(result));
-            return result;
+              throw Error('K4 FALSE PERSISTENCE UNDER REAL QUOTA');
+            if(!k4Failure)throw Error('K4 write did not encounter actual storage pressure');
+            // Free only this throwaway filler database; test that legitimate
+            // preferences can be saved again after storage is available.
+            await new Promise((resolve,reject)=>{
+              const del=indexedDB.deleteDatabase('k4-ac13-fill');
+              del.onsuccess=resolve;
+              del.onerror=()=>reject(del.error);
+              del.onblocked=()=>reject(Error('quota probe database still open'));
+            });
+            const recovered=await store.save({
+              learnerId:learner,expectedRevision:0,next:initial.preferences
+            });
+            const verified=await store.read(learner);
+            if(!recovered.persisted||!verified.persisted||verified.preferences.revision!==1)
+              throw Error('K4 preferences did not recover after actual quota clearance');
+            return {quotaFailure,quotaError,storedMiB,beforeQuota:before.quota,
+              usedWhileFull,persistedReceipt,k4Failure,
+              afterPersisted:after.persisted,afterRevision:after.preferences.revision,
+              recovered:recovered.persisted,verifiedRevision:verified.preferences.revision};
           })();
         """, 'args': [MAX_FILL_MIB]}, timeout=250)
         assert outcome['quotaFailure'] and not outcome['persistedReceipt']
         assert outcome['afterPersisted'] is False and outcome['afterRevision'] == 0
         assert outcome['k4Failure'], outcome
+        assert outcome['recovered'] and outcome['verifiedRevision'] == 1, outcome
         print('K4_REAL_PHYSICAL_QUOTA: PASS ' + str(outcome))
     finally:
         if session:
