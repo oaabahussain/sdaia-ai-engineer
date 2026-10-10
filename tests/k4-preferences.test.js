@@ -40,3 +40,22 @@ test('snooze action validates future expiration and durable receipt',async()=>{
   await assert.rejects(()=>updateSchedulingPreferences({store,nowIso:'2026-10-09T00:00:00.000Z',
     request:{learnerId:user,expectedRevision:1,action:'SNOOZE',familyId:'family-2',untilAt:'2026-10-08T00:00:00.000Z'}}));
 });
+
+test('AC-13 actual readwrite put quota error aborts and cannot return a durable receipt',async()=>{
+  const dbName=db(),native=globalThis.IDBObjectStore.prototype.put;
+  const store=createSchedulingPreferencesStore({indexedDB,dbName});
+  await store.read(user); // ensure opening the DB itself is not the failing path
+  try{
+    globalThis.IDBObjectStore.prototype.put=function(...args){
+      if(this.name==='preferences')throw new DOMException('Synthetic write quota exhausted','QuotaExceededError');
+      return native.apply(this,args);
+    };
+    await assert.rejects(
+      ()=>store.save({learnerId:user,expectedRevision:0,next:initial()}),
+      e=>e?.name==='QuotaExceededError'
+    );
+  }finally{globalThis.IDBObjectStore.prototype.put=native}
+  const after=await store.read(user);
+  assert.equal(after.persisted,false,'a failed quota write cannot be presented as saved');
+  assert.equal(after.preferences.revision,0,'transaction must not advance durable revision');
+});
