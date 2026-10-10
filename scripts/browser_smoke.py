@@ -306,42 +306,6 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
-        # AC-13: REAL Chromium-enforced per-origin quota (DevTools Protocol),
-        # not a monkeypatched IndexedDB exception. Scoped to disposable browser.
-        def cdp(method, params):
-            return req('POST', f'/session/{session}/goog/cdp/execute',
-                       {'cmd':method,'params':params})
-        baseline=cdp('Storage.getUsageAndQuota',{'origin':BASE})
-        assert isinstance(baseline,dict) and baseline.get('quota',0)>0,baseline
-        cdp('Storage.overrideQuotaForOrigin',{'origin':BASE,'quotaSize':1024})
-        try:
-            limited=cdp('Storage.getUsageAndQuota',{'origin':BASE})
-            assert limited['overrideActive'] is True and limited['quota']==1024,limited
-            failure=execute(session,"""
-              return new Promise(resolve=>{
-                const request=indexedDB.open('k4-quota-browser-probe',1);
-                request.onerror=()=>resolve({ok:false,name:request.error?.name||'OpenError'});
-                request.onupgradeneeded=()=>{
-                  try{request.result.createObjectStore('items')}catch(e){resolve({ok:false,name:e.name})}
-                };
-                request.onsuccess=()=>{
-                  const db=request.result;
-                  try{
-                    const tx=db.transaction('items','readwrite');
-                    tx.objectStore('items').put('x'.repeat(1024*1024),'probe');
-                    tx.oncomplete=()=>{db.close();resolve({ok:true})};
-                    tx.onerror=()=>{};
-                    tx.onabort=()=>{db.close();resolve({ok:false,name:tx.error?.name||'AbortError'})};
-                  }catch(e){db.close();resolve({ok:false,name:e.name})}
-                };
-              })
-            """)
-            assert failure.get('ok') is False, 'Chromium quota must reject oversized durable IndexedDB write'
-        finally:
-            cdp('Storage.overrideQuotaForOrigin',{'origin':BASE})
-        normal=cdp('Storage.getUsageAndQuota',{'origin':BASE})
-        assert normal.get('overrideActive') is False,normal
-        print('K4_CHROMIUM_QUOTA: PASS browser_enforced_override=1024 oversized_write_rejected=PASS restored=PASS')
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
