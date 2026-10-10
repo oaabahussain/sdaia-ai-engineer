@@ -36,7 +36,7 @@ export function createPracticeSession({recorder,learnerId,trackId,releaseId,loca
   RUNS.set(session,{present:null,answer:null,responseIndex:null});
   return session;
 }
-export async function presentPracticeItem({recorder,session}={}){
+export async function presentPracticeItem({recorder,session,expectedSourceHead}={}){
   const run=RUNS.get(session);
   if(!run || !recorder?.startActivity || !recorder?.presentItem)throw new TypeError('K4 practice session invalid');
   if(session.presentation_receipt)return session.presentation_receipt;
@@ -46,7 +46,7 @@ export async function presentPracticeItem({recorder,session}={}){
       const started=accepted(await recorder.startActivity({
         learner_id:session.learner_id,track_id:session.track_id,
         content_release_id:session.content_release_id,mode:'practice',
-        locale:session.locale,source:'browser'
+        locale:session.locale,source:'browser',...(expectedSourceHead===undefined?{}:{expectedSourceHead})
       }),'K4 activity start');
       if(typeof started.event?.activity_id!=='string')throw new Error('K4 activity ID missing');
       session.start_receipt=started;session.activity_id=started.event.activity_id;

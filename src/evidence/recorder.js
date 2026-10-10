@@ -166,13 +166,14 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     return interaction;
   }
 
-  async function capture(definitionId, eventInput) {
+  async function capture(definitionId, eventInput, expectedSourceHead) {
     return captureLocalEvidence({
       store,
       outbox,
       eventInput: { ...eventInput, occurred_at: eventInput.occurred_at ?? nowIso(clock) },
       definition: eventDefinition(runtimeContext, definitionId),
-      runtimeContext
+      runtimeContext,
+      ...(expectedSourceHead === undefined ? {} : { expectedSourceHead })
     });
   }
 
@@ -243,7 +244,9 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
       } : {})
     };
     const payload = input.source === undefined ? {} : { source: requireString(input.source, 'source') };
-    const result = await capture('learner.activity.started@1', { ...commonEnvelope(activity), payload });
+    if (input.expectedSourceHead !== undefined && mode !== 'practice')
+      throw new TypeError('conditional K4 source capture requires practice mode');
+    const result = await capture('learner.activity.started@1', { ...commonEnvelope(activity), payload }, input.expectedSourceHead);
     activities.set(activity.activity_id, activity);
     if (strict) localAttemptRevisions.set(activity.assessment_attempt_id, activity.attempt_revision);
     return result;

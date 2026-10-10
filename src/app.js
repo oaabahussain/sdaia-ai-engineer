@@ -170,13 +170,13 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
            qById(recommendation.action.item_version_id):null;
          return {recommendation,question};
        },
-       startSession:async({recommendation,locale})=>{
+       startSession:async({recommendation,locale,expectedSourceHead})=>{
          const session=createPracticeSession({
            recorder:EVIDENCE_RECORDER,learnerId:state.anon_id,
            trackId:BANK.track.id,releaseId:BANK.evidence.content_release_id,
            locale,candidate:recommendation.action,objectives:OBJECTIVE_CATALOG
          });
-         await presentPracticeItem({recorder:EVIDENCE_RECORDER,session});
+         await presentPracticeItem({recorder:EVIDENCE_RECORDER,session,expectedSourceHead});
          return session;
        },
        respond:({session,optionIndex})=>recordPracticeResponse({

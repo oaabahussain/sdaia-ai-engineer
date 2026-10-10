@@ -226,8 +226,13 @@ export function createIndexedDbEvidenceStore({ dbName, storeId, indexedDB }) {
       for (const value of prepared) receipts.push(value.invalid ? rejectedEvidenceReceipt(storeId, value) : await this.accept(value.event));
       return { schema_version: 1, receipts };
     },
-    captureLocal({ eventInput, runtimeContext, outbox: requestedOutbox }) {
+    captureLocal({ eventInput, runtimeContext, outbox: requestedOutbox, expectedSourceHead }) {
       if (requestedOutbox != null && requestedOutbox !== outbox) throw new TypeError('capture requires the same store-bound outbox');
+      if (expectedSourceHead !== undefined &&
+          (!expectedSourceHead || expectedSourceHead.store_id !== storeId ||
+           !Number.isSafeInteger(expectedSourceHead.through_store_seq) ||
+           expectedSourceHead.through_store_seq < 0))
+        throw new Error('stale K4 practice source watermark');
       const input = structuredClone(eventInput);
       assertOrdinaryEvidenceProducer(input.definition_id);
       const storage = runtimeContext?.originStorage;
@@ -244,6 +249,12 @@ export function createIndexedDbEvidenceStore({ dbName, storeId, indexedDB }) {
           const captured = await transact(['events', 'receipts', 'meta', 'outbox'], 'readwrite', async tx => {
             const current = await localHead(tx, storage);
             if (current.origin_id !== head.origin_id || current.origin_seq !== head.origin_seq) return null;
+            if (expectedSourceHead !== undefined) {
+              const next = (await requestResult(tx.objectStore('meta').get('next_store_seq')))?.value ?? 1;
+              if (!Number.isSafeInteger(next) || next < 1 ||
+                  next - 1 !== expectedSourceHead.through_store_seq)
+                throw new Error('stale K4 practice source watermark');
+            }
             const receipt = await appendInTransaction(tx, event, fingerprint);
             if (receipt.disposition !== 'ACCEPTED') throw new Error(`Local evidence not durably recorded: ${receipt.disposition}`);
             tx.objectStore('meta').put({ key: 'capture_origin', value: { origin_id: event.origin_id, origin_seq: event.origin_seq } });

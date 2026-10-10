@@ -155,7 +155,23 @@ export function createK4BrowserController({
         return null;
       }
       pendingExcludedFamily=null;
-      const started=await startSession({recommendation:refreshed.recommendation,question:refreshed.question,locale:locale()});
+      let started;
+      try{
+        started=await startSession({
+          recommendation:refreshed.recommendation,question:refreshed.question,locale:locale(),
+          ...(sourceBound?{expectedSourceHead:{
+            store_id:refreshed.recommendation.source_store_id,
+            through_store_seq:refreshed.recommendation.through_store_seq
+          }}:{})
+        });
+      }catch(error){
+        if(sourceBound && error?.message==='stale K4 practice source watermark'){
+          if(generation===practiceGeneration)
+            displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+          return null;
+        }
+        throw error;
+      }
       if(!started)throw new Error('K4 practice start failed');
       if(generation!==practiceGeneration)return null;
       practiceQuestion=structuredClone(selected.question);
