@@ -198,8 +198,9 @@ def main():
         assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
         wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
         click(session,find(session,'#k4Practice button:last-child'))
-        # AC-13: exercise denied K4 preference storage in the real browser,
-        # rather than only a fake-IDB unit test. Restore the original method.
+        # AC-13: K4 canonical preferences now share the K3 evidence database.
+        # Deny that actual transactional port in Chromium (not the legacy DB).
+        # A failed K4 snooze must still show an error without a false receipt.
         # Close now replays evidence asynchronously; wait for the new actionable card.
         active_family=wait_until(
             lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
@@ -209,7 +210,7 @@ def main():
         assert execute(session,"""
           window.__k4OriginalOpen=indexedDB.open;
           indexedDB.open=function(name,...args){
-            if(String(name).includes('.k4.preferences.'))throw new DOMException('K4 preference storage denied','QuotaExceededError');
+            if(String(name).includes('.evidence.v1.'))throw new DOMException('K4 canonical preference storage denied','QuotaExceededError');
             return window.__k4OriginalOpen.call(this,name,...args);
           };
           return true;
