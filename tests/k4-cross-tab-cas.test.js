@@ -38,10 +38,10 @@ test('K4 cross-tab stale recommendation cannot record an ineligible duplicate pr
   const a=tab(name),b=tab(name);
   const revalidatedByA=await a.store.getSourceHead();
   assert.equal(revalidatedByA.through_store_seq,0);
-  const bReceipt=await presentPracticeItem({recorder:b.recorder,session:b.session,expectedSourceHead:revalidatedByA});
+  const bReceipt=await presentPracticeItem({recorder:b.recorder,session:b.session,expectedSourceHead:revalidatedByA,expectedPreferencesRevision:0});
   assert.equal(bReceipt.receipt.disposition,'ACCEPTED');
   await assert.rejects(
-    ()=>presentPracticeItem({recorder:a.recorder,session:a.session,expectedSourceHead:revalidatedByA}),
+    ()=>presentPracticeItem({recorder:a.recorder,session:a.session,expectedSourceHead:revalidatedByA,expectedPreferencesRevision:0}),
     /stale K4 practice source watermark/
   );
   assert.equal(a.session.start_receipt,null,'stale tab must not persist even a ghost activity start');
@@ -138,4 +138,11 @@ test('K4 atomic preference migration preserves already saved legacy snoozes',asy
   const anotherTab=createSchedulingPreferencesStore({indexedDB,dbName:legacyName,evidenceStore:tab(name).store});
   const readAgain=await anotherTab.read('learner:shared');
   assert.deepEqual(readAgain,read);
+  await new Promise((resolve,reject)=>{
+    const request=indexedDB.deleteDatabase(legacyName);
+    request.onsuccess=resolve;request.onerror=()=>reject(request.error);
+    request.onblocked=()=>reject(new Error('legacy preference database still locked'));
+  });
+  assert.deepEqual(await anotherTab.read('learner:shared'),read,
+    'the atomic source must retain migrated preferences even after the legacy database is deleted');
 });
