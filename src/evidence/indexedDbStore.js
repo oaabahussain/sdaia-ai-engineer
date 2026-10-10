@@ -226,6 +226,139 @@ export function createIndexedDbEvidenceStore({ dbName, storeId, indexedDB }) {
       for (const value of prepared) receipts.push(value.invalid ? rejectedEvidenceReceipt(storeId, value) : await this.accept(value.event));
       return { schema_version: 1, receipts };
     },
+    async getK4Preferences({learnerId,initial}={}) {
+      if(typeof learnerId!=='string'||!learnerId)throw new TypeError('K4 learner ID required');
+      return transact(['meta'],initial===undefined?'readonly':'readwrite',async tx=>{
+        const meta=tx.objectStore('meta'),key='k4_preferences:'+learnerId;
+        const saved=(await requestResult(meta.get(key)))?.value;
+        if(saved)return structuredClone(saved);
+        if(initial===undefined)return null;
+        if(typeof initial?.persisted!=='boolean' ||
+           initial.preferences?.learner_id!==learnerId ||
+           !Number.isSafeInteger(initial.preferences?.revision) ||
+           initial.preferences.revision<0)
+          throw new TypeError('K4 initial preference snapshot invalid');
+        const value=structuredClone(initial);
+        meta.add({key,value});
+        return value;
+      });
+    },
+    async saveK4Preferences({learnerId,expectedRevision,next}={}) {
+      if(typeof learnerId!=='string'||!learnerId ||
+         !Number.isSafeInteger(expectedRevision)||expectedRevision<0 ||
+         next?.learner_id!==learnerId)
+        throw new TypeError('K4 save preference identity or revision invalid');
+      return transact(['meta'],'readwrite',async tx=>{
+        const meta=tx.objectStore('meta'),key='k4_preferences:'+learnerId;
+        const saved=(await requestResult(meta.get(key)))?.value;
+        if(!saved)throw new Error('K4 preferences must be loaded before save');
+        if(saved.preferences?.revision!==expectedRevision)
+          throw new Error('K4 preferences revision conflict');
+        const value=structuredClone(next);
+        value.revision=expectedRevision+1;
+        meta.put({key,value:{persisted:true,preferences:value}});
+        return {persisted:true,revision:value.revision};
+      });
+    },
+    async clearK4Preferences(learnerId) {
+      if(typeof learnerId!=='string'||!learnerId)throw new TypeError('K4 learner ID required');
+      return transact(['meta'],'readwrite',async tx=>{
+        const meta=tx.objectStore('meta'),key='k4_preferences:'+learnerId;
+        const saved=(await requestResult(meta.get(key)))?.value;
+        const revision=(saved?.preferences?.revision??0)+1;
+        meta.put({key,value:{persisted:false,preferences:{
+          learner_id:learnerId,version:1,revision,
+          snoozed_families:[],dismissed_families:[],preferred_domain_id:null
+        }}});
+        return {persisted:true};
+      });
+    },
+    captureLocalPracticePair({
+      startInput,presentInput,runtimeContext,outbox:requestedOutbox,
+      expectedSourceHead,expectedPreferencesRevision
+    }={}) {
+      if(requestedOutbox!=null && requestedOutbox!==outbox)
+        throw new TypeError('capture requires the same store-bound outbox');
+      if(!expectedSourceHead || expectedSourceHead.store_id!==storeId ||
+         !Number.isSafeInteger(expectedSourceHead.through_store_seq) ||
+         expectedSourceHead.through_store_seq<0)
+        throw new Error('stale K4 practice source watermark');
+      if(!Number.isSafeInteger(expectedPreferencesRevision)||expectedPreferencesRevision<0)
+        throw new TypeError('K4 guarded practice preference revision required');
+      const start=structuredClone(startInput),present=structuredClone(presentInput);
+      if(start?.definition_id!=='learner.activity.started@1' ||
+         present?.definition_id!=='learner.item.presented@1' ||
+         start.mode!=='practice'||present.mode!=='practice' ||
+         !start.learner_id||present.learner_id!==start.learner_id ||
+         present.activity_id!==start.activity_id ||
+         present.track_id!==start.track_id ||
+         present.content_release_id!==start.content_release_id ||
+         present.locale!==start.locale)
+        throw new TypeError('K4 guarded practice pair has inconsistent identity');
+      assertOrdinaryEvidenceProducer(start.definition_id);
+      assertOrdinaryEvidenceProducer(present.definition_id);
+      const storage=runtimeContext?.originStorage;
+      const context=structuredClone({
+        track:runtimeContext?.track,evidence:runtimeContext?.evidence,
+        eventDefinitions:runtimeContext?.eventDefinitions
+      });
+      const syncEnabled=requestedOutbox!=null;
+      const operation=async()=>{
+        for(;;){
+          const head=await transact(['events','meta'],'readonly',tx=>localHead(tx,storage));
+          if(!Number.isSafeInteger(head.origin_seq) || head.origin_seq<0 ||
+             head.origin_seq>Number.MAX_SAFE_INTEGER-2)
+            throw new Error('capture origin sequence overflow');
+          const startEvent=createLearnerEvidenceEvent({
+            ...start,origin_id:head.origin_id,origin_seq:head.origin_seq+1
+          },context);
+          const presentEvent=createLearnerEvidenceEvent({
+            ...present,origin_id:head.origin_id,origin_seq:head.origin_seq+2
+          },context);
+          assertEvidenceAcceptance(startEvent);
+          assertEvidenceAcceptance(presentEvent);
+          // Calculate both fingerprints before opening the write transaction.
+          const [startHash,presentHash]=await Promise.all([
+            fingerprintEvent(startEvent),fingerprintEvent(presentEvent)
+          ]);
+          const result=await transact(['events','receipts','meta','outbox'],'readwrite',async tx=>{
+            const current=await localHead(tx,storage);
+            if(current.origin_id!==head.origin_id ||
+               current.origin_seq!==head.origin_seq)return null;
+            const meta=tx.objectStore('meta');
+            const next=(await requestResult(meta.get('next_store_seq')))?.value??1;
+            if(!Number.isSafeInteger(next)||next<1||
+               next-1!==expectedSourceHead.through_store_seq)
+              throw new Error('stale K4 practice source watermark');
+            const pref=(await requestResult(meta.get('k4_preferences:'+start.learner_id)))?.value;
+            const revision=pref?.preferences?.revision??0;
+            if(!Number.isSafeInteger(revision)||revision!==expectedPreferencesRevision)
+              throw new Error('stale K4 practice preference revision');
+            const started=await appendInTransaction(tx,startEvent,startHash);
+            if(started.disposition!=='ACCEPTED')
+              throw new Error('K4 activity start was not accepted');
+            const shown=await appendInTransaction(tx,presentEvent,presentHash);
+            if(shown.disposition!=='ACCEPTED')
+              throw new Error('K4 presentation was not accepted');
+            meta.put({key:'capture_origin',value:{
+              origin_id:head.origin_id,origin_seq:head.origin_seq+2
+            }});
+            if(syncEnabled){
+              tx.objectStore('outbox').add(pendingOutboxRecord(startEvent.event_id));
+              tx.objectStore('outbox').add(pendingOutboxRecord(presentEvent.event_id));
+            }
+            return {
+              started:{event:startEvent,receipt:started},
+              presented:{event:presentEvent,receipt:shown}
+            };
+          });
+          if(result)return result;
+        }
+      };
+      const job=captureTail.then(operation,operation);
+      captureTail=job.then(()=>undefined,()=>undefined);
+      return job;
+    },
     captureLocal({ eventInput, runtimeContext, outbox: requestedOutbox, expectedSourceHead }) {
       if (requestedOutbox != null && requestedOutbox !== outbox) throw new TypeError('capture requires the same store-bound outbox');
       if (expectedSourceHead !== undefined &&

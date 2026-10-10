@@ -125,7 +125,8 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
      });
      const rulePolicy=validateRulePolicy(policyRaw);
      const prefStore=createSchedulingPreferencesStore({
-       indexedDB:globalThis.indexedDB,dbName:'learning-platform.k4.preferences.v1.'+BANK.track.id
+       indexedDB:globalThis.indexedDB,dbName:'learning-platform.k4.preferences.v1.'+BANK.track.id,
+       evidenceStore
      });
      const localPreferences=()=>({learner_id:state.anon_id,version:1,revision:0,
        snoozed_families:[],dismissed_families:[],preferred_domain_id:null});
@@ -151,9 +152,9 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
            activeReleaseId:BANK.evidence.content_release_id,policy:rulePolicy,
            nowIso,acceptedContentCatalog:publicCatalog
          });
-         let preferences=localPreferences();
-         try{preferences=(await prefStore.read(state.anon_id)).preferences}
-         catch(error){console.warn('K4 local preference storage unavailable',error)}
+         // Never rank an actionable recommendation using invented preference defaults
+         // when the canonical or legacy storage cannot be verified.
+         const preferences=(await prefStore.read(state.anon_id)).preferences;
          if(excludeFamilyId){
            preferences.dismissed_families=preferences.dismissed_families
              .filter(entry=>entry.question_family_id!==excludeFamilyId);
@@ -168,15 +169,16 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
          });
          const question=recommendation.status==='ACTION'?
            qById(recommendation.action.item_version_id):null;
-         return {recommendation,question};
+         return {recommendation,question,preferencesRevision:preferences.revision};
        },
-       startSession:async({recommendation,locale,expectedSourceHead})=>{
+       startSession:async({recommendation,locale,expectedSourceHead,expectedPreferencesRevision})=>{
          const session=createPracticeSession({
            recorder:EVIDENCE_RECORDER,learnerId:state.anon_id,
            trackId:BANK.track.id,releaseId:BANK.evidence.content_release_id,
            locale,candidate:recommendation.action,objectives:OBJECTIVE_CATALOG
          });
-         await presentPracticeItem({recorder:EVIDENCE_RECORDER,session,expectedSourceHead});
+         await presentPracticeItem({recorder:EVIDENCE_RECORDER,session,
+           expectedSourceHead,expectedPreferencesRevision});
          return session;
        },
        respond:({session,optionIndex})=>recordPracticeResponse({

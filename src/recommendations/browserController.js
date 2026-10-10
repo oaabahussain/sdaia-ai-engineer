@@ -162,10 +162,11 @@ export function createK4BrowserController({
           ...(sourceBound?{expectedSourceHead:{
             store_id:refreshed.recommendation.source_store_id,
             through_store_seq:refreshed.recommendation.through_store_seq
-          }}:{})
+          },expectedPreferencesRevision:refreshed.preferencesRevision}:{})
         });
       }catch(error){
-        if(sourceBound && error?.message==='stale K4 practice source watermark'){
+        if(sourceBound && ['stale K4 practice source watermark',
+          'stale K4 practice preference revision'].includes(error?.message)){
           if(generation===practiceGeneration)
             displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
           return null;

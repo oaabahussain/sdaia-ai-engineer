@@ -60,29 +60,51 @@ async function transaction(indexedDB,dbName,mode,perform){
   });
 }
 
-export function createSchedulingPreferencesStore({indexedDB,dbName}={}){
+export function createSchedulingPreferencesStore({indexedDB,dbName,evidenceStore=null}={}){
   if(!indexedDB||typeof indexedDB.open!=='function')throw new TypeError('IndexedDB is required');
   if(typeof dbName!=='string'||!dbName)throw new TypeError('K4 preferences database name required');
+  if(evidenceStore && !['getK4Preferences','saveK4Preferences','clearK4Preferences'].every(
+    key=>typeof evidenceStore[key]==='function'))
+    throw new TypeError('K4 atomic preference port is unavailable');
+
+  async function readLegacy(learnerId){
+    return transaction(indexedDB,dbName,'readonly',(store,finish,fail)=>{
+      const request=store.get(learnerId);
+      request.onsuccess=()=>{
+        try{
+          const existing=request.result;
+          finish(existing?{persisted:true,preferences:checkIntent(existing,learnerId)}
+            :{persisted:false,preferences:base(learnerId)});
+        }catch(e){fail(e)}
+      };
+      request.onerror=()=>fail(request.error??new Error('K4 read failed'));
+    });
+  }
+  async function read(learnerId){
+    learner(learnerId);
+    if(!evidenceStore)return readLegacy(learnerId);
+    // The canonical record and all practice events share one IndexedDB
+    // transaction domain. Legacy preferences are consulted only once when
+    // the canonical row has not yet been initialized.
+    const saved=await evidenceStore.getK4Preferences({learnerId});
+    if(saved)return {persisted:saved.persisted,
+      preferences:checkIntent(saved.preferences,learnerId)};
+    const legacy=await readLegacy(learnerId);
+    const initialized=await evidenceStore.getK4Preferences({learnerId,initial:legacy});
+    return {persisted:initialized.persisted,
+      preferences:checkIntent(initialized.preferences,learnerId)};
+  }
   return {
-    async read(learnerId){
-      learner(learnerId);
-      return transaction(indexedDB,dbName,'readonly',(store,finish,fail)=>{
-        const request=store.get(learnerId);
-        request.onsuccess=()=>{
-          try{
-            const existing=request.result;
-            finish(existing?{persisted:true,preferences:checkIntent(existing,learnerId)}
-              :{persisted:false,preferences:base(learnerId)});
-          }catch(e){fail(e)}
-        };
-        request.onerror=()=>fail(request.error??new Error('K4 read failed'));
-      });
-    },
+    read,
     async save({learnerId,expectedRevision,next}={}){
       learner(learnerId);
       if(!Number.isSafeInteger(expectedRevision)||expectedRevision<0)
         throw new TypeError('K4 expected revision must be nonnegative');
       const valid=checkIntent(next,learnerId);
+      if(evidenceStore){
+        await read(learnerId);
+        return evidenceStore.saveK4Preferences({learnerId,expectedRevision,next:valid});
+      }
       return transaction(indexedDB,dbName,'readwrite',(store,finish,fail)=>{
         const request=store.get(learnerId);
         request.onsuccess=()=>{
@@ -98,6 +120,10 @@ export function createSchedulingPreferencesStore({indexedDB,dbName}={}){
     },
     async clear(learnerId){
       learner(learnerId);
+      if(evidenceStore){
+        await read(learnerId);
+        return evidenceStore.clearK4Preferences(learnerId);
+      }
       return transaction(indexedDB,dbName,'readwrite',(store,finish,fail)=>{
         const request=store.delete(learnerId);
         request.onsuccess=()=>finish({persisted:true});

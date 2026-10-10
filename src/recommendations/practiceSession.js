@@ -36,12 +36,34 @@ export function createPracticeSession({recorder,learnerId,trackId,releaseId,loca
   RUNS.set(session,{present:null,answer:null,responseIndex:null});
   return session;
 }
-export async function presentPracticeItem({recorder,session,expectedSourceHead}={}){
+export async function presentPracticeItem({recorder,session,expectedSourceHead,expectedPreferencesRevision}={}){
   const run=RUNS.get(session);
   if(!run || !recorder?.startActivity || !recorder?.presentItem)throw new TypeError('K4 practice session invalid');
   if(session.presentation_receipt)return session.presentation_receipt;
   if(run.present)return run.present;
   run.present=(async()=>{
+    if(expectedSourceHead!==undefined){
+      if(typeof recorder.startPracticeItem!=='function')
+        throw new Error('K4 guarded practice requires atomic presentation');
+      const c=session.candidate;
+      const pair=await recorder.startPracticeItem({
+        learner_id:session.learner_id,track_id:session.track_id,
+        content_release_id:session.content_release_id,mode:'practice',
+        locale:session.locale,source:'browser',
+        question_family_id:c.question_family_id,item_version_id:c.item_version_id,
+        objective_id:c.objective_id,domain_id:c.domain_id,
+        expectedSourceHead,expectedPreferencesRevision
+      });
+      // Both receipts were committed atomically. Never mark either durable
+      // if their shared transaction aborted.
+      const started=accepted(pair?.started,'K4 atomic activity start');
+      const shown=accepted(pair?.presented,'K4 atomic item presentation');
+      session.start_receipt=started;
+      session.activity_id=started.event.activity_id;
+      session.presentation_receipt=shown;
+      session.item_interaction_id=shown.event.item_interaction_id;
+      return shown;
+    }
     if(!session.start_receipt){
       const started=accepted(await recorder.startActivity({
         learner_id:session.learner_id,track_id:session.track_id,
