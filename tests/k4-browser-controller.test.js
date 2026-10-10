@@ -370,7 +370,7 @@ test('Home barrier includes two unresolved Starts when later Start finishes firs
   const barrier=controller.leavePractice();
   let settled=false;
   Promise.resolve(barrier).then(()=>{settled=true});
-  releaseB();await startB;await Promise.resolve();
+  releaseB();await startB;for(let n=0;n<16;n++)await Promise.resolve();
   assert.equal(settled,false,'settling B must not release the Home barrier while A is pending');
   releaseA();
   await Promise.all([startA,barrier]);
