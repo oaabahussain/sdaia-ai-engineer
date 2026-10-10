@@ -1,5 +1,13 @@
 import { replayEvidence } from '../evidence/replay.js';
 
+const VALIDATED_HISTORY=new WeakMap();
+// Only K3 replay-backed scoped arrays carry the verified full correction graph.
+// Direct raw projection calls keep the original strict release-only contract.
+export function validatedHistoryForK4Projection(scopedEvents){
+  if(!Array.isArray(scopedEvents))throw new TypeError('K4 scoped events must be an array');
+  return VALIDATED_HISTORY.get(scopedEvents)??scopedEvents;
+}
+
 // Reads accepted local K3 evidence, never its sync cursor. This local pseudonym
 // is not a server-authenticated learner identity and does not authorize grading.
 export async function readK4Evidence({store,learnerId,trackId,releaseId,throughStoreSeq}={}) {
@@ -38,6 +46,10 @@ export async function readK4Evidence({store,learnerId,trackId,releaseId,throughS
       throw new Error('K4 evidence principal/track/store identity is inconsistent');
     if(row.content_release_id===releaseId)activeEvents.push(row);
   }
+  // Retain the full, already fingerprint-verified K3 correction graph out of
+  // the public projection payload. K4 only schedules current-release events,
+  // but a correction may reference or revoke an event across release versions.
+  VALIDATED_HISTORY.set(activeEvents,replay.projections.events);
   return {
     source_store_id:head.store_id,
     through_store_seq:throughStoreSeq,
