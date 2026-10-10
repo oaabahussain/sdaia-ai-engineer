@@ -474,3 +474,18 @@ test('language-triggered renderHome honors pending writes while Close waits',asy
   releaseA();
   await Promise.all([a,closing,localized]);
 });
+
+test('AC-09 cross-tab freshness: stale public action cannot record a new presentation',async()=>{
+  let reads=0,writes=0;
+  const {controller,document}=make({
+    loading:async()=>++reads===1?{recommendation,question}:
+      {recommendation:{status:'NO_ELIGIBLE_ACTION'},question:null},
+    start:async()=>{writes++;return {candidate:recommendation.action}}
+  });
+  await controller.renderHome();
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'item-a');
+  await controller.openPractice();
+  assert.equal(writes,0,'a stale action from another tab must not append a presentation event');
+  assert.equal(document.getElementById('k4HomeCard').getAttribute('data-k4-family-id'),'');
+  assert.equal(document.getElementById('k4Practice').children.length,0);
+});
