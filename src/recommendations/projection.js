@@ -1,4 +1,5 @@
 import { resolveCurrentEvidence } from '../evidence/corrections.js';
+import { validatedHistoryForK4Projection } from './sourceReader.js';
 import { eligiblePublicItems } from './publicCatalog.js';
 import { validateRulePolicy } from './policy.js';
 import { assertInstant, computeDueAt } from './clock.js';
@@ -39,7 +40,10 @@ export function computeScheduleProjection({
   }
   if(throughStoreSeq===0 && events.length!==0)
     throw new TypeError('K4 zero watermark cannot contain events');
-  const ordered=[...events].sort((a,b)=>a.store_seq-b.store_seq||cmp(a.event_id,b.event_id));
+  const ordered=[...validatedHistoryForK4Projection(events)]
+    .sort((a,b)=>a.store_seq-b.store_seq||cmp(a.event_id,b.event_id));
+  // Global K3 correction links can span content releases; resolve before
+  // narrowing effects to the current K4 public release.
   const resolved=resolveCurrentEvidence(ordered);
   const byEventId=new Map(ordered.map(e=>[e.event_id,e]));
   const byFamily=new Map(),affectedFamilies=new Set();
@@ -57,7 +61,8 @@ export function computeScheduleProjection({
     // K4 must not inspect an excluded strict-assessment correction's
     // missing sibling: the entire finding is outside this scheduling mode.
     const target=byEventId.get(finding.target_event_id);
-    if(target && !policy.include_modes.includes(target.mode))continue;
+    if(target && (target.content_release_id!==activeReleaseId ||
+                   !policy.include_modes.includes(target.mode)))continue;
     const referenced=[
       finding.target_event_id,finding.superseding_event_id,
       ...(finding.event_ids??[])
@@ -65,14 +70,16 @@ export function computeScheduleProjection({
     if(!referenced.length)globalUnknown=true;
     for(const id of referenced){
       const base=byEventId.get(id);
-      if(base && !policy.include_modes.includes(base.mode))continue;
+      if(base && (base.content_release_id!==activeReleaseId ||
+                  !policy.include_modes.includes(base.mode)))continue;
       const family=familyOf(base);
       if(family)affectedFamilies.add(family);
       else globalUnknown=true;
     }
   }
   for(const e of resolved.activeEvents) {
-    if(e.definition_id!==PRESENTED || !policy.include_modes.includes(e.mode))continue;
+    if(e.content_release_id!==activeReleaseId ||
+       e.definition_id!==PRESENTED || !policy.include_modes.includes(e.mode))continue;
     const candidate=eligible.get(e.item_version_id);
     if(!candidate)continue;
     if(e.question_family_id!==candidate.question_family_id ||
