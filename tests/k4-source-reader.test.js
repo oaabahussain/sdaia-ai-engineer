@@ -5,6 +5,9 @@ import { createIndexedDbEvidenceStore } from '../src/evidence/indexedDbStore.js'
 import { readK4Evidence } from '../src/recommendations/sourceReader.js';
 import * as sourceReader from '../src/recommendations/sourceReader.js';
 import { resolveCurrentEvidence } from '../src/evidence/corrections.js';
+import { validatePublicCatalog } from '../src/recommendations/publicCatalog.js';
+import { validateRulePolicy } from '../src/recommendations/policy.js';
+import { computeScheduleProjection } from '../src/recommendations/projection.js';
 
 let count=0;
 function store(label='source') {
@@ -138,4 +141,53 @@ test('AC-09 old-release correction revokes an active current-release source even
   const resolved=resolveCurrentEvidence(sourceReader.validatedHistoryForK4Projection(latest.events));
   assert.deepEqual(resolved.unresolved,[]);
   assert.deepEqual(resolved.activeEvents,[],'a valid old-release correction must revoke target current event');
+});
+
+test('AC-09 full source-to-projection: active release correction targeting old release never creates MISSING_TARGET',async()=>{
+  const s=store('cross-release-projection');
+  const old=event();
+  await s.accept(old);
+  const currentRelease='sdaia-ai-engineer.bootstrap.v1';
+  const correction=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174019',
+    origin_seq:2,
+    content_release_id:currentRelease,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    payload:{action:'VOID',target_event_id:old.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  assert.equal((await s.accept(correction)).disposition,'ACCEPTED');
+  const result=await readK4Evidence({store:s,...args,releaseId:currentRelease,throughStoreSeq:2});
+  const family='sdaia-ai-engineer.core-ai.reasoning.definition.best-description';
+  const version=family+'.v1';
+  const objective='sdaia-ai-engineer.objective.core-ai.reasoning.v1';
+  const digest='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
+  const catalog=validatePublicCatalog({
+    catalog:{schema_version:1,catalog_id:'sdaia-ai-engineer.public.bootstrap.v1',track_id:'sdaia-ai-engineer',
+      content_release_id:currentRelease,question_payload_sha256:digest,source:'MIGRATED_GRANDFATHERED_PUBLIC',
+      items:[{question_family_id:family,item_version_id:version,objective_id:objective,
+        domain_id:'core-ai',visibility:'PUBLIC',lifecycle:'ACTIVE'}]},
+    trackManifest:{id:'sdaia-ai-engineer',status:'active'},
+    evidenceContext:{content_release_id:currentRelease,question_payload_sha256:digest},
+    publicQuestions:[{id:version,family_id:family,domain_id:'core-ai'}],
+    objectives:{track_id:'sdaia-ai-engineer',objectives:[{objective_id:objective,track_id:'sdaia-ai-engineer',
+      domain_id:'core-ai',concept_ids:['core-ai.reasoning'],status:'provisional'}]}
+  });
+  const policy=validateRulePolicy({
+    schema_version:1,policy_id:'K4.RULES.v1',algorithm:'DETERMINISTIC_RULES',
+    first_review_delay_hours:48,trusted_incorrect_delay_hours:24,trusted_correct_delay_hours:96,
+    max_review_delay_hours:720,max_action_items:1,
+    include_modes:['learn','practice'],exclude_modes:['check','mock','section','full'],
+    allow_provisional_objectives_for_labels:true,allow_provisional_objectives_for_prerequisites:false,
+    fsrs_enabled:false,protected_candidates_allowed:false,untrusted_correctness_allowed:false,
+    unavailable_content_behavior:'SAFE_FALLBACK'
+  });
+  const output=computeScheduleProjection({
+    learnerId:'learner:p1',sourceStoreId:result.source_store_id,
+    throughStoreSeq:result.through_store_seq,events:result.events,
+    activeReleaseId:currentRelease,policy,nowIso:'2026-10-10T08:00:00.000Z',
+    acceptedContentCatalog:catalog
+  });
+  assert.equal(output.integrity_status,'COMPLETE');
+  assert.deepEqual(output.items,[]);
 });
