@@ -12,7 +12,7 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
-  let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null;
+  let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null,pendingExcludedFamily=null;
   const pendingStarts=new Set(),pendingStartFamilies=new Map();
   let pendingBarrier=null;
   function durableStartBarrier(){
@@ -135,7 +135,22 @@ export function createK4BrowserController({
     if(selected.recommendation.status!=='ACTION')
       throw new Error('K4 public practice action unavailable');
     const work=(async()=>{
-      const started=await startSession({recommendation:selected.recommendation,question:selected.question,locale:locale()});
+      // Another tab can update accepted K3 evidence or K4 snooze after Home was
+      // painted. Validate exact current release, candidate and preferences
+      // before recording any durable presentation.
+      const refreshed=await loadRecommendation({nowIso:clock(),excludeFamilyId:pendingExcludedFamily});
+      if(generation!==practiceGeneration)return null;
+      const oldAction=selected.recommendation.action;
+      const newAction=refreshed?.recommendation?.action;
+      const keys=['track_id','release_id','question_family_id','item_version_id','objective_id','domain_id','route_mode'];
+      if(refreshed?.recommendation?.status!=='ACTION' ||
+         refreshed?.question?.id!==selected.question.id ||
+         keys.some(k=>newAction?.[k]!==oldAction?.[k])){
+        displayHome(refreshed??{recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+        return null;
+      }
+      pendingExcludedFamily=null;
+      const started=await startSession({recommendation:refreshed.recommendation,question:refreshed.question,locale:locale()});
       if(!started)throw new Error('K4 practice start failed');
       if(generation!==practiceGeneration)return null;
       practiceQuestion=structuredClone(selected.question);
@@ -174,6 +189,7 @@ export function createK4BrowserController({
     const result=await loadRecommendation({nowIso:clock(),excludeFamilyId:family});
     if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
     lastPracticeFamily=null;
+    pendingExcludedFamily=family;
     return displayHome(result);
   }
   async function nextAction(){
