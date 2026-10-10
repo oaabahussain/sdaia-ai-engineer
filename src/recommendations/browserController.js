@@ -218,9 +218,14 @@ export function createK4BrowserController({
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
     // Never offer a stale family while K3's durable presentation is re-read.
+    const generation=++homeGeneration;
     displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
     onViewChange('home');
-    try { await durableStartBarrier(); await renderHome(); return true; }
+    try {
+      await durableStartBarrier();
+      if(generation!==homeGeneration)return false;
+      await renderHome();return true;
+    }
     catch {
       displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
       return false;
