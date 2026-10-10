@@ -149,6 +149,16 @@ export function createK4BrowserController({
     }
   }
   async function another(){
+    if(pendingStarts.size>1){
+      // More than one durable presentation is not yet reflected in the source.
+      // No single-family exclusion can safely pick a third candidate.
+      invalidatePractice();
+      const generation=++homeGeneration;
+      displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
+      await durableStartBarrier();
+      if(generation!==homeGeneration)return current?.recommendation??{status:'INSUFFICIENT_EVIDENCE'};
+      return renderHome();
+    }
     const family=current?.recommendation?.action?.question_family_id??lastPracticeFamily;
     if(!family)return renderHome();
     invalidatePractice();
@@ -210,7 +220,7 @@ export function createK4BrowserController({
     // Never offer a stale family while K3's durable presentation is re-read.
     displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
     onViewChange('home');
-    try { await renderHome(); return true; }
+    try { await durableStartBarrier(); await renderHome(); return true; }
     catch {
       displayHome({recommendation:{status:'NO_ELIGIBLE_ACTION'}});
       return false;
