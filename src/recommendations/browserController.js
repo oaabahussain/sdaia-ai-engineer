@@ -12,7 +12,14 @@ export function createK4BrowserController({
   const practice=document.getElementById('k4Practice');
   if(!home||!practice)throw new Error('K4 public practice screen unavailable');
   let current=null,session=null,practiceQuestion=null,selectedIndex=null,reasonVisible=false;
-  let homeGeneration=0,openPromise=null,outstandingWrite=null,practiceGeneration=0,lastPracticeFamily=null;
+  let homeGeneration=0,openPromise=null,practiceGeneration=0,lastPracticeFamily=null;
+  const pendingStarts=new Set();
+  let pendingBarrier=null;
+  function durableStartBarrier(){
+    if(!pendingStarts.size)return Promise.resolve();
+    if(!pendingBarrier)pendingBarrier=Promise.allSettled([...pendingStarts]);
+    return pendingBarrier;
+  }
   function invalidatePractice(){
     // Navigation retires any in-flight Start; a late receipt must not restore
     // a view whose user intent has already been superseded.
@@ -133,10 +140,12 @@ export function createK4BrowserController({
       return view;
     })();
     openPromise=work;
-    outstandingWrite=work;
+    pendingStarts.add(work);
+    pendingBarrier=null;
     try{return await work}finally{
       if(openPromise===work)openPromise=null;
-      if(outstandingWrite===work)outstandingWrite=null;
+      pendingStarts.delete(work);
+      if(!pendingStarts.size)pendingBarrier=null;
     }
   }
   async function another(){
@@ -188,7 +197,7 @@ export function createK4BrowserController({
   function leavePractice(){
     // The durable presentation write may still be pending when Home is clicked.
     // Retire the UI synchronously but return its settlement barrier to the app.
-    const pending=outstandingWrite??openPromise;
+    const pending=durableStartBarrier();
     lastPracticeFamily=session?.candidate?.question_family_id??current?.recommendation?.action?.question_family_id??null;
     invalidatePractice();
     homeGeneration++;
