@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://automizelab.net/sdaia/k4/current-state.schema.json",
+  "title": "K4 Independent Execution State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state_revision",
+    "programme",
+    "phase",
+    "status",
+    "execution_branch",
+    "base_main_sha",
+    "spec_path",
+    "spec_blob_sha",
+    "plan_path",
+    "plan_blob_sha",
+    "spec_approval",
+    "plan_approval",
+    "completed_through_task",
+    "next_task",
+    "open_critical_findings",
+    "open_important_findings",
+    "gates",
+    "merge_guard_mode",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "state_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "programme": {
+      "const": "K4"
+    },
+    "phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "EXECUTING",
+        "PHASE_GATE",
+        "REVIEW",
+        "INTEGRATION",
+        "POST_MERGE_VERIFY",
+        "COMPLETE"
+      ]
+    },
+    "execution_branch": {
+      "type": "string",
+      "pattern": "^impl/k4-[a-z0-9][a-z0-9._/-]*$"
+    },
+    "base_main_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "spec_path": {
+      "const": "docs/superpowers/specs/2026-10-08-k4-next-best-action-spaced-practice-design.md"
+    },
+    "spec_blob_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "plan_path": {
+      "const": "docs/superpowers/plans/2026-10-09-k4-next-best-action-spaced-practice.md"
+    },
+    "plan_blob_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "spec_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "git_blob_sha"
+      ],
+      "properties": {
+        "status": {
+          "const": "APPROVED"
+        },
+        "git_blob_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "plan_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "git_blob_sha"
+      ],
+      "properties": {
+        "status": {
+          "const": "APPROVED"
+        },
+        "git_blob_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "completed_through_task": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "next_task": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 15
+    },
+    "open_critical_findings": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "open_important_findings": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "SPEC_APPROVED",
+        "PLAN_APPROVED",
+        "ISOLATED_SOURCE_READY",
+        "BASELINE_CI_GREEN"
+      ],
+      "properties": {
+        "SPEC_APPROVED": {
+          "enum": [
+            "PASS",
+            "PENDING",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "PLAN_APPROVED": {
+          "enum": [
+            "PASS",
+            "PENDING",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "ISOLATED_SOURCE_READY": {
+          "enum": [
+            "PASS",
+            "PENDING",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "BASELINE_CI_GREEN": {
+          "enum": [
+            "PASS",
+            "PENDING",
+            "FAIL",
+            "BLOCKED"
+          ]
+        }
+      }
+    },
+    "merge_guard_mode": {
+      "const": "HIGH_REASONING_MERGE_GATE"
+    },
+    "merged_main_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "release_evidence_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

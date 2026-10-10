@@ -1,0 +1,193 @@
+import 'fake-indexeddb/auto';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createIndexedDbEvidenceStore } from '../src/evidence/indexedDbStore.js';
+import { readK4Evidence } from '../src/recommendations/sourceReader.js';
+import * as sourceReader from '../src/recommendations/sourceReader.js';
+import { resolveCurrentEvidence } from '../src/evidence/corrections.js';
+import { validatePublicCatalog } from '../src/recommendations/publicCatalog.js';
+import { validateRulePolicy } from '../src/recommendations/policy.js';
+import { computeScheduleProjection } from '../src/recommendations/projection.js';
+
+let count=0;
+function store(label='source') {
+  count+=1;
+  return createIndexedDbEvidenceStore({dbName:'k4-source-'+label+'-'+count,storeId:'k4-store',indexedDB});
+}
+function event(changes={}) {
+  return {
+    schema_version:2,event_id:'123e4567-e89b-42d3-a456-426614174000',
+    definition_id:'learner.response.recorded@1',learner_id:'learner:p1',
+    origin_id:'223e4567-e89b-42d3-a456-426614174001',origin_seq:1,
+    activity_id:'323e4567-e89b-42d3-a456-426614174002',
+    track_id:'sdaia-ai-engineer',content_release_id:'release-1',
+    mode:'practice',locale:'en',occurred_at:'2026-10-08T20:00:00.000Z',
+    item_interaction_id:'523e4567-e89b-42d3-a456-426614174004',
+    item_version_id:'item-v1',payload:{response_version:1,response_kind:'OPTION',response:{option_index:0}},...changes
+  };
+}
+const args={learnerId:'learner:p1',trackId:'sdaia-ai-engineer',releaseId:'release-1'};
+
+test('empty source has head zero and cold-start never performs invalid replay',async()=>{
+  const s=store('empty');
+  assert.deepEqual(await s.getSourceHead(),{store_id:'k4-store',through_store_seq:0});
+  const r=await readK4Evidence({store:s,...args,throughStoreSeq:0});
+  assert.equal(r.source_store_id,'k4-store');
+  assert.equal(r.through_store_seq,0);
+  assert.deepEqual(r.events,[]);
+});
+
+test('local committed head is not the unrelated sync cursor',async()=>{
+  const s=store('cursor');
+  await s.accept(event());
+  await s.commitSyncCursor({store_id:'k4-store',through_store_seq:0});
+  assert.deepEqual(await s.getSourceHead(),{store_id:'k4-store',through_store_seq:1});
+  const r=await readK4Evidence({store:s,...args,throughStoreSeq:1});
+  assert.equal(r.events.length,1);
+  assert.equal(r.events[0].definition_id,'learner.response.recorded@1');
+  assert.equal(r.events[0].store_seq,1);
+  assert.equal(typeof r.events[0].event_fingerprint,'string');
+});
+
+test('duplicate delivery does not increment local source watermark',async()=>{
+  const s=store('duplicate');
+  const one=await s.accept(event());
+  const retry=await s.accept(event());
+  assert.equal(one.disposition,'ACCEPTED');
+  assert.equal(retry.disposition,'DUPLICATE');
+  assert.equal((await s.getSourceHead()).through_store_seq,1);
+});
+
+test('source reader rejects invalid head, wrong releases and watermark',async()=>{
+  const s=store('bad');
+  await s.accept(event());
+  await assert.rejects(()=>readK4Evidence({store:s,...args,throughStoreSeq:-1}));
+  await assert.rejects(()=>readK4Evidence({store:s,...args,throughStoreSeq:2}));
+  const older=await readK4Evidence({store:s,...args,releaseId:'different',throughStoreSeq:1});
+  assert.deepEqual(older.events,[],'historical release must not poison active-release recommendations');
+  assert.equal(older.through_store_seq,1,'global store watermark remains source-bound');
+  await assert.rejects(()=>readK4Evidence({store:{...s,store_id:'foreign'},...args,throughStoreSeq:1}));
+});
+
+test('learner filter does not mix another learner on same store',async()=>{
+  const s=store('multilearner');
+  await s.accept(event());
+  const second=event({event_id:'623e4567-e89b-42d3-a456-426614174005',origin_seq:2,
+    learner_id:'learner:p2',item_interaction_id:'723e4567-e89b-42d3-a456-426614174006'});
+  await s.accept(second);
+  assert.equal((await s.getSourceHead()).through_store_seq,2);
+  const r=await readK4Evidence({store:s,...args,throughStoreSeq:2});
+  assert.equal(r.events.length,1);
+  assert.equal(r.events[0].learner_id,'learner:p1');
+});
+
+test('AC-09 source upgrade reads only the active public release while preserving validated historic K3 events',async()=>{
+  const s=store('release-upgrade');
+  await s.accept(event());
+  await s.accept(event({
+    event_id:'723e4567-e89b-42d3-a456-426614174010',
+    origin_seq:2,
+    item_interaction_id:'823e4567-e89b-42d3-a456-426614174011',
+    content_release_id:'release-2'
+  }));
+  const oldRelease=await readK4Evidence({store:s,...args,throughStoreSeq:2});
+  assert.equal(oldRelease.events.length,1);
+  assert.equal(oldRelease.events[0].content_release_id,'release-1');
+  const newer=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.equal(newer.events.length,1);
+  assert.equal(newer.events[0].content_release_id,'release-2');
+  assert.equal(newer.events[0].store_seq,2);
+  assert.equal(newer.through_store_seq,2);
+});
+
+test('AC-09 cross-release corrections retain historical targets through full validated replay',async()=>{
+  const s=store('cross-release-correction');
+  const older=event();
+  const first=await s.accept(older);
+  assert.equal(first.disposition,'ACCEPTED');
+  const correction=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174017',
+    origin_seq:2,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    content_release_id:'release-2',
+    payload:{action:'VOID',target_event_id:older.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  const second=await s.accept(correction);
+  assert.equal(second.disposition,'ACCEPTED');
+  const fresh=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.deepEqual(fresh.events.map(x=>x.event_id),[correction.event_id]);
+  assert.equal(typeof sourceReader.validatedHistoryForK4Projection,'function');
+  const resolved=resolveCurrentEvidence(sourceReader.validatedHistoryForK4Projection(fresh.events));
+  assert.deepEqual(resolved.unresolved,[],'current correction must still find real old-release target');
+  assert.deepEqual(resolved.conflicts,[]);
+  assert.deepEqual(resolved.activeEvents,[]);
+});
+test('AC-09 old-release correction revokes an active current-release source event',async()=>{
+  const s=store('historical-correction');
+  const active=event({content_release_id:'release-2'});
+  await s.accept(active);
+  const previous=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174018',
+    origin_seq:2,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    content_release_id:'release-1',
+    payload:{action:'VOID',target_event_id:active.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  assert.equal((await s.accept(previous)).disposition,'ACCEPTED');
+  const latest=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.deepEqual(latest.events.map(x=>x.event_id),[active.event_id]);
+  const resolved=resolveCurrentEvidence(sourceReader.validatedHistoryForK4Projection(latest.events));
+  assert.deepEqual(resolved.unresolved,[]);
+  assert.deepEqual(resolved.activeEvents,[],'a valid old-release correction must revoke target current event');
+});
+
+test('AC-09 full source-to-projection: active release correction targeting old release never creates MISSING_TARGET',async()=>{
+  const s=store('cross-release-projection');
+  const old=event();
+  await s.accept(old);
+  const currentRelease='sdaia-ai-engineer.bootstrap.v1';
+  const correction=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174019',
+    origin_seq:2,
+    content_release_id:currentRelease,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    payload:{action:'VOID',target_event_id:old.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  assert.equal((await s.accept(correction)).disposition,'ACCEPTED');
+  const result=await readK4Evidence({store:s,...args,releaseId:currentRelease,throughStoreSeq:2});
+  const family='sdaia-ai-engineer.core-ai.reasoning.definition.best-description';
+  const version=family+'.v1';
+  const objective='sdaia-ai-engineer.objective.core-ai.reasoning.v1';
+  const digest='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
+  const catalog=validatePublicCatalog({
+    catalog:{schema_version:1,catalog_id:'sdaia-ai-engineer.public.bootstrap.v1',track_id:'sdaia-ai-engineer',
+      content_release_id:currentRelease,question_payload_sha256:digest,source:'MIGRATED_GRANDFATHERED_PUBLIC',
+      items:[{question_family_id:family,item_version_id:version,objective_id:objective,
+        domain_id:'core-ai',visibility:'PUBLIC',lifecycle:'ACTIVE'}]},
+    trackManifest:{id:'sdaia-ai-engineer',status:'active'},
+    evidenceContext:{content_release_id:currentRelease,question_payload_sha256:digest},
+    publicQuestions:[{id:version,family_id:family,domain_id:'core-ai'}],
+    objectives:{track_id:'sdaia-ai-engineer',objectives:[{objective_id:objective,track_id:'sdaia-ai-engineer',
+      domain_id:'core-ai',concept_ids:['core-ai.reasoning'],status:'provisional'}]}
+  });
+  const policy=validateRulePolicy({
+    schema_version:1,policy_id:'K4.RULES.v1',algorithm:'DETERMINISTIC_RULES',
+    first_review_delay_hours:48,trusted_incorrect_delay_hours:24,trusted_correct_delay_hours:96,
+    max_review_delay_hours:720,max_action_items:1,
+    include_modes:['learn','practice'],exclude_modes:['check','mock','section','full'],
+    allow_provisional_objectives_for_labels:true,allow_provisional_objectives_for_prerequisites:false,
+    fsrs_enabled:false,protected_candidates_allowed:false,untrusted_correctness_allowed:false,
+    unavailable_content_behavior:'SAFE_FALLBACK'
+  });
+  const output=computeScheduleProjection({
+    learnerId:'learner:p1',sourceStoreId:result.source_store_id,
+    throughStoreSeq:result.through_store_seq,events:result.events,
+    activeReleaseId:currentRelease,policy,nowIso:'2026-10-10T08:00:00.000Z',
+    acceptedContentCatalog:catalog
+  });
+  assert.equal(output.integrity_status,'COMPLETE');
+  assert.deepEqual(output.items,[]);
+});

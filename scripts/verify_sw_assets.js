@@ -7,6 +7,39 @@ const match = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 if (!match) throw new Error('ASSETS missing');
 const assets = [...match[1].matchAll(/'([^']+)'/g)].map(item => item[1]);
 
+const k4Required=[
+  './src/recommendations/policy.js',
+  './src/recommendations/publicCatalog.js',
+  './src/recommendations/sourceReader.js',
+  './src/recommendations/projection.js',
+  './src/recommendations/clock.js',
+  './src/recommendations/ranker.js',
+  './src/recommendations/preferencesStore.js',
+  './src/recommendations/practiceSession.js',
+  './src/recommendations/browserController.js',
+  './src/evidence/replay.js',
+  './src/evidence/corrections.js',
+  './data/recommendations/k4-public-catalog-v1.json',
+  './data/recommendations/k4-rule-policy-v1.json'
+];
+for(const item of k4Required){
+  if(!assets.includes(item))throw new Error('Missing K4 offline asset: '+item);
+}
+const publicCatalog=JSON.parse(fs.readFileSync(
+  path.join(root,'data/recommendations/k4-public-catalog-v1.json'),'utf8'
+));
+if(publicCatalog.content_release_id!=='sdaia-ai-engineer.bootstrap.v1' ||
+   publicCatalog.question_payload_sha256!=='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9' ||
+   !Array.isArray(publicCatalog.items)||publicCatalog.items.length!==1120 ||
+   publicCatalog.items.some(item=>item.visibility!=='PUBLIC'||item.lifecycle!=='ACTIVE')){
+  throw new Error('K4 public catalog cannot expose protected or unapproved release items');
+}
+const k4Policy=JSON.parse(fs.readFileSync(
+  path.join(root,'data/recommendations/k4-rule-policy-v1.json'),'utf8'
+));
+if(k4Policy.policy_id!=='K4.RULES.v1'||k4Policy.fsrs_enabled!==false)
+  throw new Error('K4 public policy invalid');
+
 if (assets.some(asset => asset.includes('/data/concepts/'))) {
   throw new Error('Concept-bank chunks must not be pre-cached');
 }

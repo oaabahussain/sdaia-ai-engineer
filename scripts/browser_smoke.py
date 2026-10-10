@@ -159,6 +159,70 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
+        # K4_BROWSER_ACCEPTANCE: test the real single-question screen, not a stub.
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 public card')
+        assert 'Practice one question' in text(session,find(session,'#k4HomeCard'))
+        assert execute(session,"return document.documentElement.dir")=='ltr'
+        assert execute(session,"const b=document.querySelector('#k4HomeCard button');b.focus();return document.activeElement===b"), 'K4 keyboard focus must work'
+        click(session,find(session,'#k4HomeCard button'))
+        wait_until(lambda:execute(session,"return document.getElementById('k4Practice').classList.contains('active')"),label='K4 practice screen')
+        assert len(finds(session,'#k4Practice .option'))==4
+        assert 'Practice one question' in text(session,find(session,'#k4Practice'))
+        assert 'readiness' not in text(session,find(session,'#k4Practice')).lower()
+        click(session,find(session,'#k4Practice .option'))
+        wait_until(lambda:'Response saved locally' in text(session,find(session,'#k4Practice')),label='K4 durable response receipt')
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
+        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
+        assert len(finds(session,'#k4Practice .option'))==4
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
+        click(session,find(session,'#k4Practice button:last-child'))
+        wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
+        previous_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 refreshed action after first practice close'
+        )
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 refreshed alternative controls')
+        click(session,find(session,'#k4HomeCard button:nth-of-type(3)'))
+        alternate_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 alternate family ID assigned'
+        )
+        wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")!=previous_family,
+            label='K4 alternate public family selection completed'
+        )
+        alternate_family=execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")
+        assert alternate_family and alternate_family!=previous_family, 'K4 another must choose a different public family'
+        assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
+        wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
+        click(session,find(session,'#k4Practice button:last-child'))
+        # AC-13: K4 canonical preferences now share the K3 evidence database.
+        # Deny that actual transactional port in Chromium (not the legacy DB).
+        # A failed K4 snooze must still show an error without a false receipt.
+        # Close now replays evidence asynchronously; wait for the new actionable card.
+        active_family=wait_until(
+            lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
+            label='K4 new action after closing alternative'
+        )
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 refreshed action controls')
+        assert execute(session,"""
+          window.__k4OriginalOpen=indexedDB.open;
+          indexedDB.open=function(name,...args){
+            if(String(name).includes('.evidence.v1.'))throw new DOMException('K4 canonical preference storage denied','QuotaExceededError');
+            return window.__k4OriginalOpen.call(this,name,...args);
+          };
+          return true;
+        """)
+        click(session,find(session,'#k4HomeCard button:nth-of-type(4)'))
+        wait_until(lambda:'Local preference storage failed' in text(session,find(session,'#k4HomeCard')),label='K4 browser denied IndexedDB without false save')
+        assert execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')")==active_family
+        assert execute(session,"indexedDB.open=window.__k4OriginalOpen;delete window.__k4OriginalOpen;return true")
+        req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
+        assert execute(session,"return window.innerWidth<=450"), 'K4 mobile viewport'
+        assert execute(session,"return document.getElementById('k4HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K4 responsive card'
+        req('POST',f'/session/{session}/window/rect',{'width':1400,'height':1000})
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
         wait_until(lambda:f'1 of {EXPECTED_FULL}' in text(session,find(session,'#questionCounter')),label='profile-sized full exam')
@@ -210,6 +274,12 @@ def main():
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),timeout=20,label='offline cached home reload')
         assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
         assert text(session,find(session,'.domainCard h3'))==PRESENTATION['locales']['en']['domain_labels'][first_domain]
+        # K4_OFFLINE_ACCEPTANCE: new public policy and modules work from the installed cache.
+        wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 offline public card')
+        click(session,find(session,'#k4HomeCard button'))
+        wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 offline practice view')
+        click(session,find(session,'#k4Practice button:last-child'))
+
         req('POST',f'/session/{session}/url',{'url':BASE+'/feedback.html'})
         wait_until(lambda:len(finds(session,'.feedback-card'))==3,label='three feedback cards')
         wait_until(lambda:text(session,find(session,'#feedbackBrand'))==PRESENTATION['locales']['en']['brand'],label='feedback presentation brand')

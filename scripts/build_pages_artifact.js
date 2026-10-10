@@ -33,6 +33,7 @@ rmSync(join(output, 'src/platform-kernel'), { recursive: true, force: true });
 for (const relative of [
   'data/concepts',
   'data/migrations',
+  'data/recommendations',
   'data/learn.json',
   'data/cases.json',
   'data/evidence/sdaia-ai-engineer.objectives-v1.json',
