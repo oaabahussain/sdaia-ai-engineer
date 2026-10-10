@@ -478,7 +478,7 @@ test('language-triggered renderHome honors pending writes while Close waits',asy
 test('AC-09 cross-tab freshness: stale public action cannot record a new presentation',async()=>{
   let reads=0,writes=0;
   const {controller,document}=make({
-    loading:async()=>++reads===1?{recommendation,question}:
+    loading:async()=>++reads===1?{recommendation:{...recommendation,source_store_id:'local',through_store_seq:1},question}:
       {recommendation:{status:'NO_ELIGIBLE_ACTION'},question:null},
     start:async()=>{writes++;return {candidate:recommendation.action}}
   });
