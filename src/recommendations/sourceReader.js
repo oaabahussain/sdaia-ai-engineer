@@ -28,14 +28,19 @@ export async function readK4Evidence({store,learnerId,trackId,releaseId,throughS
   const replay=await replayEvidence(source,{
     fromSeq:1,toSeq:throughStoreSeq,projectors:{events: rows=>rows}
   });
+  // Replay and fingerprint-check the full learner history before selecting the
+  // active release; retained older content releases are valid K3 history, not
+  // evidence usable by this K4 recommendation snapshot.
+  const activeEvents=[];
   for(const row of replay.projections.events){
     if(row.learner_id!==learnerId || row.track_id!==trackId ||
-       row.content_release_id!==releaseId || row.store_id!==head.store_id)
-      throw new Error('K4 evidence principal/track/release is inconsistent');
+       row.store_id!==head.store_id)
+      throw new Error('K4 evidence principal/track/store identity is inconsistent');
+    if(row.content_release_id===releaseId)activeEvents.push(row);
   }
   return {
     source_store_id:head.store_id,
     through_store_seq:throughStoreSeq,
-    events:replay.projections.events
+    events:activeEvents
   };
 }
