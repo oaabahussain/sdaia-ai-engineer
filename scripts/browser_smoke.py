@@ -306,6 +306,45 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
+        # AC-13 physical browser quota experiment on a disposable IndexedDB
+        # namespace. Bounded at 4 MiB, high entropy (not compressible text).
+        # A browser acknowledgement alone is not accepted as quota proof.
+        def cdp(command, params):
+            return req('POST', f'/session/{session}/goog/cdp/execute',
+                       {'cmd':command,'params':params})
+        origin=BASE
+        cdp('Storage.overrideQuotaForOrigin',{'origin':origin,'quotaSize':0})
+        try:
+            quota=cdp('Storage.getUsageAndQuota',{'origin':origin})
+            assert quota['overrideActive'] and quota['quota']==0,quota
+            outcome=execute(session,"""
+              return new Promise(resolve=>{
+                const dbName='k4-ac13-quota-boundary-probe';
+                const opening=indexedDB.open(dbName,1);
+                opening.onerror=()=>resolve({persisted:false,error:opening.error?.name||'OpenError'});
+                opening.onupgradeneeded=()=>opening.result.createObjectStore('test');
+                opening.onsuccess=()=>{
+                  const db=opening.result;
+                  try{
+                    const bytes=new Uint8Array(4*1024*1024);
+                    for(let i=0;i<bytes.length;i+=65536)
+                      crypto.getRandomValues(bytes.subarray(i,i+65536));
+                    const tx=db.transaction('test','readwrite');
+                    tx.objectStore('test').put(bytes,'large-random-payload');
+                    tx.oncomplete=()=>{db.close();resolve({persisted:true})};
+                    tx.onabort=()=>{db.close();resolve({persisted:false,error:tx.error?.name||'AbortError'})};
+                    tx.onerror=()=>{};
+                  }catch(err){db.close();resolve({persisted:false,error:err.name})}
+                };
+              })
+            """)
+            assert outcome['persisted'] is False, (
+                'Chromium did not enforce the zero-byte quota against bounded random IndexedDB write: '+str(outcome))
+            print('K4_REAL_BROWSER_QUOTA: PASS zero_byte_quota randomized_4mib_write_rejected')
+        finally:
+            cdp('Storage.overrideQuotaForOrigin',{'origin':origin})
+            restored=cdp('Storage.getUsageAndQuota',{'origin':origin})
+            assert not restored['overrideActive'],restored
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
