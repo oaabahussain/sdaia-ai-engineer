@@ -3,6 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createIndexedDbEvidenceStore } from '../src/evidence/indexedDbStore.js';
 import { readK4Evidence } from '../src/recommendations/sourceReader.js';
+import * as sourceReader from '../src/recommendations/sourceReader.js';
+import { resolveCurrentEvidence } from '../src/evidence/corrections.js';
 
 let count=0;
 function store(label='source') {
@@ -93,4 +95,47 @@ test('AC-09 source upgrade reads only the active public release while preserving
   assert.equal(newer.events[0].content_release_id,'release-2');
   assert.equal(newer.events[0].store_seq,2);
   assert.equal(newer.through_store_seq,2);
+});
+
+test('AC-09 cross-release corrections retain historical targets through full validated replay',async()=>{
+  const s=store('cross-release-correction');
+  const older=event();
+  const first=await s.accept(older);
+  assert.equal(first.disposition,'ACCEPTED');
+  const correction=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174017',
+    origin_seq:2,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    content_release_id:'release-2',
+    payload:{action:'VOID',target_event_id:older.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  const second=await s.accept(correction);
+  assert.equal(second.disposition,'ACCEPTED');
+  const fresh=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.deepEqual(fresh.events.map(x=>x.event_id),[correction.event_id]);
+  assert.equal(typeof sourceReader.validatedHistoryForK4Projection,'function');
+  const resolved=resolveCurrentEvidence(sourceReader.validatedHistoryForK4Projection(fresh.events));
+  assert.deepEqual(resolved.unresolved,[],'current correction must still find real old-release target');
+  assert.deepEqual(resolved.conflicts,[]);
+  assert.deepEqual(resolved.activeEvents,[]);
+});
+test('AC-09 old-release correction revokes an active current-release source event',async()=>{
+  const s=store('historical-correction');
+  const active=event({content_release_id:'release-2'});
+  await s.accept(active);
+  const previous=event({
+    event_id:'923e4567-e89b-42d3-a456-426614174018',
+    origin_seq:2,
+    definition_id:'learner.evidence.correction.recorded@1',
+    authority_ref:'authority:test',
+    content_release_id:'release-1',
+    payload:{action:'VOID',target_event_id:active.event_id,reason_code:'ADMIN_CORRECTION'}
+  });
+  assert.equal((await s.accept(previous)).disposition,'ACCEPTED');
+  const latest=await readK4Evidence({store:s,...args,releaseId:'release-2',throughStoreSeq:2});
+  assert.deepEqual(latest.events.map(x=>x.event_id),[active.event_id]);
+  const resolved=resolveCurrentEvidence(sourceReader.validatedHistoryForK4Projection(latest.events));
+  assert.deepEqual(resolved.unresolved,[]);
+  assert.deepEqual(resolved.activeEvents,[],'a valid old-release correction must revoke target current event');
 });
