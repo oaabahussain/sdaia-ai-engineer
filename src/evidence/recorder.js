@@ -166,13 +166,14 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     return interaction;
   }
 
-  async function capture(definitionId, eventInput) {
+  async function capture(definitionId, eventInput, expectedSourceHead) {
     return captureLocalEvidence({
       store,
       outbox,
       eventInput: { ...eventInput, occurred_at: eventInput.occurred_at ?? nowIso(clock) },
       definition: eventDefinition(runtimeContext, definitionId),
-      runtimeContext
+      runtimeContext,
+      ...(expectedSourceHead === undefined ? {} : { expectedSourceHead })
     });
   }
 
@@ -219,6 +220,52 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
     return job;
   }
 
+  async function startPracticeItem(input={}) {
+    if(typeof store.captureLocalPracticePair!=='function')
+      throw new Error('K4 atomic practice storage contract unavailable');
+    const trackId=input.track_id??runtimeContext.track.id;
+    const releaseId=input.content_release_id??runtimeContext.evidence.content_release_id;
+    if(trackId!==runtimeContext.track.id ||
+       releaseId!==runtimeContext.evidence.content_release_id)
+      throw new Error('K4 practice track or release mismatch');
+    const activity={
+      learner_id:requireString(input.learner_id,'learner_id'),
+      activity_id:uuid('activity_id'),track_id:trackId,
+      content_release_id:releaseId,mode:'practice',
+      locale:requireString(input.locale,'locale')
+    };
+    const interaction={
+      item_interaction_id:uuid('item_interaction_id'),
+      question_family_id:requireString(input.question_family_id,'question_family_id'),
+      item_version_id:requireString(input.item_version_id,'item_version_id'),
+      objective_id:requireString(input.objective_id,'objective_id'),
+      domain_id:requireString(input.domain_id,'domain_id')
+    };
+    const instant=nowIso(clock);
+    const pair=await store.captureLocalPracticePair({
+      outbox,runtimeContext,expectedSourceHead:input.expectedSourceHead,
+      expectedPreferencesRevision:input.expectedPreferencesRevision,
+      startInput:{
+        ...commonEnvelope(activity),
+        definition_id:'learner.activity.started@1',
+        occurred_at:instant,
+        payload:input.source===undefined?{}:{source:requireString(input.source,'source')}
+      },
+      presentInput:{
+        ...commonEnvelope(activity),...interaction,
+        definition_id:'learner.item.presented@1',
+        occurred_at:instant,payload:{}
+      }
+    });
+    if(!pair?.started?.receipt || !pair?.presented?.receipt ||
+       pair.started.receipt.disposition!=='ACCEPTED' ||
+       pair.presented.receipt.disposition!=='ACCEPTED')
+      throw new Error('K4 atomic practice pair receipt unavailable');
+    activities.set(activity.activity_id,activity);
+    interactions.set(interaction.item_interaction_id,interaction);
+    return pair;
+  }
+
   async function startActivity(input = {}) {
     const mode = requireString(input.mode, 'mode');
     const strict = STRICT_MODES.has(mode);
@@ -243,7 +290,9 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
       } : {})
     };
     const payload = input.source === undefined ? {} : { source: requireString(input.source, 'source') };
-    const result = await capture('learner.activity.started@1', { ...commonEnvelope(activity), payload });
+    if (input.expectedSourceHead !== undefined && mode !== 'practice')
+      throw new TypeError('conditional K4 source capture requires practice mode');
+    const result = await capture('learner.activity.started@1', { ...commonEnvelope(activity), payload }, input.expectedSourceHead);
     activities.set(activity.activity_id, activity);
     if (strict) localAttemptRevisions.set(activity.assessment_attempt_id, activity.attempt_revision);
     return result;
@@ -324,6 +373,7 @@ export function createEvidenceRecorder({ store, outbox = null, runtimeContext, c
   }
 
   return {
+    startPracticeItem,
     startActivity,
     presentItem,
     recordResponse,

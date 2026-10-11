@@ -1,4 +1,4 @@
-const CACHE = 'learning-platform-shell-v1';
+const CACHE = 'learning-platform-shell-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,19 @@ const ASSETS = [
   './icon-512.png',
   './src/registerServiceWorker.js',
   './src/app.js',
+  './src/recommendations/policy.js',
+  './src/recommendations/publicCatalog.js',
+  './src/recommendations/sourceReader.js',
+  './src/recommendations/projection.js',
+  './src/recommendations/clock.js',
+  './src/recommendations/ranker.js',
+  './src/recommendations/preferencesStore.js',
+  './src/recommendations/practiceSession.js',
+  './src/recommendations/browserController.js',
+  './src/evidence/replay.js',
+  './src/evidence/corrections.js',
+  './data/recommendations/k4-public-catalog-v1.json',
+  './data/recommendations/k4-rule-policy-v1.json',
   './src/feedback.js',
   './src/config.js',
   './src/tracks/registry.js',

@@ -72,3 +72,6 @@ jobs:
           trap - EXIT
       - name: Browser smoke test
         run: python3 scripts/browser_smoke.py
+      - name: AC-13 isolated real Chromium storage quota
+        timeout-minutes: 6
+        run: python3 scripts/k4_real_quota_probe.py

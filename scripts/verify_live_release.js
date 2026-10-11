@@ -70,6 +70,24 @@ for (const entry of registry.tracks) {
       typeof evidence.event_definitions_ref !== 'string'
     ) throw new Error('Invalid live learner evidence runtime context');
 
+    const [k4Catalog,k4Policy]=await Promise.all([
+      getJson('data/recommendations/k4-public-catalog-v1.json'),
+      getJson('data/recommendations/k4-rule-policy-v1.json')
+    ]);
+    if(k4Catalog?.content_release_id!==evidence.content_release_id ||
+       k4Catalog?.question_payload_sha256!==evidence.question_payload_sha256 ||
+       k4Catalog?.track_id!==manifest.id ||
+       !Array.isArray(k4Catalog.items)||k4Catalog.items.length!==1120 ||
+       new Set(k4Catalog.items.map(item=>item.item_version_id)).size!==1120 ||
+       k4Catalog.items.some(item=>item.visibility!=='PUBLIC'||item.lifecycle!=='ACTIVE') ||
+       k4Policy?.policy_id!=='K4.RULES.v1' || k4Policy.fsrs_enabled!==false)
+      throw new Error('K4 live public catalog/policy mismatch');
+    for(const item of [
+      'src/recommendations/browserController.js',
+      'src/recommendations/projection.js',
+      'src/recommendations/ranker.js'
+    ]) await response(item);
+
     const scoring = await getJson(evidence.scoring_policy_path);
     if (scoring.id !== evidence.scoring_policy_ref) {
       throw new Error('Live scoring policy reference mismatch');
