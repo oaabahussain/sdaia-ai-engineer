@@ -105,7 +105,12 @@ Produce JSON-only, versioned, fully defined object. Candidate normative example 
       "identity_scope": "LOCAL_UNAUTHENTICATED",
       "track_id": "sdaia-ai-engineer",
       "content_release_id": "sdaia-ai-engineer.bootstrap.v1",
-      "catalog_digest": "5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9",
+      "question_payload_sha256": "5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9",
+      "catalog_version": "sdaia-ai-engineer.public.bootstrap.v1",
+      "catalog_canonical_sha256": "<verified-canonical-catalog-sha256>",
+      "objective_map_canonical_sha256": "<verified-canonical-objectives-sha256>",
+      "lineage_map_version": null,
+      "lineage_map_canonical_sha256": null,
       "objective_map_version": "sdaia-ai-engineer.objectives-v1",
       "identity_resolution_version": null,
       "integrity_status": "COMPLETE",
@@ -123,17 +128,33 @@ Produce JSON-only, versioned, fully defined object. Candidate normative example 
       "model_validation_ref": null
     }
 
-This is an interface illustration, NOT permission to emit an actual estimate. Actual IDs/digests must be drawn from verified inputs, never copied as runtime constants except accepted immutable release fixtures. Versioned schema in future data/schema must enforce additionalProperties=false and nullable estimates exactly as described. Null is JSON null, not omitted/undefined, zero or an empty numeric array. For now generated_at may be omitted deliberately to ensure two replays of the same source snapshot yield identical canonical output; if added, display time is separate from deterministic evidence payload and must not enter its digest.
+This is an interface illustration, NOT permission to emit an actual estimate. The angle-bracket hash values in the illustrative object are documentation metavariables, never valid runtime values. Actual projection values MUST be 64-character lowercase SHA-256 hashes over canonically serialized entire validated public catalog and objective mapping. The question payload digest is separate from those hashes and cannot substitute for them. Optional verified lineage maps require both immutable version and canonical SHA256; absent maps require both null. Cache/replay keys bind all these values; changing mapping bytes under an unchanged version invalidates the projection. Actual IDs/digests must be drawn from verified inputs, never copied as runtime constants except accepted immutable release fixtures. Versioned schema in future data/schema must enforce additionalProperties=false and nullable estimates exactly as described. Null is JSON null, not omitted/undefined, zero or an empty numeric array. For now generated_at may be omitted deliberately to ensure two replays of the same source snapshot yield identical canonical output; if added, display time is separate from deterministic evidence payload and must not enter its digest.
 
 ### 6.1 Enums and cardinality
 
 - integrity_status: COMPLETE | INCOMPLETE | CONFLICTED | SOURCE_INVALID.
 - observation_status: NO_OBSERVATIONS | OBSERVATIONS_PRESENT | INSUFFICIENT_EVIDENCE | QUARANTINED.
 - estimation_status (first public K5 version): DISABLED_UNVALIDATED only.
-- reason_codes (sorted, unique, finite vocabulary): NO_EVIDENCE; EXPOSURE_ONLY; NO_TRUSTED_EVALUATION; PUBLIC_FAMILY_REPEATED; PROVISIONAL_OBJECTIVE_MAP; CORRECTION_UNRESOLVED; CORRECTION_CONFLICT; SOURCE_INTEGRITY_INVALID; CONTENT_RELEASE_MISMATCH; UNKNOWN_FAMILY_MAPPING; IDENTITY_UNVERIFIED; CALIBRATION_NOT_APPROVED; PROTECTED_EVIDENCE_UNAVAILABLE.
+- reason_codes (sorted, unique, finite vocabulary): NO_EVIDENCE; EXPOSURE_ONLY; NO_TRUSTED_EVALUATION; PUBLIC_FAMILY_REPEATED; PROVISIONAL_OBJECTIVE_MAP; CORRECTION_UNRESOLVED; CORRECTION_CONFLICT; SOURCE_INTEGRITY_INVALID; CONTENT_RELEASE_MISMATCH; CORRECTION_AUTHORITY_UNVERIFIED; UNKNOWN_FAMILY_MAPPING; IDENTITY_UNVERIFIED; CALIBRATION_NOT_APPROVED; PROTECTED_EVIDENCE_UNAVAILABLE.
 - No raw responses, correctness, answer keys, protected family IDs, direct PII, experimental group assignments or prompt text in the projection or public UI.
 - OBJECTIVE entries are sorted by objective_id and include: objective_id, domain_id, mapping_status (PROVISIONAL | APPROVED), observed_distinct_family_count (nonnegative int), observed_distinct_interaction_count (nonnegative int), source_status (OBSERVED_ONLY | NO_OBSERVATIONS | QUARANTINED), reason_codes, mastery_estimate:null. Domain summaries can be derived by deterministic aggregation; don't double-count one interaction assigned to multiple objectives as independent attempts.
 - Source provenance IDs, if retained internally for local debugging, are bounded to 5 distinct verified events with a truncation flag, sorted by store_seq and event_id; no raw IDs exported as public analytics or remote logs.
+
+### 6.1.1 Deterministic statuses, authority, and reason precedence
+
+K3 structural correction resolution is NOT authentication. The current K3 resolver accepts nonempty authority_ref without proving producer identity. K5 MUST verify separately that the producer is authenticated and authorized for the learner, store, target and correction operation BEFORE effective VOID/SUPERSEDE resolution. Until a production attestation adapter is independently approved, quarantine any potentially impacted family as CONFLICTED/CORRECTION_AUTHORITY_UNVERIFIED or mark the entire source SOURCE_INVALID if impact cannot be bounded; never silently apply or discard the correction then claim COMPLETE.
+
+Use this ordered decision table; the first matching row wins. Mandatory reason codes appear once and are emitted sorted by Unicode codepoint. All rows have estimation_status=DISABLED_UNVALIDATED and the five estimate/validation fields equal to JSON null.
+
+| Priority | Predicate | integrity_status | observation_status | Mandatory reasons | Displayable counts |
+|---|---|---|---|---|---|
+| 1 | Invalid store/head/fingerprint/identity/mapping digest or correction impact unbounded | SOURCE_INVALID | QUARANTINED | SOURCE_INTEGRITY_INVALID, plus specific applicable reasons | None: zero safely displayable counts and empty objectives |
+| 2 | Bounded competing/cyclic/unauthenticated correction affecting families | CONFLICTED | QUARANTINED | CORRECTION_CONFLICT or CORRECTION_AUTHORITY_UNVERIFIED | Independently unaffected families only; affected objectives QUARANTINED |
+| 3 | Bounded missing target or unresolved correction/lineage | INCOMPLETE | QUARANTINED | CORRECTION_UNRESOLVED or UNKNOWN_FAMILY_MAPPING | Independently unaffected families only; affected objectives QUARANTINED |
+| 4 | Complete validated source, no eligible public presentation | COMPLETE | NO_OBSERVATIONS | NO_EVIDENCE, NO_TRUSTED_EVALUATION, CALIBRATION_NOT_APPROVED | Zero |
+| 5 | Complete validated source with eligible public presentation | COMPLETE | OBSERVATIONS_PRESENT | EXPOSURE_ONLY, NO_TRUSTED_EVALUATION, CALIBRATION_NOT_APPROVED | Exact verified observed counts |
+
+INSUFFICIENT_EVIDENCE means only otherwise valid records cannot be classified due to missing approved mapping, with no correction conflict: integrity_status=INCOMPLETE and reason UNKNOWN_FAMILY_MAPPING. Never claim an exact aggregate when unmapped evidence could change it. A quarantined objective uses source_status=QUARANTINED, a verified observed objective uses OBSERVED_ONLY, otherwise NO_OBSERVATIONS. Add PROVISIONAL_OBJECTIVE_MAP only for provisional mappings; PUBLIC_FAMILY_REPEATED only for verified repeated family interactions; IDENTITY_UNVERIFIED when scope is LOCAL_UNAUTHENTICATED, without treating that identity scope itself as source corruption; and CONTENT_RELEASE_MISMATCH for a rejected mismatched record. NO_EVIDENCE is allowed only for NO_OBSERVATIONS, never QUARANTINED. Any further reason requires its declared independently verified predicate. The tuple and reasons are deterministic independent of locale.
 
 ### 6.2 Special empty source case
 
@@ -147,10 +168,10 @@ Every output emitted under K5.EVIDENCE.v1 MUST have mastery_estimate, readiness_
 
 ### 7.1 Source acceptance and pinning
 
-1. Require an explicit pinned K3 store_id and safe nonnegative integer through_store_seq at or below a read-back source head. Source identity cannot be inferred from one event; reject mismatched store IDs, unknown learner/track, mixed releases, duplicate event IDs/store sequences and changed event fingerprints.
+1. Require an explicit pinned K3 store_id and safe nonnegative integer through_store_seq at or below a read-back source head. Source identity cannot be inferred from one event; reject mismatched store IDs, unknown learner/track, unknown or inconsistent release references, duplicate event IDs/store sequences and changed event fingerprints. Verified multiple historical content releases for the same learner/track/store are valid; replay the full verified multi-release history before resolving cross-release corrections and selecting the current release.
 2. Read and validate the complete authorized learner history (not all users) to the watermark before selecting current-release events. A cross-release correction may VOID/SUPERSEDE an event from the active release; restricting correction graph too early would be unsound.
 3. Treat accepted K3 store sequence as canonical ordering, never local timestamp, locale collation or UUID lexicographic time. K3 out-of-order origin sequences are legal; absence of a contiguous subset does not automatically mean a globally incomplete store.
-4. Resolve corrections with K3 authoritative resolver. Missing target, ambiguous supersession, unauthorized correction, cycles and conflicting identity cause explicit INCOMPLETE/CONFLICTED or SOURCE_INVALID; no original evidence is silently revived as a valid observation. Safe unaffected families may be displayed only if their lineage and resolution can be independently established. Global unknown provenance invalidates the overall source summary.
+4. Verify correction producer identity and target-level authority OUTSIDE the K3 structural resolver first: the existing K3 resolver only checks nonempty authority_ref, so that string is never an authentication proof. Until a separately approved production authority adapter exists, quarantine potentially affected families or fail closed if unbounded; do NOT let forged VOID/SUPERSEDE suppress a public count and return COMPLETE. Only then resolve verified corrections with the K3 structural resolver. Missing target, ambiguous supersession, unauthorized correction, cycles and conflicting identity cause explicit INCOMPLETE/CONFLICTED or SOURCE_INVALID; no original evidence is silently revived as a valid observation. Safe unaffected families may be displayed only if their lineage and resolution can be independently established. Global unknown provenance invalidates the overall source summary.
 5. Verify event context against a catalog-pinned active public release: track_id, content_release_id, question_family_id, item_version_id, objective_id, domain_id, item interaction and mode. Unpublished/factory-only/protected/retired items are not public-eligible descriptive evidence. A protected event cannot alter a public count, but missing correction provenance must not be ignored if it could affect a public event.
 6. Require event authorization and origin only to the extent ACTUALLY furnished by K3; do not turn ordinary local source-integrity checks into a claim of verified SYSTEM authority.
 
@@ -223,7 +244,7 @@ Threat tests: forged authority_ref, replayed event fingerprints, wrong learner/t
 
 - Projection is recomputable from accepted source and immutable catalog; K5 state never writes K3 raw events, K4 user preferences or K2 review status.
 - Source read failure/erasure/correction/unknown model version -> return safe reason status or reject per strict contract; never fall back to an old optimistic estimate.
-- Policy version changes, objective-map revisions and source watermark changes invalidate any cached derived state; schema migrations preserve ability to replay old evidence without mutating source events.
+- Policy version changes, canonical catalog/objective/optional lineage mapping hashes and versions, and source watermark changes invalidate any cached derived state; schema migrations preserve ability to replay old evidence without mutating source events.
 - Avoid global Date.now, locale sorting or browser-only APIs inside deterministic core. Determinism checks compare browser and Node snapshots.
 - K5 does not require Python, cloud GPU, trained models or additional storage services; if needed later, use explicit adapter ports and deployment gates.
 - Unsupported/partial record must not be silently treated as COMPLETE. Projection validation must distinguish K3 source integrity from K5 sufficiency and from statistical readiness.
@@ -237,8 +258,8 @@ The following acceptance criteria define EXPECTED future tests. They are NOT cla
 |---|---|
 | AC-01 | K5 has independent source/spec/plan approval and separately versioned policy/schema; preapproval product writes blocked. |
 | AC-02 | Empty local store head=0 returns valid NO_OBSERVATIONS; no K3 replay call with toSeq=0 and every numeric estimate is JSON null. |
-| AC-03 | Replayed K3 source must bind exact learner, track, store, release and watermark; duplicates, changed event fingerprints and mixed identity fail closed. |
-| AC-04 | Correction VOID/SUPERSEDE, cross-release reference, cycle, competing corrections and unresolved target produce deterministic quarantine or SOURCE_INVALID, not inflated progress. |
+| AC-03 | Replayed K3 source must bind exact learner, track, store, release and watermark; duplicates, changed event fingerprints and inconsistent identity/release provenance fail closed; verified multi-release history remains eligible for correction resolution. |
+| AC-04 | Correction VOID/SUPERSEDE, cross-release reference, cycle, competing corrections, forged nonempty authority_ref and unresolved target produce deterministic quarantine or SOURCE_INVALID; no unverified producer may delete or restore observations. |
 | AC-05 | Public family presentation count deduped by item_interaction_id; repeated responses, refreshes and retries do not mint new observations. |
 | AC-06 | Item version sibling with same family ID is one exposed family; lack of approved older-release family mapping cannot be labeled unseen/transfer. |
 | AC-07 | Provisional migration-derived objective labels group only; they cannot produce prerequisite graph, inferred mastery or official readiness. |
@@ -248,7 +269,7 @@ The following acceptance criteria define EXPECTED future tests. They are NOT cla
 | AC-11 | Check/section/mock activity in shared PUBLIC bank cannot count as unseen protected holdout or establish official transfer. |
 | AC-12 | Unpublished/factory/protected/retired/quarantined catalog items cannot reach public counts or render protected IDs/answers. |
 | AC-13 | Missing current-release events with nonzero old-release history are reported correctly, not fabricated zero source head. |
-| AC-14 | Same accepted inputs and source watermark yield identical canonical output after record ordering permutations, locale and timezone changes. |
+| AC-14 | Same accepted inputs and source watermark yield identical canonical output after record ordering permutations, locale and timezone changes; freeze complete status/reason table fixtures including mixed releases and correction authority. |
 | AC-15 | Incomplete source and missing mapping present exact reason codes without stale optimistic UI, and generic public navigation remains usable. |
 | AC-16 | Every Lane 1 mastery_estimate, readiness_estimate, readiness_probability, confidence_interval, model_validation_ref is EXACT null in core, UI, export and persisted/disposable cache. |
 | AC-17 | An accidental config flag or internal estimator adapter cannot activate statistical inference without new policy + independently approved gate. |
@@ -256,24 +277,16 @@ The following acceptance criteria define EXPECTED future tests. They are NOT cla
 | AC-19 | IndexedDB denied/quota/reload/offline/erasure handling preserves K3/K4/exam behavior; no false saved-state claim. |
 | AC-20 | No change to the 1,120-question bank hash, seven domains, 200-question full exam, protected content exclusion, or K4 public ACTION selection. |
 | AC-21 | Privacy/pseudonym boundary denies cross-learner/cross-store data and new analytics payloads with response text/secrets; deletion invalidates projections. |
-| AC-22 | Deterministic client and server adapter tests verify source quality, backdated/superseded events, late arrivals, invalid timestamps and replay after policy/version changes. |
+| AC-22 | Deterministic client and server adapter tests verify source quality, late arrivals and corrections; canonical public catalog, objective and optional lineage mapping digests are separate from question payload digest and invalidate caches when bytes change. |
 | AC-23 | Whole-branch independent review: no open Critical/Important findings, tests on FINAL exact head, docs/recovery and source consistency; no auto merge. |
 | AC-24 | Manual PR integration only after separate owner approval naming PR and full exact SHA; merged-main Node/Python/Chromium/Pages, actual live digest and persisted K5 scope evidence verified before claiming initial release closed. |
 | AC-25 | Full K5 numerical lane remains explicitly INACTIVE/NOT_VALIDATED at initial closure; K6 cannot start based on an unproven statistical readiness claim. |
 
 Acceptance criteria enforce the trust boundary across the whole source, not just the UI. An acceptance test that stubs an authorised producer does NOT prove deployment auth, cohort validity or real outcome calibration. Every code task must use RED -> GREEN -> regression evidence, then independent review and exact-head CI; a test unexpectedly already green is NOT accepted RED.
 
-## 13. Proposed implementation decomposition (design guidance only, NOT a plan)
+## 13. Boundary before implementation planning
 
-Future planning MAY decompose into checkpoints:
-A. K5 independent state/gates and base regression proof;
-B. exact replay/identity/catalog input reader, pinning and correction-aware snapshot;
-C. pure evidence classifier/projection/schema and negative trust/lineage cases;
-D. narrow bilingual public read UI, K4 interop, offline/permission handling;
-E. evidence sufficiency status, dormant Lane 2 port and explicit denied activation tests;
-F. release, security/accessibility, authorizations, CI and verification.
-
-Checkpoint decomposition is indicative and contains no task authorizations, hard-coded task count, sprint estimate, file ownership mandate or code execution. The future writing-plans skill must derive exact tasks and tests after owner approves the committed spec.
+This is an architectural specification, not a task decomposition. Exact implementation tasks, file ownership, sequencing, checkpoints and executable command lists shall be authored only after renewed approval of this revised written spec using Superpowers writing-plans. No product code or implementation plan is authorized here.
 
 ## 14. Quality gates and immutable approvals
 
