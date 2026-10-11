@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "state_revision": 16,
+  "state_revision": 17,
   "programme": "K4",
   "phase": "CLOSED",
   "status": "COMPLETE",
@@ -30,12 +30,10 @@
     "PR65_MERGED": "PASS",
     "MAIN_CI_GREEN": "PASS",
     "PAGES_DEPLOY_VERIFIED": "PASS",
-    "EXPOSURE_ONLY_SCOPE_APPROVED": "PASS",
-    "CLOSURE_DOCUMENT_REVIEW": "PASS",
-    "CLOSURE_INTEGRATION": "PASS"
+    "EXPOSURE_ONLY_SCOPE_APPROVED": "PASS"
   },
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
   "merged_main_sha": "6067cac99af669bce16147edc028c71702cf4112",
   "release_evidence_ref": "docs/superpowers/reviews/k4-post-merge-verification.md",
-  "updated_at": "2026-10-11T04:28:00Z"
+  "updated_at": "2026-10-11T04:29:00Z"
 }
