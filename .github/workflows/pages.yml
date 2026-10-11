@@ -55,7 +55,7 @@ jobs:
           node scripts/verify_sw_assets.js _site
           source_sha="$(sha256sum _site/index.html | awk '{print $1}')"
           echo "SOURCE_INDEX_SHA256=$source_sha"
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: _site
