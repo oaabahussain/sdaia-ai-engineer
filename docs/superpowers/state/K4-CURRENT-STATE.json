@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "state_revision": 14,
+  "state_revision": 15,
   "programme": "K4",
-  "phase": "REVIEW",
+  "phase": "CLOSURE_REVIEW",
   "status": "REVIEW",
   "execution_branch": "impl/k4-native-tdd-2026-10-09",
   "base_main_sha": "9e55881e9480b4a02d8ef5d92a0b21a9313492f1",
@@ -26,10 +26,16 @@
     "SPEC_APPROVED": "PASS",
     "PLAN_APPROVED": "PASS",
     "ISOLATED_SOURCE_READY": "PASS",
-    "BASELINE_CI_GREEN": "PASS"
+    "BASELINE_CI_GREEN": "PASS",
+    "PR65_MERGED": "PASS",
+    "MAIN_CI_GREEN": "PASS",
+    "PAGES_DEPLOY_VERIFIED": "PASS",
+    "EXPOSURE_ONLY_SCOPE_APPROVED": "PASS",
+    "CLOSURE_DOCUMENT_REVIEW": "PENDING",
+    "CLOSURE_INTEGRATION": "PENDING"
   },
   "merge_guard_mode": "HIGH_REASONING_MERGE_GATE",
-  "merged_main_sha": null,
-  "release_evidence_ref": null,
-  "updated_at": "2026-10-09T07:25:00Z"
+  "merged_main_sha": "6067cac99af669bce16147edc028c71702cf4112",
+  "release_evidence_ref": "docs/superpowers/reviews/k4-post-merge-verification.md",
+  "updated_at": "2026-10-11T04:22:00Z"
 }
