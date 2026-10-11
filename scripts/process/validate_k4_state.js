@@ -14,7 +14,7 @@ const SHA = /^[0-9a-f]{40}$/;
 const pass = (details={}) => ({ok:true,code:'STATE_VALID',details});
 const deny = (code,details={}) => ({ok:false,code,details});
 
-export function validateK4State({state,liveMainSha,specBlobSha,planBlobSha,executionRef}={}) {
+export function validateK4State({state,liveMainSha,specBlobSha,planBlobSha,executionRef,verifiedReleaseAncestry=false}={}) {
   if (!validateSchema(state)) return deny('STATE_SCHEMA_INVALID',{errors:validateSchema.errors});
   if (![liveMainSha,specBlobSha,planBlobSha].every(s=>SHA.test(s??''))) return deny('SOURCE_REF_MISSING');
   if (state.spec_blob_sha !== specBlobSha || state.spec_approval.git_blob_sha !== specBlobSha) return deny('SPEC_BLOB_MISMATCH');
@@ -25,7 +25,7 @@ export function validateK4State({state,liveMainSha,specBlobSha,planBlobSha,execu
   const blocked = Object.entries(state.gates).find(([,value]) => value !== 'PASS');
   if (blocked) return deny('PROCESS_GATE_BLOCKED',{gate:blocked[0]});
   if (state.status === 'COMPLETE') {
-    if (!SHA.test(state.merged_main_sha??'') || state.merged_main_sha !== liveMainSha ||
+    if (!SHA.test(state.merged_main_sha??'') || (state.merged_main_sha !== liveMainSha && !verifiedReleaseAncestry) ||
         typeof state.release_evidence_ref !== 'string' || !state.release_evidence_ref ||
         executionRef !== 'main') return deny('POST_MERGE_EVIDENCE_MISSING');
   } else {
@@ -42,6 +42,15 @@ function argument(name) {
 function headBlob(filePath) {
   return execFileSync('git',['rev-parse','HEAD:'+filePath],{cwd:root,encoding:'utf8'}).trim();
 }
+function verifiedAncestry(releaseSha, currentSha) {
+  if (!SHA.test(releaseSha??'') || !SHA.test(currentSha??'')) return false;
+  try {
+    const head=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
+    if (head !== currentSha) return false;
+    execFileSync('git',['merge-base','--is-ancestor',releaseSha,currentSha],{cwd:root,stdio:'ignore'});
+    return true;
+  } catch { return false; }
+}
 function main() {
   const liveMainSha=argument('--live-main-sha');
   const executionRef=argument('--source-ref');
@@ -54,6 +63,7 @@ function main() {
     const state=JSON.parse(readFileSync(path.join(root,'docs/superpowers/state/K4-CURRENT-STATE.json'),'utf8'));
     const result=validateK4State({
       state,liveMainSha,executionRef,
+      verifiedReleaseAncestry: state.status === 'COMPLETE' && verifiedAncestry(state.merged_main_sha,liveMainSha),
       specBlobSha:headBlob(state.spec_path),
       planBlobSha:headBlob(state.plan_path)
     });
