@@ -90,9 +90,18 @@ test('closed K3 state remains untouched by K4 and is not an execution grant', ()
   assert.equal(old.gates.ACTIVE_REF_RESOLUTION_VALID, 'PENDING');
 });
 
+test('completed K4 state requires verified release ancestry when main advances', () => {
+  const release='6067cac99af669bce16147edc028c71702cf4112';
+  const newer='a'.repeat(40);
+  const state=fixture({status:'COMPLETE',merged_main_sha:release,release_evidence_ref:'docs/superpowers/reviews/k4-post-merge-verification.md'});
+  const ctx={...context,liveMainSha:newer,executionRef:'main'};
+  assert.equal(validateK4State({state,...ctx}).code,'POST_MERGE_EVIDENCE_MISSING');
+  assert.equal(validateK4State({state,...ctx,verifiedReleaseAncestry:true}).code,'STATE_VALID');
+});
+
 test('actual K4 manifest validates through K4 preflight CLI with Git blob pins', () => {
   const state = JSON.parse(readFileSync(new URL('../docs/superpowers/state/K4-CURRENT-STATE.json', import.meta.url), 'utf8'));
-  const main = state.status === 'COMPLETE' ? state.merged_main_sha : state.base_main_sha;
+  const main = state.status === 'COMPLETE' ? execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim() : state.base_main_sha;
   const executionRef = state.status === 'COMPLETE' ? 'main' : state.execution_branch;
   const result = execFileSync(process.execPath, [
     'scripts/process/validate_k4_state.js',
