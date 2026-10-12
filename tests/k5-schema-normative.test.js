@@ -46,3 +46,28 @@ test('reject private event fields and unordered reasons',()=>{
  assert.throws(()=>validateK5Projection({...empty(),response_text:'private answer'}),/unknown/i);
  assert.throws(()=>validateK5Projection({...empty(),reason_codes:['NO_EVIDENCE','CALIBRATION_NOT_APPROVED']}),/sort/i);
 });
+
+test('rejects claimed aggregate activity without matching objective rows',()=>{
+ const p={...empty(),observation_status:'OBSERVATIONS_PRESENT',
+  reason_codes:['CALIBRATION_NOT_APPROVED','EXPOSURE_ONLY','IDENTITY_UNVERIFIED','NO_TRUSTED_EVALUATION'],
+  observed_distinct_family_count:1,observed_distinct_interaction_count:4,observed_domain_count:1,objectives:[]};
+ assert.throws(()=>validateK5Projection(p),/reconcil|objective|total/i);
+});
+test('rejects objective counters that do not reconcile with domain totals',()=>{
+ const row={objective_id:'o1',domain_id:'D1',mapping_status:'PROVISIONAL',
+  observed_distinct_family_count:1,observed_distinct_interaction_count:2,
+  source_status:'OBSERVED_ONLY',reason_codes:[],mastery_estimate:null};
+ const p={...empty(),observation_status:'OBSERVATIONS_PRESENT',
+  reason_codes:['CALIBRATION_NOT_APPROVED','EXPOSURE_ONLY','IDENTITY_UNVERIFIED','NO_TRUSTED_EVALUATION'],
+  observed_distinct_family_count:2,observed_distinct_interaction_count:2,observed_domain_count:1,
+  objectives:[row]};
+ assert.throws(()=>validateK5Projection(p),/reconcil|objective|total/i);
+});
+test('rejects quarantined objective with positive counters',()=>{
+ const p={...empty(),integrity_status:'CONFLICTED',observation_status:'QUARANTINED',
+  reason_codes:['CALIBRATION_NOT_APPROVED','CORRECTION_AUTHORITY_UNVERIFIED','IDENTITY_UNVERIFIED','NO_TRUSTED_EVALUATION'],
+  objectives:[{objective_id:'o1',domain_id:'D1',mapping_status:'PROVISIONAL',
+   observed_distinct_family_count:1,observed_distinct_interaction_count:1,
+   source_status:'QUARANTINED',reason_codes:['CORRECTION_AUTHORITY_UNVERIFIED'],mastery_estimate:null}]};
+ assert.throws(()=>validateK5Projection(p),/quarantin|counter/i);
+});
