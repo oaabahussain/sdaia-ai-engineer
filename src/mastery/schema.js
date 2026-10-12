@@ -58,6 +58,17 @@ export function validateK5Projection(p){
    must(['PROVISIONAL','APPROVED'].includes(objective.mapping_status)&&['OBSERVED_ONLY','NO_OBSERVATIONS','QUARANTINED'].includes(objective.source_status),'invalid objective status');
    must(count(objective.observed_distinct_family_count)&&count(objective.observed_distinct_interaction_count)&&objective.mastery_estimate===null,'invalid objective count or mastery null');
    validReasons(objective.reason_codes);
+   if(objective.source_status==='QUARANTINED'||objective.source_status==='NO_OBSERVATIONS')
+     must(objective.observed_distinct_family_count===0&&objective.observed_distinct_interaction_count===0,'quarantined or empty objective counters must be zero');
+   if(objective.source_status==='OBSERVED_ONLY')
+     must(objective.observed_distinct_family_count>0&&objective.observed_distinct_interaction_count>0,'observed objective must have positive counters');
  }
+ const active=p.objectives.filter(objective=>objective.source_status==='OBSERVED_ONLY');
+ const familyTotal=active.reduce((sum,objective)=>sum+objective.observed_distinct_family_count,0);
+ const interactionTotal=active.reduce((sum,objective)=>sum+objective.observed_distinct_interaction_count,0);
+ const domainTotal=new Set(active.map(objective=>objective.domain_id)).size;
+ must(p.observed_distinct_family_count===familyTotal&&
+      p.observed_distinct_interaction_count===interactionTotal&&
+      p.observed_domain_count===domainTotal,'K5 aggregate objective counts do not reconcile');
  return true;
 }
