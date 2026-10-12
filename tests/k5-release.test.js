@@ -36,10 +36,32 @@ test('numerical scoring lane remains inactive even with green tests',()=>{
 test('post-merge closure requires validated exact merged main SHA',()=>{
  const input=valid();input.phase='POST_MERGE';
  assert.equal(verifyK5Release(input).ready,false);
- input.mergedHead=SHA;
- input.postMergeChecks=[{name:'merged-main full regression',sha:SHA,conclusion:'success'}];
+ const merged='c'.repeat(40);
+ input.mergedHead=merged;
+ input.mainHead=merged;
+ input.mergeParents=['a'.repeat(40),SHA];
+ input.postMergeChecks=[
+  {name:'merged-main full regression',sha:merged,conclusion:'success'},
+  {name:'Pages deployment smoke',sha:merged,conclusion:'success'}
+ ];
  assert.equal(verifyK5Release(input).ready,true);
 });
 test('positive predicate is only a synthetic readiness contract, not live merge consent',()=>{
  const out=verifyK5Release(valid());assert.equal(out.ready,true);assert.deepEqual(out.blockers,[]);
+});
+
+test('merge commit must contain approved PR head, not simply equal the head',()=>{
+ const merged='c'.repeat(40),input=valid();
+ input.phase='POST_MERGE';input.mergedHead=merged;input.mainHead=merged;
+ input.mergeParents=['a'.repeat(40),SHA];
+ input.postMergeChecks=[
+  {name:'merged-main full regression',sha:merged,conclusion:'success'},
+  {name:'Pages deployment smoke',sha:merged,conclusion:'success'}
+ ];
+ assert.equal(verifyK5Release(input).ready,true);
+ for(const changed of [
+  {mergeParents:['a'.repeat(40),'d'.repeat(40)]},
+  {mainHead:'e'.repeat(40)},
+  {postMergeChecks:[{name:'merged-main full regression',sha:merged,conclusion:'success'}]}
+ ])assert.equal(verifyK5Release({...input,...changed}).ready,false);
 });
