@@ -5,8 +5,8 @@ const SHA='b'.repeat(40);
 const valid=()=>({prNumber:69,prHead:SHA,
  approval:{prNumber:69,headSha:SHA,approvedBy:'owner',approvedAt:'2026-10-12T12:00:00Z'},
  checks:[{name:'Pull request quality gate',sha:SHA,conclusion:'success'},
-  {name:'Server and adapter contract tests',sha:SHA,conclusion:'success'},
-  {name:'K5 Chromium accessibility',sha:SHA,conclusion:'success'}],
+  {name:'Server and adapter contract tests',sha:SHA,conclusion:'success'}],
+ browserEvidence:{sha:SHA,runId:10001,jobId:20002,stepName:'Browser smoke test',conclusion:'success'},
  review:{headSha:SHA,completed:true,openCritical:0,openImportant:0},
  policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'},phase:'PRE_MERGE'});
 test('missing owner approval cannot authorize landing',()=>{
