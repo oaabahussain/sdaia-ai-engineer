@@ -1,7 +1,7 @@
 // Pure release-readiness contract; NEVER a merge operation.
 // Only independently verified GitHub current-head checks and explicit owner
 // authorization may populate these arguments during a real landing decision.
-const REQUIRED_CHECKS=['Pull request quality gate','Server and adapter contract tests','K5 Chromium accessibility'];
+const REQUIRED_CHECKS=['Pull request quality gate','Server and adapter contract tests'];
 const FULL_SHA=/^[0-9a-f]{40}$/;
 function approved(approval,number,sha){
  return approval?.prNumber===number&&approval?.headSha===sha&&
@@ -9,7 +9,7 @@ function approved(approval,number,sha){
   typeof approval.approvedAt==='string'&&Number.isFinite(Date.parse(approval.approvedAt));
 }
 export function verifyK5Release({prNumber,prHead,approval,checks=[],review,policy,
-  phase='PRE_MERGE',mergedHead,postMergeChecks=[]}={}){
+  phase='PRE_MERGE',mergedHead,postMergeChecks=[],browserEvidence}={}){
  const blockers=[];
  if(!Number.isSafeInteger(prNumber)||prNumber<1||!FULL_SHA.test(prHead??''))
   blockers.push('INVALID_PR_HEAD');
@@ -22,6 +22,11 @@ export function verifyK5Release({prNumber,prHead,approval,checks=[],review,polic
  if(!Array.isArray(checks)||!REQUIRED_CHECKS.every(name=>
     checks.some(check=>check.name===name&&check.sha===prHead&&check.conclusion==='success')))
   blockers.push('CI_INCOMPLETE_EXACT_HEAD');
+ if(!browserEvidence||browserEvidence.sha!==prHead||
+    !Number.isSafeInteger(browserEvidence.runId)||browserEvidence.runId<=0||
+    !Number.isSafeInteger(browserEvidence.jobId)||browserEvidence.jobId<=0||
+    browserEvidence.stepName!=='Browser smoke test'||browserEvidence.conclusion!=='success')
+  blockers.push('BROWSER_SMOKE_EVIDENCE_REQUIRED');
  if(policy?.policy_id!=='K5.EVIDENCE.v1'||policy.numericalLane!=='INACTIVE')
   blockers.push('UNAPPROVED_SCORING_LANE');
  if(phase==='POST_MERGE'){
