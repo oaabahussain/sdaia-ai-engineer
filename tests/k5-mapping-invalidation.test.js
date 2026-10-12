@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
 import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
-import {computeK5SourceFingerprint} from '../src/mastery/source.js';
+import {readK5Source,computeK5SourceFingerprint} from '../src/mastery/source.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1',
  DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
 const FAMILY=ID+'.core-ai.reasoning.definition.best-description',OBJECTIVE=ID+'.objective.core-ai.reasoning.v1';
@@ -21,9 +21,14 @@ function verified(){
 test('same version and public bank digest cannot reuse an objective-mapping-changed projection',async()=>{
  const catalog=verified(),source={source_store_id:'local',through_store_seq:0,learner_id:'opaque',
   track_id:ID,release_id:RELEASE},policy={policy_id:'K5.EVIDENCE.v1'};
- source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
+ const trust=await readK5Source({
+  store:{store_id:'local',
+   getSourceHead:async()=>({store_id:'local',through_store_seq:0}),
+   readRange:async()=>{throw Error('zero watermark never reads');}},
+  learnerId:'opaque',trackId:ID,releaseId:RELEASE,throughStoreSeq:0
+ });
  const build=raw=>deriveK5EvidenceSufficiency({
-  source,events:[],acceptedPublicCatalog:catalog,
+  source:trust,events:trust.events,acceptedPublicCatalog:catalog,
   acceptedObjectiveMap:{version:'objectives-v1',items:[{objective_id:OBJECTIVE,domain_id:'core-ai',
     mapping_status:'PROVISIONAL'}],raw},policy
  });
@@ -39,7 +44,12 @@ test('same version and public bank digest cannot reuse an objective-mapping-chan
 test('mutated normalized mapping cannot reuse unchanged raw-mapping SHA',async()=>{
  const catalog=verified();
  const source={source_store_id:'local',through_store_seq:0,learner_id:'opaque',track_id:ID,release_id:RELEASE};
- source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
+ const trust=await readK5Source({
+  store:{store_id:'local',
+   getSourceHead:async()=>({store_id:'local',through_store_seq:0}),
+   readRange:async()=>{throw Error('zero watermark never reads');}},
+  learnerId:'opaque',trackId:ID,releaseId:RELEASE,throughStoreSeq:0
+ });
  const raw={schema_version:1,track_id:ID,objectives:[{
   objective_id:OBJECTIVE,track_id:ID,domain_id:'core-ai',status:'provisional'
  }]};
