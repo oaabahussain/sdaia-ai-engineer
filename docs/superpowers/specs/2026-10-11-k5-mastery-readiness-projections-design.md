@@ -116,7 +116,7 @@ Produce JSON-only, versioned, fully defined object. Candidate normative example 
       "integrity_status": "COMPLETE",
       "observation_status": "NO_OBSERVATIONS",
       "estimation_status": "DISABLED_UNVALIDATED",
-      "reason_codes": ["NO_EVIDENCE", "NO_TRUSTED_EVALUATION"],
+      "reason_codes": ["CALIBRATION_NOT_APPROVED", "IDENTITY_UNVERIFIED", "NO_EVIDENCE", "NO_TRUSTED_EVALUATION"],
       "observed_distinct_family_count": 0,
       "observed_distinct_interaction_count": 0,
       "observed_domain_count": 0,
@@ -144,17 +144,18 @@ This is an interface illustration, NOT permission to emit an actual estimate. Th
 
 K3 structural correction resolution is NOT authentication. The current K3 resolver accepts nonempty authority_ref without proving producer identity. K5 MUST verify separately that the producer is authenticated and authorized for the learner, store, target and correction operation BEFORE effective VOID/SUPERSEDE resolution. Until a production attestation adapter is independently approved, quarantine any potentially impacted family as CONFLICTED/CORRECTION_AUTHORITY_UNVERIFIED or mark the entire source SOURCE_INVALID if impact cannot be bounded; never silently apply or discard the correction then claim COMPLETE.
 
-Use this ordered decision table; the first matching row wins. Mandatory reason codes appear once and are emitted sorted by Unicode codepoint. All rows have estimation_status=DISABLED_UNVALIDATED and the five estimate/validation fields equal to JSON null.
+Use this ordered decision table; the first matching row wins. Mandatory reason codes appear once and are emitted sorted by Unicode codepoint. All rows have estimation_status=DISABLED_UNVALIDATED and the five estimate/validation fields equal to JSON null. For rows 1–3a, require NO_TRUSTED_EVALUATION and CALIBRATION_NOT_APPROVED as global non-estimation reasons, in addition to the listed integrity/mapping reason; row 1 cannot suppress source-invalid warnings. Every row appends IDENTITY_UNVERIFIED exactly when identity_scope=LOCAL_UNAUTHENTICATED. Thus the mandatory reason set is always the union of row-specific reasons, these global reasons, and only predicate-true optional reasons, code-point sorted.
 
 | Priority | Predicate | integrity_status | observation_status | Mandatory reasons | Displayable counts |
 |---|---|---|---|---|---|
 | 1 | Invalid store/head/fingerprint/identity/mapping digest or correction impact unbounded | SOURCE_INVALID | QUARANTINED | SOURCE_INTEGRITY_INVALID, plus specific applicable reasons | None: zero safely displayable counts and empty objectives |
 | 2 | Bounded competing/cyclic/unauthenticated correction affecting families | CONFLICTED | QUARANTINED | CORRECTION_CONFLICT or CORRECTION_AUTHORITY_UNVERIFIED | Independently unaffected families only; affected objectives QUARANTINED |
-| 3 | Bounded missing target or unresolved correction/lineage | INCOMPLETE | QUARANTINED | CORRECTION_UNRESOLVED or UNKNOWN_FAMILY_MAPPING | Independently unaffected families only; affected objectives QUARANTINED |
+| 3 | Bounded missing target or unresolved correction/lineage affecting a known target | INCOMPLETE | QUARANTINED | CORRECTION_UNRESOLVED or UNKNOWN_FAMILY_MAPPING | Independently unaffected families only; affected objectives QUARANTINED |
+| 3a | No correction conflict; otherwise verified records cannot be classified due solely to missing approved public family/objective mapping | INCOMPLETE | INSUFFICIENT_EVIDENCE | UNKNOWN_FAMILY_MAPPING, NO_TRUSTED_EVALUATION, CALIBRATION_NOT_APPROVED | Only independently verified mapped families; unknown contributions excluded and aggregate flagged incomplete |
 | 4 | Complete validated source, no eligible public presentation | COMPLETE | NO_OBSERVATIONS | NO_EVIDENCE, NO_TRUSTED_EVALUATION, CALIBRATION_NOT_APPROVED | Zero |
 | 5 | Complete validated source with eligible public presentation | COMPLETE | OBSERVATIONS_PRESENT | EXPOSURE_ONLY, NO_TRUSTED_EVALUATION, CALIBRATION_NOT_APPROVED | Exact verified observed counts |
 
-INSUFFICIENT_EVIDENCE means only otherwise valid records cannot be classified due to missing approved mapping, with no correction conflict: integrity_status=INCOMPLETE and reason UNKNOWN_FAMILY_MAPPING. Never claim an exact aggregate when unmapped evidence could change it. A quarantined objective uses source_status=QUARANTINED, a verified observed objective uses OBSERVED_ONLY, otherwise NO_OBSERVATIONS. Add PROVISIONAL_OBJECTIVE_MAP only for provisional mappings; PUBLIC_FAMILY_REPEATED only for verified repeated family interactions; IDENTITY_UNVERIFIED when scope is LOCAL_UNAUTHENTICATED, without treating that identity scope itself as source corruption; and CONTENT_RELEASE_MISMATCH for a rejected mismatched record. NO_EVIDENCE is allowed only for NO_OBSERVATIONS, never QUARANTINED. Any further reason requires its declared independently verified predicate. The tuple and reasons are deterministic independent of locale.
+INSUFFICIENT_EVIDENCE is exactly the row 3a mapping-only case, never row 3. Row 3 is reserved for missing correction/lineage references that might have altered known observations and thus QUARANTINED. If both apply, row 3 takes precedence. Never claim an exact aggregate when unmapped evidence could change it. A quarantined objective uses source_status=QUARANTINED, a verified observed objective uses OBSERVED_ONLY, otherwise NO_OBSERVATIONS. Add PROVISIONAL_OBJECTIVE_MAP only for provisional mappings; PUBLIC_FAMILY_REPEATED only for verified repeated family interactions; IDENTITY_UNVERIFIED when scope is LOCAL_UNAUTHENTICATED, without treating that identity scope itself as source corruption; and CONTENT_RELEASE_MISMATCH for a rejected mismatched record. NO_EVIDENCE is allowed only for NO_OBSERVATIONS, never QUARANTINED. Any further reason requires its declared independently verified predicate. The tuple and reasons are deterministic independent of locale.
 
 ### 6.2 Special empty source case
 
