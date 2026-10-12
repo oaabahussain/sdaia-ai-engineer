@@ -1,6 +1,7 @@
 import { replayEvidence } from '../evidence/replay.js';
 
 const validId = value => typeof value === 'string' && value.length > 0;
+const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value);
 async function fingerprintScope(parts) {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 required');
   const bytes = new TextEncoder().encode(JSON.stringify(parts));
@@ -12,6 +13,7 @@ async function fingerprintScope(parts) {
 // Full learner history across valid releases is kept for correction resolution.
 export async function readK5Source({store,learnerId,trackId,releaseId,throughStoreSeq}={}) {
   if (![learnerId,trackId,releaseId].every(validId)) throw new TypeError('invalid source scope');
+  if (hasDirectPII(learnerId)) throw new TypeError('learner_id must be an opaque pseudonym without direct PII');
   if (!Number.isSafeInteger(throughStoreSeq) || throughStoreSeq < 0)
     throw new RangeError('invalid watermark');
   if (!store || !validId(store.store_id) || typeof store.getSourceHead !== 'function' ||
