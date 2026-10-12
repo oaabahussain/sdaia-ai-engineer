@@ -70,3 +70,13 @@ test('input ordering permutation does not affect same pinned projection',async()
  const events=[event(1),event(2,{question_family_id:F2,item_version_id:F2+'.v1',objective_id:O2})];
  const a=await project(events),b=await project([...events].reverse());assert.deepEqual(a,b);
 });
+
+test('arbitrary syntactically valid event and source fingerprints cannot forge COMPLETE exposure',async()=>{
+ const events=[event(1,{item_interaction_id:'tampered-by-caller'})];
+ const source={source_store_id:'store',through_store_seq:1,learner_id:'L',track_id:ID,
+  release_id:RELEASE,source_fingerprint:'f'.repeat(64)};
+ await assert.rejects(deriveK5EvidenceSufficiency({
+  source,events,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'}
+ }),/fingerprint|replay/i);
+});
