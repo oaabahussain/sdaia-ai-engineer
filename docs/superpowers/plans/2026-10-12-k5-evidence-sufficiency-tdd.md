@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node 22 ESM; native `node:test` + `node:assert/strict`, AJV v8; IndexedDB + `fake-indexeddb`; browser AR/EN JS/HTML/CSS; Python 3.12 browser/contract suite; GitHub Actions and GitHub Pages.
 
-**Spec:** `docs/superpowers/specs/2026-10-11-k5-mastery-readiness-projections-design.md` at Git blob `097cf8024dbb73fe9df61e3c0450aec39615489b`, source commit `13a530a8c221f3d5953730caacc92db84b285435`; resolve latest exact-head review before release. This plan is authorized for implementation by owner message of 2026-10-12 08:05:22Z, subject to PR safety/review policy.
+**Spec:** `docs/superpowers/specs/2026-10-11-k5-mastery-readiness-projections-design.md` at Git blob `dee75a0b1e5161d09bce0a840ab987c7a6aa2278`, source commit `1e9770f957ba00a92fb46f359d83cddb07168b83`; Codex review of this exact spec head completed 2026-10-12T10:54:13Z and CI passed. Verify all later changes independently. The owner requested continued implementation on 2026-10-12, subject to PR safety/review policy.
 
 ## Global Constraints
 
