@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
 import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
 import {fingerprintEvent} from '../src/evidence/jcs.js';
-import {computeK5SourceFingerprint} from '../src/mastery/source.js';
+import {readK5Source,computeK5SourceFingerprint} from '../src/mastery/source.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
 const DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
 const F1=ID+'.core-ai.reasoning.definition.best-description',F2=ID+'.core-ai.reasoning.definition.other-example';
@@ -31,11 +31,15 @@ async function project(events=[]){
   const raw={...event};for(const field of ['store_id','store_seq','accepted_at','event_fingerprint'])delete raw[field];
   return {...event,event_fingerprint:await fingerprintEvent(raw)};
  }));
- const source={source_store_id:'store',through_store_seq:verified.length?Math.max(...verified.map(e=>e.store_seq)):0,
-  learner_id:'L',track_id:ID,release_id:RELEASE};
- source.source_fingerprint=await computeK5SourceFingerprint(source,verified);
+ const head=verified.length?Math.max(...verified.map(e=>e.store_seq)):0;
+ const store={store_id:'store',
+  getSourceHead:async()=>({store_id:'store',through_store_seq:head}),
+  readRange:async({fromSeq,toSeq,learnerId})=>verified.filter(event=>
+   event.store_seq>=fromSeq&&event.store_seq<=toSeq&&event.learner_id===learnerId)};
+ const source=await readK5Source({store,learnerId:'L',trackId:ID,releaseId:RELEASE,
+  throughStoreSeq:head});
  return deriveK5EvidenceSufficiency({
-  source,events:verified,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  source,events:source.events,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
   policy:{policy_id:'K5.EVIDENCE.v1'},identityResolutionVersion:null
  });
 }
