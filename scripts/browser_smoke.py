@@ -159,9 +159,17 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
+        # K5_CROSS_RUNTIME: compare real Chromium DOM to an independently executed Node projection.
+        node_k5=json.loads(subprocess.check_output(
+            ['node','scripts/k5_empty_projection_fixture.js'],cwd=ROOT,text=True))
+        assert node_k5['status']=='NO_OBSERVATIONS'
+        assert node_k5['count']==0
         # K5_BROWSER_ACCEPTANCE: verify the real descriptive-only learner home, not HTML source text.
         wait_until(lambda:len(finds(session,'#k5HomeCard h2'))==1,label='K5 recorded activity card')
         assert text(session,find(session,'#k5HomeCard h2'))=='Recorded activity'
+        assert text(session,find(session,'#k5HomeCard h2'))==node_k5['heading']
+        assert node_k5['body'] in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('data-k5-status')")==node_k5['status']
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('data-k5-status')")=='NO_OBSERVATIONS', 'K5 source must be verified on fresh browser'
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-live')")=='polite'
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('role')")=='region'
