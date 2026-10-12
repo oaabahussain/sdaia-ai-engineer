@@ -27,6 +27,7 @@ const ASSETS = [
   './src/mastery/corrections.js',
   './src/mastery/presentations.js',
   './src/mastery/provenance.js',
+  './src/mastery/objectiveMap.js',
   './src/evidence/replay.js',
   './src/evidence/corrections.js',
   './data/recommendations/k4-public-catalog-v1.json',
