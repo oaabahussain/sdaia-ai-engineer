@@ -159,6 +159,20 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
+        # K5_BROWSER_ACCEPTANCE: verify the real descriptive-only learner home, not HTML source text.
+        wait_until(lambda:len(finds(session,'#k5HomeCard h2'))==1,label='K5 recorded activity card')
+        assert text(session,find(session,'#k5HomeCard h2'))=='Recorded activity'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('data-k5-status')")=='NO_OBSERVATIONS', 'K5 source must be verified on fresh browser'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-live')")=='polite'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('role')")=='region'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='ltr'
+        assert 'readiness estimates are not available' in text(session,find(session,'#k5HomeCard')).lower()
+        assert '%' not in text(session,find(session,'#k5HomeCard'))
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='النشاط المسجل',label='K5 Arabic locale')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='rtl'
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='Recorded activity',label='K5 English locale restored')
         # K4_BROWSER_ACCEPTANCE: test the real single-question screen, not a stub.
         wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 public card')
         assert 'Practice one question' in text(session,find(session,'#k4HomeCard'))
