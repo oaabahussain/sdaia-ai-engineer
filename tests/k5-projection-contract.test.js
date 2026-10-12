@@ -89,3 +89,13 @@ test('arbitrary syntactically valid event and source fingerprints cannot forge C
   policy:{policy_id:'K5.EVIDENCE.v1'}
  }),/fingerprint|replay/i);
 });
+
+test('self-consistent caller-computed hashes do not authenticate an arbitrary replay',async()=>{
+ const source={source_store_id:'store',through_store_seq:0,learner_id:'L',track_id:ID,
+  release_id:RELEASE};
+ source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
+ await assert.rejects(deriveK5EvidenceSufficiency({
+  source,events:[],acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'}
+ }),/verified K3 replay source|trusted replay|source binding/i);
+});
