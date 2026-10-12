@@ -126,14 +126,8 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
      // K5 is descriptive/read-only; K3 and K4 authority remain unchanged.
      try {
        const {createK5BrowserController}=await import('./mastery/browserController.js');
-       const objectiveMap={
-         version:'sdaia-ai-engineer.objectives-v1',
-         items:OBJECTIVE_CATALOG.objectives.map(objective=>({
-           objective_id:objective.objective_id,domain_id:objective.domain_id,
-           mapping_status:objective.status==='provisional'?'PROVISIONAL':'APPROVED'
-         })),
-         raw:OBJECTIVE_CATALOG
-       };
+       const {validateK5ObjectiveMap}=await import('./mastery/objectiveMap.js');
+       const objectiveMap=await validateK5ObjectiveMap(OBJECTIVE_CATALOG,BANK.track.id);
        K5_CONTROLLER=createK5BrowserController({
          document,root:$('k5HomeCard'),store:evidenceStore,catalog:publicCatalog,
          objectiveMap,learnerId:state.anon_id,trackId:BANK.track.id,
