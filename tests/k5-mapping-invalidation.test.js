@@ -35,3 +35,21 @@ test('same version and public bank digest cannot reuse an objective-mapping-chan
  assert.equal(a.catalog_canonical_sha256,b.catalog_canonical_sha256);
  assert.notEqual(a.objective_map_canonical_sha256,b.objective_map_canonical_sha256);
 });
+
+test('mutated normalized mapping cannot reuse unchanged raw-mapping SHA',async()=>{
+ const catalog=verified();
+ const source={source_store_id:'local',through_store_seq:0,learner_id:'opaque',track_id:ID,release_id:RELEASE};
+ source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
+ const raw={schema_version:1,track_id:ID,objectives:[{
+  objective_id:OBJECTIVE,track_id:ID,domain_id:'core-ai',status:'provisional'
+ }]};
+ const fixed={version:'objectives-v1',raw,items:[{objective_id:OBJECTIVE,domain_id:'core-ai',mapping_status:'PROVISIONAL'}]};
+ const changed={version:'objectives-v1',raw,items:[{objective_id:OBJECTIVE,domain_id:'wrong-domain',mapping_status:'APPROVED'}]};
+ const build=acceptedObjectiveMap=>deriveK5EvidenceSufficiency({source,events:[],
+   acceptedPublicCatalog:catalog,acceptedObjectiveMap,policy:{policy_id:'K5.EVIDENCE.v1'}});
+ const a=await build(fixed);
+ let b;
+ try{b=await build(changed)}catch(error){assert.match(error.message,/map|objective|approval|status|mismatch/i);return}
+ assert.notEqual(a.objective_map_canonical_sha256,b.objective_map_canonical_sha256,
+  'aggregation mapping changed under unchanged raw bytes and digest');
+});
