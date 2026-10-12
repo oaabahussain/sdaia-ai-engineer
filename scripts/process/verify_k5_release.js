@@ -10,13 +10,17 @@ const REQUESTED_CHECKS=['Pull request quality gate','Server and adapter contract
 export async function collectK5GitHubEvidence({
   repo,prNumber,token,fetchImpl=globalThis.fetch
 }={}) {
-  if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo??''))
+  const parts=typeof repo==='string'?repo.split('/'):[];
+  if(parts.length!==2||
+     !/^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(parts[0])||
+     !/^[A-Za-z0-9_][A-Za-z0-9_.-]{0,99}$/.test(parts[1])||
+     parts[1].includes('..'))
     throw new TypeError('invalid GitHub repo');
   if(!Number.isSafeInteger(prNumber)||prNumber<1)
     throw new TypeError('invalid PR number');
   if(typeof token!=='string'||!token)throw new TypeError('GitHub token required');
   if(typeof fetchImpl!=='function')throw new TypeError('GitHub transport required');
-  const [owner,name]=repo.split('/');
+  const [owner,name]=parts;
   const root='https://api.github.com';
   const api='/repos/'+repo;
   async function request(path,graphqlBody=null){
