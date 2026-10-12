@@ -55,7 +55,7 @@ test('mutated normalized mapping cannot reuse unchanged raw-mapping SHA',async()
  }]};
  const fixed={version:'objectives-v1',raw,items:[{objective_id:OBJECTIVE,domain_id:'core-ai',mapping_status:'PROVISIONAL'}]};
  const changed={version:'objectives-v1',raw,items:[{objective_id:OBJECTIVE,domain_id:'wrong-domain',mapping_status:'APPROVED'}]};
- const build=acceptedObjectiveMap=>deriveK5EvidenceSufficiency({source,events:[],
+ const build=acceptedObjectiveMap=>deriveK5EvidenceSufficiency({source:trust,events:trust.events,
    acceptedPublicCatalog:catalog,acceptedObjectiveMap,policy:{policy_id:'K5.EVIDENCE.v1'}});
  const a=await build(fixed);
  let b;
