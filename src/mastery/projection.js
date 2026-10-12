@@ -121,7 +121,7 @@ export async function deriveK5EvidenceSufficiency({
     question_payload_sha256:acceptedPublicCatalog.question_payload_sha256,
     catalog_version:acceptedPublicCatalog.catalog_id,
     catalog_canonical_sha256:await canonicalMappingHash(acceptedPublicCatalog),
-    objective_map_canonical_sha256:await canonicalMappingHash(acceptedObjectiveMap.raw ?? acceptedObjectiveMap),
+    objective_map_canonical_sha256:await canonicalMappingHash({version:acceptedObjectiveMap.version,items:acceptedObjectiveMap.items,raw:acceptedObjectiveMap.raw??null}),
     lineage_map_version:null,lineage_map_canonical_sha256:null,
     objective_map_version:acceptedObjectiveMap.version,identity_resolution_version:null,
     integrity_status,observation_status,estimation_status:'DISABLED_UNVALIDATED',
