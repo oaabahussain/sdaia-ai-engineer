@@ -9,7 +9,7 @@ function approved(approval,number,sha){
   typeof approval.approvedAt==='string'&&Number.isFinite(Date.parse(approval.approvedAt));
 }
 export function verifyK5Release({prNumber,prHead,approval,checks=[],review,policy,
-  phase='PRE_MERGE',mergedHead,postMergeChecks=[],browserEvidence}={}){
+  phase='PRE_MERGE',mergedHead,mainHead,mergeParents,postMergeChecks=[],browserEvidence}={}){
  const blockers=[];
  if(!Number.isSafeInteger(prNumber)||prNumber<1||!FULL_SHA.test(prHead??''))
   blockers.push('INVALID_PR_HEAD');
@@ -30,9 +30,12 @@ export function verifyK5Release({prNumber,prHead,approval,checks=[],review,polic
  if(policy?.policy_id!=='K5.EVIDENCE.v1'||policy.numericalLane!=='INACTIVE')
   blockers.push('UNAPPROVED_SCORING_LANE');
  if(phase==='POST_MERGE'){
-   if(mergedHead!==prHead||
-      !postMergeChecks.some(check=>check.name==='merged-main full regression'&&
-        check.sha===mergedHead&&check.conclusion==='success'))
+   const mergeIsDescendant=FULL_SHA.test(mergedHead??'')&&mergedHead!==prHead&&
+     mainHead===mergedHead&&Array.isArray(mergeParents)&&mergeParents.length===2&&
+     mergeParents.every(parent=>FULL_SHA.test(parent))&&mergeParents.includes(prHead);
+   const required=['merged-main full regression','Pages deployment smoke'];
+   if(!mergeIsDescendant||!required.every(name=>postMergeChecks.some(check=>
+     check.name===name&&check.sha===mergedHead&&check.conclusion==='success')))
      blockers.push('POST_MERGE_VERIFICATION_REQUIRED');
  }else if(phase!=='PRE_MERGE')blockers.push('INVALID_RELEASE_PHASE');
  return {ready:blockers.length===0,blockers};
