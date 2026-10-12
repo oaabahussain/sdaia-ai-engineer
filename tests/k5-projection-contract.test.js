@@ -101,5 +101,5 @@ test('self-consistent caller-computed hashes do not authenticate an arbitrary re
  await assert.rejects(deriveK5EvidenceSufficiency({
   source,events:[],acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
   policy:{policy_id:'K5.EVIDENCE.v1'}
- }),/verified K3 replay source|trusted replay|source binding/i);
+ }),/same verified K3 replay|verified K3 replay source|trusted replay|source binding/i);
 });
