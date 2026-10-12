@@ -37,7 +37,9 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 ### Task 01: Governance and immutable execution ledger
 
-**Files:** Test: `tests/k5-state.test.js`; Create/modify: `scripts/process/validate_k5_state.js`.
+**Files:** Test: `tests/k5-state.test.js`; Create/modify: `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson`, `scripts/process/validate_k5_state.js`.
+
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
 
 **Interfaces:** Produces `validateK5State({state,sourceHead,specBlobSha,planBlobSha})->{ok,code}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
@@ -53,6 +55,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-schema.test.js`; Create/modify: `data/schema/evidence-sufficiency-projection-v1.schema.json`, `src/mastery/schema.js`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `validateK5Projection(projection)->boolean`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-02, AC-07, AC-16, AC-17.
@@ -67,11 +71,13 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-mapping.test.js`; Create/modify: `src/mastery/provenance.js`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `canonicalMappingHash(mapping)->Promise<string>; validateK5Mappings({catalog,objectives,lineage,releaseId})->{catalogHash,objectiveHash,lineageHash,lineageVersion}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-06, AC-07, AC-12, AC-22.
 
-- [ ] **Step 1 — RED test:** In `tests/k5-mapping.test.js`, define a `node:test` case named `k5 task 03 canonical mapping provenance`; assert: changing family/objective linkage changes hash even when question payload digest is unchanged; protected entry and mismatched release rejected. Name a one-line inverse code change that must cause test failure before accepting the test.
+- [ ] **Step 1 — RED test:** In `tests/k5-mapping.test.js`, define a `node:test` case named `k5 task 03 canonical mapping provenance`; assert: changing family/objective linkage changes hash even when question payload digest is unchanged; protected entry and mismatched release rejected; fixed SHA-256 canonical JSON serialization vectors for nested arrays/catalog/objectives/lineage with reordered object-property insertion order MUST match across adapters. Name a one-line inverse code change that must cause test failure before accepting the test.
 - [ ] **Step 2 — Observe RED:** Run `node --test tests/k5-mapping.test.js`. Expected: nonzero exit with contract-specific assertion or missing implementation export; syntax/setup errors do not count. Record full failure.
 - [ ] **Step 3 — Minimal GREEN:** Implement exactly `canonicalMappingHash(mapping)->Promise<string>; validateK5Mappings({catalog,objectives,lineage,releaseId})->{catalogHash,objectiveHash,lineageHash,lineageVersion}` and required supporting behavior in the owned paths. Do not add unrelated capabilities or derived ability estimates.
 - [ ] **Step 4 — Verify GREEN:** Run `node --test tests/k5-mapping.test.js` (exit 0), then `npm test` (exit 0). If either fails, correct behavior and rerun rather than weakening assertions. For Task 09 and 10 also run `python3 scripts/browser_smoke.py`.
@@ -80,6 +86,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 ### Task 04: Pinned source reader and release-safe replay
 
 **Files:** Test: `tests/k5-source.test.js`; Create/modify: `src/mastery/source.js`.
+
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
 
 **Interfaces:** Produces `readK5Source({store,learnerId,trackId,releaseId,throughStoreSeq})->Promise<{source_store_id,through_store_seq,events}>`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
@@ -95,11 +103,13 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-corrections.test.js`; Create/modify: `src/mastery/corrections.js`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `classifyK5Corrections({events,verifyAuthority})->{safeEvents,quarantinedFamilies,sourceInvalid,reasons}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-04, AC-14, AC-15.
 
-- [ ] **Step 1 — RED test:** In `tests/k5-corrections.test.js`, define a `node:test` case named `k5 task 05 correction authentication and quarantine`; assert: forged authority_ref cannot remove presentation; cross-release target/competing corrections/cycle give quarantined or SOURCE_INVALID; affected family never COMPLETE. Name a one-line inverse code change that must cause test failure before accepting the test.
+- [ ] **Step 1 — RED test:** In `tests/k5-corrections.test.js`, define a `node:test` case named `k5 task 05 correction authentication and quarantine`; assert: forged authority_ref alone => CONFLICTED/QUARANTINED with CORRECTION_AUTHORITY_UNVERIFIED; bounded competing/cyclic => CONFLICTED/QUARANTINED with CORRECTION_CONFLICT; overlapping forged plus competing => CONFLICTED/QUARANTINED with sorted BOTH reason codes; bounded missing target => INCOMPLETE/QUARANTINED with CORRECTION_UNRESOLVED; missing target plus unresolved lineage => INCOMPLETE/QUARANTINED with sorted CORRECTION_UNRESOLVED and UNKNOWN_FAMILY_MAPPING; ONLY unbounded corruption => SOURCE_INVALID/QUARANTINED; cross-release verified correction never dropped before release selection. Name a one-line inverse code change that must cause test failure before accepting the test.
 - [ ] **Step 2 — Observe RED:** Run `node --test tests/k5-corrections.test.js`. Expected: nonzero exit with contract-specific assertion or missing implementation export; syntax/setup errors do not count. Record full failure.
 - [ ] **Step 3 — Minimal GREEN:** Implement exactly `classifyK5Corrections({events,verifyAuthority})->{safeEvents,quarantinedFamilies,sourceInvalid,reasons}` and required supporting behavior in the owned paths. Do not add unrelated capabilities or derived ability estimates.
 - [ ] **Step 4 — Verify GREEN:** Run `node --test tests/k5-corrections.test.js` (exit 0), then `npm test` (exit 0). If either fails, correct behavior and rerun rather than weakening assertions. For Task 09 and 10 also run `python3 scripts/browser_smoke.py`.
@@ -109,11 +119,13 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-presentations.test.js`; Create/modify: `src/mastery/presentations.js`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `collectK5Presentations({events,catalog,policy,quarantinedFamilies})->{observations,unknownMapping,repeatedFamilies}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-05, AC-06, AC-08, AC-09, AC-11, AC-12.
 
-- [ ] **Step 1 — RED test:** In `tests/k5-presentations.test.js`, define a `node:test` case named `k5 task 06 eligible public presentation and deduplication`; assert: only accepted learner.item.presented@1 in learn/practice; one interaction ID once; family sibling versions count once; response/check/mock/protected ignored. Name a one-line inverse code change that must cause test failure before accepting the test.
+- [ ] **Step 1 — RED test:** In `tests/k5-presentations.test.js`, define a `node:test` case named `k5 task 06 eligible public presentation and deduplication`; assert: only accepted learner.item.presented@1 in learn/practice; one interaction ID once; family sibling versions count once; approved cross-release family lineage maps siblings to one exposed family, absent approved lineage abstains on transfer/unseen; response/check/mock/protected ignored. Name a one-line inverse code change that must cause test failure before accepting the test.
 - [ ] **Step 2 — Observe RED:** Run `node --test tests/k5-presentations.test.js`. Expected: nonzero exit with contract-specific assertion or missing implementation export; syntax/setup errors do not count. Record full failure.
 - [ ] **Step 3 — Minimal GREEN:** Implement exactly `collectK5Presentations({events,catalog,policy,quarantinedFamilies})->{observations,unknownMapping,repeatedFamilies}` and required supporting behavior in the owned paths. Do not add unrelated capabilities or derived ability estimates.
 - [ ] **Step 4 — Verify GREEN:** Run `node --test tests/k5-presentations.test.js` (exit 0), then `npm test` (exit 0). If either fails, correct behavior and rerun rather than weakening assertions. For Task 09 and 10 also run `python3 scripts/browser_smoke.py`.
@@ -122,6 +134,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 ### Task 07: Deterministic status matrix and aggregation
 
 **Files:** Test: `tests/k5-projection.test.js`; Create/modify: `src/mastery/projection.js`.
+
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
 
 **Interfaces:** Produces `deriveK5EvidenceSufficiency({source,events,acceptedPublicCatalog,policy,identityResolutionVersion,clock})->EvidenceSufficiencyProjectionV1`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
@@ -137,6 +151,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-estimator-disabled.test.js`; Create/modify: `src/mastery/estimator.js`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `requestK5Estimator({policyId,evidence,enableFlag})->{status,mastery_estimate,readiness_estimate,readiness_probability,confidence_interval,model_validation_ref}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-08, AC-09, AC-10, AC-16, AC-17, AC-25.
@@ -151,6 +167,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-ui.test.js`; Create/modify: `src/mastery/view.js`, `src/mastery/browserController.js`, `index.html`, `src/styles.css`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `renderK5Summary({projection,locale})->{heading,body,status}; mountK5Summary({root,store,catalog,locale})->Promise<void>`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-15, AC-16, AC-18, AC-19, AC-21.
@@ -163,7 +181,9 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 ### Task 10: Offline, cache, and privacy integration
 
-**Files:** Test: `tests/k5-browser.test.js`; Create/modify: `scripts/browser_smoke.py`, `scripts/verify_sw_assets.js`, `tests/k5-browser.test.js`.
+**Files:** Test: `tests/k5-browser.test.js`; Create/modify: `src/mastery/snapshot.js`, `scripts/browser_smoke.py`, `scripts/verify_sw_assets.js`, `tests/k5-browser.test.js`.
+
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
 
 **Interfaces:** Produces `loadK5Snapshot({store,context})->Promise<EvidenceSufficiencyProjectionV1>`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
@@ -179,6 +199,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 
 **Files:** Test: `tests/k5-contract.test.js`; Create/modify: `tests/k5-contract.test.js`, `docs/superpowers/state/K5-CURRENT-STATE.json`.
 
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
+
 **Interfaces:** Produces `validateK5CrossRuntime({browserSnapshot,nodeSnapshot})->{ok,differences}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
 **Coverage:** AC-14, AC-20, AC-22, AC-23.
@@ -192,6 +214,8 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 ### Task 12: Release gates and post-merge verification
 
 **Files:** Test: `tests/k5-release.test.js`; Create/modify: `scripts/process/verify_k5_release.js`, `docs/superpowers/state/K5-CURRENT-STATE.json`.
+
+**Ledger:** Update `docs/superpowers/state/K5-EXECUTION-LEDGER.ndjson` (created in Task 01) with observed RED exit+assertion, GREEN exit, full-regression exit, commit SHA and any ruling. A task cannot be marked done without this file and verifiable CI logs.
 
 **Interfaces:** Produces `verifyK5Release({prHead,checks,review,mainHead,policy})->{ready,blockers}`. Consumes previously defined validated sources, mappings and policy; no private event payload leaves this component.
 
@@ -210,5 +234,7 @@ Each numbered task must write its own RED and GREEN log evidence (exit code, obs
 - [ ] Request a PR Completion readiness assessment; verify open review threads=0, main/base freshness and protections. Obtain explicit separate authorization naming the CURRENT product PR and exact full HEAD; never treat general implementation approval as merge authority.
 - [ ] After authorized safe merge, fetch current main SHA, run Node/Python/Chromium/Pages smoke on merged main and compare immutable public bank and new K5 output fingerprints before recording K5 initial descriptive release closure.
 - [ ] Record Lane 2 as NOT_VALIDATED / INACTIVE; K6 has no release permission based on K5 exposure activity.
+
+**Plan review invariants:** Every Task 01 execution-state fixture MUST pin spec blob `dee75a0b1e5161d09bce0a840ab987c7a6aa2278` (never any previous blob), and the final reviewed plan blob. Task 03 includes explicit approved-vs-absent lineage fixture with fixed SHA vectors. Task 05 correction fixture outputs must match ordered §6.1.1 rows exactly; generic `QUARANTINED or SOURCE_INVALID` is prohibited. Task 10 owns `src/mastery/snapshot.js`. The ledger is owned across all 12 tasks, with commit proof.
 
 **Plan status:** WRITTEN_FOR_IMPLEMENTATION; awaiting independent exact-head specification re-review and practical local test workspace; not evidence of implemented behavior. No claim that CI or tests have run for this plan.
