@@ -9,6 +9,16 @@ async function fingerprintScope(parts) {
   return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2,'0')).join('');
 }
 
+export async function computeK5SourceFingerprint(source,events) {
+  if(!source||!Array.isArray(events))throw new TypeError('pinned source and events required');
+  const ordered=[...events].sort((a,b)=>a.store_seq-b.store_seq||
+    (a.event_id<b.event_id?-1:a.event_id>b.event_id?1:0));
+  return fingerprintScope([
+    source.source_store_id,source.learner_id,source.track_id,source.release_id,source.through_store_seq,
+    ordered.map(event=>[event.store_seq,event.event_id,event.event_fingerprint])
+  ]);
+}
+
 // Read a pinned K3 local source head, not its independent sync cursor.
 // Full learner history across valid releases is kept for correction resolution.
 export async function readK5Source({store,learnerId,trackId,releaseId,throughStoreSeq}={}) {
@@ -40,10 +50,10 @@ export async function readK5Source({store,learnerId,trackId,releaseId,throughSto
     seen.add(event.event_id);
   }
   if (throughStoreSeq === 0 && events.length) throw new Error('zero watermark cannot contain events');
-  const source_fingerprint = await fingerprintScope([
-    store.store_id,learnerId,trackId,releaseId,throughStoreSeq,
-    events.map(event=>[event.store_seq,event.event_id,event.event_fingerprint])
-  ]);
+  const source_fingerprint = await computeK5SourceFingerprint({
+    source_store_id:store.store_id,learner_id:learnerId,
+    track_id:trackId,release_id:releaseId,through_store_seq:throughStoreSeq
+  },events);
   return {
     learner_id: learnerId,track_id:trackId,release_id:releaseId,
     source_store_id:store.store_id,through_store_seq:throughStoreSeq,
