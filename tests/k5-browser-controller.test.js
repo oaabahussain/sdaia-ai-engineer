@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createK5BrowserController} from '../src/mastery/browserController.js';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
+import {fingerprintEvent} from '../src/evidence/jcs.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
 const FAMILY=ID+'.core-ai.reasoning.definition.best-description',VERSION=FAMILY+'.v1';
 const OBJECTIVE=ID+'.objective.core-ai.reasoning.v1';
@@ -38,4 +39,29 @@ test('denied IndexedDB does not pretend to report zero or reveal exceptions',asy
  await controller.render();assert.equal(el.attrs['data-k5-status'],'SOURCE_INVALID');
  assert.ok(el.children.some(node=>/unavailable|verify/i.test(node.textContent)));
  assert.ok(!el.children.some(node=>/permission denied|private IndexedDB/i.test(node.textContent)));
+});
+
+test('K5 discards prior observed activity immediately after source erasure',async()=>{
+ const el=root();
+ const raw={event_id:'opaque-event-1',definition_id:'learner.item.presented@1',
+  learner_id:'local',track_id:ID,content_release_id:RELEASE,mode:'practice',
+  item_interaction_id:'interaction-1',question_family_id:FAMILY,item_version_id:VERSION,
+  domain_id:'core-ai',objective_id:OBJECTIVE};
+ const event={...raw,store_id:'local-store',store_seq:1,
+  event_fingerprint:await fingerprintEvent(raw)};
+ let head=1;
+ const mutableStore={store_id:'local-store',
+  getSourceHead:async()=>({store_id:'local-store',through_store_seq:head}),
+  readRange:async({fromSeq,toSeq})=>head&&fromSeq<=1&&toSeq>=1?[event]:[]};
+ const controller=createK5BrowserController({document,root:el,store:mutableStore,
+  catalog,objectiveMap,learnerId:'local',trackId:ID,releaseId:RELEASE,locale:()=> 'en'});
+ const before=await controller.render();
+ assert.equal(before.status,'OBSERVATIONS_PRESENT');
+ assert.equal(before.count,1);
+ head=0; // simulates successful K3 source erasure, not a cached estimate
+ const after=await controller.render();
+ assert.equal(after.status,'NO_OBSERVATIONS');
+ assert.equal(after.count,0);
+ assert.equal(el.attrs['data-k5-status'],'NO_OBSERVATIONS');
+ assert.ok(!el.children.some(node=>/1 public question families/i.test(node.textContent)));
 });
