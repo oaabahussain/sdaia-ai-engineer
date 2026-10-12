@@ -236,6 +236,7 @@ def main():
         req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
         assert execute(session,"return window.innerWidth<=450"), 'K4 mobile viewport'
         assert execute(session,"return document.getElementById('k4HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K4 responsive card'
+        assert execute(session,"return document.getElementById('k5HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K5 responsive activity region'
         req('POST',f'/session/{session}/window/rect',{'width':1400,'height':1000})
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
@@ -288,6 +289,10 @@ def main():
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),timeout=20,label='offline cached home reload')
         assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
         assert text(session,find(session,'.domainCard h3'))==PRESENTATION['locales']['en']['domain_labels'][first_domain]
+        # K5_OFFLINE_ACCEPTANCE: actual new modules and verified read-only summary boot without network.
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='Recorded activity',label='K5 offline activity summary')
+        assert execute(session,"return document.getElementById('k5HomeCard').getAttribute('data-k5-status')")!='SOURCE_INVALID', 'K5 offline source must remain verified'
+        assert '%' not in text(session,find(session,'#k5HomeCard')), 'K5 offline page cannot display readiness percent'
         # K4_OFFLINE_ACCEPTANCE: new public policy and modules work from the installed cache.
         wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 offline public card')
         click(session,find(session,'#k4HomeCard button'))
