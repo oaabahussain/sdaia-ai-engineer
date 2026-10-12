@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
 import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
+import {fingerprintEvent} from '../src/evidence/jcs.js';
+import {computeK5SourceFingerprint} from '../src/mastery/source.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
 const DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
 const F1=ID+'.core-ai.reasoning.definition.best-description',F2=ID+'.core-ai.reasoning.definition.other-example';
@@ -24,12 +26,19 @@ function event(seq,more={}){return {event_id:'event-'+seq,store_id:'store',store
  objective_id:O1,domain_id:'core-ai',event_fingerprint:'a'.repeat(64),...more};}
 const correction=(seq,target)=>event(seq,{definition_id:'learner.evidence.correction.recorded@1',
  authority_ref:'forged',payload:{action:'VOID',target_event_id:target}});
-async function project(events=[]){return deriveK5EvidenceSufficiency({
- source:{source_store_id:'store',through_store_seq:events.length?Math.max(...events.map(e=>e.store_seq)):0,
-  learner_id:'L',track_id:ID,release_id:RELEASE},
- events,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
- policy:{policy_id:'K5.EVIDENCE.v1'},identityResolutionVersion:null
-});}
+async function project(events=[]){
+ const verified=await Promise.all(events.map(async event=>{
+  const raw={...event};for(const field of ['store_id','store_seq','accepted_at','event_fingerprint'])delete raw[field];
+  return {...event,event_fingerprint:await fingerprintEvent(raw)};
+ }));
+ const source={source_store_id:'store',through_store_seq:verified.length?Math.max(...verified.map(e=>e.store_seq)):0,
+  learner_id:'L',track_id:ID,release_id:RELEASE};
+ source.source_fingerprint=await computeK5SourceFingerprint(source,verified);
+ return deriveK5EvidenceSufficiency({
+  source,events:verified,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'},identityResolutionVersion:null
+ });
+}
 const isNull=r=>['mastery_estimate','readiness_estimate','readiness_probability','confidence_interval','model_validation_ref'].forEach(key=>assert.strictEqual(r[key],null,key));
 test('empty K5 source yields normative deterministic NO_OBSERVATIONS',async()=>{
  const r=await project();assert.equal(r.integrity_status,'COMPLETE');
