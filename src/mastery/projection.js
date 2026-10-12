@@ -2,6 +2,8 @@ import {classifyK5Corrections} from './corrections.js';
 import {collectK5Presentations} from './presentations.js';
 import {canonicalMappingHash} from './provenance.js';
 import {validateK5Projection} from './schema.js';
+import {fingerprintEvent} from '../evidence/jcs.js';
+import {computeK5SourceFingerprint} from './source.js';
 const cmp=(a,b)=>a<b?-1:a>b?1:0;
 const nonempty=x=>typeof x==='string'&&x.length>0;
 const nullEstimates={mastery_estimate:null,readiness_estimate:null,readiness_probability:null,confidence_interval:null,model_validation_ref:null};
@@ -35,8 +37,15 @@ export async function deriveK5EvidenceSufficiency({
        !/^[a-f0-9]{64}$/.test(event.event_fingerprint)||
        ids.has(event.event_id)||seqs.has(event.store_seq))
       throw new TypeError('source replay identity, fingerprint or duplicate invalid');
+    const raw=structuredClone(event);
+    for(const field of ['store_id','store_seq','accepted_at','event_fingerprint'])delete raw[field];
+    if(await fingerprintEvent(raw)!==event.event_fingerprint)
+      throw new TypeError('K3 replay event fingerprint mismatch');
     ids.add(event.event_id);seqs.add(event.store_seq);
   }
+  if(!/^[0-9a-f]{64}$/.test(source.source_fingerprint||'')||
+     await computeK5SourceFingerprint(source,events)!==source.source_fingerprint)
+    throw new TypeError('verified K3 replay source fingerprint mismatch');
   const corrected=classifyK5Corrections({events});
   const visible=corrected.sourceInvalid?
     {observations:[],observed_distinct_interaction_count:0,unknownMapping:false,repeatedFamilies:0}:
