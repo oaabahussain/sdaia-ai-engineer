@@ -1,5 +1,11 @@
 import { replayEvidence } from '../evidence/replay.js';
 
+const verifiedReplayEvents=new WeakMap();
+export function assertK5VerifiedReplayBinding(source,events) {
+  if(!source||typeof source!=='object'||verifiedReplayEvents.get(source)!==events)
+    throw new TypeError('K5 requires source and events from the same verified K3 replay');
+  return true;
+}
 const validId = value => typeof value === 'string' && value.length > 0;
 const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value);
 async function fingerprintScope(parts) {
@@ -54,9 +60,14 @@ export async function readK5Source({store,learnerId,trackId,releaseId,throughSto
     source_store_id:store.store_id,learner_id:learnerId,
     track_id:trackId,release_id:releaseId,through_store_seq:throughStoreSeq
   },events);
-  return {
-    learner_id: learnerId,track_id:trackId,release_id:releaseId,
+  // Bind this result to the exact verified replay array. Public hashes alone
+  // are not authority; only this reader may register the source/event pair.
+  const frozenEvents=Object.freeze(events.map(event=>Object.freeze(event)));
+  const source=Object.freeze({
+    learner_id:learnerId,track_id:trackId,release_id:releaseId,
     source_store_id:store.store_id,through_store_seq:throughStoreSeq,
-    source_fingerprint,events
-  };
+    source_fingerprint,events:frozenEvents
+  });
+  verifiedReplayEvents.set(source,frozenEvents);
+  return source;
 }
