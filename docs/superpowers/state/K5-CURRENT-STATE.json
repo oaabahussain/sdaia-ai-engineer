@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "feature": "K5.EVIDENCE.v1",
+  "stage": "IN_PROGRESS",
+  "baseline_main_sha": "3d886c1066137e15e6ff5d3939f588a0fc59affd",
+  "spec_blob_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+  "plan_blob_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+  "branch": "feat/k5-tdd-evidence-20261012",
+  "numeric_lane": "INACTIVE",
+  "owner_authorization_for_implementation": "2026-10-12 user messages",
+  "owner_authorization_for_exact_head_landing": null,
+  "landing_authorized": false,
+  "merged": false,
+  "acceptance_criteria_closed": false,
+  "notes": "Implementation is independent from PR #67 design and PR #68 plan. No K5 numeric readiness or mastery. Exact-head independent review and owner landing confirmation remain release gates."
+}
