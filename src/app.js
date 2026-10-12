@@ -17,7 +17,7 @@ registerServiceWorker();
 
 const $=id=>document.getElementById(id);
 let BANK, PROFILE, QUESTIONS=[], WEIGHTS={}, state, lang='ar', activeExam=null;
-let PRESENTATION=null,OBJECTIVE_CATALOG=null,EVIDENCE_RECORDER=null,K4_CONTROLLER=null;
+let PRESENTATION=null,OBJECTIVE_CATALOG=null,EVIDENCE_RECORDER=null,K4_CONTROLLER=null,K5_CONTROLLER=null;
 let actionTail=Promise.resolve();
 function trackState(){return state.tracks[BANK.track.id]}
 function surfaceEvidenceError(error){console.error(error);const box=$('errorBox');if(box){box.textContent=error?.message||String(error);box.classList.add('show')}}
@@ -43,7 +43,7 @@ function applyTheme(theme){document.documentElement.dataset.theme=theme;$('theme
 
 function renderAllocation(){const allocation=weightedAllocation(WEIGHTS,PROFILE.question_count);$('allocation').innerHTML=Object.entries(allocation).map(([d,n])=>`<div class="allocRow"><div><b>${domainLabel(d)}</b><div class="bar"><i style="width:${WEIGHTS[d]}%"></i></div></div><span>${n} · ${WEIGHTS[d]}%</span></div>`).join('')}
 function renderDomains(){const counts=Object.fromEntries(Object.keys(WEIGHTS).map(d=>[d,QUESTIONS.filter(q=>q.domain_id===d).length]));const preferred=PROFILE.section_sizes.includes(50)?50:PROFILE.section_sizes.find(x=>x!=='all');$('domainGrid').innerHTML=Object.entries(WEIGHTS).map(([d,w],i)=>`<div class="card domainCard"><div class="eyebrow">${String(i+1).padStart(2,'0')}</div><h3>${domainLabel(d)}</h3><div class="domainMeta"><span class="chip">${t('weight')} ${w}%</span><span class="chip">${t('bank')} ${counts[d]}</span></div><div class="domainActions"><select class="select sectionCount" data-domain="${d}">${PROFILE.section_sizes.map(size=>`<option value="${size}" ${size===preferred?'selected':''}>${size==='all'?`${t('all')} (${counts[d]})`:size}</option>`).join('')}</select><button class="btn primary startSection" data-domain="${d}">${t('start')}</button></div></div>`).join('');document.querySelectorAll('.startSection').forEach(btn=>btn.onclick=()=>runUiAction(()=>{const d=btn.dataset.domain;const sel=[...document.querySelectorAll('.sectionCount')].find(x=>x.dataset.domain===d);return startSection(d,sel.value)}))}
-function renderHome(){if(!BANK)return;if(K4_CONTROLLER)void K4_CONTROLLER.renderHome().catch(surfaceEvidenceError);const domainCount=Object.keys(WEIGHTS).length;$('bankCount').textContent=QUESTIONS.length;$('domainCount').textContent=domainCount;$('fullExamCount').textContent=PROFILE.question_count;$('fullExamTitle').textContent=t('weightedExam',PROFILE.question_count);$('fullExamDesc').textContent=t('weightedDesc',domainCount);$('startFullBtn').textContent=t('startFull',PROFILE.question_count);renderAllocation();renderDomains();$('domainSummary').innerHTML=`<div class="stats"><div class="stat"><b>${QUESTIONS.length}</b><small>${t('questions')}</small></div><div class="stat"><b>${Object.keys(WEIGHTS).length}</b><small>${t('domains')}</small></div></div>`;const box=$('resumeBox');if(activeExam&&!activeExam.submitted){box.classList.add('show');$('resumeMeta').textContent=t('resumeText',activeExam.index+1,activeExam.questionIds.length)}else box.classList.remove('show')}
+function renderHome(){if(!BANK)return;if(K4_CONTROLLER)void K4_CONTROLLER.renderHome().catch(surfaceEvidenceError);if(K5_CONTROLLER)void K5_CONTROLLER.render().catch(()=>{});const domainCount=Object.keys(WEIGHTS).length;$('bankCount').textContent=QUESTIONS.length;$('domainCount').textContent=domainCount;$('fullExamCount').textContent=PROFILE.question_count;$('fullExamTitle').textContent=t('weightedExam',PROFILE.question_count);$('fullExamDesc').textContent=t('weightedDesc',domainCount);$('startFullBtn').textContent=t('startFull',PROFILE.question_count);renderAllocation();renderDomains();$('domainSummary').innerHTML=`<div class="stats"><div class="stat"><b>${QUESTIONS.length}</b><small>${t('questions')}</small></div><div class="stat"><b>${Object.keys(WEIGHTS).length}</b><small>${t('domains')}</small></div></div>`;const box=$('resumeBox');if(activeExam&&!activeExam.submitted){box.classList.add('show');$('resumeMeta').textContent=t('resumeText',activeExam.index+1,activeExam.questionIds.length)}else box.classList.remove('show')}
 
 async function createExam(mode,questions,domain=null){const pendingK4=K4_CONTROLLER?.leavePractice();if(pendingK4)await pendingK4.catch(surfaceEvidenceError);const id=`exam-${Date.now()}-${Math.floor(secureRng()*1e6)}`;const optionOrders=buildOptionOrders(questions,secureRng);const startedAt=new Date().toISOString();const assessmentContext=BANK.evidence?createBrowserAssessmentContext({form_id:`form:${id}`,ui_mode:mode,content_release_id:BANK.evidence.content_release_id,exam_profile_id:BANK.exam_profile.id,exam_profile_version:String(BANK.exam_profile.version),scoring_policy_ref:BANK.evidence.scoring_policy_ref,item_version_ids:questions.map(q=>q.id),option_orders:optionOrders,locale:presentationView().locale,started_at:startedAt}):null;activeExam={id,mode,domain,track_id:BANK.track.id,track_version:BANK.track.version,exam_profile_id:BANK.exam_profile.id,exam_profile_version:BANK.exam_profile.version,questionIds:questions.map(q=>q.id),index:0,answers:{},confidence:{},flags:{},optionOrders,started_at:startedAt,...(assessmentContext?{evidence_mode:assessmentContext.evidence_mode,assessment_snapshot:assessmentContext.assessment_snapshot}:{}),submitted:false};try{if(EVIDENCE_RECORDER&&assessmentContext){const context=evidenceContext(activeExam);const started=await beginExamEvidence(EVIDENCE_RECORDER,activeExam,context);activeExam.evidence_runtime=started.evidence_runtime}save();showScreen('exam');renderExam();await ensureCurrentItemEvidence()}catch(error){activeExam=null;throw error}}
 async function startFull(){return createExam('full',sampleWeightedExam(QUESTIONS,WEIGHTS,PROFILE.question_count,secureRng))}
@@ -123,6 +123,26 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
        publicQuestions:QUESTIONS.map(q=>({id:q.id,family_id:q.family_id,domain_id:q.domain_id})),
        objectives:OBJECTIVE_CATALOG
      });
+     // K5 is descriptive/read-only; K3 and K4 authority remain unchanged.
+     try {
+       const {createK5BrowserController}=await import('./mastery/browserController.js');
+       const objectiveMap={
+         version:'sdaia-ai-engineer.objectives-v1',
+         items:OBJECTIVE_CATALOG.objectives.map(objective=>({
+           objective_id:objective.objective_id,domain_id:objective.domain_id,
+           mapping_status:objective.status==='provisional'?'PROVISIONAL':'APPROVED'
+         })),
+         raw:OBJECTIVE_CATALOG
+       };
+       K5_CONTROLLER=createK5BrowserController({
+         document,root:$('k5HomeCard'),store:evidenceStore,catalog:publicCatalog,
+         objectiveMap,learnerId:state.anon_id,trackId:BANK.track.id,
+         releaseId:BANK.evidence.content_release_id,locale:()=>lang
+       });
+     } catch(k5Error) {
+       console.warn('K5 activity card unavailable',k5Error);
+       $('k5HomeCard').textContent='النشاط المسجل غير متاح حاليًا';
+     }
      const rulePolicy=validateRulePolicy(policyRaw);
      const prefStore=createSchedulingPreferencesStore({
        indexedDB:globalThis.indexedDB,dbName:'learning-platform.k4.preferences.v1.'+BANK.track.id,
