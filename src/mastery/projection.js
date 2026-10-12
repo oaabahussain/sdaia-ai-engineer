@@ -3,7 +3,7 @@ import {collectK5Presentations} from './presentations.js';
 import {canonicalMappingHash} from './provenance.js';
 import {validateK5Projection} from './schema.js';
 import {fingerprintEvent} from '../evidence/jcs.js';
-import {computeK5SourceFingerprint} from './source.js';
+import {computeK5SourceFingerprint,assertK5VerifiedReplayBinding} from './source.js';
 const cmp=(a,b)=>a<b?-1:a>b?1:0;
 const nonempty=x=>typeof x==='string'&&x.length>0;
 const nullEstimates={mastery_estimate:null,readiness_estimate:null,readiness_probability:null,confidence_interval:null,model_validation_ref:null};
@@ -18,6 +18,7 @@ export async function deriveK5EvidenceSufficiency({
      !nonempty(source.track_id)||!nonempty(source.release_id)||
      !Number.isSafeInteger(source.through_store_seq)||source.through_store_seq<0)
     throw new TypeError('invalid pinned source');
+  assertK5VerifiedReplayBinding(source,events);
   if(!Array.isArray(events)||(source.through_store_seq===0&&events.length))
     throw new TypeError('invalid K3 replay history');
   if(!acceptedPublicCatalog||acceptedPublicCatalog.content_release_id!==source.release_id||
