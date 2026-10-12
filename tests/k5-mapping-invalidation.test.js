@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
 import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
+import {computeK5SourceFingerprint} from '../src/mastery/source.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1',
  DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
 const FAMILY=ID+'.core-ai.reasoning.definition.best-description',OBJECTIVE=ID+'.objective.core-ai.reasoning.v1';
@@ -20,6 +21,7 @@ function verified(){
 test('same version and public bank digest cannot reuse an objective-mapping-changed projection',async()=>{
  const catalog=verified(),source={source_store_id:'local',through_store_seq:0,learner_id:'opaque',
   track_id:ID,release_id:RELEASE},policy={policy_id:'K5.EVIDENCE.v1'};
+ source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
  const build=raw=>deriveK5EvidenceSufficiency({
   source,events:[],acceptedPublicCatalog:catalog,
   acceptedObjectiveMap:{version:'objectives-v1',items:[{objective_id:OBJECTIVE,domain_id:'core-ai',
