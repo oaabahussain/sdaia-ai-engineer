@@ -12,21 +12,36 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "Implementation is independent from PR #67 design and PR #68 plan. No K5 numeric readiness or mastery. Exact-head independent review and owner landing confirmation remain release gates.",
-  "last_code_ci_verified_sha": "d0763412da3929314ab5b28b289ba5bf5ce04a4c",
+  "notes": "Lane 1 public observations only; no mastery/readiness numerical estimate. Two P1 security findings addressed through observed RED/GREEN and reviewed threads resolved; this is not an independent final-head code review. AC-01, AC-23, AC-24 remain unclosed. Documentation commits invalidate last code-head CI for landing; obtain final exact-head checks before eligibility.",
+  "last_code_ci_verified_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
   "last_full_ci": {
-    "quality_run_id": 38261940888,
-    "server_run_id": 38261940921,
+    "quality_run_id": 38379023765,
+    "server_run_id": 38379024518,
     "conclusion": "SUCCESS",
-    "scope": "Node+Python+Chromium+offline+K5 read-only GitHub audit"
+    "scope": "1064 Node + 76 Python + Chromium, offline, factory-import, SW/Pages assembly and K5 read-only audit on code head 6d8f79b..."
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "BLOCKED_CODEX_USAGE_LIMIT",
+  "independent_review_status": "PENDING_FRESH_REVIEW_OF_FINAL_HEAD",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "INDEPENDENT_FRESH_EXACT_HEAD_REVIEW_NOT_AVAILABLE",
+    "FINAL_EXACT_HEAD_INDEPENDENT_CODE_REVIEW_AND_ANY_NEW_FINDINGS",
+    "FORMAL_SPEC_PLAN_APPROVAL_PROVENANCE_RECONCILIATION",
     "OWNER_PER_PR_FULL_SHA_LANDING_CONFIRMATION_NOT_GIVEN",
-    "POST_MERGE_VERIFICATION_NOT_YET_POSSIBLE"
-  ]
+    "POST_MERGE_NODE_PYTHON_CHROMIUM_AND_PAGES_NOT_YET_POSSIBLE"
+  ],
+  "open_important_review_threads_as_of_last_check": 0,
+  "security_remediation": {
+    "red_sha": "0da59cbf8a49b050ce9c1614c4d016e9660fb119",
+    "green_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
+    "red_quality_run_id": 38378621537,
+    "green_quality_run_id": 38379023765,
+    "green_server_run_id": 38379024518,
+    "reviewed_comment_ids": [
+      4256618135,
+      4256618149
+    ],
+    "review_threads_resolved": true,
+    "final_exact_head_review_still_required": true
+  }
 }
