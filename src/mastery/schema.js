@@ -7,7 +7,13 @@ const allowedReasons=new Set(K5_REASON_CODES);
 const isPlain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)&&Object.getPrototypeOf(x)===Object.prototype;
 const sha=x=>typeof x==='string'&&/^[0-9a-f]{64}$/.test(x);
 const id=x=>typeof x==='string'&&x.length>0;
-const hasDirectPII=value=>/@/.test(value)||/^\+?\d[\d\s().-]{6,}$/.test(value)||/^(?:\d{1,3}\.){3}\d{1,3}$/.test(value);
+const looksLikeIPv6=value=>{
+ const unwrapped=value.startsWith('[')&&value.endsWith(']')?value.slice(1,-1):value;
+ const host=unwrapped.replace(/%[a-zA-Z0-9_.~-]+$/,'');
+ if(!host.includes(':'))return false;
+ try{new URL('http://['+host+']/');return true}catch{return false}
+};
+const hasDirectPII=value=>/@/.test(value)||/^\+?\d[\d\s().-]{6,}$/.test(value)||/^(?:\d{1,3}\.){3}\d{1,3}$/.test(value)||looksLikeIPv6(value);
 const count=x=>Number.isSafeInteger(x)&&x>=0;
 const must=(condition,message)=>{if(!condition)throw new Error(message)};
 function exact(value,keys){
