@@ -107,6 +107,16 @@ export async function deriveK5EvidenceSufficiency({
       if(!candidate)continue;
       const mapping=mapped.get(candidate.objective_id);
       if(!mapping)continue;
+      // A quarantined family can share an objective with independent, safe
+      // observed families. Never erase their authenticated counts.
+      const observedSibling=byObjective.get(mapping.objective_id);
+      if(observedSibling?.source_status==='OBSERVED_ONLY'){
+        byObjective.set(mapping.objective_id,{
+          ...observedSibling,
+          reason_codes:[...new Set([...observedSibling.reason_codes,...corrected.reasons])].sort(cmp)
+        });
+        continue;
+      }
       byObjective.set(mapping.objective_id,{
         objective_id:mapping.objective_id,domain_id:mapping.domain_id,
         mapping_status:mapping.mapping_status,
