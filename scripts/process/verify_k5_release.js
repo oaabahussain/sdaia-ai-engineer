@@ -3,7 +3,16 @@ import {pathToFileURL} from 'node:url';
 
 const SHA=/^[a-f0-9]{40}$/;
 const APPROVAL=/^K5-LANDING-APPROVED PR=(\d+) HEAD=([a-f0-9]{40})$/;
-const REQUESTED_CHECKS=['Pull request quality gate','Server and adapter contract tests'];
+// Repository-pinned GitHub workflow identities, not mutable display names.
+const REQUIRED_WORKFLOWS=Object.freeze({
+  'Pull request quality gate':Object.freeze({
+    id:354048838,path:'.github/workflows/ci.yml'
+  }),
+  'Server and adapter contract tests':Object.freeze({
+    id:352261825,path:'.github/workflows/server-tests.yml'
+  })
+});
+const REQUESTED_CHECKS=Object.keys(REQUIRED_WORKFLOWS);
 
 // Read-only, fail-closed GitHub API inspection. Never merges, approves or sets
 // an issue label. Synthetic test objects are not a live authorization source.
@@ -42,9 +51,24 @@ export async function collectK5GitHubEvidence({
   if(pr.number!==prNumber||pr.base?.ref!=='main'||!SHA.test(pr.head?.sha??'')||
      pr.merged||pr.state!=='open')throw new Error('unexpected PR identity/base/state');
   const prHead=pr.head.sha;
+  // GitHub caps reviews at 100 per page; an omitted objection must never
+  // become an implicit approval. Page until short, or fail closed on limits.
+  async function getCompleteReviews(){
+    const all=[];
+    for(let page=1;page<=100;page++){
+      const suffix=page===1?'':'&page='+page;
+      const entries=await request(api+'/pulls/'+prNumber+
+        '/reviews?per_page=100'+suffix);
+      if(!Array.isArray(entries)||entries.length>100)
+        throw new Error('invalid GitHub review pagination; release blocked');
+      all.push(...entries);
+      if(entries.length<100)return all;
+    }
+    throw new Error('review pagination limit exceeded; release blocked');
+  }
   const [runs,reviews,comments,graphql]=await Promise.all([
     request(api+'/actions/runs?head_sha='+prHead+'&per_page=100'),
-    request(api+'/pulls/'+prNumber+'/reviews?per_page=100'),
+    getCompleteReviews(),
     request(api+'/issues/'+prNumber+'/comments?per_page=100'),
     request('/graphql',{query:`query($owner:String!,$name:String!,$number:Int!){
       repository(owner:$owner,name:$name){pullRequest(number:$number){
@@ -84,7 +108,14 @@ export async function collectK5GitHubEvidence({
   // cannot conceal later failed, cancelled or pending runs on the same SHA.
   const allRuns=Array.isArray(runs.workflow_runs)?runs.workflow_runs:[];
   const latestRun=name=>allRuns
-    .filter(run=>run.head_sha===prHead&&run.name===name)
+    .filter(run=>{
+      const workflow=REQUIRED_WORKFLOWS[name];
+      return run.head_sha===prHead&&run.name===name&&
+        run.workflow_id===workflow.id&&run.path===workflow.path&&
+        run.event==='pull_request'&&
+        Array.isArray(run.pull_requests)&&run.pull_requests.some(p=>
+          p.number===prNumber&&p.head?.sha===prHead);
+    })
     .sort((a,b)=>{
       const timeA=Date.parse(a.created_at??'')||0,timeB=Date.parse(b.created_at??'')||0;
       return timeB-timeA||(Number(b.run_number)||0)-(Number(a.run_number)||0)||
