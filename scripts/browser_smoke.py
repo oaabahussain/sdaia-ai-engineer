@@ -362,6 +362,7 @@ def main():
         # P2: the K5 fail-closed fallback must update with app locale
         # even when the K5 controller never initialized.
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('lang')")=='en'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='Recorded activity', 'English fallback region must have English accessible name'
         click(session,find(session,'#langBtn'))
         wait_until(lambda:execute(session,"return document.documentElement.lang")=='ar',
                    label='Arabic locale after failed K4 bootstrap')
@@ -370,12 +371,14 @@ def main():
             label='K5 fallback reflects Arabic language switch')
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='rtl'
         assert 'لا يمكن التحقق' in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='النشاط المسجل', 'Arabic fallback region must have Arabic accessible name'
         click(session,find(session,'#langBtn'))
         wait_until(lambda:execute(session,
             "return document.querySelector('#k5HomeCard').getAttribute('lang')==='en'"),
             label='K5 fallback reflects English language switch')
         assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='ltr'
         assert 'Recorded activity cannot be verified' in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='Recorded activity', 'Restored English fallback must update accessible name'
 
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
