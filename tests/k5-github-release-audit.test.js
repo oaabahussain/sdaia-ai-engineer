@@ -15,7 +15,8 @@ function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chat
    {name:'Server and adapter contract tests',head_sha:checkHead,status:'completed',conclusion:'success',id:124}
   ]};
   else if(key.endsWith('/actions/runs/123/jobs?per_page=100'))data={jobs:[{id:456,steps:[{name:'Browser smoke test',conclusion:'success'}]}]};
-  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody},...(requestedChanges?[{commit_id:H,state:'CHANGES_REQUESTED',user:{login:'independent-security-reviewer'},body:'Blocking request'}]:[])];
+  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{id:410,commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody},...(requestedChanges?[{commit_id:H,state:'CHANGES_REQUESTED',user:{login:'independent-security-reviewer'},body:'Blocking request'}]:[])];
+  else if(key.endsWith('/pulls/69/reviews/410/comments?per_page=100'))data=[];
   else if(key.endsWith('/issues/69/comments?per_page=100'))data=approval?[{body:'K5-LANDING-APPROVED PR=69 HEAD='+H,user:{login:'oaabahussain'},created_at:'2026-10-12T13:01:00Z'}]:[];
   else if(url.endsWith('/graphql'))data={data:{repository:{pullRequest:{reviewThreads:{nodes:openThread?[{isResolved:false,comments:{nodes:[{body:'P1 unresolved'}]}}]:[],pageInfo:{hasNextPage:false}}}}}};
   else throw Error('unexpected endpoint '+url);
