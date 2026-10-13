@@ -59,8 +59,15 @@ export async function collectK5GitHubEvidence({
   const openThreads=threadPage.nodes.filter(node=>!node.isResolved);
   const materialOpen=openThreads.filter(node=>
     node.comments?.nodes?.some(c=>/P0|P1|P2|critical|important/i.test(c.body??'')));
+  // Owner COMMENTED reviews and drive-by remarks are not independent
+  // code reviews. Require Codex's actual review submission (not an
+  // arbitrary PR comment), its reviewed-commit marker, and exact head.
   const validReviews=(Array.isArray(reviews)?reviews:[])
-    .filter(v=>v.commit_id===prHead&&['APPROVED','COMMENTED'].includes(v.state));
+    .filter(v=>v.commit_id===prHead&&v.state==='COMMENTED'&&
+      v.user?.login==='chatgpt-codex-connector[bot]'&&
+      typeof v.body==='string'&&
+      v.body.includes('### 💡 Codex Review')&&
+      v.body.includes('**Reviewed commit:** `'+prHead.slice(0,10)+'`'));
   const eligibleRuns=(runs.workflow_runs??[]).filter(run=>
     run.head_sha===prHead&&run.status==='completed'&&run.conclusion==='success');
   const checks=REQUESTED_CHECKS.flatMap(checkName=>{
