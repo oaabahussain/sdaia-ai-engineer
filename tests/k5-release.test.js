@@ -8,7 +8,8 @@ const valid=()=>({prNumber:69,prHead:SHA,
   {name:'Server and adapter contract tests',sha:SHA,conclusion:'success'}],
  browserEvidence:{sha:SHA,runId:10001,jobId:20002,stepName:'Browser smoke test',conclusion:'success'},
  review:{headSha:SHA,completed:true,openCritical:0,openImportant:0},
- policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'},phase:'PRE_MERGE'});
+ policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'},
+ governance:{approved:true,headSha:SHA,specBlobSha:'b'.repeat(40),planBlobSha:'c'.repeat(40)},phase:'PRE_MERGE'});
 test('missing owner approval cannot authorize landing',()=>{
  const input=valid();delete input.approval;
  const out=verifyK5Release(input);
