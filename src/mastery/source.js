@@ -14,7 +14,13 @@ export function assertK5VerifiedReplayBinding(source,events) {
   return true;
 }
 const validId = value => typeof value === 'string' && value.length > 0;
-const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value);
+const looksLikeIPv6=value=>{
+ const unwrapped=value.startsWith('[')&&value.endsWith(']')?value.slice(1,-1):value;
+ const host=unwrapped.replace(/%[a-zA-Z0-9_.~-]+$/,'');
+ if(!host.includes(':'))return false;
+ try{new URL('http://['+host+']/');return true}catch{return false}
+};
+const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || looksLikeIPv6(value);
 async function fingerprintScope(parts) {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 required');
   const bytes = new TextEncoder().encode(JSON.stringify(parts));
