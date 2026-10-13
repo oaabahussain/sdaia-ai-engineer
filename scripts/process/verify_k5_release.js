@@ -65,16 +65,37 @@ export async function collectK5GitHubEvidence({
   const validReviews=(Array.isArray(reviews)?reviews:[])
     .filter(v=>v.commit_id===prHead&&v.state==='COMMENTED'&&
       v.user?.login==='chatgpt-codex-connector[bot]'&&
+      Number.isSafeInteger(v.id)&&v.id>0&&
       typeof v.body==='string'&&
       v.body.includes('### 💡 Codex Review')&&
       v.body.includes('**Reviewed commit:** `'+prHead.slice(0,10)+'`'));
-  const eligibleRuns=(runs.workflow_runs??[]).filter(run=>
-    run.head_sha===prHead&&run.status==='completed'&&run.conclusion==='success');
-  const checks=REQUESTED_CHECKS.flatMap(checkName=>{
-    const run=eligibleRuns.find(v=>v.name===checkName);
-    return run?[{name:checkName,sha:prHead,conclusion:'success'}]:[];
-  });
-  const quality=eligibleRuns.find(run=>run.name==='Pull request quality gate');
+  // Resolved GitHub threads do not erase the reviewer finding. A finding
+  // submitted by Codex against THIS commit blocks the release for this SHA.
+  // Fixing it requires a changed head and independent review of that head.
+  const reviewComments=await Promise.all(validReviews.map(async review=>{
+    const comments=await request(api+'/pulls/'+prNumber+'/reviews/'+review.id+'/comments?per_page=100');
+    if(!Array.isArray(comments)||comments.length===100)
+      throw new Error('review comment pagination incomplete; release blocked');
+    return comments;
+  }));
+  const exactHeadReviewHasFindings=reviewComments.some(comments=>
+    comments.some(comment=>/\bP[012]\b|critical|important/i.test(comment.body??'')));
+  // Select the newest check independently from its result: old green runs
+  // cannot conceal later failed, cancelled or pending runs on the same SHA.
+  const allRuns=Array.isArray(runs.workflow_runs)?runs.workflow_runs:[];
+  const latestRun=name=>allRuns
+    .filter(run=>run.head_sha===prHead&&run.name===name)
+    .sort((a,b)=>{
+      const timeA=Date.parse(a.created_at??'')||0,timeB=Date.parse(b.created_at??'')||0;
+      return timeB-timeA||(Number(b.run_number)||0)-(Number(a.run_number)||0)||
+        (Number(b.id)||0)-(Number(a.id)||0);
+    })[0]??null;
+  const latestRuns=REQUESTED_CHECKS.map(latestRun);
+  const successful=run=>run?.status==='completed'&&run.conclusion==='success';
+  const checks=latestRuns.filter(successful).map(run=>({
+    name:run.name,sha:prHead,conclusion:'success'
+  }));
+  const quality=latestRuns.find(run=>run?.name==='Pull request quality gate'&&successful(run));
   let browserEvidence=null;
   if(quality){
     const jobs=await request(api+'/actions/runs/'+quality.id+'/jobs?per_page=100');
@@ -101,7 +122,8 @@ export async function collectK5GitHubEvidence({
   const changesRequested=(Array.isArray(reviews)?reviews:[])
     .some(v=>v.commit_id===prHead&&v.state==='CHANGES_REQUESTED');
   const review={headSha:prHead,
-    completed:validReviews.length>0&&openThreads.length===0&&!changesRequested,
+    completed:validReviews.length>0&&openThreads.length===0&&
+      !changesRequested&&!exactHeadReviewHasFindings,
     openCritical:materialOpen.length,openImportant:openThreads.length};
   const readiness=verifyK5Release({prNumber,prHead,approval,checks,review,browserEvidence,
     policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'}});
