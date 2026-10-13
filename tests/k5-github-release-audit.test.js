@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
 const H='a'.repeat(40);
 const paths=[];
-function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chatgpt-codex-connector[bot]',reviewHead=H,reviewBody='### 💡 Codex Review\n**Reviewed commit:** `'+H.slice(0,10)+'`'}={}){
+function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chatgpt-codex-connector[bot]',reviewHead=H,reviewBody='### 💡 Codex Review\n**Reviewed commit:** `'+H.slice(0,10)+'`',requestedChanges=false}={}){
  paths.length=0;
  const get=async(url,opts)=>{
   paths.push(url);
@@ -15,7 +15,7 @@ function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chat
    {name:'Server and adapter contract tests',head_sha:checkHead,status:'completed',conclusion:'success',id:124}
   ]};
   else if(key.endsWith('/actions/runs/123/jobs?per_page=100'))data={jobs:[{id:456,steps:[{name:'Browser smoke test',conclusion:'success'}]}]};
-  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody}];
+  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody},...(requestedChanges?[{commit_id:H,state:'CHANGES_REQUESTED',user:{login:'independent-security-reviewer'},body:'Blocking request'}]:[])];
   else if(key.endsWith('/issues/69/comments?per_page=100'))data=approval?[{body:'K5-LANDING-APPROVED PR=69 HEAD='+H,user:{login:'oaabahussain'},created_at:'2026-10-12T13:01:00Z'}]:[];
   else if(url.endsWith('/graphql'))data={data:{repository:{pullRequest:{reviewThreads:{nodes:openThread?[{isResolved:false,comments:{nodes:[{body:'P1 unresolved'}]}}]:[],pageInfo:{hasNextPage:false}}}}}};
   else throw Error('unexpected endpoint '+url);
@@ -65,4 +65,11 @@ test('trusted reviewer must supply genuine full-review marker on exact current h
    prNumber:69,token:'test',fetchImpl:fixture(options)});
   assert.equal(report.readiness.ready,false,JSON.stringify(options));
  }
+});
+
+test('a pending changes-requested review blocks landing despite Codex COMMENTED and green CI',async()=>{
+ const report=await collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',
+  prNumber:69,token:'test',fetchImpl:fixture({requestedChanges:true})});
+ assert.equal(report.readiness.ready,false);
+ assert.ok(report.readiness.blockers.includes('CHANGES_REQUESTED_BLOCKS_RELEASE'));
 });
