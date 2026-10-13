@@ -42,7 +42,7 @@ export async function computeK5SourceFingerprint(source,events) {
 // Full learner history across valid releases is kept for correction resolution.
 export async function readK5Source({store,learnerId,trackId,releaseId,throughStoreSeq}={}) {
   if (![learnerId,trackId,releaseId].every(validId)) throw new TypeError('invalid source scope');
-  if (hasDirectPII(learnerId)) throw new TypeError('learner_id must be an opaque pseudonym without direct PII');
+  if (learnerId!==learnerId.trim() || hasDirectPII(learnerId)) throw new TypeError('learner_id must be an opaque pseudonym without direct PII or surrounding whitespace');
   if (!Number.isSafeInteger(throughStoreSeq) || throughStoreSeq < 0)
     throw new RangeError('invalid watermark');
   if (!store || !validId(store.store_id) || typeof store.getSourceHead !== 'function' ||
