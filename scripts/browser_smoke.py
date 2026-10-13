@@ -136,6 +136,12 @@ def main():
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?first-new-version-navigation-offline=1'})
         wait_until(lambda:execute(session,"return document.getElementById('bankCount')?.textContent")==str(EXPECTED_BANK),timeout=20,label='first new-version navigation offline')
         assert execute(session,"return document.getElementById('errorBox').classList.contains('show')") is False
+        # K5 first-entry offline must resolve verified activity before any online visit.
+        # A newly imported module missing from the precache must fail this assertion.
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='NO_OBSERVATIONS'"),
+          timeout=20,label='K5 first feedback-installed service worker offline boot')
+        assert execute(session,"return document.getElementById('k5HomeCard').getAttribute('data-k5-status')")!='SOURCE_INVALID', 'new privacy module must be cached during service-worker install'
         server=start_server()
         wait_http(BASE+'/index.html')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
