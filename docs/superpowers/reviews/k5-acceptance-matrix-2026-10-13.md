@@ -6,6 +6,21 @@
 **RED:** `0da59cbf8a49b050ce9c1614c4d016e9660fb119`; quality run [38378621537](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38378621537), 1061/1063 Node tests passed, two intentional trust-boundary regressions failed with missing expected exception/rejection.
 **GREEN:** `6d8f79b95933803029b54d12c06d64ae3ebee79b`; [quality run 38379023765](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38379023765) and [server run 38379024518](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38379024518) SUCCESS; 1064/1064 Node and 76/76 Python. Browser smoke, offline checks, factory import, SW/Pages assembly, K5 GitHub read-only audit and AC-13 real Chromium quota probe completed successfully.
 
+## Latest K5 release-auditor security verification (2026-10-13)
+
+**Verified source-code SHA:** `ca8ca7e79a194882f4293732f7d5726cc998bf79` (after restoring correct trust semantics). The earlier security checks above remain immutable historical evidence. This document itself and state/ledger updates advance the branch, so final-head checks must be re-run and independently reviewed before any release claim.
+
+- **P1 / review thread `PRRT_kwDOUQgV2c6r1Sxe` / comment `4257964005`:** exact-head `DISMISSED` Codex reviews carrying P0/P1/P2 were omitted from security finding detection; a separate clean review could produce a false readiness decision. Root-cause patch in `scripts/process/verify_k5_release.js`: collect evidence from verified exact-head `COMMENTED` + `DISMISSED`, but count only `COMMENTED` as clean review. This patch does not change the owner/merge approval gate.
+- **RED:** `d61cde62ed34bace875cdea87794dbeb599809a7` on [GitHub QG 38410902141](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38410902141): 1076/1079 Node tests passed, precisely 3 purposefully failing P0/P1/P2 bypass tests, all benign/old-head/non-Codex controls passed.
+- **GREEN:** `ca8ca7e79a194882f4293732f7d5726cc998bf79`, [QG 38411130134](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38411130134) SUCCESS: 1079/1079 Node, 76/76 Python, Chromium, Pages, Offline and K5 read-only audit. [Server/adapter 38411129540](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38411129540) SUCCESS.
+- **Reviewer triage:** replied to issue with evidence (reply `4259739333`) and resolved that single thread. Resolution is NOT independent head review.
+- **Autopilot pilot:** archived `skill.zip` loaded locally; 36/36 deterministic Skill tests PASS; Model Router `VALID_DESIGN_ONLY` (no enabled provider, no paid fallback, zero remote model calls); `flowctl.py` selected RC01 and release audit conservatively returned BLOCKED when observation completeness was intentionally not certified. Neither an installed GitHub agent nor model routing/deployment is claimed.
+- **AC-01:** still PARTIAL, due to original spec explicitly marked NOT_APPROVED and draft design/plan PRs #67/#68.
+- **AC-22:** PARTIAL until independent late-arrival and lineage challenge review of final head.
+- **AC-23:** BLOCKED pending independent clean code review on final SHA after all docs and code are frozen.
+- **AC-24:** BLOCKED pending owner PR #69 full 40-character SHA-specific landing consent via PR Completion guarded helper and actual merged-main/Pages postlanding proof.
+- **Numerical lane:** `INACTIVE`; five estimate fields remain JSON null. Question-bank invariants to be reconfirmed after landing: 1120 public questions / 7 domains / 200-question mock.
+
 ## Root-cause-backed corrections
 
 1. **Review #4256618135:** `validateK5Projection` only checked shape and aggregate self-consistency, allowing caller-created exposure counts. `deriveK5EvidenceSufficiency` now privately brands its deeply frozen results; snapshot and view require the exact opaque result. See `tests/k5-trust-boundaries.test.js`, `tests/k5-snapshot-trust.test.js`, `tests/k5-view.test.js`.
