@@ -86,17 +86,20 @@ export async function collectK5GitHubEvidence({
   // Owner COMMENTED reviews and drive-by remarks are not independent
   // code reviews. Require Codex's actual review submission (not an
   // arbitrary PR comment), its reviewed-commit marker, and exact head.
-  const validReviews=(Array.isArray(reviews)?reviews:[])
-    .filter(v=>v.commit_id===prHead&&v.state==='COMMENTED'&&
+  // Exact-head dismissed Codex reviews can still carry a P0/P1/P2 finding.
+  // Dismissal must never erase evidence, but it is NOT clean approval either.
+  const evidenceReviews=(Array.isArray(reviews)?reviews:[])
+    .filter(v=>v.commit_id===prHead&&
+      (v.state==='COMMENTED'||v.state==='DISMISSED')&&
       v.user?.login==='chatgpt-codex-connector[bot]'&&
       Number.isSafeInteger(v.id)&&v.id>0&&
       typeof v.body==='string'&&
       v.body.includes('### 💡 Codex Review')&&
       v.body.includes('**Reviewed commit:** `'+prHead.slice(0,10)+'`'));
-  // Resolved GitHub threads do not erase the reviewer finding. A finding
-  // submitted by Codex against THIS commit blocks the release for this SHA.
-  // Fixing it requires a changed head and independent review of that head.
-  const reviewComments=await Promise.all(validReviews.map(async review=>{
+  const validReviews=evidenceReviews.filter(v=>v.state==='COMMENTED');
+  // Resolved threads and administratively dismissed review submissions do
+  // not erase exact-head findings. Fixes need a new head and a new review.
+  const reviewComments=await Promise.all(evidenceReviews.map(async review=>{
     const comments=await request(api+'/pulls/'+prNumber+'/reviews/'+review.id+'/comments?per_page=100');
     if(!Array.isArray(comments)||comments.length===100)
       throw new Error('review comment pagination incomplete; release blocked');
