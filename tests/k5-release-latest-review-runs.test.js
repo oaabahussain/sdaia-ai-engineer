@@ -1,3 +1,4 @@
+import {withSyntheticApprovedK5Governance} from './helpers/k5-approved-governance-fixture.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
@@ -51,7 +52,7 @@ function transport({latestQuality='success',resolvedFinding=false,firstReviewFin
 
 const run=async options=>collectK5GitHubEvidence({
  repo:'oaabahussain/sdaia-ai-engineer',prNumber:69,token:'fake-test-token',
- fetchImpl:transport(options)
+ fetchImpl:withSyntheticApprovedK5Governance(transport(options))
 });
 test('P1 resolved independent Codex inline finding still rejects release without clean follow-up review',async()=>{
  const r=await run({resolvedFinding:true});
