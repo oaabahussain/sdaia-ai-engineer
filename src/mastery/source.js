@@ -1,6 +1,13 @@
 import { replayEvidence } from '../evidence/replay.js';
 
 const verifiedReplayEvents=new WeakMap();
+// Freeze an independent replay snapshot, never mutable IndexedDB/store row references.
+function deepFreezeReplay(value,seen=new WeakSet()){
+ if(!value||typeof value!=='object'||seen.has(value))return value;
+ seen.add(value);
+ for(const child of Object.values(value))deepFreezeReplay(child,seen);
+ return Object.freeze(value);
+}
 export function assertK5VerifiedReplayBinding(source,events) {
   if(!source||typeof source!=='object'||verifiedReplayEvents.get(source)!==events)
     throw new TypeError('K5 requires source and events from the same verified K3 replay');
@@ -56,13 +63,15 @@ export async function readK5Source({store,learnerId,trackId,releaseId,throughSto
     seen.add(event.event_id);
   }
   if (throughStoreSeq === 0 && events.length) throw new Error('zero watermark cannot contain events');
+  // Clone and deep-freeze before the first async fingerprint calculation.
+  // All later correction classification sees the same immutable verified bytes.
+  const frozenEvents=Object.freeze(events.map(event=>deepFreezeReplay(structuredClone(event))));
   const source_fingerprint = await computeK5SourceFingerprint({
     source_store_id:store.store_id,learner_id:learnerId,
     track_id:trackId,release_id:releaseId,through_store_seq:throughStoreSeq
-  },events);
+  },frozenEvents);
   // Bind this result to the exact verified replay array. Public hashes alone
   // are not authority; only this reader may register the source/event pair.
-  const frozenEvents=Object.freeze(events.map(event=>Object.freeze(event)));
   const source=Object.freeze({
     learner_id:learnerId,track_id:trackId,release_id:releaseId,
     source_store_id:store.store_id,through_store_seq:throughStoreSeq,
