@@ -2,6 +2,16 @@ import {classifyK5Corrections} from './corrections.js';
 import {collectK5Presentations} from './presentations.js';
 import {canonicalMappingHash} from './provenance.js';
 import {validateK5Projection} from './schema.js';
+import {assertK5ValidatedObjectiveMap} from './objectiveMap.js';
+
+// Unforgeable in-process provenance: only this derivation can mint a public projection.
+const VERIFIED_PROJECTIONS=new WeakSet();
+export function assertK5VerifiedProjection(projection){
+ if(!projection||!VERIFIED_PROJECTIONS.has(projection))
+  throw new TypeError('validated K5 projection with verified source provenance required');
+ validateK5Projection(projection);
+ return true;
+}
 import {fingerprintEvent} from '../evidence/jcs.js';
 import {computeK5SourceFingerprint,assertK5VerifiedReplayBinding} from './source.js';
 const cmp=(a,b)=>a<b?-1:a>b?1:0;
@@ -26,9 +36,7 @@ export async function deriveK5EvidenceSufficiency({
      !Array.isArray(acceptedPublicCatalog.items)||
      !/^[0-9a-f]{64}$/.test(acceptedPublicCatalog.question_payload_sha256))
     throw new TypeError('invalid pinned public catalog');
-  if(!acceptedObjectiveMap||!nonempty(acceptedObjectiveMap.version)||
-     !Array.isArray(acceptedObjectiveMap.items))
-    throw new TypeError('invalid validated objective map');
+  assertK5ValidatedObjectiveMap(acceptedObjectiveMap);
   const ids=new Set(),seqs=new Set();
   for(const event of events){
     if(!nonempty(event?.event_id)||!Number.isSafeInteger(event.store_seq)||
@@ -131,5 +139,11 @@ export async function deriveK5EvidenceSufficiency({
     observed_domain_count:observedDomains,objectives,...nullEstimates
   };
   validateK5Projection(output);
+  output.reason_codes=Object.freeze(output.reason_codes);
+  output.objectives=Object.freeze(output.objectives.map(row=>Object.freeze({
+    ...row,reason_codes:Object.freeze([...row.reason_codes])
+  })));
+  Object.freeze(output);
+  VERIFIED_PROJECTIONS.add(output);
   return output;
 }
