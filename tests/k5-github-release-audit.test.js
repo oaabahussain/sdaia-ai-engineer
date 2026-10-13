@@ -2,6 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
 const H='a'.repeat(40);
+const WORKFLOWS={
+ 'Pull request quality gate':{workflow_id:354048838,path:'.github/workflows/ci.yml'},
+ 'Server and adapter contract tests':{workflow_id:352261825,path:'.github/workflows/server-tests.yml'}
+};
+const workflowRun=(name,id,sha)=>({
+ ...WORKFLOWS[name],name,id,head_sha:sha,event:'pull_request',
+ pull_requests:[{number:69,head:{sha}}],status:'completed',conclusion:'success'
+});
 const paths=[];
 function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chatgpt-codex-connector[bot]',reviewHead=H,reviewBody='### 💡 Codex Review\n**Reviewed commit:** `'+H.slice(0,10)+'`',requestedChanges=false}={}){
  paths.length=0;
@@ -11,8 +19,8 @@ function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chat
   let data;
   if(key.endsWith('/pulls/69'))data={number:69,state:'open',draft:false,merged:false,head:{sha:H},base:{ref:'main'}};
   else if(key.includes('/actions/runs?'))data={workflow_runs:[
-   {name:'Pull request quality gate',head_sha:checkHead,status:'completed',conclusion:'success',id:123},
-   {name:'Server and adapter contract tests',head_sha:checkHead,status:'completed',conclusion:'success',id:124}
+   workflowRun('Pull request quality gate',123,checkHead),
+   workflowRun('Server and adapter contract tests',124,checkHead)
   ]};
   else if(key.endsWith('/actions/runs/123/jobs?per_page=100'))data={jobs:[{id:456,steps:[{name:'Browser smoke test',conclusion:'success'}]}]};
   else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{id:410,commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody},...(requestedChanges?[{commit_id:H,state:'CHANGES_REQUESTED',user:{login:'independent-security-reviewer'},body:'Blocking request'}]:[])];
