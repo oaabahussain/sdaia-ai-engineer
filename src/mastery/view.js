@@ -1,4 +1,4 @@
-import {validateK5Projection} from './schema.js';
+import {assertK5VerifiedProjection} from './projection.js';
 const STRINGS={
  ar:{
    heading:'النشاط المسجل',
@@ -18,7 +18,7 @@ const STRINGS={
  }
 };
 export function renderK5Summary({projection,locale='ar'}={}) {
-  validateK5Projection(projection);
+  assertK5VerifiedProjection(projection);
   const lang=locale==='en'?'en':'ar',labels=STRINGS[lang];
   const status=projection.observation_status;
   const count=['NO_OBSERVATIONS','OBSERVATIONS_PRESENT'].includes(status)?
