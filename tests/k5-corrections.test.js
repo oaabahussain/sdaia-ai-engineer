@@ -10,3 +10,25 @@ test('unbounded missing target invalidates source rather than guessing family',(
 test('supersession cycle is quarantined with both sorted reasons',()=>{const r=classifyK5Corrections({events:[e('event1'),e('event2'),c('correction1','event1','SUPERSEDE','event2'),c('correction2','event2','SUPERSEDE','event1')]});assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_CONFLICT']);assert.equal(r.sourceInvalid,false)});
 test('caller supplied authority callback cannot authenticate correction',()=>{const r=classifyK5Corrections({events:[e('event1'),c('correction1','event1')],verifyAuthority:()=>true});assert.ok(r.reasons.includes('CORRECTION_AUTHORITY_UNVERIFIED'));assert.deepEqual(r.safeEvents,[])});
 test('uncorrected families remain preserved',()=>{const r=classifyK5Corrections({events:[e('event1'),e('event2','family-B')]});assert.equal(r.integrity_status,'COMPLETE');assert.deepEqual(r.safeEvents.map(x=>x.event_id),['event1','event2']);assert.deepEqual(r.reasons,[])});
+
+test('missing replacement with known target quarantines only its family',()=>{
+ const r=classifyK5Corrections({events:[
+  e('event1','family-A'),e('event2','family-B'),
+  c('correction1','event1','SUPERSEDE','missing-event')
+ ]});
+ assert.equal(r.sourceInvalid,false,'known target bounds quarantine to family-A');
+ assert.deepEqual(r.quarantinedFamilies,['family-A']);
+ assert.deepEqual(r.safeEvents.map(x=>x.question_family_id),['family-B']);
+ assert.equal(r.integrity_status,'CONFLICTED');
+ assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_UNRESOLVED']);
+});
+test('unknown target still invalidates source regardless of replacement pointer',()=>{
+ const r=classifyK5Corrections({events:[
+  e('event1','family-A'),e('event2','family-B'),
+  c('correction1','missing-target','SUPERSEDE','missing-replacement')
+ ]});
+ assert.equal(r.sourceInvalid,true);
+ assert.deepEqual(r.safeEvents,[]);
+ assert.deepEqual(r.quarantinedFamilies,[]);
+ assert.ok(r.reasons.includes('CORRECTION_UNRESOLVED'));
+});
