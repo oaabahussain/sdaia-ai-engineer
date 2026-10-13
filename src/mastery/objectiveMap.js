@@ -1,16 +1,33 @@
 import {canonicalMappingHash} from './provenance.js';
 
+// A validated objective mapping is a private capability, not a caller claim.
+const VERIFIED_OBJECTIVE_MAPS=new WeakSet();
+const deepFreeze=value=>{
+ if(value&&typeof value==='object'&&!Object.isFrozen(value)){
+  for(const child of Object.values(value))deepFreeze(child);
+  Object.freeze(value);
+ }
+ return value;
+};
+export function assertK5ValidatedObjectiveMap(map){
+ if(!map||!VERIFIED_OBJECTIVE_MAPS.has(map))
+  throw new TypeError('verified immutable K5 objective map required');
+ return true;
+}
+
+
 // Approved K5 Lane 1 mapping is the frozen K2 provisional catalog.
 // No objective has been approved for numerical readiness or mastery.
 export const K5_APPROVED_OBJECTIVE_CANONICAL_SHA256=
  '6727666fa76c7ea66d35bb9c61232e523295e523ebc52ee0b49822af66ebf8bf';
 export async function validateK5ObjectiveMap(raw,trackId){
- if(trackId!=='sdaia-ai-engineer'||raw?.track_id!==trackId)
+ const approvedRaw=structuredClone(raw);
+ if(trackId!=='sdaia-ai-engineer'||approvedRaw?.track_id!==trackId)
   throw new TypeError('unapproved objective track');
- if(raw.schema_version!==1||!Array.isArray(raw.objectives)||raw.objectives.length===0)
+ if(approvedRaw.schema_version!==1||!Array.isArray(approvedRaw.objectives)||approvedRaw.objectives.length===0)
   throw new TypeError('invalid objective mapping');
  const seen=new Set(),items=[];
- for(const objective of raw.objectives){
+ for(const objective of approvedRaw.objectives){
   if(objective?.status!=='provisional'||objective?.origin!=='migration-derived')
    throw new TypeError('unapproved objective mapping status');
   if(objective?.track_id!==trackId||
@@ -25,11 +42,13 @@ export async function validateK5ObjectiveMap(raw,trackId){
    mapping_status:'PROVISIONAL'
   });
  }
- const canonicalSha256=await canonicalMappingHash(raw);
+ const canonicalSha256=await canonicalMappingHash(approvedRaw);
  if(canonicalSha256!==K5_APPROVED_OBJECTIVE_CANONICAL_SHA256)
   throw new Error('objective mapping digest differs from approved immutable baseline');
- return Object.freeze({
+ const accepted=Object.freeze({
   version:'sdaia-ai-engineer.objectives-v1',
-  items,raw,canonicalSha256
+  items:deepFreeze(items),raw:deepFreeze(approvedRaw),canonicalSha256
  });
+ VERIFIED_OBJECTIVE_MAPS.add(accepted);
+ return accepted;
 }
