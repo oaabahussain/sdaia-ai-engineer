@@ -12,16 +12,16 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "Observed exact source code head 7200266825b0e6614d6fbb8d8c83c93921eb62c0 CI GREEN: 1087 Node, 76 Python, Chromium/Pages. Two Codex P2 concerns from review of 74d145010a were reproduced in RED 38435853892 (3 intentional failures), repaired and replied/resolved: known-family missing supersession replacement now quarantines ONLY affected family while unknown targets still source-invalid; whitespace-wrapped IP/contact IDs rejected at K3 source and K5 projection boundaries. 23/23 GitHub review threads resolved as of check, but NO independent review on final documentation HEAD yet. AC01 formal spec/plan still unapproved; AC23 and AC24 remain blocked. This state/documentation commit changes HEAD and requires fresh exact-head CI and independent review; release not authorized.",
-  "last_code_ci_verified_sha": "7200266825b0e6614d6fbb8d8c83c93921eb62c0",
+  "notes": "Review #5 (Codex on 4026a315...) exposed shared-objective sibling count loss and Unicode format-control-wrapped learner PII. Observed RED at 37673affa57c9b1822b5b21aaaf97471fe2c29eb (QG 38437889136 1085/1088 pass and 3 expected failures), GREEN source e534695f2bc288a4f1e723eb9f8f8e61c84edc4e (QG 38438160388 1088/1088 Node, 76/76 Python, real Chromium and offline/Pages; server 38438160354). Per-objective safe sibling counts now survive family quarantine, with reason codes preserved; learner IDs with Unicode format or control characters are rejected at BOTH source and projection boundaries. All 25 review threads individually resolved as of live check; this documentation commit advances HEAD and requires fresh CI and independent final review. AC01 formal exact spec/plan approval, AC23 current head reviewer and AC24 authorized merge/postmerge remain open. Five numerical fields must remain null.",
+  "last_code_ci_verified_sha": "e534695f2bc288a4f1e723eb9f8f8e61c84edc4e",
   "last_full_ci": {
-    "quality_run_id": 38436062665,
-    "server_run_id": 38436062963,
+    "quality_run_id": 38438160388,
+    "server_run_id": 38438160354,
     "conclusion": "SUCCESS",
-    "scope": "1087/1087 Node; 76/76 Python; real Chromium bilingual/offline/K4 failure, Pages assembly, read-only release audit on exact source HEAD 7200266825b0e6614d6fbb8d8c83c93921eb62c0"
+    "scope": "1088/1088 Node, 76/76 Python, Chromium browser smoke, offline cached reload, Pages assembly, exact source HEAD e534695f2bc288a4f1e723eb9f8f8e61c84edc4e"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_FINAL_HEAD_INDEPENDENT_CODE_REVIEW_AFTER_SECURITY_REMEDIATION",
+  "independent_review_status": "PENDING_FRESH_REVIEW_ON_FINAL_DOCUMENTATION_HEAD",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
@@ -67,36 +67,37 @@
     "requires_final_head_independent_review": true
   },
   "latest_review_cycle": {
-    "reviewed_head": "74d145010abefbb627f030eeb438d08a72f3fd8e",
+    "reviewed_head": "4026a31533cde74a2c9075a4e000d62a0137b115",
     "review_findings": [
       {
-        "id": 4261542426,
-        "thread": "PRRT_kwDOUQgV2c6r9_zq",
+        "id": 4261772901,
+        "thread": "PRRT_kwDOUQgV2c6r-jVR",
         "level": "P2",
-        "issue": "KNOWN_TARGET_MISSING_SUPERSESSION_QUARANTINE"
+        "issue": "MIXED_OBJECTIVE_QUARANTINE_DISCARDS_SAFE_SIBLING_COUNTS"
       },
       {
-        "id": 4261542438,
-        "thread": "PRRT_kwDOUQgV2c6r9_z0",
+        "id": 4261772909,
+        "thread": "PRRT_kwDOUQgV2c6r-jVW",
         "level": "P2",
-        "issue": "WHITESPACE_WRAPPED_LEARNER_PII"
+        "issue": "UNICODE_FORMAT_CONTROL_WRAPPED_LEARNER_PII"
       }
     ],
     "red": {
-      "sha": "4aa75f78cceb274d3e3da6179615b8c7bb6e1fb7",
-      "run_id": 38435853892,
-      "node": "1084/1087 pass; three intentional failures"
+      "sha": "37673affa57c9b1822b5b21aaaf97471fe2c29eb",
+      "quality_run_id": 38437889136,
+      "node": "1085/1088 pass; 3 expected failures"
     },
     "green": {
-      "sha": "7200266825b0e6614d6fbb8d8c83c93921eb62c0",
-      "quality_run_id": 38436062665,
-      "server_run_id": 38436062963,
-      "node": "1087/1087",
+      "sha": "e534695f2bc288a4f1e723eb9f8f8e61c84edc4e",
+      "quality_run_id": 38438160388,
+      "server_run_id": 38438160354,
+      "node": "1088/1088",
       "python": "76/76",
-      "browser": "PASS",
+      "chromium": "PASS",
+      "offline": "PASS",
       "pages": "PASS"
     },
     "threads_resolved": true,
-    "current_head_independent_review_required": true
+    "final_head_review_required": true
   }
 }
