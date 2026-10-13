@@ -19,13 +19,13 @@ const EMPTY={
 const store={store_id:'store',getSourceHead:async()=>({store_id:'store',through_store_seq:0}),
  readRange:async()=>[]};
 test('rejects direct PII learner IDs before reading K3 evidence',async()=>{
- for(const learnerId of ['example@example.com','+966555555555','192.168.0.1']){
+ for(const learnerId of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0']){
   await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
    releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
  }
 });
 test('strict public K5 projection cannot export direct PII as learner scope',()=>{
- for(const learner_id of ['example@example.com','+966555555555','192.168.0.1'])
+ for(const learner_id of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0'])
   assert.throws(()=>validateK5Projection({...EMPTY,learner_id}),/PII|pseudonym/i,learner_id);
 });
 test('opaque pseudonyms remain valid in the privacy contract',()=>{
