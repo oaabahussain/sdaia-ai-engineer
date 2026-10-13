@@ -4,13 +4,21 @@ import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
 
 const H='a'.repeat(40);
 const REVIEW_BODY='### 💡 Codex Review\n**Reviewed commit:** `'+H.slice(0,10)+'`';
+const workflow={
+ quality:{workflow_id:354048838,path:'.github/workflows/ci.yml',
+  name:'Pull request quality gate'},
+ server:{workflow_id:352261825,path:'.github/workflows/server-tests.yml',
+  name:'Server and adapter contract tests'}
+};
+const trusted=name=>({...workflow[name],head_sha:H,event:'pull_request',
+ pull_requests:[{number:69,head:{sha:H}}]});
 function transport({latestQuality='success',resolvedFinding=false,firstReviewFinding=false}={}){
  const runs=[
-  {id:100,created_at:'2026-10-13T09:00:00Z',name:'Pull request quality gate',head_sha:H,status:'completed',conclusion:'success'},
-  {id:110,created_at:'2026-10-13T09:01:00Z',name:'Server and adapter contract tests',head_sha:H,status:'completed',conclusion:'success'}
+  {...trusted('quality'),id:100,created_at:'2026-10-13T09:00:00Z',status:'completed',conclusion:'success'},
+  {...trusted('server'),id:110,created_at:'2026-10-13T09:01:00Z',status:'completed',conclusion:'success'}
  ];
- if(latestQuality!=='absent')runs.push({id:120,created_at:'2026-10-13T09:02:00Z',
-  name:'Pull request quality gate',head_sha:H,status:latestQuality==='in_progress'?'in_progress':'completed',
+ if(latestQuality!=='absent')runs.push({...trusted('quality'),id:120,created_at:'2026-10-13T09:02:00Z',
+  status:latestQuality==='in_progress'?'in_progress':'completed',
   conclusion:latestQuality==='in_progress'?null:latestQuality});
  return async(url)=>{
   const path=url.replace('https://api.github.com','');
