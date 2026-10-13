@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
 import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
 import {fingerprintEvent} from '../src/evidence/jcs.js';
+import {validateK5ObjectiveMap} from '../src/mastery/objectiveMap.js';
+import {readFileSync} from 'node:fs';
 import {readK5Source,computeK5SourceFingerprint} from '../src/mastery/source.js';
 const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
 const DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
-const F1=ID+'.core-ai.reasoning.definition.best-description',F2=ID+'.core-ai.reasoning.definition.other-example';
-const O1=ID+'.objective.core-ai.reasoning.v1',O2=ID+'.objective.core-ai.reasoning.v2';
+const F1=ID+'.core-ai.activation-function.definition.best-description',F2=ID+'.core-ai.backpropagation.definition.other-example';
+const O1=ID+'.objective.core-ai.activation-function.v1',O2=ID+'.objective.core-ai.backpropagation.v1';
 const item=(f,o)=>({question_family_id:f,item_version_id:f+'.v1',objective_id:o,domain_id:'core-ai',visibility:'PUBLIC',lifecycle:'ACTIVE'});
 function catalog(){return validatePublicCatalog({
  catalog:{schema_version:1,catalog_id:ID+'.public.bootstrap.v1',track_id:ID,
@@ -17,9 +19,10 @@ function catalog(){return validatePublicCatalog({
  publicQuestions:[{id:F1+'.v1',family_id:F1,domain_id:'core-ai',answer:0},
   {id:F2+'.v1',family_id:F2,domain_id:'core-ai',answer:0}],
  objectives:{track_id:ID,objectives:[O1,O2].map(objective_id=>({
-  objective_id,track_id:ID,domain_id:'core-ai',concept_ids:['core-ai.reasoning'],status:'provisional'}))}
+  objective_id,track_id:ID,domain_id:'core-ai',concept_ids:[objective_id===O1?'core-ai.activation-function':'core-ai.backpropagation'],status:'provisional'}))}
 });}
-const objectives={version:'objective-v1',items:[{objective_id:O1,domain_id:'core-ai',mapping_status:'PROVISIONAL'},{objective_id:O2,domain_id:'core-ai',mapping_status:'PROVISIONAL'}]};
+const objectives=await validateK5ObjectiveMap(JSON.parse(readFileSync(
+ new URL('../data/evidence/sdaia-ai-engineer.objectives-v1.json',import.meta.url),'utf8')),ID);
 function event(seq,more={}){return {event_id:'event-'+seq,store_id:'store',store_seq:seq,learner_id:'L',track_id:ID,
  content_release_id:RELEASE,definition_id:'learner.item.presented@1',mode:'practice',
  item_interaction_id:'interaction-'+seq,question_family_id:F1,item_version_id:F1+'.v1',
