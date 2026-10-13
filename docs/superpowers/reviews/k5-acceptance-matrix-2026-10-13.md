@@ -1,0 +1,57 @@
+# K5 — Independent-release readiness and AC evidence matrix (2026-10-13)
+
+**Status:** SECURITY_REMEDIATIONS_TESTED / RELEASE_NOT_AUTHORIZED.
+**Product PR:** #69, branch `feat/k5-tdd-evidence-20261012`.
+**Verified code head before this documentation:** `6d8f79b95933803029b54d12c06d64ae3ebee79b`.
+**RED:** `0da59cbf8a49b050ce9c1614c4d016e9660fb119`; quality run [38378621537](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38378621537), 1061/1063 Node tests passed, two intentional trust-boundary regressions failed with missing expected exception/rejection.
+**GREEN:** `6d8f79b95933803029b54d12c06d64ae3ebee79b`; [quality run 38379023765](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38379023765) and [server run 38379024518](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38379024518) SUCCESS; 1064/1064 Node and 76/76 Python. Browser smoke, offline checks, factory import, SW/Pages assembly, K5 GitHub read-only audit and AC-13 real Chromium quota probe completed successfully.
+
+## Root-cause-backed corrections
+
+1. **Review #4256618135:** `validateK5Projection` only checked shape and aggregate self-consistency, allowing caller-created exposure counts. `deriveK5EvidenceSufficiency` now privately brands its deeply frozen results; snapshot and view require the exact opaque result. See `tests/k5-trust-boundaries.test.js`, `tests/k5-snapshot-trust.test.js`, `tests/k5-view.test.js`.
+2. **Review #4256618149:** browser bootstrap authenticated the frozen objective map, but the exported projection accepted arbitrary mapping inputs. `validateK5ObjectiveMap` now clones, digests and deeply freezes the canonical provisional mapping, returns a privately branded capability, and projection requires it before aggregation. Synthetic tests were updated to exercise genuine approved mappings. See `tests/k5-trust-boundaries.test.js`, `tests/k5-mapping-invalidation.test.js`, `tests/k5-objective-governance.test.js`.
+
+Both reviewer threads were replied to with RED/GREEN evidence and marked resolved after successful GREEN. This is **not** a substitute for an independent new-head code review.
+
+## Normative AC-01 through AC-25 reconciliation
+
+Status here is an evidence index, **not an approval to merge**. `PASS` means scoped automated checks passed on the verified code head, not that the public release is closed. `PARTIAL` means a specific governance or proof limitation remains; `BLOCKED` is an explicit release gate.
+
+| AC | Status | Evidence / outstanding requirement |
+|---|---|---|
+| 01 | PARTIAL | `tests/k5-state.test.js`, K5 state/ledger and pinned spec/plan blobs; spec and plan PR #67/#68 are still draft and the text of the original spec still says proposed; reconcile final formal owner-reviewed approval provenance before release. |
+| 02 | PASS | `tests/k5-source-contract.test.js`, `tests/k5-projection-contract.test.js`; legitimate zero-watermark replay skipped, five estimators null. |
+| 03 | PASS | `tests/k5-source*.test.js`, `tests/k5-indexeddb-source.test.js`; scoped replay, watermark and wrong-source rejection. |
+| 04 | PASS | `tests/k5-corrections.test.js` and `tests/k5-projection-contract.test.js`; unauthenticated corrections quarantined. |
+| 05 | PASS | `tests/k5-presentations*.test.js`; interaction ID/family deduplication. |
+| 06 | PASS | `tests/k5-presentations-contract.test.js`; no transfer/readiness inference from absent approved lineage. |
+| 07 | PASS | `tests/k5-objective-governance.test.js`; 140 migration-derived provisional objectives cannot imply mastery. |
+| 08 | PASS | `tests/k5-estimator-disabled.test.js`, `tests/k5-projection-contract.test.js`; responses/evaluations do not activate estimator. |
+| 09 | PASS | Forged SYSTEM producer and authority-ref tests in `tests/k5-projection-contract.test.js`. |
+| 10 | N/A (DORMANT) | No authenticated statistical scoring producer was introduced; synthetic fixtures are not deployed evidence. |
+| 11 | PASS | Public-family selection in `src/mastery/presentations.js`, `tests/k5-presentations-contract.test.js`; shared public mocks are not holdout. |
+| 12 | PASS | `src/recommendations/publicCatalog.js`, K5 presentation checks and privacy tests; protected records excluded. |
+| 13 | PASS | Multi-release/source handling tests and separate AC-13 Chromium quota CI step (different scenarios). |
+| 14 | PASS | Deterministic `tests/k5-projection-contract.test.js`; permutation and strict reason-order tests. |
+| 15 | PASS | `tests/k5-browser-controller.test.js`, `tests/k5-view.test.js`; incomplete/invalid data do not show fabricated optimistic counts. |
+| 16 | PASS | `tests/k5-schema*.test.js`, estimator-disabled and browser UI; five fields stay JSON null. |
+| 17 | PASS | `tests/k5-estimator-disabled.test.js`; no configuration flag activates numerical scoring. |
+| 18 | PASS | `scripts/browser_smoke.py` Chromium keyboard/mobile/RTL/LTR and accessibility path in full QG. |
+| 19 | PASS | `tests/k5-browser-controller.test.js`, offline browser smoke, real Chromium quota CI; erase/denial failures fail closed. |
+| 20 | PASS | Full QG `npm run validate`, `verify:factory-import`, SW and Pages checks; K3/K4/exam regression tests passed. Baseline 1120/7/200 must be rechecked on merged main. |
+| 21 | PASS | `tests/k5-privacy-boundary.test.js`, source binding and browser erasure tests; no cross-learner evidence claim. |
+| 22 | PARTIAL | K5 canonical provenance/mapping invalidation tests and Node/Chromium parity passed; a final independent assessment of all late-arrival/cross-release scenarios is still part of AC-23. |
+| 23 | BLOCKED | Fresh independent code review on the **final PR head** required; original reviewer quota issue may persist. Resolve any new P1/P0 and re-run exact-head CI. |
+| 24 | BLOCKED | No per-PR and exact-full-SHA owner landing consent, no merge commit, no merged-main Node/Python/Chromium/Pages proof. |
+| 25 | PASS (initial Lane 1 only) | `numeric_lane=INACTIVE`, null estimation, no K6 authorization from observational K5. |
+
+## Explicit remaining gates
+
+- Check the final documentation commit head and both full GitHub workflows. All prior green evidence belongs to `6d8f79b...` only until a new exact head is re-tested.
+- Request a **new independent** Codex review with reviewed-head attestation; reject previous-head substitutions and reviewer quota claims as approval.
+- Resolve any new material findings, preserving RED/GREEN evidence and privacy/immutability boundaries.
+- Align formal exact-spec/plan owner approval evidence (AC-01) without rewriting history.
+- PR #69 remains DRAFT; do not merge via an alternate GitHub API or silently convert to ready. PR Completion landing requires fresh checks, separate explicit per-PR/full-SHA owner approval, and its guarded helper.
+- After authorized integration, verify the actual merged-main commit and deployed Pages, including unchanged 1120/7/200 content invariants. Lane 2 remains disabled.
+
+**Scope restraint:** This file certifies the tests and findings named above; it does not assert all 25 criteria are release-closed, nor does it grant merge authority.
