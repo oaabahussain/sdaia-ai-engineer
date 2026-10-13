@@ -96,10 +96,19 @@ export async function collectK5GitHubEvidence({
     prNumber,headSha:prHead,approvedBy:owner,
     approvedAt:approvalComments.at(-1).created_at
   }:null;
-  const review={headSha:prHead,completed:validReviews.length>0&&openThreads.length===0,
+  // A current-head CHANGES_REQUESTED submission is a blocking review even
+  // when a different independent reviewer also left a COMMENTED review.
+  const changesRequested=(Array.isArray(reviews)?reviews:[])
+    .some(v=>v.commit_id===prHead&&v.state==='CHANGES_REQUESTED');
+  const review={headSha:prHead,
+    completed:validReviews.length>0&&openThreads.length===0&&!changesRequested,
     openCritical:materialOpen.length,openImportant:openThreads.length};
   const readiness=verifyK5Release({prNumber,prHead,approval,checks,review,browserEvidence,
     policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'}});
+  if(changesRequested){
+    readiness.ready=false;
+    readiness.blockers.push('CHANGES_REQUESTED_BLOCKS_RELEASE');
+  }
   if(pr.draft||openThreads.length){
     readiness.ready=false;
     if(pr.draft)readiness.blockers.push('DRAFT_PR');
