@@ -19,13 +19,13 @@ const EMPTY={
 const store={store_id:'store',getSourceHead:async()=>({store_id:'store',through_store_seq:0}),
  readRange:async()=>[]};
 test('rejects direct PII learner IDs before reading K3 evidence',async()=>{
- for(const learnerId of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0',' 2001:db8::1 ',' [2001:db8::1] ',' 192.168.0.1 ',' +966555555555 ',' example@example.com ']){
+ for(const learnerId of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0',' 2001:db8::1 ',' [2001:db8::1] ',' 192.168.0.1 ',' +966555555555 ',' example@example.com ','\u200b192.168.0.1\u200b','\u200b+966555555555\u200b','\u202e2001:db8::1\u202c','\u2066[2001:db8::1]\u2069','opaque\u200b-id']){
   await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
    releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
  }
 });
 test('strict public K5 projection cannot export direct PII as learner scope',()=>{
- for(const learner_id of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0',' 2001:db8::1 ',' [2001:db8::1] ',' 192.168.0.1 ',' +966555555555 ',' example@example.com '])
+ for(const learner_id of ['example@example.com','+966555555555','192.168.0.1','2001:db8::1','::1','[2001:db8::5]','::ffff:192.0.2.42','fe80::1%eth0',' 2001:db8::1 ',' [2001:db8::1] ',' 192.168.0.1 ',' +966555555555 ',' example@example.com ','\u200b192.168.0.1\u200b','\u200b+966555555555\u200b','\u202e2001:db8::1\u202c','\u2066[2001:db8::1]\u2069','opaque\u200b-id'])
   assert.throws(()=>validateK5Projection({...EMPTY,learner_id}),/PII|pseudonym/i,learner_id);
 });
 test('opaque pseudonyms remain valid in the privacy contract',()=>{
