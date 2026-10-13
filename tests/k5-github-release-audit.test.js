@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
 const H='a'.repeat(40);
 const paths=[];
-function fixture({openThread=false,approval=true,checkHead=H}={}){
+function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chatgpt-codex-connector[bot]',reviewHead=H,reviewBody='### 💡 Codex Review\n**Reviewed commit:** `'+H.slice(0,10)+'`'}={}){
  paths.length=0;
  const get=async(url,opts)=>{
   paths.push(url);
@@ -15,7 +15,7 @@ function fixture({openThread=false,approval=true,checkHead=H}={}){
    {name:'Server and adapter contract tests',head_sha:checkHead,status:'completed',conclusion:'success',id:124}
   ]};
   else if(key.endsWith('/actions/runs/123/jobs?per_page=100'))data={jobs:[{id:456,steps:[{name:'Browser smoke test',conclusion:'success'}]}]};
-  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{commit_id:H,state:'COMMENTED',user:{login:'codex'}}];
+  else if(key.endsWith('/pulls/69/reviews?per_page=100'))data=[{commit_id:reviewHead,state:'COMMENTED',user:{login:reviewerLogin},body:reviewBody}];
   else if(key.endsWith('/issues/69/comments?per_page=100'))data=approval?[{body:'K5-LANDING-APPROVED PR=69 HEAD='+H,user:{login:'oaabahussain'},created_at:'2026-10-12T13:01:00Z'}]:[];
   else if(url.endsWith('/graphql'))data={data:{repository:{pullRequest:{reviewThreads:{nodes:openThread?[{isResolved:false,comments:{nodes:[{body:'P1 unresolved'}]}}]:[],pageInfo:{hasNextPage:false}}}}}};
   else throw Error('unexpected endpoint '+url);
@@ -43,4 +43,26 @@ test('auditor forbids arbitrary repository, no PR and missing token',async()=>{
  await assert.rejects(collectK5GitHubEvidence({repo:'../fake',prNumber:69,token:'test',fetchImpl:fixture()}),/repo/i);
  await assert.rejects(collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',prNumber:0,token:'test',fetchImpl:fixture()}),/pr/i);
  await assert.rejects(collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',prNumber:69,token:'',fetchImpl:fixture()}),/token/i);
+});
+
+test('self COMMENTED review and unrelated users never authorize independent review',async()=>{
+ for(const reviewerLogin of ['oaabahussain','unrelated-user','random-bot[bot]']){
+  const report=await collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',
+   prNumber:69,token:'test',fetchImpl:fixture({reviewerLogin})});
+  assert.equal(report.readiness.ready,false,reviewerLogin);
+  assert.ok(report.readiness.blockers.includes('INDEPENDENT_REVIEW_NOT_CLEAN'),reviewerLogin);
+ }
+});
+test('trusted reviewer must supply genuine full-review marker on exact current head',async()=>{
+ const variants=[
+  {reviewHead:'b'.repeat(40)},
+  {reviewBody:''},
+  {reviewBody:'Looks good, incidental comment'},
+  {reviewBody:'### 💡 Codex Review\\n**Reviewed commit:** \`bbbbbbbbbb\`'}
+ ];
+ for(const options of variants){
+  const report=await collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',
+   prNumber:69,token:'test',fetchImpl:fixture(options)});
+  assert.equal(report.readiness.ready,false,JSON.stringify(options));
+ }
 });
