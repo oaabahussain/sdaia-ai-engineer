@@ -334,6 +334,31 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
+        # K5 independent fallback: K4 bootstrap errors must not leave an
+        # indefinitely 'verifying' K5 card. Isolate failure to K4 policy fetch.
+        server=start_server()
+        wait_http(BASE+'/index.html')
+        req('POST',f'/session/{session}/goog/cdp/execute',{
+            'cmd':'Page.addScriptToEvaluateOnNewDocument',
+            'params':{'source':"""
+              const priorFetch=window.fetch.bind(window);
+              window.fetch=function(resource,options){
+                if(String(resource).includes('k4-rule-policy-v1.json'))
+                  return Promise.reject(new Error('synthetic K4-only bootstrap failure'));
+                return priorFetch(resource,options);
+              };
+            """}
+        })
+        req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?k5-fallback-on-k4-failure=1'})
+        wait_until(lambda:text(session,find(session,'#bankCount'))==str(EXPECTED_BANK),
+                   label='public bank loads when K4 policy fetch fails')
+        wait_until(lambda:len(text(session,find(session,'#k4HomeCard')))>10,
+                   label='K4 displays its offline failure fallback')
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='SOURCE_INVALID'"),
+          label='K5 must explicitly fail closed on K4 startup failure')
+        assert 'verifying' not in text(session,find(session,'#k5HomeCard')).lower()
+        assert '%' not in text(session,find(session,'#k5HomeCard'))
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
