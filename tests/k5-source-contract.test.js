@@ -9,3 +9,22 @@ test('K3 head zero never calls range replay, retains verified store scope',async
 test('full verified learner history includes old and current releases before correction',async()=>{const rows=[evt(1,'release-old'),evt(2,'release-new',{definition_id:'learner.evidence.correction.recorded@1',payload:{action:'VOID',target_event_id:'event1'},authority_ref:'forged'})];const v=await readK5Source({...base,store:k3Store(rows),throughStoreSeq:2});assert.deepEqual(v.events.map(x=>x.event_id),['event1','event2']);assert.equal(v.learner_id,'L');assert.equal(v.track_id,'T');assert.equal(v.release_id,'release-new')});
 test('rejects foreign principal / wrong track / source id',async()=>{for(const bad of [evt(1,'release-old',{learner_id:'foreigner'}),evt(1,'release-old',{track_id:'foreign'}),evt(1,'release-old',{store_id:'foreign'})]){const store={...k3Store([bad]),readRange:async()=>[bad]};await assert.rejects(readK5Source({...base,store,throughStoreSeq:1}),/identity|principal|track|source|store/i)}});
 test('rejects watermark above actual head, duplicates and missing fingerprint',async()=>{await assert.rejects(readK5Source({...base,store:k3Store([],0),throughStoreSeq:1}),/watermark/i);for(const rows of [[evt(1),evt(1)],[evt(1,'release-old',{event_fingerprint:undefined})]])await assert.rejects(readK5Source({...base,store:{...k3Store(rows),readRange:async()=>rows},throughStoreSeq:rows.length}),/duplicate|fingerprint|identity/i)});
+
+
+test('correction payload and nested metadata are immutable bound K3 replay evidence',async()=>{
+ const rows=[evt(1,'release-old'),evt(2,'release-new',{
+  definition_id:'learner.evidence.correction.recorded@1',
+  payload:{action:'VOID',target_event_id:'event1',metadata:{nested:{scope:'source'}}},
+  authority_ref:'unverified'
+ })];
+ const source=await readK5Source({...base,store:k3Store(rows),throughStoreSeq:2});
+ const correction=source.events[1];
+ assert.equal(correction.payload.action,'VOID');
+ assert.equal(Object.isFrozen(source.events),true);
+ assert.equal(Object.isFrozen(correction),true);
+ assert.equal(Object.isFrozen(correction.payload),true,'nested correction payload must be frozen');
+ assert.equal(Object.isFrozen(correction.payload.metadata.nested),true,'deep nested fields must be frozen');
+ assert.throws(()=>{correction.payload.action='SUPERSEDE'},TypeError);
+ rows[1].payload.action='SUPERSEDE';
+ assert.equal(correction.payload.action,'VOID','mutation of original K3 store rows cannot alter verified replay');
+});
