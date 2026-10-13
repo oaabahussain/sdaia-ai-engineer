@@ -1,8 +1,14 @@
 import {verifyK5Release} from '../../src/mastery/release.js';
+import {validateK5State} from './validate_k5_state.js';
 import {pathToFileURL} from 'node:url';
 
 const SHA=/^[a-f0-9]{40}$/;
 const APPROVAL=/^K5-LANDING-APPROVED PR=(\d+) HEAD=([a-f0-9]{40})$/;
+const SPEC_APPROVAL=/^K5-SPEC-APPROVED BLOB=([a-f0-9]{40})$/;
+const PLAN_APPROVAL=/^K5-PLAN-APPROVED BLOB=([a-f0-9]{40})$/;
+const GOV_STATE='docs/superpowers/state/K5-CURRENT-STATE.json';
+const SPEC_DOC='docs/superpowers/specs/2026-10-11-k5-mastery-readiness-projections-design.md';
+const PLAN_DOC='docs/superpowers/plans/2026-10-12-k5-evidence-sufficiency-tdd.md';
 // Repository-pinned GitHub workflow identities, not mutable display names.
 const REQUIRED_WORKFLOWS=Object.freeze({
   'Pull request quality gate':Object.freeze({
@@ -66,16 +72,41 @@ export async function collectK5GitHubEvidence({
     }
     throw new Error('review pagination limit exceeded; release blocked');
   }
-  const [runs,reviews,comments,graphql]=await Promise.all([
+  async function getCompleteIssueComments(){
+    const all=[];
+    for(let page=1;page<=100;page++){
+      const suffix=page===1?'':'&page='+page;
+      const entries=await request(api+'/issues/'+prNumber+
+        '/comments?per_page=100'+suffix);
+      if(!Array.isArray(entries)||entries.length>100)
+        throw new Error('invalid owner-comment pagination; release blocked');
+      all.push(...entries);
+      if(entries.length<100)return all;
+    }
+    throw new Error('owner-comment pagination limit exceeded; release blocked');
+  }
+  // Obtain immutable GitHub blob IDs and bytes from the SAME head as the PR.
+  // The PR author cannot turn an unapproved specification into approval via
+  // a landing comment; approval must bind the actual spec/plan Git blobs.
+  async function readGovernanceDocument(path){
+    const file=await request(api+'/contents/'+path+'?ref='+prHead);
+    if(!SHA.test(file?.sha??'')||file?.encoding!=='base64'||
+       typeof file?.content!=='string')
+      throw new Error('invalid authenticated K5 governance artifact '+path);
+    return {sha:file.sha,text:Buffer.from(file.content,'base64').toString('utf8')};
+  }
+  const [runs,reviews,comments,graphql,governanceDocs]=await Promise.all([
     request(api+'/actions/runs?head_sha='+prHead+'&per_page=100'),
     getCompleteReviews(),
-    request(api+'/issues/'+prNumber+'/comments?per_page=100'),
+    getCompleteIssueComments(),
     request('/graphql',{query:`query($owner:String!,$name:String!,$number:Int!){
       repository(owner:$owner,name:$name){pullRequest(number:$number){
         reviewThreads(first:100){nodes{isResolved comments(first:1){nodes{body}}}
           pageInfo{hasNextPage}}
       }}
-    }`,variables:{owner,name,number:prNumber}})
+    }`,variables:{owner,name,number:prNumber}}),
+    Promise.all([readGovernanceDocument(GOV_STATE),
+      readGovernanceDocument(SPEC_DOC),readGovernanceDocument(PLAN_DOC)])
   ]);
   const threadPage=graphql?.data?.repository?.pullRequest?.reviewThreads;
   if(!threadPage||threadPage.pageInfo?.hasNextPage)
@@ -141,6 +172,35 @@ export async function collectK5GitHubEvidence({
       }
     }
   }
+  const [stateDoc,specDoc,planDoc]=governanceDocs;
+  const state=JSON.parse(stateDoc.text);
+  const stateValidity=validateK5State({
+    state,liveMainSha:pr.base?.sha,specBlobSha:specDoc.sha,
+    planBlobSha:planDoc.sha,executionRef:pr.head?.ref
+  });
+  // The status lines are in the exact Git blobs, not inferred from the
+  // implementation authorization or from draft/CI status.
+  const approvedStatus=source=>
+    /^\\*\\*Status:\\*\\*\\s*APPROVED\\s*$/m.test(source);
+  const ownerHasBlobApproval=(regex,blob)=>comments.some(note=>{
+    if(note.user?.login!==owner)return false;
+    const match=regex.exec((note.body??'').trim());
+    return Boolean(match&&match[1]===blob);
+  });
+  const specAccepted=state.formal_spec_approval?.approved_by===owner&&
+    state.formal_spec_approval.blob_sha===specDoc.sha&&
+    Number.isFinite(Date.parse(state.formal_spec_approval.approved_at));
+  const planAccepted=state.formal_plan_approval?.approved_by===owner&&
+    state.formal_plan_approval.blob_sha===planDoc.sha&&
+    Number.isFinite(Date.parse(state.formal_plan_approval.approved_at));
+  const ac01Blocked=Array.isArray(state.release_blockers)&&
+    state.release_blockers.some(value=>/AC0?1|SPEC.*APPROV|PLAN.*APPROV/i.test(String(value)));
+  const governance={headSha:prHead,specBlobSha:specDoc.sha,
+    planBlobSha:planDoc.sha,approved:Boolean(stateValidity.ok&&
+      approvedStatus(specDoc.text)&&approvedStatus(planDoc.text)&&
+      specAccepted&&planAccepted&&!ac01Blocked&&
+      ownerHasBlobApproval(SPEC_APPROVAL,specDoc.sha)&&
+      ownerHasBlobApproval(PLAN_APPROVAL,planDoc.sha))};
   const approvalComments=(Array.isArray(comments)?comments:[])
     .filter(c=>c.user?.login===owner)
     .filter(c=>{
@@ -160,7 +220,7 @@ export async function collectK5GitHubEvidence({
       !changesRequested&&!exactHeadReviewHasFindings,
     openCritical:materialOpen.length,openImportant:openThreads.length};
   const readiness=verifyK5Release({prNumber,prHead,approval,checks,review,browserEvidence,
-    policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'}});
+    policy:{policy_id:'K5.EVIDENCE.v1',numericalLane:'INACTIVE'},governance});
   if(changesRequested){
     readiness.ready=false;
     readiness.blockers.push('CHANGES_REQUESTED_BLOCKS_RELEASE');
@@ -170,7 +230,7 @@ export async function collectK5GitHubEvidence({
     if(pr.draft)readiness.blockers.push('DRAFT_PR');
     if(openThreads.length)readiness.blockers.push('OPEN_REVIEW_THREADS');
   }
-  return {prNumber,prHead,draft:Boolean(pr.draft),checks,review,browserEvidence,
+  return {prNumber,prHead,draft:Boolean(pr.draft),governance,checks,review,browserEvidence,
     approvalPresent:Boolean(approval),readiness};
 }
 
