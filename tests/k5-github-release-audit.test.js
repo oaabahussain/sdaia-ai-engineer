@@ -1,3 +1,4 @@
+import {withSyntheticApprovedK5Governance} from './helpers/k5-approved-governance-fixture.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
@@ -30,7 +31,7 @@ function fixture({openThread=false,approval=true,checkHead=H,reviewerLogin='chat
   else throw Error('unexpected endpoint '+url);
   return {ok:true,json:async()=>data};
  };
- return get;
+ return withSyntheticApprovedK5Governance(get);
 }
 test('auditor reads GitHub head, workflow checks and browser job instead of caller claims',async()=>{
  const result=await collectK5GitHubEvidence({repo:'oaabahussain/sdaia-ai-engineer',prNumber:69,
