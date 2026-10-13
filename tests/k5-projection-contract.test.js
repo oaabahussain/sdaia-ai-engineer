@@ -10,14 +10,16 @@ const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
 const DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
 const F1=ID+'.core-ai.activation-function.definition.best-description',F2=ID+'.core-ai.backpropagation.definition.other-example';
 const O1=ID+'.objective.core-ai.activation-function.v1',O2=ID+'.objective.core-ai.backpropagation.v1';
+const F3=ID+'.core-ai.activation-function.definition.second-public-example';
 const item=(f,o)=>({question_family_id:f,item_version_id:f+'.v1',objective_id:o,domain_id:'core-ai',visibility:'PUBLIC',lifecycle:'ACTIVE'});
-function catalog(){return validatePublicCatalog({
+function catalog(withSibling=false){return validatePublicCatalog({
  catalog:{schema_version:1,catalog_id:ID+'.public.bootstrap.v1',track_id:ID,
   content_release_id:RELEASE,question_payload_sha256:DIGEST,source:'MIGRATED_GRANDFATHERED_PUBLIC',
-  items:[item(F1,O1),item(F2,O2)]},
+  items:[item(F1,O1),item(F2,O2),...(withSibling?[item(F3,O1)]:[])]},
  trackManifest:{id:ID,status:'active'},evidenceContext:{content_release_id:RELEASE,question_payload_sha256:DIGEST},
  publicQuestions:[{id:F1+'.v1',family_id:F1,domain_id:'core-ai',answer:0},
-  {id:F2+'.v1',family_id:F2,domain_id:'core-ai',answer:0}],
+  {id:F2+'.v1',family_id:F2,domain_id:'core-ai',answer:0},
+  ...(withSibling?[{id:F3+'.v1',family_id:F3,domain_id:'core-ai',answer:0}]:[])],
  objectives:{track_id:ID,objectives:[O1,O2].map(objective_id=>({
   objective_id,track_id:ID,domain_id:'core-ai',concept_ids:[objective_id===O1?'core-ai.activation-function':'core-ai.backpropagation'],status:'provisional'}))}
 });}
@@ -29,7 +31,7 @@ function event(seq,more={}){return {event_id:'event-'+seq,store_id:'store',store
  objective_id:O1,domain_id:'core-ai',event_fingerprint:'a'.repeat(64),...more};}
 const correction=(seq,target)=>event(seq,{definition_id:'learner.evidence.correction.recorded@1',
  authority_ref:'forged',payload:{action:'VOID',target_event_id:target}});
-async function project(events=[]){
+async function project(events=[],acceptedPublicCatalog=catalog()){
  const verified=await Promise.all(events.map(async event=>{
   const raw={...event};for(const field of ['store_id','store_seq','accepted_at','event_fingerprint'])delete raw[field];
   return {...event,event_fingerprint:await fingerprintEvent(raw)};
@@ -42,7 +44,7 @@ async function project(events=[]){
  const source=await readK5Source({store,learnerId:'L',trackId:ID,releaseId:RELEASE,
   throughStoreSeq:head});
  return deriveK5EvidenceSufficiency({
-  source,events:source.events,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  source,events:source.events,acceptedPublicCatalog,acceptedObjectiveMap:objectives,
   policy:{policy_id:'K5.EVIDENCE.v1'},identityResolutionVersion:null
  });
 }
@@ -105,4 +107,23 @@ test('self-consistent caller-computed hashes do not authenticate an arbitrary re
   source,events:[],acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
   policy:{policy_id:'K5.EVIDENCE.v1'}
  }),/same verified K3 replay|verified K3 replay source|trusted replay|source binding/i);
+});
+
+test('shared objective preserves independently observed sibling family under quarantine',async()=>{
+ const r=await project([
+  event(1),
+  event(2,{question_family_id:F3,item_version_id:F3+'.v1',objective_id:O1,
+   item_interaction_id:'interaction-2'}),
+  correction(3,'event-1')
+ ],catalog(true));
+ assert.equal(r.integrity_status,'CONFLICTED');
+ assert.equal(r.observation_status,'QUARANTINED');
+ assert.equal(r.observed_distinct_family_count,1);
+ assert.equal(r.observed_distinct_interaction_count,1);
+ const row=r.objectives.find(item=>item.objective_id===O1);
+ assert.ok(row,'mixed objective should remain visible');
+ assert.equal(row.observed_distinct_family_count,1);
+ assert.equal(row.observed_distinct_interaction_count,1);
+ assert.ok(row.reason_codes.includes('CORRECTION_AUTHORITY_UNVERIFIED'));
+ isNull(r);
 });
