@@ -18,6 +18,16 @@ registerServiceWorker();
 const $=id=>document.getElementById(id);
 let BANK, PROFILE, QUESTIONS=[], WEIGHTS={}, state, lang='ar', activeExam=null;
 let PRESENTATION=null,OBJECTIVE_CATALOG=null,EVIDENCE_RECORDER=null,K4_CONTROLLER=null,K5_CONTROLLER=null;
+function showK5Unavailable(){
+ const card=$('k5HomeCard');if(!card)return;
+ card.setAttribute('role','region');card.setAttribute('aria-live','polite');
+ card.setAttribute('lang',lang==='en'?'en':'ar');
+ card.setAttribute('dir',lang==='en'?'ltr':'rtl');
+ card.setAttribute('data-k5-status','SOURCE_INVALID');
+ card.textContent=lang==='en'?
+  'Recorded activity cannot be verified currently. Numerical mastery and readiness estimates remain unavailable.':
+  'لا يمكن التحقق من النشاط المسجل حاليًا. تقديرات الإتقان والجاهزية الرقمية غير متاحة.';
+}
 let actionTail=Promise.resolve();
 function trackState(){return state.tracks[BANK.track.id]}
 function surfaceEvidenceError(error){console.error(error);const box=$('errorBox');if(box){box.textContent=error?.message||String(error);box.classList.add('show')}}
@@ -135,7 +145,7 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
        });
      } catch(k5Error) {
        console.warn('K5 activity card unavailable',k5Error);
-       $('k5HomeCard').textContent='النشاط المسجل غير متاح حاليًا';
+       showK5Unavailable();
      }
      const rulePolicy=validateRulePolicy(policyRaw);
      const prefStore=createSchedulingPreferencesStore({
@@ -202,6 +212,7 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
    } catch(k4Error) {
      console.warn('K4 recommendation interface unavailable',k4Error);
      $('k4HomeCard').textContent=t('k4Unavailable');
+      if(!K5_CONTROLLER)showK5Unavailable();
    }
   }
   document.documentElement.dataset.theme=state.preferences.theme==='dark'?'dark':'light';
