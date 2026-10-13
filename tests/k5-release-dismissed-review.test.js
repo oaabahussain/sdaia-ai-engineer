@@ -1,3 +1,4 @@
+import {withSyntheticApprovedK5Governance} from './helpers/k5-approved-governance-fixture.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
@@ -48,7 +49,7 @@ function transport({
 async function collect(opts){
  const {seen,fetchImpl}=transport(opts);
  return {data:await collectK5GitHubEvidence({repo:REPO,prNumber:69,
-  token:'fixture-token',fetchImpl}),seen};
+  token:'fixture-token',fetchImpl:withSyntheticApprovedK5Governance(fetchImpl)}),seen};
 }
 
 for(const priority of ['P0','P1','P2']){
