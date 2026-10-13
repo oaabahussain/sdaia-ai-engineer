@@ -1,7 +1,7 @@
 // One fail-closed learner-principal policy for source intake and public K5 export.
 // NFKC is used ONLY for comparison: the original pseudonym is never rewritten.
 const hidden = /[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}]/u;
-const phone = /^\+?\d[\d\s().-]{6,}$/;
+const phone = /^\+?\p{Nd}[\p{Nd}\s().-]{6,}$/u;
 const ipv4 = /^(?:\d{1,3}\.){3}\d{1,3}$/;
 function looksLikeIPv6(value) {
   const unwrapped=value.startsWith('[')&&value.endsWith(']')?value.slice(1,-1):value;
