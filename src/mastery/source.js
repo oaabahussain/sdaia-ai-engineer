@@ -20,7 +20,8 @@ const looksLikeIPv6=value=>{
  if(!host.includes(':'))return false;
  try{new URL('http://['+host+']/');return true}catch{return false}
 };
-const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || looksLikeIPv6(value);
+// Opaque learner keys must not include invisible format/bidi or control code points.
+const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || looksLikeIPv6(value) || /[\p{Cc}\p{Cf}]/u.test(value);
 async function fingerprintScope(parts) {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 required');
   const bytes = new TextEncoder().encode(JSON.stringify(parts));
