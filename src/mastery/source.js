@@ -1,4 +1,5 @@
 import { replayEvidence } from '../evidence/replay.js';
+import { isOpaqueK5LearnerId } from './privacy.js';
 
 const verifiedReplayEvents=new WeakMap();
 // Freeze an independent replay snapshot, never mutable IndexedDB/store row references.
@@ -14,14 +15,6 @@ export function assertK5VerifiedReplayBinding(source,events) {
   return true;
 }
 const validId = value => typeof value === 'string' && value.length > 0;
-const looksLikeIPv6=value=>{
- const unwrapped=value.startsWith('[')&&value.endsWith(']')?value.slice(1,-1):value;
- const host=unwrapped.replace(/%[a-zA-Z0-9_.~-]+$/,'');
- if(!host.includes(':'))return false;
- try{new URL('http://['+host+']/');return true}catch{return false}
-};
-// Opaque learner keys must reject control and default-ignorable Unicode code points, including Mn variation selectors and grapheme joiners.
-const hasDirectPII = value => /@/.test(value) || /^\+?\d[\d\s().-]{6,}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || looksLikeIPv6(value) || /[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}]/u.test(value);
 async function fingerprintScope(parts) {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 required');
   const bytes = new TextEncoder().encode(JSON.stringify(parts));
@@ -43,7 +36,7 @@ export async function computeK5SourceFingerprint(source,events) {
 // Full learner history across valid releases is kept for correction resolution.
 export async function readK5Source({store,learnerId,trackId,releaseId,throughStoreSeq}={}) {
   if (![learnerId,trackId,releaseId].every(validId)) throw new TypeError('invalid source scope');
-  if (learnerId!==learnerId.trim() || hasDirectPII(learnerId)) throw new TypeError('learner_id must be an opaque pseudonym without direct PII or surrounding whitespace');
+  if (!isOpaqueK5LearnerId(learnerId)) throw new TypeError('learner_id must be an opaque pseudonym without direct PII or surrounding whitespace');
   if (!Number.isSafeInteger(throughStoreSeq) || throughStoreSeq < 0)
     throw new RangeError('invalid watermark');
   if (!store || !validId(store.store_id) || typeof store.getSourceHead !== 'function' ||

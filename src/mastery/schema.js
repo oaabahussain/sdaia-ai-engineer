@@ -1,3 +1,4 @@
+import { isOpaqueK5LearnerId } from './privacy.js';
 // Versioned K5 Lane 1: never infer numeric ability from public exposures.
 const ESTIMATES=['mastery_estimate','readiness_estimate','readiness_probability','confidence_interval','model_validation_ref'];
 const KEYS=['schema_version','projection_type','policy_id','source_store_id','through_store_seq','learner_id','identity_scope','track_id','content_release_id','question_payload_sha256','catalog_version','catalog_canonical_sha256','objective_map_canonical_sha256','lineage_map_version','lineage_map_canonical_sha256','objective_map_version','identity_resolution_version','integrity_status','observation_status','estimation_status','reason_codes','observed_distinct_family_count','observed_distinct_interaction_count','observed_domain_count','objectives',...ESTIMATES];
@@ -7,14 +8,6 @@ const allowedReasons=new Set(K5_REASON_CODES);
 const isPlain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)&&Object.getPrototypeOf(x)===Object.prototype;
 const sha=x=>typeof x==='string'&&/^[0-9a-f]{64}$/.test(x);
 const id=x=>typeof x==='string'&&x.length>0;
-const looksLikeIPv6=value=>{
- const unwrapped=value.startsWith('[')&&value.endsWith(']')?value.slice(1,-1):value;
- const host=unwrapped.replace(/%[a-zA-Z0-9_.~-]+$/,'');
- if(!host.includes(':'))return false;
- try{new URL('http://['+host+']/');return true}catch{return false}
-};
-// Opaque learner keys must reject control and default-ignorable Unicode code points, including Mn variation selectors and grapheme joiners.
-const hasDirectPII=value=>/@/.test(value)||/^\+?\d[\d\s().-]{6,}$/.test(value)||/^(?:\d{1,3}\.){3}\d{1,3}$/.test(value)||looksLikeIPv6(value) || /[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}]/u.test(value);
 const count=x=>Number.isSafeInteger(x)&&x>=0;
 const must=(condition,message)=>{if(!condition)throw new Error(message)};
 function exact(value,keys){
@@ -31,7 +24,7 @@ export function validateK5Projection(p){
  must(p.schema_version===1&&p.projection_type==='EvidenceSufficiencyProjectionV1'&&p.policy_id==='K5.EVIDENCE.v1'&&p.estimation_status==='DISABLED_UNVALIDATED','unsupported policy or schema');
  for(const key of ESTIMATES)must(p[key]===null,key+' must be JSON null');
  for(const key of ['source_store_id','learner_id','track_id','content_release_id','catalog_version','objective_map_version'])must(id(p[key]),'missing identity '+key);
- must(p.learner_id===p.learner_id.trim()&&!hasDirectPII(p.learner_id),'learner_id must be a pseudonym without direct PII or surrounding whitespace');
+ must(isOpaqueK5LearnerId(p.learner_id),'learner_id must be a pseudonym without direct PII or surrounding whitespace');
  for(const key of ['question_payload_sha256','catalog_canonical_sha256','objective_map_canonical_sha256'])must(sha(p[key]),'invalid SHA-256 hash '+key);
  must((p.lineage_map_version===null&&p.lineage_map_canonical_sha256===null)||(id(p.lineage_map_version)&&sha(p.lineage_map_canonical_sha256)),'lineage map version/digest inconsistent');
  must(count(p.through_store_seq),'invalid source watermark');
