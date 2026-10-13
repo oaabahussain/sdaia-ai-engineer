@@ -1,3 +1,4 @@
+import {withSyntheticApprovedK5Governance} from './helpers/k5-approved-governance-fixture.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectK5GitHubEvidence} from '../scripts/process/verify_k5_release.js';
@@ -42,7 +43,7 @@ function api({runs=[],reviews=[],extraReviewPages={}}={}){
 const verify=async cfg=>{
  const {fetchImpl,hits}=api(cfg);
  return {result:await collectK5GitHubEvidence({repo:REPO,prNumber:69,
-  token:'fixture-token',fetchImpl}),hits};
+  token:'fixture-token',fetchImpl:withSyntheticApprovedK5Governance(fetchImpl)}),hits};
 };
 
 test('P1 dispatched workflow cannot replace failed PR quality gate, even on same SHA',async()=>{
