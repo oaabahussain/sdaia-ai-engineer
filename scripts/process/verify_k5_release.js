@@ -181,7 +181,7 @@ export async function collectK5GitHubEvidence({
   // The status lines are in the exact Git blobs, not inferred from the
   // implementation authorization or from draft/CI status.
   const approvedStatus=source=>
-    /^\\*\\*Status:\\*\\*\\s*APPROVED\\s*$/m.test(source);
+    /^\*\*Status:\*\*\s*APPROVED\s*$/m.test(source);
   const ownerHasBlobApproval=(regex,blob)=>comments.some(note=>{
     if(note.user?.login!==owner)return false;
     const match=regex.exec((note.body??'').trim());
