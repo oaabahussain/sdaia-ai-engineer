@@ -30,7 +30,7 @@ export function validateK5Projection(p){
  must(p.schema_version===1&&p.projection_type==='EvidenceSufficiencyProjectionV1'&&p.policy_id==='K5.EVIDENCE.v1'&&p.estimation_status==='DISABLED_UNVALIDATED','unsupported policy or schema');
  for(const key of ESTIMATES)must(p[key]===null,key+' must be JSON null');
  for(const key of ['source_store_id','learner_id','track_id','content_release_id','catalog_version','objective_map_version'])must(id(p[key]),'missing identity '+key);
- must(!hasDirectPII(p.learner_id),'learner_id must be a pseudonym without direct PII');
+ must(p.learner_id===p.learner_id.trim()&&!hasDirectPII(p.learner_id),'learner_id must be a pseudonym without direct PII or surrounding whitespace');
  for(const key of ['question_payload_sha256','catalog_canonical_sha256','objective_map_canonical_sha256'])must(sha(p[key]),'invalid SHA-256 hash '+key);
  must((p.lineage_map_version===null&&p.lineage_map_canonical_sha256===null)||(id(p.lineage_map_version)&&sha(p.lineage_map_canonical_sha256)),'lineage map version/digest inconsistent');
  must(count(p.through_store_seq),'invalid source watermark');
