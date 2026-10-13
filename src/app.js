@@ -23,6 +23,7 @@ function showK5Unavailable(){
  card.setAttribute('role','region');card.setAttribute('aria-live','polite');
  card.setAttribute('lang',lang==='en'?'en':'ar');
  card.setAttribute('dir',lang==='en'?'ltr':'rtl');
+ card.setAttribute('aria-label',lang==='en'?'Recorded activity':'النشاط المسجل');
  card.setAttribute('data-k5-status','SOURCE_INVALID');
  card.textContent=lang==='en'?
   'Recorded activity cannot be verified currently. Numerical mastery and readiness estimates remain unavailable.':
