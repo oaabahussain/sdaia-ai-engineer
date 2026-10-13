@@ -35,7 +35,7 @@ export function classifyK5Corrections({events}={}) {
     if(p.action==='SUPERSEDE'){
       const replacement=byId.get(p.superseding_event_id);
       if(!replacement||replacement.definition_id===CORRECTION){
-        reasons.add('CORRECTION_UNRESOLVED');sourceInvalid=true;continue;
+        reasons.add('CORRECTION_UNRESOLVED');continue;
       }
       if(replacement.learner_id!==correction.learner_id){
         reasons.add('CORRECTION_CONFLICT');sourceInvalid=true;continue;
