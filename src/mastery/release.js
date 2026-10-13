@@ -9,10 +9,18 @@ function approved(approval,number,sha){
   typeof approval.approvedAt==='string'&&Number.isFinite(Date.parse(approval.approvedAt));
 }
 export function verifyK5Release({prNumber,prHead,approval,checks=[],review,policy,
-  phase='PRE_MERGE',mergedHead,mainHead,mergeParents,postMergeChecks=[],browserEvidence}={}){
+  phase='PRE_MERGE',mergedHead,mainHead,mergeParents,postMergeChecks=[],browserEvidence,
+  governance}={}){
  const blockers=[];
  if(!Number.isSafeInteger(prNumber)||prNumber<1||!FULL_SHA.test(prHead??''))
   blockers.push('INVALID_PR_HEAD');
+ // Governance is a separate prerequisite: a landing comment cannot silently
+ // approve a previously unapproved spec or plan. The authenticated GitHub
+ // auditor must supply both canonical blob proofs and formal owner evidence.
+ if(governance?.approved!==true||governance.headSha!==prHead||
+    !FULL_SHA.test(governance.specBlobSha??'')||
+    !FULL_SHA.test(governance.planBlobSha??''))
+  blockers.push('K5_FORMAL_SPEC_PLAN_APPROVAL_REQUIRED');
  if(!approved(approval,prNumber,prHead))
   blockers.push('OWNER_PR_HEAD_APPROVAL_REQUIRED');
  if(!review||review.headSha!==prHead||review.completed!==true||
