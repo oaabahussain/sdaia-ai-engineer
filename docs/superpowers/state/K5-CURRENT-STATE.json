@@ -12,23 +12,23 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "Lane 1 public observations only; no mastery/readiness numerical estimate. Two P1 security findings addressed through observed RED/GREEN and reviewed threads resolved; this is not an independent final-head code review. AC-01, AC-23, AC-24 remain unclosed. Documentation commits invalidate last code-head CI for landing; obtain final exact-head checks before eligibility.",
-  "last_code_ci_verified_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
+  "notes": "K5 Lane 1 only. Review finding P1 #4257964005 (administratively dismissed exact-head Codex P0/P1/P2 findings were ignored) was reproduced (RED 38410902141) and repaired (GREEN 38411130134) with all old and new tests passing. All 15 observed review threads individually resolved, but this is not a clean independent review of the final head. AC-01 governance, AC-23 new-head independent review and AC-24 approval/integration remain unclosed. The current documentation commit will advance the head and MUST obtain its own exact-head CI.",
+  "last_code_ci_verified_sha": "ca8ca7e79a194882f4293732f7d5726cc998bf79",
   "last_full_ci": {
-    "quality_run_id": 38379023765,
-    "server_run_id": 38379024518,
+    "quality_run_id": 38411130134,
+    "server_run_id": 38411129540,
     "conclusion": "SUCCESS",
-    "scope": "1064 Node + 76 Python + Chromium, offline, factory-import, SW/Pages assembly and K5 read-only audit on code head 6d8f79b..."
+    "scope": "1079/1079 Node, 76/76 Python, Chromium browser smoke, offline, Pages assembly, K5 read-only audit verified on source SHA ca8ca7e79a194882f4293732f7d5726cc998bf79"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_FRESH_REVIEW_OF_FINAL_HEAD",
+  "independent_review_status": "PENDING_FRESH_INDEPENDENT_REVIEW_ON_FINAL_HEAD_AFTER_DOCS",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "FINAL_EXACT_HEAD_INDEPENDENT_CODE_REVIEW_AND_ANY_NEW_FINDINGS",
-    "FORMAL_SPEC_PLAN_APPROVAL_PROVENANCE_RECONCILIATION",
-    "OWNER_PER_PR_FULL_SHA_LANDING_CONFIRMATION_NOT_GIVEN",
-    "POST_MERGE_NODE_PYTHON_CHROMIUM_AND_PAGES_NOT_YET_POSSIBLE"
+    "AC01_SPEC_AND_PLAN_FORMAL_APPROVAL_NOT_PROVEN",
+    "AC23_NEW_FINAL_HEAD_INDEPENDENT_CLEAN_CODE_REVIEW",
+    "AC24_NO_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_APPROVAL",
+    "AC24_POSTMERGE_MAIN_CI_AND_GITHUB_PAGES_NOT_TESTED"
   ],
   "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
@@ -43,5 +43,27 @@
     ],
     "review_threads_resolved": true,
     "final_exact_head_review_still_required": true
+  },
+  "latest_security_review": {
+    "finding_comment_id": 4257964005,
+    "thread_id": "PRRT_kwDOUQgV2c6r1Sxe",
+    "issue": "DISMISSED_CODEX_REVIEW_FINDINGS_BYPASS",
+    "red": {
+      "sha": "d61cde62ed34bace875cdea87794dbeb599809a7",
+      "quality_run_id": 38410902141,
+      "node": "1076/1079; exactly 3 expected security regression failures"
+    },
+    "green": {
+      "sha": "ca8ca7e79a194882f4293732f7d5726cc998bf79",
+      "quality_run_id": 38411130134,
+      "server_run_id": 38411129540,
+      "node": "1079/1079",
+      "python": "76/76",
+      "chromium": "PASS",
+      "offline": "PASS",
+      "pages_assembly": "PASS"
+    },
+    "thread_resolved": true,
+    "requires_final_head_independent_review": true
   }
 }
