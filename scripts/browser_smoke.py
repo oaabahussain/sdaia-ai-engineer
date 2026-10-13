@@ -359,6 +359,24 @@ def main():
           label='K5 must explicitly fail closed on K4 startup failure')
         assert 'verifying' not in text(session,find(session,'#k5HomeCard')).lower()
         assert '%' not in text(session,find(session,'#k5HomeCard'))
+        # P2: the K5 fail-closed fallback must update with app locale
+        # even when the K5 controller never initialized.
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('lang')")=='en'
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.lang")=='ar',
+                   label='Arabic locale after failed K4 bootstrap')
+        wait_until(lambda:execute(session,
+            "return document.querySelector('#k5HomeCard').getAttribute('lang')==='ar'"),
+            label='K5 fallback reflects Arabic language switch')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='rtl'
+        assert 'لا يمكن التحقق' in text(session,find(session,'#k5HomeCard'))
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,
+            "return document.querySelector('#k5HomeCard').getAttribute('lang')==='en'"),
+            label='K5 fallback reflects English language switch')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='ltr'
+        assert 'Recorded activity cannot be verified' in text(session,find(session,'#k5HomeCard'))
+
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
