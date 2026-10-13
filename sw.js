@@ -23,6 +23,7 @@ const ASSETS = [
   './src/mastery/view.js',
   './src/mastery/projection.js',
   './src/mastery/schema.js',
+  './src/mastery/privacy.js',
   './src/mastery/source.js',
   './src/mastery/corrections.js',
   './src/mastery/presentations.js',
