@@ -31,3 +31,32 @@ test('strict public K5 projection cannot export direct PII as learner scope',()=
 test('opaque pseudonyms remain valid in the privacy contract',()=>{
  assert.equal(validateK5Projection(EMPTY),true);
 });
+
+
+test('blocks Unicode-dash direct phone PII at BOTH K5 boundaries without rejecting opaque pseudonyms',async()=>{
+ const phoneIds=[
+  '+٩٦٦‐٥٥٥‐٥٥٥‐٥٥٥', // U+2010 HYPHEN
+  '+٩٦٦‑٥٥٥‑٥٥٥‑٥٥٥', // U+2011 NON-BREAKING HYPHEN
+  '+٩٦٦–٥٥٥–٥٥٥–٥٥٥', // U+2013 EN DASH
+  '+٩٦٦—٥٥٥—٥٥٥—٥٥٥', // U+2014 EM DASH
+  '+٩٦٦−٥٥٥−٥٥٥−٥٥٥', // U+2212 MINUS SIGN
+  '+٩٦٦⁃٥٥٥⁃٥٥٥⁃٥٥٥', // U+2043 HYPHEN BULLET
+  '+٩٦٦﹣٥٥٥﹣٥٥٥﹣٥٥٥', // U+FE63 SMALL HYPHEN-MINUS
+  '+٩٦٦－٥٥٥－٥٥٥－٥٥٥', // U+FF0D FULLWIDTH HYPHEN-MINUS
+  '٩٦٦‐٥٥٥‐٥٥٥‐٥٥٥', // no +; still direct phone PII
+  '+۹۶۶-۵۵۵‐۵۵۵-۵۵۵'  // mixed script/separator
+ ];
+ for(const learnerId of phoneIds){
+  await assert.rejects(
+   readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',releaseId:'release',throughStoreSeq:0}),
+   /PII|pseudonym/i,learnerId
+  );
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),
+   /PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['student‐alpha','learner−demo','batch‐2026‐cohort','9–alpha-id']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
