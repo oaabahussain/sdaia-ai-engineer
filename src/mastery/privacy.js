@@ -15,7 +15,9 @@ export function isOpaqueK5LearnerId(value) {
   if(hidden.test(value))return false;
   // Unicode compatibility forms include fullwidth digits, @, dots, colons,
   // and plus signs. Their visual PII must not cross either K5 boundary.
-  const normalized=value.normalize('NFKC');
+  // Canonicalize phone-style dash separators ONLY for comparison, never for the stored ID.
+  // U+2212 MINUS SIGN and U+2043 HYPHEN BULLET are common non-Pd visual dashes.
+  const normalized=value.normalize('NFKC').replace(/[\p{Pd}\u2212\u2043]/gu,'-');
   if(!normalized||normalized!==normalized.trim()||hidden.test(normalized))return false;
   if(normalized.includes('@')||phone.test(normalized)||ipv4.test(normalized)||looksLikeIPv6(normalized))return false;
   return true;
