@@ -220,6 +220,6 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
   $('themeBtn').textContent=document.documentElement.dataset.theme==='dark'?'🌙':'☀️';
   applyLanguage();
   renderHome();
- }catch(error){console.error(error);$('errorBox').textContent=error.message||String(error);$('errorBox').classList.add('show')}
+ }catch(error){console.error(error);showK5Unavailable();$('errorBox').textContent=error.message||String(error);$('errorBox').classList.add('show')}
 }
 init();
