@@ -24,7 +24,7 @@ function fixture({formal=true,specStatus='APPROVED',planStatus='APPROVED',
  const comments=[specApproval,ownerSpec?specApproval:ownerComment('K5-SPEC-APPROVED BLOB='+SPEC,'another-user'),planApproval];
  // The duplicated valid spec comment is harmless and models real repeated approval notes.
  const deduped=ownerSpec?[specApproval,planApproval]:[comments[1],planApproval];
- const detachedComment={...ownerComment('Owner decision recorded from ChatGPT conversation, 2026-10-14T13:03:19Z: **APPROVED** the explicitly requested K5 design/spec blob `'+SPEC+'` and implementation plan blob `'+PLAN+'` (AC-01). Approval scope: **specification and plan only**. It is **NOT** per-PR/exact-HEAD landing consent.'),id:6169066017};
+ const detachedComment={...ownerComment('Owner decision recorded from ChatGPT conversation, 2026-10-14T13:03:19Z: **APPROVED** the explicitly requested K5 design/spec blob `'+SPEC+'` and implementation plan blob `'+PLAN+'` (AC-01). Approval scope: **specification and plan only**. It is **NOT** per-PR/exact-HEAD landing consent.'),id:6169066017,created_at:'2026-10-14T13:06:54Z'};
  const page1=landingPage2?[
    ...deduped,...Array.from({length:98},(_,i)=>ownerComment('ordinary backlog note '+i))
  ]:[...deduped,landing,...(detached?[detachedComment]:[])];
