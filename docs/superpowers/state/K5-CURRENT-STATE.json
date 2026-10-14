@@ -12,22 +12,22 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "2026-10-14 owner approved exact spec/plan blobs only, recorded PR comment 6169066017. New Codex review on b1b0c89 found combining mark phone PII and outer bootstrap K5 stale verifying. RED 6da753b (1090/1092 pass, 2 expected failures); GREEN 7b3ba03 (quality 38569430661 and server 38569430621 SUCCESS). Await fresh final-doc-head independent review, explicit PR #69 exact SHA landing approval and postmerge main/Pages tests. Numeric lane inactive.",
-  "last_code_ci_verified_sha": "7b3ba03dccd0d20deca0117a770f984abe14bdae",
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE.",
+  "last_code_ci_verified_sha": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
   "last_full_ci": {
-    "quality_run_id": 38569430661,
-    "server_run_id": 38569430621,
+    "quality_run_id": 38580497809,
+    "server_run_id": 38580497841,
     "conclusion": "SUCCESS",
-    "scope": "Final code SHA: Node, Python, Chromium bilingual/offline, Pages, quota, server"
+    "scope": "1096/1096 Node, 76/76 Python, Chromium AR/EN and offline, Pages assembly, quota, server"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "FRESH_FINAL_HEAD_REVIEW_REQUIRED_AFTER_DOC_COMMIT",
+  "independent_review_status": "FRESH_REVIEW_REQUIRED_ON_FINAL_DOC_HEAD_AFTER_P1_P2",
   "independent_review_blocker_comment_id": 6126041737,
-  "open_critical_review_threads_as_of_last_check": 0,
+  "open_critical_review_threads_as_of_last_check": 2,
   "release_blockers": [
-    "AC23_NEW_INDEPENDENT_CLEAN_REVIEW_ON_FINAL_DOCUMENTATION_HEAD_REQUIRED",
+    "AC23_FINAL_HEAD_INDEPENDENT_CLEAN_REVIEW_REQUIRED",
     "AC24_EXPLICIT_PR69_FULL_FINAL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
-    "AC24_MERGED_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
+    "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
   ],
   "open_important_review_threads_as_of_last_check": 2,
   "security_remediation": {
@@ -66,30 +66,31 @@
     "requires_final_head_independent_review": true
   },
   "latest_review_cycle": {
-    "reviewed_head": "b1b0c89d3f056039c53c889abdb80e0df9f4c314",
+    "reviewed_head": "f49966c8edaeeeed8aa91218c2395dba4260c303",
     "findings": [
       {
-        "id": 4271107296,
-        "thread": "PRRT_kwDOUQgV2c6sU5YW",
-        "issue": "UNICODE_COMBINING_MARK_PHONE_PII"
+        "comment_id": 4271203280,
+        "thread": "PRRT_kwDOUQgV2c6sVO8O",
+        "issue": "APPROVAL_CONTRACT_MISMATCH_P1"
       },
       {
-        "id": 4271107301,
-        "thread": "PRRT_kwDOUQgV2c6sU5Ya",
-        "issue": "OUTER_BOOTSTRAP_K5_VERIFYING_HANG"
+        "thread": "PRRT_kwDOUQgV2c6sVO8Y",
+        "issue": "UNICODE_ND_IP_PRIVACY_P2"
       }
     ],
     "red": {
-      "sha": "6da753b06d7aeb94e10441715edd3a8195e490ba",
-      "quality_run_id": 38569232367,
-      "pass": 1090,
+      "sha": "cee4d57541d2b152bcced417e167e7f80d4db5c3",
+      "quality_run_id": 38579831283,
+      "pass": 1093,
       "fail": 2
     },
     "green": {
-      "sha": "7b3ba03dccd0d20deca0117a770f984abe14bdae",
-      "quality_run_id": 38569430661,
-      "server_run_id": 38569430621,
-      "conclusion": "both SUCCESS"
+      "sha": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
+      "quality_run_id": 38580497809,
+      "server_run_id": 38580497841,
+      "conclusion": "both SUCCESS",
+      "node": "1096/1096",
+      "python": "76/76"
     },
     "status": "GREEN_CI_VERIFIED_REVIEW_REPLIES_PENDING",
     "final_review_required": true
@@ -140,6 +141,16 @@
     "pr_comment_id": 6169066017,
     "spec_blob_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
     "plan_blob_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
-    "scope": "SPEC_AND_PLAN_ONLY_NO_MERGE_AUTHORIZATION"
+    "scope": "SPEC_AND_PLAN_ONLY_NO_MERGE_AUTHORIZATION",
+    "approval_contract": "AUTHENTICATED_DETACHED_EXACT_BLOB_OWNER_ATTESTATION"
+  },
+  "governance_audit": {
+    "observed_in_quality_run_id": 38580497809,
+    "observed_head": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
+    "approved": true,
+    "spec_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "immutable_spec_status_remains_not_approved_header": true,
+    "owner_comment_id": 6169066017
   }
 }
