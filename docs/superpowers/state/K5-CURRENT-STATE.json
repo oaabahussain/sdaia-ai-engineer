@@ -13,22 +13,22 @@
   "merged": false,
   "acceptance_criteria_closed": false,
   "notes": "Review #5 (Codex on 4026a315...) exposed shared-objective sibling count loss and Unicode format-control-wrapped learner PII. Observed RED at 37673affa57c9b1822b5b21aaaf97471fe2c29eb (QG 38437889136 1085/1088 pass and 3 expected failures), GREEN source e534695f2bc288a4f1e723eb9f8f8e61c84edc4e (QG 38438160388 1088/1088 Node, 76/76 Python, real Chromium and offline/Pages; server 38438160354). Per-objective safe sibling counts now survive family quarantine, with reason codes preserved; learner IDs with Unicode format or control characters are rejected at BOTH source and projection boundaries. All 25 review threads individually resolved as of live check; this documentation commit advances HEAD and requires fresh CI and independent final review. AC01 formal exact spec/plan approval, AC23 current head reviewer and AC24 authorized merge/postmerge remain open. Five numerical fields must remain null.",
-  "last_code_ci_verified_sha": "0874428063e339f4facfb78d0faa04fc68e0c7c3",
+  "last_code_ci_verified_sha": "26732ddb15da1ead7d5576cf25320df613651f13",
   "last_full_ci": {
-    "quality_run_id": 38564160025,
-    "server_run_id": 38564160053,
+    "quality_run_id": 38567226022,
+    "server_run_id": 38567226023,
     "conclusion": "SUCCESS",
-    "scope": "Exact code SHA 0874428063e339f4facfb78d0faa04fc68e0c7c3: Node, Python, real Chromium bilingual/offline, Pages assembly, quota & server checks"
+    "scope": "1090 Node tests, 76 Python tests, Chromium AR/EN offline/Pages, quota and server adapters on exact code SHA"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "AWAITING_NEW_INDEPENDENT_REVIEW_ON_DOCUMENTATION_FINAL_HEAD",
+  "independent_review_status": "REVIEWED_PRIOR_HEAD_9ac00eec_WITH_TWO_P2; NEW_FINAL_HEAD_REVIEW_REQUIRED",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC01_SPEC_AND_PLAN_FORMAL_EXACT_BLOB_OWNER_APPROVAL_NOT_PROVEN",
-    "AC23_FRESH_INDEPENDENT_REVIEW_ON_FINAL_DOCUMENTATION_HEAD",
-    "AC24_NO_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_APPROVAL",
-    "AC24_POSTMERGE_MAIN_CI_AND_PAGES_NOT_TESTED"
+    "AC01_SPEC_PLAN_FORMAL_EXACT_BLOB_OWNER_APPROVAL_MISSING",
+    "AC23_NEW_INDEPENDENT_CLEAN_REVIEW_ON_FINAL_DOCUMENTATION_HEAD_REQUIRED",
+    "AC24_EXPLICIT_PR69_FULL_FINAL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
+    "AC24_MERGED_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
   ],
   "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
@@ -114,5 +114,29 @@
     "thread_resolved": true,
     "negative_phone_variants": 10,
     "positive_opaque_controls": 4
+  },
+  "latest_phone_grouping_remediation": {
+    "red_sha": "0c39f392eed6cfbc1bc8e3861a6e7fcfb5f437fd",
+    "red_quality_run_id": 38567104252,
+    "red_node_pass": 1089,
+    "red_node_fail": 1,
+    "green_sha": "26732ddb15da1ead7d5576cf25320df613651f13",
+    "green_quality_run_id": 38567226022,
+    "green_server_run_id": 38567226023,
+    "review_comment_id": 4270842457,
+    "reply_id": 4271010497,
+    "thread_id": "PRRT_kwDOUQgV2c6sUQeb",
+    "resolved": true,
+    "scope": "Shared privacy comparator rejects Unicode punctuation/symbol grouped phone PII at K3 intake and K5 projection without changing stored pseudonym"
+  },
+  "review_disposition_mapping_unknown": {
+    "review_comment_id": 4270842468,
+    "reply_id": 4270993167,
+    "thread_id": "PRRT_kwDOUQgV2c6sUQeh",
+    "resolved": true,
+    "decision": "PRESERVE_NORMATIVE_FAIL_CLOSED_ROW_3A",
+    "reason": "K4 catalog only verifies ACTIVE PUBLIC entries. No authenticated protected/retired inventory exists to classify unknown current-release item; ignoring would falsely claim COMPLETE despite missing public mapping",
+    "spec": "2026-10-11 K5 design section 6.1.1 row 3a",
+    "test": "tests/k5-projection-contract.test.js mapping-only mismatch"
   }
 }
