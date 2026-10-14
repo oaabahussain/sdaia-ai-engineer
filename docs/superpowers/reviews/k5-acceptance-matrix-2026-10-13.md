@@ -92,3 +92,10 @@ Status here is an evidence index, **not an approval to merge**. `PASS` means sco
 - After authorized integration, verify the actual merged-main commit and deployed Pages, including unchanged 1120/7/200 content invariants. Lane 2 remains disabled.
 
 **Scope restraint:** This file certifies the tests and findings named above; it does not assert all 25 criteria are release-closed, nor does it grant merge authority.
+
+## Unicode-phone P2 remediation checkpoint — 2026-10-14
+
+- RED `05ebd69ec88e5fae9cd663628f5ae66aa690e31e`: Quality Gate [38564016817](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38564016817) **FAILURE** from new two-boundary regressions; Server 38564016821 SUCCESS.
+- GREEN `0874428063e339f4facfb78d0faa04fc68e0c7c3`: Quality Gate [38564160025](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38564160025) and Server [38564160053](https://github.com/oaabahussain/sdaia-ai-engineer/actions/runs/38564160053) **SUCCESS**. Unicode Pd/U+2212/U+2043 dash normalization is comparison-only; source/export phone tests each exercise 10 negative PII cases; 4 opaque IDs accepted.
+- Codex thread `PRRT_kwDOUQgV2c6sAWVT` P2 comment `4262524189`: evidence reply `4270766446`; resolved **after** GREEN. Historic resolution does not certify a new independent final-head review.
+- **AC-21 privacy:** regression proof strengthened at both source and projection boundaries. **AC-01 remains PARTIAL; AC-22 PARTIAL; AC-23 BLOCKED pending a new independent review on this document commit; AC-24 BLOCKED** (formal exact-blob owner approvals and PR #69/full-40-character-head landing authorization absent; no main/Pages postmerge verification). PR #69 remains DRAFT/UNMERGED. K5 numeric estimation remains INACTIVE and all five fields JSON null.

@@ -13,22 +13,22 @@
   "merged": false,
   "acceptance_criteria_closed": false,
   "notes": "Review #5 (Codex on 4026a315...) exposed shared-objective sibling count loss and Unicode format-control-wrapped learner PII. Observed RED at 37673affa57c9b1822b5b21aaaf97471fe2c29eb (QG 38437889136 1085/1088 pass and 3 expected failures), GREEN source e534695f2bc288a4f1e723eb9f8f8e61c84edc4e (QG 38438160388 1088/1088 Node, 76/76 Python, real Chromium and offline/Pages; server 38438160354). Per-objective safe sibling counts now survive family quarantine, with reason codes preserved; learner IDs with Unicode format or control characters are rejected at BOTH source and projection boundaries. All 25 review threads individually resolved as of live check; this documentation commit advances HEAD and requires fresh CI and independent final review. AC01 formal exact spec/plan approval, AC23 current head reviewer and AC24 authorized merge/postmerge remain open. Five numerical fields must remain null.",
-  "last_code_ci_verified_sha": "e534695f2bc288a4f1e723eb9f8f8e61c84edc4e",
+  "last_code_ci_verified_sha": "0874428063e339f4facfb78d0faa04fc68e0c7c3",
   "last_full_ci": {
-    "quality_run_id": 38438160388,
-    "server_run_id": 38438160354,
+    "quality_run_id": 38564160025,
+    "server_run_id": 38564160053,
     "conclusion": "SUCCESS",
-    "scope": "1088/1088 Node, 76/76 Python, Chromium browser smoke, offline cached reload, Pages assembly, exact source HEAD e534695f2bc288a4f1e723eb9f8f8e61c84edc4e"
+    "scope": "Exact code SHA 0874428063e339f4facfb78d0faa04fc68e0c7c3: Node, Python, real Chromium bilingual/offline, Pages assembly, quota & server checks"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_FRESH_REVIEW_ON_FINAL_DOCUMENTATION_HEAD",
+  "independent_review_status": "AWAITING_NEW_INDEPENDENT_REVIEW_ON_DOCUMENTATION_FINAL_HEAD",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC01_SPEC_AND_PLAN_FORMAL_APPROVAL_NOT_PROVEN",
-    "AC23_NEW_FINAL_HEAD_INDEPENDENT_CLEAN_CODE_REVIEW",
+    "AC01_SPEC_AND_PLAN_FORMAL_EXACT_BLOB_OWNER_APPROVAL_NOT_PROVEN",
+    "AC23_FRESH_INDEPENDENT_REVIEW_ON_FINAL_DOCUMENTATION_HEAD",
     "AC24_NO_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_APPROVAL",
-    "AC24_POSTMERGE_MAIN_CI_AND_GITHUB_PAGES_NOT_TESTED"
+    "AC24_POSTMERGE_MAIN_CI_AND_PAGES_NOT_TESTED"
   ],
   "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
@@ -99,5 +99,20 @@
     },
     "threads_resolved": true,
     "final_head_review_required": true
+  },
+  "latest_unicode_privacy_remediation": {
+    "red_sha": "05ebd69ec88e5fae9cd663628f5ae66aa690e31e",
+    "red_quality_run_id": 38564016817,
+    "red_conclusion": "FAILURE_EXPECTED_REGRESSION",
+    "green_sha": "0874428063e339f4facfb78d0faa04fc68e0c7c3",
+    "green_quality_run_id": 38564160025,
+    "green_server_run_id": 38564160053,
+    "green_conclusion": "SUCCESS",
+    "review_comment_id": 4262524189,
+    "review_reply_id": 4270766446,
+    "review_thread_id": "PRRT_kwDOUQgV2c6sAWVT",
+    "thread_resolved": true,
+    "negative_phone_variants": 10,
+    "positive_opaque_controls": 4
   }
 }
