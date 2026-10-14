@@ -19,12 +19,12 @@ const specApproval=ownerComment('K5-SPEC-APPROVED BLOB='+SPEC);
 const planApproval=ownerComment('K5-PLAN-APPROVED BLOB='+PLAN);
 const encode=(body,sha)=>({sha,encoding:'base64',content:Buffer.from(body).toString('base64')});
 function fixture({formal=true,specStatus='APPROVED',planStatus='APPROVED',
-  ownerSpec=true,landingPage2=false,detached=false}={}){
+  ownerSpec=true,landingPage2=false,detached=false,detachedOwner=OWNER,detachedCommentId=6169066017}={}){
  const recorded=[];
  const comments=[specApproval,ownerSpec?specApproval:ownerComment('K5-SPEC-APPROVED BLOB='+SPEC,'another-user'),planApproval];
  // The duplicated valid spec comment is harmless and models real repeated approval notes.
  const deduped=ownerSpec?[specApproval,planApproval]:[comments[1],planApproval];
- const detachedComment={...ownerComment('Owner decision recorded from ChatGPT conversation, 2026-10-14T13:03:19Z: **APPROVED** the explicitly requested K5 design/spec blob `'+SPEC+'` and implementation plan blob `'+PLAN+'` (AC-01). Approval scope: **specification and plan only**. It is **NOT** per-PR/exact-HEAD landing consent.'),id:6169066017,created_at:'2026-10-14T13:06:54Z'};
+ const detachedComment={...ownerComment('Owner decision recorded from ChatGPT conversation, 2026-10-14T13:03:19Z: **APPROVED** the explicitly requested K5 design/spec blob `'+SPEC+'` and implementation plan blob `'+PLAN+'` (AC-01). Approval scope: **specification and plan only**. It is **NOT** per-PR/exact-HEAD landing consent. ',detachedOwner),id:detachedCommentId,created_at:'2026-10-14T13:06:54Z'};
  const page1=landingPage2?[
    ...deduped,...Array.from({length:98},(_,i)=>ownerComment('ordinary backlog note '+i))
  ]:[...deduped,landing,...(detached?[detachedComment]:[])];
@@ -104,4 +104,12 @@ test('detached exact-blob owner attestation can approve immutable NOT_APPROVED s
 test('NOT_APPROVED spec remains blocked without owner-authenticated detached approval',async()=>{
  const {report}=await audit({specStatus:'NOT_APPROVED',planStatus:'NOT_APPROVED'});
  assert.equal(report.governance.approved,false);
+});
+
+test('detached attestation rejects forged author or mismatched GitHub comment identity',async()=>{
+ for(const options of [{detachedOwner:'unrelated-user'},{detachedCommentId:6169066018}]){
+  const {report}=await audit({...options,detached:true,specStatus:'NOT_APPROVED',planStatus:'NOT_APPROVED'});
+  assert.equal(report.governance.approved,false,JSON.stringify(options));
+  assert.ok(report.readiness.blockers.includes('K5_FORMAL_SPEC_PLAN_APPROVAL_REQUIRED'));
+ }
 });
