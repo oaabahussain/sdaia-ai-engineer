@@ -69,13 +69,14 @@
     "reviewed_head": "f49966c8edaeeeed8aa91218c2395dba4260c303",
     "findings": [
       {
-        "comment_id": 4271203280,
+        "comment_id": 4271245754,
         "thread": "PRRT_kwDOUQgV2c6sVO8O",
         "issue": "APPROVAL_CONTRACT_MISMATCH_P1"
       },
       {
         "thread": "PRRT_kwDOUQgV2c6sVO8Y",
-        "issue": "UNICODE_ND_IP_PRIVACY_P2"
+        "issue": "UNICODE_ND_IP_PRIVACY_P2",
+        "comment_id": 4271245771
       }
     ],
     "red": {
