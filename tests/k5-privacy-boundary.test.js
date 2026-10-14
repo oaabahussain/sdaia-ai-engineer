@@ -60,3 +60,13 @@ test('blocks Unicode-dash direct phone PII at BOTH K5 boundaries without rejecti
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('reject slash-separated phone identifiers at intake and projection',async()=>{
+  for(const candidate of ['+٩٦٦／٥٥٥／٥٥٥／٥٥٥','+٩٦٦/٥٥٥/٥٥٥/٥٥٥','+٩٦٦٬٥٥٥٬٥٥٥٬٥٥٥']){
+    await assert.rejects(readK5Source({store,learnerId:candidate,trackId:'sdaia-ai-engineer',releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i);
+    assert.throws(()=>validateK5Projection({...EMPTY,learner_id:candidate}),/PII|pseudonym/i);
+  }
+  for(const candidate of ['study/group-2026','learner:demo-25']){
+    assert.equal(validateK5Projection({...EMPTY,learner_id:candidate}),true);
+  }
+});
