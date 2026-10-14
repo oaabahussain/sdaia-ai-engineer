@@ -199,7 +199,7 @@ export async function collectK5GitHubEvidence({
       if(note.id!==detached.pr_comment_id||note.user?.login!==owner||
         !Number.isFinite(Date.parse(note.created_at??''))||
         Date.parse(note.created_at)<Date.parse(detached.at))return false;
-      const match=/^Owner decision recorded from ChatGPT conversation, (\\S+): \\*\\*APPROVED\\*\\* the explicitly requested K5 design\\/spec blob \\x60([0-9a-f]{40})\\x60 and implementation plan blob \\x60([0-9a-f]{40})\\x60 \\(AC-01\\)\\. Approval scope: \\*\\*specification and plan only\\*\\*\\. It is \\*\\*NOT\\*\\* per-PR\\/exact-HEAD landing consent/.exec(note.body??'');
+      const match=/^Owner decision recorded from ChatGPT conversation, (\S+): \*\*APPROVED\*\* the explicitly requested K5 design\/spec blob \x60([0-9a-f]{40})\x60 and implementation plan blob \x60([0-9a-f]{40})\x60 \(AC-01\)\. Approval scope: \*\*specification and plan only\*\*\. It is \*\*NOT\*\* per-PR\/exact-HEAD landing consent/.exec(note.body??'');
       return Boolean(match&&match[1]===detached.at&&
         match[2]===specDoc.sha&&match[3]===planDoc.sha);
     }));
