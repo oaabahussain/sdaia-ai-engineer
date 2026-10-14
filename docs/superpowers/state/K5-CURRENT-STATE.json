@@ -12,25 +12,24 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "Review #5 (Codex on 4026a315...) exposed shared-objective sibling count loss and Unicode format-control-wrapped learner PII. Observed RED at 37673affa57c9b1822b5b21aaaf97471fe2c29eb (QG 38437889136 1085/1088 pass and 3 expected failures), GREEN source e534695f2bc288a4f1e723eb9f8f8e61c84edc4e (QG 38438160388 1088/1088 Node, 76/76 Python, real Chromium and offline/Pages; server 38438160354). Per-objective safe sibling counts now survive family quarantine, with reason codes preserved; learner IDs with Unicode format or control characters are rejected at BOTH source and projection boundaries. All 25 review threads individually resolved as of live check; this documentation commit advances HEAD and requires fresh CI and independent final review. AC01 formal exact spec/plan approval, AC23 current head reviewer and AC24 authorized merge/postmerge remain open. Five numerical fields must remain null.",
-  "last_code_ci_verified_sha": "26732ddb15da1ead7d5576cf25320df613651f13",
+  "notes": "2026-10-14 owner approved exact spec/plan blobs only, recorded PR comment 6169066017. New Codex review on b1b0c89 found combining mark phone PII and outer bootstrap K5 stale verifying. RED 6da753b (1090/1092 pass, 2 expected failures); GREEN 7b3ba03 (quality 38569430661 and server 38569430621 SUCCESS). Await fresh final-doc-head independent review, explicit PR #69 exact SHA landing approval and postmerge main/Pages tests. Numeric lane inactive.",
+  "last_code_ci_verified_sha": "7b3ba03dccd0d20deca0117a770f984abe14bdae",
   "last_full_ci": {
-    "quality_run_id": 38567226022,
-    "server_run_id": 38567226023,
+    "quality_run_id": 38569430661,
+    "server_run_id": 38569430621,
     "conclusion": "SUCCESS",
-    "scope": "1090 Node tests, 76 Python tests, Chromium AR/EN offline/Pages, quota and server adapters on exact code SHA"
+    "scope": "Final code SHA: Node, Python, Chromium bilingual/offline, Pages, quota, server"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "REVIEWED_PRIOR_HEAD_9ac00eec_WITH_TWO_P2; NEW_FINAL_HEAD_REVIEW_REQUIRED",
+  "independent_review_status": "FRESH_FINAL_HEAD_REVIEW_REQUIRED_AFTER_DOC_COMMIT",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC01_SPEC_PLAN_FORMAL_EXACT_BLOB_OWNER_APPROVAL_MISSING",
     "AC23_NEW_INDEPENDENT_CLEAN_REVIEW_ON_FINAL_DOCUMENTATION_HEAD_REQUIRED",
     "AC24_EXPLICIT_PR69_FULL_FINAL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
     "AC24_MERGED_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
   ],
-  "open_important_review_threads_as_of_last_check": 0,
+  "open_important_review_threads_as_of_last_check": 2,
   "security_remediation": {
     "red_sha": "0da59cbf8a49b050ce9c1614c4d016e9660fb119",
     "green_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
@@ -67,38 +66,33 @@
     "requires_final_head_independent_review": true
   },
   "latest_review_cycle": {
-    "reviewed_head": "4026a31533cde74a2c9075a4e000d62a0137b115",
-    "review_findings": [
+    "reviewed_head": "b1b0c89d3f056039c53c889abdb80e0df9f4c314",
+    "findings": [
       {
-        "id": 4261772901,
-        "thread": "PRRT_kwDOUQgV2c6r-jVR",
-        "level": "P2",
-        "issue": "MIXED_OBJECTIVE_QUARANTINE_DISCARDS_SAFE_SIBLING_COUNTS"
+        "id": 4271107296,
+        "thread": "PRRT_kwDOUQgV2c6sU5YW",
+        "issue": "UNICODE_COMBINING_MARK_PHONE_PII"
       },
       {
-        "id": 4261772909,
-        "thread": "PRRT_kwDOUQgV2c6r-jVW",
-        "level": "P2",
-        "issue": "UNICODE_FORMAT_CONTROL_WRAPPED_LEARNER_PII"
+        "id": 4271107301,
+        "thread": "PRRT_kwDOUQgV2c6sU5Ya",
+        "issue": "OUTER_BOOTSTRAP_K5_VERIFYING_HANG"
       }
     ],
     "red": {
-      "sha": "37673affa57c9b1822b5b21aaaf97471fe2c29eb",
-      "quality_run_id": 38437889136,
-      "node": "1085/1088 pass; 3 expected failures"
+      "sha": "6da753b06d7aeb94e10441715edd3a8195e490ba",
+      "quality_run_id": 38569232367,
+      "pass": 1090,
+      "fail": 2
     },
     "green": {
-      "sha": "e534695f2bc288a4f1e723eb9f8f8e61c84edc4e",
-      "quality_run_id": 38438160388,
-      "server_run_id": 38438160354,
-      "node": "1088/1088",
-      "python": "76/76",
-      "chromium": "PASS",
-      "offline": "PASS",
-      "pages": "PASS"
+      "sha": "7b3ba03dccd0d20deca0117a770f984abe14bdae",
+      "quality_run_id": 38569430661,
+      "server_run_id": 38569430621,
+      "conclusion": "both SUCCESS"
     },
-    "threads_resolved": true,
-    "final_head_review_required": true
+    "status": "GREEN_CI_VERIFIED_REVIEW_REPLIES_PENDING",
+    "final_review_required": true
   },
   "latest_unicode_privacy_remediation": {
     "red_sha": "05ebd69ec88e5fae9cd663628f5ae66aa690e31e",
@@ -138,5 +132,14 @@
     "reason": "K4 catalog only verifies ACTIVE PUBLIC entries. No authenticated protected/retired inventory exists to classify unknown current-release item; ignoring would falsely claim COMPLETE despite missing public mapping",
     "spec": "2026-10-11 K5 design section 6.1.1 row 3a",
     "test": "tests/k5-projection-contract.test.js mapping-only mismatch"
+  },
+  "owner_authorization_for_spec_and_plan": {
+    "approved": true,
+    "at": "2026-10-14T13:03:19Z",
+    "source": "User explicitly replied موافق to question naming both exact blobs",
+    "pr_comment_id": 6169066017,
+    "spec_blob_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "plan_blob_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "scope": "SPEC_AND_PLAN_ONLY_NO_MERGE_AUTHORIZATION"
   }
 }
