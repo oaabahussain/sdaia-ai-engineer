@@ -22,6 +22,15 @@ export function isOpaqueK5LearnerId(value) {
   // Compare digits after removing Unicode punctuation, symbols, marks and spacing;
   // never rewrite the actual pseudonym or infer a learner identity from it.
   const phoneCandidate=normalized.replace(/[\p{P}\p{S}\p{Z}\p{M}\s]/gu,'');
-  if(normalized.includes('@')||phone.test(phoneCandidate)||ipv4.test(normalized)||looksLikeIPv6(normalized))return false;
+  // Nd digits occupy contiguous decimal runs of 10 (sometimes several
+  // consecutive sets). Convert only the comparison value; preserve the ID.
+  const isDecimal=char=>/\\p{Nd}/u.test(char);
+  const ipCandidate=normalized.replace(/\\p{Nd}/gu,char=>{
+    const cp=char.codePointAt(0);
+    let start=cp;
+    while(start>0&&isDecimal(String.fromCodePoint(start-1)))start--;
+    return String((cp-start)%10);
+  });
+  if(normalized.includes('@')||phone.test(phoneCandidate)||ipv4.test(ipCandidate)||looksLikeIPv6(ipCandidate))return false;
   return true;
 }

@@ -187,6 +187,22 @@ export async function collectK5GitHubEvidence({
     const match=regex.exec((note.body??'').trim());
     return Boolean(match&&match[1]===blob);
   });
+  // Immutable approved blobs remain unchanged. An explicit authenticated
+  // owner attestation can approve those exact bytes without rewriting their
+  // historical NOT_APPROVED headers (which would change the approved hashes).
+  const detached=state.owner_authorization_for_spec_and_plan;
+  const detachedApproval=Boolean(detached?.approved===true&&
+    detached.scope==='SPEC_AND_PLAN_ONLY_NO_MERGE_AUTHORIZATION'&&
+    detached.spec_blob_sha===specDoc.sha&&detached.plan_blob_sha===planDoc.sha&&
+    Number.isSafeInteger(detached.pr_comment_id)&&detached.pr_comment_id>0&&
+    Number.isFinite(Date.parse(detached.at??''))&&comments.some(note=>{
+      if(note.id!==detached.pr_comment_id||note.user?.login!==owner||
+        !Number.isFinite(Date.parse(note.created_at??''))||
+        Date.parse(note.created_at)<Date.parse(detached.at))return false;
+      const match=/^Owner decision recorded from ChatGPT conversation, (\\S+): \\*\\*APPROVED\\*\\* the explicitly requested K5 design\\/spec blob \\x60([0-9a-f]{40})\\x60 and implementation plan blob \\x60([0-9a-f]{40})\\x60 \\(AC-01\\)\\. Approval scope: \\*\\*specification and plan only\\*\\*\\. It is \\*\\*NOT\\*\\* per-PR\\/exact-HEAD landing consent/.exec(note.body??'');
+      return Boolean(match&&match[1]===detached.at&&
+        match[2]===specDoc.sha&&match[3]===planDoc.sha);
+    }));
   const specAccepted=state.formal_spec_approval?.approved_by===owner&&
     state.formal_spec_approval.blob_sha===specDoc.sha&&
     Number.isFinite(Date.parse(state.formal_spec_approval.approved_at));
@@ -197,10 +213,11 @@ export async function collectK5GitHubEvidence({
     state.release_blockers.some(value=>/AC0?1|SPEC.*APPROV|PLAN.*APPROV/i.test(String(value)));
   const governance={headSha:prHead,specBlobSha:specDoc.sha,
     planBlobSha:planDoc.sha,approved:Boolean(stateValidity.ok&&
-      approvedStatus(specDoc.text)&&approvedStatus(planDoc.text)&&
-      specAccepted&&planAccepted&&!ac01Blocked&&
-      ownerHasBlobApproval(SPEC_APPROVAL,specDoc.sha)&&
-      ownerHasBlobApproval(PLAN_APPROVAL,planDoc.sha))};
+      ((approvedStatus(specDoc.text)&&approvedStatus(planDoc.text)&&
+        specAccepted&&planAccepted&&
+        ownerHasBlobApproval(SPEC_APPROVAL,specDoc.sha)&&
+        ownerHasBlobApproval(PLAN_APPROVAL,planDoc.sha))||detachedApproval)&&
+      !ac01Blocked)};
   const approvalComments=(Array.isArray(comments)?comments:[])
     .filter(c=>c.user?.login===owner)
     .filter(c=>{
