@@ -81,3 +81,17 @@ test('rejects combining-mark separated direct phone numbers at both boundaries',
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects Unicode decimal-digit IP addresses at both privacy boundaries',async()=>{
+ const directIPs=['١.١.١.١','١٩٢.١٦٨.٠.١','٢٠٠١:db8::1','[٢٠٠١:db8::5]','::ffff:١٩٢.٠.٢.٤٢','2001:db8::١'];
+ for(const learnerId of directIPs){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['cohort-١٢٣','study-٢٠٢٦-alpha','learner:demo-٣']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
