@@ -70,3 +70,14 @@ test('reject slash-separated phone identifiers at intake and projection',async()
     assert.equal(validateK5Projection({...EMPTY,learner_id:candidate}),true);
   }
 });
+
+test('rejects combining-mark separated direct phone numbers at both boundaries',async()=>{
+ for(const learnerId of ['+٩٦٦\u0301٥٥٥\u0301٥٥٥\u0301٥٥٥','+966\u0301555\u0301555\u0301555','+٩٦٦\u064e٥٥٥\u064e٥٥٥\u064e٥٥٥']){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['cohort\u0301alpha-2026','study\u0301/group']) {
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
