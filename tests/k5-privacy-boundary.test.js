@@ -95,3 +95,24 @@ test('rejects Unicode decimal-digit IP addresses at both privacy boundaries',asy
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects combining-mark obfuscated IPv4 and IPv6 at both privacy boundaries',async()=>{
+ const directIPs=[
+  '1\u0301.1\u0301.1\u0301.1',
+  '2001\u0301:db8::1',
+  '٢٠٠١\u0301:db8::1',
+  '١\u064e٩\u064e٢.١\u064e٦\u064e٨.٠.١',
+  '[2001\u0301:db8::5]',
+  '::ffff:١\u0309٩٢.٠.٢.٤٢'
+ ];
+ for(const learnerId of directIPs){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['cohort\u0301alpha-2026','study\u0301/group','student-٢٠٢٦\u064e-alpha']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
