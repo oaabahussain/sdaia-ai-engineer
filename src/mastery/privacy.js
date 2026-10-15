@@ -30,7 +30,7 @@ export function isOpaqueK5LearnerId(value) {
     let start=cp;
     while(start>0&&isDecimal(String.fromCodePoint(start-1)))start--;
     return String((cp-start)%10);
-  });
+  }).replace(/\p{M}/gu,'');
   if(normalized.includes('@')||phone.test(phoneCandidate)||ipv4.test(ipCandidate)||looksLikeIPv6(ipCandidate))return false;
   return true;
 }
