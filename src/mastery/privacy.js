@@ -25,7 +25,7 @@ export function isOpaqueK5LearnerId(value) {
   // Nd digits occupy contiguous decimal runs of 10 (sometimes several
   // consecutive sets). Convert only the comparison value; preserve the ID.
   const isDecimal=char=>/\p{Nd}/u.test(char);
-  const ipCandidate=normalized.replace(/\p{Nd}/gu,char=>{
+  const ipCandidate=normalized.normalize('NFD').replace(/\p{Nd}/gu,char=>{
     const cp=char.codePointAt(0);
     let start=cp;
     while(start>0&&isDecimal(String.fromCodePoint(start-1)))start--;
