@@ -116,3 +116,25 @@ test('rejects combining-mark obfuscated IPv4 and IPv6 at both privacy boundaries
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects composed and decomposed IPv6 hex marks at intake and projection',async()=>{
+ const directIPs=[
+  '2001:db8::fe\u0301',
+  '2001:db8::f\u00e9',
+  '[2001:db8::fe\u0301]',
+  '::ffff:192.0.2.4\u0301',
+  '2001:db8::a\u0301',
+  '2001:db8::\u00e1',
+  '٢٠٠١:db8::fe\u0301'
+ ];
+ for(const learnerId of directIPs){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['cohort-f\u00e9-2026','student-a\u0301lpha','study-\u00e9-group']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
