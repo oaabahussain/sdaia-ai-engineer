@@ -10,6 +10,17 @@ function looksLikeIPv6(value) {
   try { new URL('http://['+host+']/'); return true; }
   catch { return false; }
 }
+// Parse URL/authority wrappers only for privacy comparison. Never rewrite IDs.
+function containsIpHost(value) {
+  let url;
+  try {
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) url=new URL(value);
+    else if (value.startsWith('//')) url=new URL('http:'+value);
+    else if (/^\[[^\]]+\]:\d{1,5}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}:\d{1,5}$/.test(value)) url=new URL('http://'+value);
+    else return false;
+  } catch { return false; }
+  return ipv4.test(url.hostname)||looksLikeIPv6(url.hostname);
+}
 export function isOpaqueK5LearnerId(value) {
   if(typeof value!=='string'||!value||value!==value.trim())return false;
   if(hidden.test(value))return false;
@@ -31,6 +42,6 @@ export function isOpaqueK5LearnerId(value) {
     while(start>0&&isDecimal(String.fromCodePoint(start-1)))start--;
     return String((cp-start)%10);
   }).replace(/\p{M}/gu,'');
-  if(normalized.includes('@')||phone.test(phoneCandidate)||ipv4.test(ipCandidate)||looksLikeIPv6(ipCandidate))return false;
+  if(normalized.includes('@')||phone.test(phoneCandidate)||ipv4.test(ipCandidate)||looksLikeIPv6(ipCandidate)||containsIpHost(ipCandidate))return false;
   return true;
 }
