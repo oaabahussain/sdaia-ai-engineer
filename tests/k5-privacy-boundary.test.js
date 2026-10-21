@@ -138,3 +138,27 @@ test('rejects composed and decomposed IPv6 hex marks at intake and projection',a
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects URL and authority wrapped IP principals at both boundaries',async()=>{
+ const bad=[
+  'http://192.168.0.1',
+  'https://192.168.0.1:443/profile',
+  'http://[2001:db8::1]',
+  'https://[2001:db8::1]:443/profile',
+  '[2001:db8::1]:443',
+  '192.168.0.1:8080',
+  'http://١٩٢.١٦٨.٠.١',
+  'http://[2001:db8::fe\u0301]',
+  '//[2001:db8::5]:443'
+ ];
+ for(const learnerId of bad){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['study/group','cohort-2026','https://example.org/cohort','learner:demo-25']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
