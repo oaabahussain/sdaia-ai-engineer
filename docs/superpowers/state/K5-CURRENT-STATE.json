@@ -12,24 +12,24 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE.",
-  "last_code_ci_verified_sha": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge.",
+  "last_code_ci_verified_sha": "f80bd03b881010a33dc5cb5a4c5d966d11bfa3cf",
   "last_full_ci": {
-    "quality_run_id": 38580497809,
-    "server_run_id": 38580497841,
+    "quality_run_id": 39804663778,
+    "server_run_id": 39804663835,
     "conclusion": "SUCCESS",
-    "scope": "1096/1096 Node, 76/76 Python, Chromium AR/EN and offline, Pages assembly, quota, server"
+    "scope": "1100/1100 Node; 76/76 Python; Chromium AR/EN/offline; Pages assembly; service worker; quota; read-only audit; server contracts; on exact code SHA"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "FRESH_REVIEW_REQUIRED_ON_FINAL_DOC_HEAD_AFTER_P1_P2",
+  "independent_review_status": "PENDING_CURRENT_HEAD_INDEPENDENT_REVIEW_AFTER_SPECIAL_SCHEME_PRIVACY_REPAIR",
   "independent_review_blocker_comment_id": 6126041737,
-  "open_critical_review_threads_as_of_last_check": 2,
+  "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC23_FINAL_HEAD_INDEPENDENT_CLEAN_REVIEW_REQUIRED",
-    "AC24_EXPLICIT_PR69_FULL_FINAL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
+    "AC23_NEW_EXACT_HEAD_INDEPENDENT_CLEAN_CODEX_REVIEW_PENDING",
+    "AC24_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
     "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
   ],
-  "open_important_review_threads_as_of_last_check": 2,
+  "open_important_review_threads_as_of_last_check": 1,
   "security_remediation": {
     "red_sha": "0da59cbf8a49b050ce9c1614c4d016e9660fb119",
     "green_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
@@ -153,5 +153,25 @@
     "plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
     "immutable_spec_status_remains_not_approved_header": true,
     "owner_comment_id": 6169066017
+  },
+  "latest_special_scheme_url_privacy_remediation": {
+    "review_comment_id": 4339061351,
+    "review_thread_id": "PRRT_kwDOUQgV2c6u2Mfp",
+    "red": {
+      "sha": "de58afa0b643d8e5eafedd6f2295382bd8c440b4",
+      "quality_run_id": 39804317418,
+      "expected": "1099 passed, 1 expected privacy regression failed"
+    },
+    "green": {
+      "sha": "f80bd03b881010a33dc5cb5a4c5d966d11bfa3cf",
+      "quality_run_id": 39804663778,
+      "server_run_id": 39804663835,
+      "results": "1100/1100 Node; 76/76 Python; browser/offline/Pages/quota/audit/server PASS"
+    },
+    "regression_tests": "10 negative special-scheme URL IP forms across K3 intake and K5 export; 5 positive pseudonyms",
+    "approved_spec_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "approved_plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "review_status_as_of_checkpoint": "PENDING",
+    "owner_landing_authorization": false
   }
 }
