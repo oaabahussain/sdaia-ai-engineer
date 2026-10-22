@@ -14,7 +14,7 @@ function looksLikeIPv6(value) {
 function containsIpHost(value) {
   let url;
   try {
-    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) url=new URL(value);
+    if (/^(?:https?|wss?|ftp):/i.test(value) || /^[a-z][a-z0-9+.-]*:\/\//i.test(value)) url=new URL(value);
     else if (value.startsWith('//')) url=new URL('http:'+value);
     else if (/^\[[^\]]+\]:\d{1,5}$/.test(value) || /^(?:\d{1,3}\.){3}\d{1,3}:\d{1,5}$/.test(value)) url=new URL('http://'+value);
     else return false;
