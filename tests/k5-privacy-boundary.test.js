@@ -162,3 +162,31 @@ test('rejects URL and authority wrapped IP principals at both boundaries',async(
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects special-scheme URL IP hosts without double slashes at both K5 boundaries',async()=>{
+ const directIPs=[
+  'http:192.168.0.1',
+  'https:/192.168.0.1',
+  'http:\\192.168.0.1',
+  'http:\\\\192.168.0.1',
+  'ftp:192.168.0.1',
+  'ws:192.168.0.1',
+  'wss:/[2001:db8::1]',
+  'https:/[2001:db8::1]',
+  'http:١٩٢.١٦٨.٠.١',
+  'http:%31%39%32.168.0.1'
+ ];
+ for(const learnerId of directIPs){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of [
+  'http:cohort-alpha','https:/example.org/cohort','study:alpha-2026',
+  'learner/demo-2026','ftp:cohort-2026'
+ ]){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
