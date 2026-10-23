@@ -12,22 +12,22 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE. 2026-10-23 late: Fresh exact-head Codex review of 1fba1c2 found one P2 malformed-port IPv6 URL with >2 separators. Test-only RED 841d9a4 QG 40007791885 expected failure 1101/1102. Comparison-only GREEN f41b73fa QG 40007922208 SUCCESS 1102/1102 Node, 76/76 Python, Chromium/browser/offline/Pages/quota and Server 40007922236 SUCCESS. Reviewed thread 4363213796 replied 4363240835 and resolved. Exact new HEAD review still required; no owner merge consent; numeric lane INACTIVE.",
-  "last_code_ci_verified_sha": "f41b73fa323522764666e5929faeae90038e33da",
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE. 2026-10-23 late: Fresh exact-head Codex review of 1fba1c2 found one P2 malformed-port IPv6 URL with >2 separators. Test-only RED 841d9a4 QG 40007791885 expected failure 1101/1102. Comparison-only GREEN f41b73fa QG 40007922208 SUCCESS 1102/1102 Node, 76/76 Python, Chromium/browser/offline/Pages/quota and Server 40007922236 SUCCESS. Reviewed thread 4363213796 replied 4363240835 and resolved. Exact new HEAD review still required; no owner merge consent; numeric lane INACTIVE. 2026-10-23: Codex clean issue-comment receipt 6372645165 reviewed 6fc4447 but formal-review-only release auditor ignored it. RED 871afee QG 40009149697 1104/1105 Node expected failure; GREEN 6c844f5 QG 40024476785 and Server 40024476843 SUCCESS 1105/1105 Node, 76/76 Python, Chromium/Pages/quota/offline PASS. New gate authenticates bot+owner request+latest exact full SHA+time, fail-closes spoofed/stale/finding or missing approval cases. Fresh final-head review required, merge remains separately owner-authorized.",
+  "last_code_ci_verified_sha": "6c844f59d4d073980e14fcb4f447fa7dd1f0aa9a",
   "last_full_ci": {
-    "quality_run_id": 40007922208,
-    "server_run_id": 40007922236,
+    "quality_run_id": 40024476785,
+    "server_run_id": 40024476843,
     "conclusion": "SUCCESS",
-    "scope": "1102/1102 Node, 76/76 Python, real Chromium AR/EN K4 Close→K5, offline, Pages, physical quota, read-only audit, Server/adapter on exact code SHA"
+    "scope": "1105/1105 Node, 76/76 Python; Chromium bilingual/offline/K4 Close to K5; Pages, isolated physical quota, Server/adapter on code SHA"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_FOCUSED_EXACT_HEAD_REVIEW_AFTER_REPEATED_SEPARATOR_P2_REPAIR_2026_10_23",
+  "independent_review_status": "PENDING_NEW_EXACT_HEAD_CODEX_REVIEW_AFTER_REVIEW_RECEIPT_AUDIT_FIX_2026_10_23",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC23_NEW_EXACT_HEAD_CLEAN_CODEX_REVIEW_PENDING",
-    "AC24_EXPLICIT_PR69_EXACT_HEAD_OWNER_LANDING_APPROVAL_REQUIRED",
-    "AC24_POST_MERGE_MAIN_AND_PAGES_PROOF_PENDING"
+    "AC23_FRESH_EXACT_HEAD_INDEPENDENT_REVIEW_PENDING",
+    "AC24_EXPLICIT_PR69_FULL_EXACT_HEAD_OWNER_LANDING_CONSENT_REQUIRED",
+    "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_PROOF_PENDING"
   ],
   "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
@@ -236,5 +236,34 @@
     "positive_controls": 3,
     "state": "GREEN_CI_VERIFIED_REVIEW_PENDING",
     "numerical_lane": "INACTIVE"
+  },
+  "latest_codex_receipt_audit_fix": {
+    "root_cause": "Previously read-only K5 release auditor accepted Codex only as formal PR review; authenticated clean issue comment on exactly requested head was ignored, producing false INDEPENDENT_REVIEW_NOT_CLEAN despite valid Codex response",
+    "original_reviewed_head": "6fc44472112ca1a1fc7e93ce6889738cd32d1ddf",
+    "owner_request_comment_id": 6372606296,
+    "codex_clean_receipt_comment_id": 6372645165,
+    "red": {
+      "sha": "871afee334869477efe3299e51d8f515c1f67d42",
+      "quality_run_id": 40009149697,
+      "node_total": 1105,
+      "node_pass": 1104,
+      "node_fail": 1,
+      "expected": "authenticated Codex clean issue receipt on requested exact head satisfies independent review gate failed"
+    },
+    "green": {
+      "sha": "6c844f59d4d073980e14fcb4f447fa7dd1f0aa9a",
+      "quality_run_id": 40024476785,
+      "server_run_id": 40024476843,
+      "node_total": 1105,
+      "node_pass": 1105,
+      "python_total": 76,
+      "python_pass": 76,
+      "browser": "PASS",
+      "pages": "PASS",
+      "quota": "PASS"
+    },
+    "scope": "comparison-only authenticated reviewer receipt source without bypass of merge owner consent; exact SHA & bot+owner identities+timestamps+latest request required; spoof/stale/missing checks/unresolved threads/changes requested fail closed",
+    "state": "GREEN_CI_VERIFIED_PENDING_NEW_EXACT_HEAD_CODEX_REVIEW",
+    "numeric_lane": "INACTIVE"
   }
 }
