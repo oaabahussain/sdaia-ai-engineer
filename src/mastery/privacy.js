@@ -14,7 +14,8 @@ function looksLikeIPv6(value) {
 function containsIpHost(value) {
   // Malformed/out-of-range ports invalidate WHATWG URLs but must not conceal
   // a syntactically valid bracketed IPv6 host from privacy screening.
-  const authority=/^(?:(?:[a-z][a-z0-9+.-]*:)?[\\/]{0,2})?\[([^\]]+)\](?::[^/?#\\]*)?(?:[/?#].*)?$/i.exec(value);
+  // Match arbitrary URL slash/backslash runs, including WHATWG special schemes.
+  const authority=/^(?:(?:[a-z][a-z0-9+.-]*:)?[\\/]*)?\[([^\]]+)\](?::[^/?#\\]*)?(?:[/?#].*)?$/i.exec(value);
   if(authority&&looksLikeIPv6(authority[1]))return true;
   let url;
   try {
