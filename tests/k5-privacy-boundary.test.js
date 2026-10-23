@@ -196,6 +196,10 @@ test('rejects bracketed IPv6 learner IDs with malformed ports at K3 and K5',asyn
   '[2001:db8::1]:65536',
   '[2001:db8::1]:abc',
   '[2001:db8::1]:999999',
+  'https://[2001:db8::1]:65536/profile',
+  '//[2001:db8::1]:abc',
+  'http:[2001:db8::1]:abc',
+  'wss:/[2001:db8::1]:invalid',
   '[::ffff:192.0.2.42]:unavailable',
   '[٢٠٠١:db8::١]:invalid',
   '[fe80::1%eth0]:bad'
