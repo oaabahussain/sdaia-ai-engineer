@@ -190,3 +190,24 @@ test('rejects special-scheme URL IP hosts without double slashes at both K5 boun
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects bracketed IPv6 learner IDs with malformed ports at K3 and K5',async()=>{
+ const hiddenIps=[
+  '[2001:db8::1]:65536',
+  '[2001:db8::1]:abc',
+  '[2001:db8::1]:999999',
+  '[::ffff:192.0.2.42]:unavailable',
+  '[٢٠٠١:db8::١]:invalid',
+  '[fe80::1%eth0]:bad'
+ ];
+ for(const learnerId of hiddenIps){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['[cohort-alpha]:invalid','[topic:alpha]:bad','learner-[batch]:not-a-port']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
