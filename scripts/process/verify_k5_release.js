@@ -128,6 +128,31 @@ export async function collectK5GitHubEvidence({
       v.body.includes('### 💡 Codex Review')&&
       v.body.includes('**Reviewed commit:** `'+prHead.slice(0,10)+'`'));
   const validReviews=evidenceReviews.filter(v=>v.state==='COMMENTED');
+  // Codex can return a clean outcome as an authenticated PR issue comment,
+  // rather than a formal review. Accept only the exact bot receipt tied to
+  // the latest explicit owner request for this full PR head.
+  const requestMarker=/^@codex review[ \t]*\r?\nReview head: \x60([a-f0-9]{40})\x60(?:\r?\n|$)/;
+  const requests=comments.filter(note=>
+    note.user?.login===owner&&Number.isSafeInteger(note.id)&&note.id>0&&
+    typeof note.body==='string'&&
+    requestMarker.exec(note.body)?.[1]===prHead&&
+    Number.isFinite(Date.parse(note.created_at??'')))
+    .sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)||a.id-b.id);
+  const latestRequest=requests.at(-1);
+  const receiptMarker=/^<!-- codex-review-receipt:v1 -->\s+Codex Review: Didn't find any major issues\.[^\n]*\s+\*\*Reviewed commit:\*\* \x60([a-f0-9]{10})\x60(?:\s|$)/;
+  const replies=latestRequest?comments.filter(note=>
+    note.user?.login==='chatgpt-codex-connector[bot]'&&
+    note.user?.type==='Bot'&&Number.isSafeInteger(note.id)&&
+    note.id>latestRequest.id&&typeof note.body==='string'&&
+    note.body.startsWith('<!-- codex-review-receipt:v1 -->')&&
+    Number.isFinite(Date.parse(note.created_at??''))&&
+    Date.parse(note.created_at)>=Date.parse(latestRequest.created_at))
+    .sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)||a.id-b.id):[];
+  const latestReply=replies.at(-1);
+  const cleanIssueReceipt=Boolean(latestReply&&
+    receiptMarker.exec(latestReply.body)?.[1]===prHead.slice(0,10)&&
+    !/\bP[012]\b|\bcritical\b|\bimportant\b/i.test(latestReply.body));
+
   // Resolved threads and administratively dismissed review submissions do
   // not erase exact-head findings. Fixes need a new head and a new review.
   const reviewComments=await Promise.all(evidenceReviews.map(async review=>{
@@ -233,7 +258,7 @@ export async function collectK5GitHubEvidence({
   const changesRequested=(Array.isArray(reviews)?reviews:[])
     .some(v=>v.commit_id===prHead&&v.state==='CHANGES_REQUESTED');
   const review={headSha:prHead,
-    completed:validReviews.length>0&&openThreads.length===0&&
+    completed:(validReviews.length>0||cleanIssueReceipt)&&openThreads.length===0&&
       !changesRequested&&!exactHeadReviewHasFindings,
     openCritical:materialOpen.length,openImportant:openThreads.length};
   const readiness=verifyK5Release({prNumber,prHead,approval,checks,review,browserEvidence,
