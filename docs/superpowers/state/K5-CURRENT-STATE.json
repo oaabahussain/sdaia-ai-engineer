@@ -12,24 +12,24 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge.",
-  "last_code_ci_verified_sha": "f80bd03b881010a33dc5cb5a4c5d966d11bfa3cf",
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE.",
+  "last_code_ci_verified_sha": "442fffedc30c5630d5c46062c1f1458f7be4942e",
   "last_full_ci": {
-    "quality_run_id": 39804663778,
-    "server_run_id": 39804663835,
+    "quality_run_id": 40006765029,
+    "server_run_id": 40006764763,
     "conclusion": "SUCCESS",
-    "scope": "1100/1100 Node; 76/76 Python; Chromium AR/EN/offline; Pages assembly; service worker; quota; read-only audit; server contracts; on exact code SHA"
+    "scope": "1101/1101 Node; 76/76 Python; Chromium AR/EN, K4 Close to K5 observed activity, offline; Pages; physical quota; read-only audit; server contracts on exact code SHA"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_CURRENT_HEAD_INDEPENDENT_REVIEW_AFTER_SPECIAL_SCHEME_PRIVACY_REPAIR",
+  "independent_review_status": "PENDING_FRESH_FOCUSED_REVIEW_AFTER_TWO_P2_FIXES_2026_10_23",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC23_NEW_EXACT_HEAD_INDEPENDENT_CLEAN_CODEX_REVIEW_PENDING",
-    "AC24_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_CONFIRMATION_MISSING",
+    "AC23_FRESH_EXACT_HEAD_INDEPENDENT_REVIEW_REQUIRED",
+    "AC24_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_APPROVAL_REQUIRED",
     "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
   ],
-  "open_important_review_threads_as_of_last_check": 1,
+  "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
     "red_sha": "0da59cbf8a49b050ce9c1614c4d016e9660fb119",
     "green_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
@@ -173,5 +173,39 @@
     "approved_plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
     "review_status_as_of_checkpoint": "PENDING",
     "owner_landing_authorization": false
+  },
+  "latest_2026_10_23_review_repairs": {
+    "reviewed_head": "609b39ae5d57e463ec3b40c62443313e00770a60",
+    "reviewed_at_utc": "2026-10-23T18:39:44Z",
+    "findings": [
+      {
+        "thread": "PRRT_kwDOUQgV2c6vuy32",
+        "comment_id": 4363059183,
+        "reply_id": 4363171471,
+        "path": "src/mastery/privacy.js",
+        "issue": "IPv6 malformed-port source/export PII bypass",
+        "red_sha": "7c97ddd01b64f4baa0daa93d24bf2a0daf54f5d7",
+        "red_quality_run_id": 40005665547,
+        "green_sha": "484e30b45ea1b9c0add7db712f73d11d495d5022",
+        "green_quality_run_id": 40005799835,
+        "green_server_run_id": 40005799588,
+        "resolved": true
+      },
+      {
+        "thread": "PRRT_kwDOUQgV2c6vuy3v",
+        "comment_id": 4363059172,
+        "reply_id": 4363171944,
+        "path": "src/app.js",
+        "issue": "K4 Close left K5 recorded activity stale",
+        "initial_false_positive_browser_sha": "d26308fea4f755eb3735d78ca909ab6780390e9e",
+        "isolated_red_sha": "7d8fe7bee7f12c2caadb68364c7d5ce36eed14fb",
+        "red_quality_run_id": 40006487993,
+        "green_sha": "442fffedc30c5630d5c46062c1f1458f7be4942e",
+        "green_quality_run_id": 40006765029,
+        "green_server_run_id": 40006764763,
+        "resolved": true
+      }
+    ],
+    "reviewed_result": "Two valid in-scope P2 findings; both fixed test-first, evidence-replied and resolved; new exact-head Codex review not yet received"
   }
 }
