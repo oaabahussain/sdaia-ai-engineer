@@ -215,3 +215,26 @@ test('rejects bracketed IPv6 learner IDs with malformed ports at K3 and K5',asyn
   assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
  }
 });
+
+test('rejects IPv6 malformed-port URLs with repeated authority separators',async()=>{
+ const bad=[
+  'http:///[2001:db8::1]:abc/',
+  'http:////[2001:db8::1]:65536/',
+  'https://///[2001:db8::1]:999999/profile',
+  'ftp:////[2001:db8::1]:bad/',
+  'wss:///\\[2001:db8::1]:65536/',
+  'http:\\\\\[2001:db8::1]:abc/',
+  'http:////[2001:db8::fe\u0301]:invalid/',
+  'https:////[٢٠٠١:db8::١]:bad/'
+ ];
+ for(const learnerId of bad){
+  await assert.rejects(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),/PII|pseudonym/i,learnerId);
+  assert.throws(()=>validateK5Projection({...EMPTY,learner_id:learnerId}),/PII|pseudonym/i,learnerId);
+ }
+ for(const learnerId of ['http:////[study:alpha]:bad/','study////[cohort:alpha]:noport/','http:////example.org/cohort']){
+  await assert.doesNotReject(readK5Source({store,learnerId,trackId:'sdaia-ai-engineer',
+   releaseId:'release',throughStoreSeq:0}),learnerId);
+  assert.equal(validateK5Projection({...EMPTY,learner_id:learnerId}),true,learnerId);
+ }
+});
