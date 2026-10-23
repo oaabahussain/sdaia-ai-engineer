@@ -12,22 +12,22 @@
   "landing_authorized": false,
   "merged": false,
   "acceptance_criteria_closed": false,
-  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE.",
-  "last_code_ci_verified_sha": "442fffedc30c5630d5c46062c1f1458f7be4942e",
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE. 2026-10-23 late: Fresh exact-head Codex review of 1fba1c2 found one P2 malformed-port IPv6 URL with >2 separators. Test-only RED 841d9a4 QG 40007791885 expected failure 1101/1102. Comparison-only GREEN f41b73fa QG 40007922208 SUCCESS 1102/1102 Node, 76/76 Python, Chromium/browser/offline/Pages/quota and Server 40007922236 SUCCESS. Reviewed thread 4363213796 replied 4363240835 and resolved. Exact new HEAD review still required; no owner merge consent; numeric lane INACTIVE.",
+  "last_code_ci_verified_sha": "f41b73fa323522764666e5929faeae90038e33da",
   "last_full_ci": {
-    "quality_run_id": 40006765029,
-    "server_run_id": 40006764763,
+    "quality_run_id": 40007922208,
+    "server_run_id": 40007922236,
     "conclusion": "SUCCESS",
-    "scope": "1101/1101 Node; 76/76 Python; Chromium AR/EN, K4 Close to K5 observed activity, offline; Pages; physical quota; read-only audit; server contracts on exact code SHA"
+    "scope": "1102/1102 Node, 76/76 Python, real Chromium AR/EN K4 Close→K5, offline, Pages, physical quota, read-only audit, Server/adapter on exact code SHA"
   },
   "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
-  "independent_review_status": "PENDING_FRESH_FOCUSED_REVIEW_AFTER_TWO_P2_FIXES_2026_10_23",
+  "independent_review_status": "PENDING_FOCUSED_EXACT_HEAD_REVIEW_AFTER_REPEATED_SEPARATOR_P2_REPAIR_2026_10_23",
   "independent_review_blocker_comment_id": 6126041737,
   "open_critical_review_threads_as_of_last_check": 0,
   "release_blockers": [
-    "AC23_FRESH_EXACT_HEAD_INDEPENDENT_REVIEW_REQUIRED",
-    "AC24_EXPLICIT_PR69_FINAL_FULL_SHA_OWNER_LANDING_APPROVAL_REQUIRED",
-    "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_VERIFICATION_PENDING"
+    "AC23_NEW_EXACT_HEAD_CLEAN_CODEX_REVIEW_PENDING",
+    "AC24_EXPLICIT_PR69_EXACT_HEAD_OWNER_LANDING_APPROVAL_REQUIRED",
+    "AC24_POST_MERGE_MAIN_AND_PAGES_PROOF_PENDING"
   ],
   "open_important_review_threads_as_of_last_check": 0,
   "security_remediation": {
@@ -207,5 +207,34 @@
       }
     ],
     "reviewed_result": "Two valid in-scope P2 findings; both fixed test-first, evidence-replied and resolved; new exact-head Codex review not yet received"
+  },
+  "latest_repeated_separator_privacy_remediation": {
+    "review_head": "1fba1c2b5e4b9240fdb68843ffb79d7b1ca5802b",
+    "finding_comment_id": 4363213796,
+    "reply_id": 4363240835,
+    "thread_id": "PRRT_kwDOUQgV2c6vvJ5B",
+    "thread_resolved": true,
+    "red": {
+      "sha": "841d9a4890fee0bcf0935e6789501c18a12066d0",
+      "quality_run_id": 40007791885,
+      "node_pass": 1101,
+      "node_failed": 1,
+      "expected_failure": "Missing expected rejection: http:///[2001:db8::1]:abc/"
+    },
+    "green": {
+      "sha": "f41b73fa323522764666e5929faeae90038e33da",
+      "quality_run_id": 40007922208,
+      "server_run_id": 40007922236,
+      "node_pass": 1102,
+      "python_pass": 76,
+      "browser": "PASS",
+      "offline": "PASS",
+      "pages": "PASS",
+      "quota": "PASS"
+    },
+    "negative_cases": 8,
+    "positive_controls": 3,
+    "state": "GREEN_CI_VERIFIED_REVIEW_PENDING",
+    "numerical_lane": "INACTIVE"
   }
 }
