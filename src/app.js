@@ -160,7 +160,11 @@ async function init(){try{await cacheAssessmentSnapshotModuleForOffline();
        clock:()=>new Date().toISOString(),
        localize:key=>t(key),
        locale:()=>lang,
-       onViewChange:id=>showScreen(id),
+       onViewChange:id=>{
+         showScreen(id);
+         // K4 Close returns directly to Home: refresh K5 from durable K3 evidence.
+         if(id==='home'&&K5_CONTROLLER)void K5_CONTROLLER.render().catch(()=>{});
+       },
        preferencesStore:prefStore,
        learnerId:state.anon_id,
        loadRecommendation:async({nowIso,excludeFamilyId=null})=>{
