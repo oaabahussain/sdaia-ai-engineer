@@ -199,12 +199,6 @@ def main():
         assert 'readiness' not in text(session,find(session,'#k4Practice')).lower()
         click(session,find(session,'#k4Practice .option'))
         wait_until(lambda:'Response saved locally' in text(session,find(session,'#k4Practice')),label='K4 durable response receipt')
-        click(session,find(session,'#langBtn'))
-        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
-        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
-        assert len(finds(session,'#k4Practice .option'))==4
-        click(session,find(session,'#langBtn'))
-        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
         # K4 Close must repaint K5 from the newly durable K3 presentation, not wait for a locale/Home click.
@@ -230,6 +224,12 @@ def main():
         assert alternate_family and alternate_family!=previous_family, 'K4 another must choose a different public family'
         assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
         wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
+        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
+        assert len(finds(session,'#k4Practice .option'))==4
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         # AC-13: K4 canonical preferences now share the K3 evidence database.
         # Deny that actual transactional port in Chromium (not the legacy DB).
