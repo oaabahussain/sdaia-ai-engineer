@@ -207,6 +207,11 @@ def main():
         wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
+        # K4 Close must repaint K5 from the newly durable K3 presentation, not wait for a locale/Home click.
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='OBSERVATIONS_PRESENT'"),
+          timeout=20,label='K5 recorded activity refreshed on K4 Close')
+        assert '%' not in text(session,find(session,'#k5HomeCard')), 'K5 readout must remain nonnumeric'
         previous_family=wait_until(
             lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
             label='K4 refreshed action after first practice close'
