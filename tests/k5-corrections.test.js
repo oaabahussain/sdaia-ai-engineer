@@ -1,0 +1,34 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {classifyK5Corrections} from '../src/mastery/corrections.js';
+const e=(id,family='family-A',release='new')=>({event_id:id,definition_id:'learner.item.presented@1',store_seq:Number(id.replace(/\D/g,''))||1,learner_id:'L',content_release_id:release,question_family_id:family,mode:'practice'});
+const c=(id,target,action='VOID',replacement=null)=>({event_id:id,definition_id:'learner.evidence.correction.recorded@1',store_seq:100+Number(id.replace(/\D/g,'')),learner_id:'L',content_release_id:'new',authority_ref:'nonempty-forged',payload:{action,target_event_id:target,...(replacement?{superseding_event_id:replacement}:{})}});
+test('unverified VOID cannot erase a known family and must quarantine it',()=>{const r=classifyK5Corrections({events:[e('event1'),c('correction1','event1')]});assert.equal(r.sourceInvalid,false);assert.deepEqual(r.quarantinedFamilies,['family-A']);assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED']);assert.deepEqual(r.safeEvents,[]);assert.equal(r.integrity_status,'CONFLICTED')});
+test('overlapping forged and competing corrections require BOTH sorted reasons',()=>{const r=classifyK5Corrections({events:[e('event1'),c('correction1','event1'),c('correction2','event1')]});assert.equal(r.integrity_status,'CONFLICTED');assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_CONFLICT'])});
+test('cross-release correction quarantines old family only',()=>{const r=classifyK5Corrections({events:[e('event1','family-A','old'),e('event2','family-B','new'),c('correction1','event1')]});assert.deepEqual(r.safeEvents.map(x=>x.question_family_id),['family-B']);assert.deepEqual(r.quarantinedFamilies,['family-A'])});
+test('unbounded missing target invalidates source rather than guessing family',()=>{const r=classifyK5Corrections({events:[e('event1'),c('correction1','nonexistent')]});assert.equal(r.sourceInvalid,true);assert.equal(r.integrity_status,'SOURCE_INVALID');assert.deepEqual(r.safeEvents,[]);assert.ok(r.reasons.includes('CORRECTION_UNRESOLVED'))});
+test('supersession cycle is quarantined with both sorted reasons',()=>{const r=classifyK5Corrections({events:[e('event1'),e('event2'),c('correction1','event1','SUPERSEDE','event2'),c('correction2','event2','SUPERSEDE','event1')]});assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_CONFLICT']);assert.equal(r.sourceInvalid,false)});
+test('caller supplied authority callback cannot authenticate correction',()=>{const r=classifyK5Corrections({events:[e('event1'),c('correction1','event1')],verifyAuthority:()=>true});assert.ok(r.reasons.includes('CORRECTION_AUTHORITY_UNVERIFIED'));assert.deepEqual(r.safeEvents,[])});
+test('uncorrected families remain preserved',()=>{const r=classifyK5Corrections({events:[e('event1'),e('event2','family-B')]});assert.equal(r.integrity_status,'COMPLETE');assert.deepEqual(r.safeEvents.map(x=>x.event_id),['event1','event2']);assert.deepEqual(r.reasons,[])});
+
+test('missing replacement with known target quarantines only its family',()=>{
+ const r=classifyK5Corrections({events:[
+  e('event1','family-A'),e('event2','family-B'),
+  c('correction1','event1','SUPERSEDE','missing-event')
+ ]});
+ assert.equal(r.sourceInvalid,false,'known target bounds quarantine to family-A');
+ assert.deepEqual(r.quarantinedFamilies,['family-A']);
+ assert.deepEqual(r.safeEvents.map(x=>x.question_family_id),['family-B']);
+ assert.equal(r.integrity_status,'CONFLICTED');
+ assert.deepEqual(r.reasons,['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_UNRESOLVED']);
+});
+test('unknown target still invalidates source regardless of replacement pointer',()=>{
+ const r=classifyK5Corrections({events:[
+  e('event1','family-A'),e('event2','family-B'),
+  c('correction1','missing-target','SUPERSEDE','missing-replacement')
+ ]});
+ assert.equal(r.sourceInvalid,true);
+ assert.deepEqual(r.safeEvents,[]);
+ assert.deepEqual(r.quarantinedFamilies,[]);
+ assert.ok(r.reasons.includes('CORRECTION_UNRESOLVED'));
+});

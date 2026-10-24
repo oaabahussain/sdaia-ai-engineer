@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "feature": "K5.EVIDENCE.v1",
+  "stage": "IN_PROGRESS",
+  "baseline_main_sha": "3d886c1066137e15e6ff5d3939f588a0fc59affd",
+  "spec_blob_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+  "plan_blob_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+  "branch": "feat/k5-tdd-evidence-20261012",
+  "numeric_lane": "INACTIVE",
+  "owner_authorization_for_implementation": "2026-10-12 user messages",
+  "owner_authorization_for_exact_head_landing": null,
+  "landing_authorized": false,
+  "merged": false,
+  "acceptance_criteria_closed": false,
+  "notes": "2026-10-14 P1 governance fixed by authenticated detached exact-blob attestation, without mutating spec/plan blobs; audit observed governance.approved=true at 4e552ff. P2 Unicode Nd IP comparator fixed without changing stored pseudonym. RED cee4d575 1093 pass 2 fail; GREEN 4e552ff 1096/1096 Node and 76/76 Python, QG 38580497809 and server 38580497841 success. Final independent review and exact PR69 SHA landing consent still required. K5 numeric lane INACTIVE. 2026-10-22: WHATWG special-scheme IP URL privacy regression reproduced RED de58afa (1099/1100 tests; intended failure); minimal GREEN f80bd03 (1100/1100 Node, 76/76 Python, browsers/offline/Pages/quota/audit, server SUCCESS). Exact-head independent Codex re-review, thread closure, standalone manual landing authorization, and postmerge verification remain pending; no auto-merge. 2026-10-23: Codex reviewed 609b39a and found two P2: K4 Close failed to refresh K5; bracketed IPv6 malformed ports bypassed privacy comparator. Privacy RED 7c97ddd (1100/1101 Node), GREEN 484e30b (1101/1101 Node; 76/76 Python; browser/Pages/quota/server PASS). Browser initial regression was false-positive because locale toggles refreshed K5; isolated RED 7d8fe7b QG 40006487993 failed on K4 Close K5 refresh timeout; GREEN 442fffed QG 40006765029 + Server 40006764763 SUCCESS. Both threads individually evidence-replied and resolved. Exact-head Codex re-review pending; no merge authorization; numeric lane INACTIVE. 2026-10-23 late: Fresh exact-head Codex review of 1fba1c2 found one P2 malformed-port IPv6 URL with >2 separators. Test-only RED 841d9a4 QG 40007791885 expected failure 1101/1102. Comparison-only GREEN f41b73fa QG 40007922208 SUCCESS 1102/1102 Node, 76/76 Python, Chromium/browser/offline/Pages/quota and Server 40007922236 SUCCESS. Reviewed thread 4363213796 replied 4363240835 and resolved. Exact new HEAD review still required; no owner merge consent; numeric lane INACTIVE. 2026-10-23: Codex clean issue-comment receipt 6372645165 reviewed 6fc4447 but formal-review-only release auditor ignored it. RED 871afee QG 40009149697 1104/1105 Node expected failure; GREEN 6c844f5 QG 40024476785 and Server 40024476843 SUCCESS 1105/1105 Node, 76/76 Python, Chromium/Pages/quota/offline PASS. New gate authenticates bot+owner request+latest exact full SHA+time, fail-closes spoofed/stale/finding or missing approval cases. Fresh final-head review required, merge remains separately owner-authorized.",
+  "last_code_ci_verified_sha": "6c844f59d4d073980e14fcb4f447fa7dd1f0aa9a",
+  "last_full_ci": {
+    "quality_run_id": 40024476785,
+    "server_run_id": 40024476843,
+    "conclusion": "SUCCESS",
+    "scope": "1105/1105 Node, 76/76 Python; Chromium bilingual/offline/K4 Close to K5; Pages, isolated physical quota, Server/adapter on code SHA"
+  },
+  "implementation_task_status": "TASKS_01_TO_11_CI_VERIFIED_TASK_12_RELEASE_BLOCKED",
+  "independent_review_status": "PENDING_NEW_EXACT_HEAD_CODEX_REVIEW_AFTER_REVIEW_RECEIPT_AUDIT_FIX_2026_10_23",
+  "independent_review_blocker_comment_id": 6126041737,
+  "open_critical_review_threads_as_of_last_check": 0,
+  "release_blockers": [
+    "AC23_FRESH_EXACT_HEAD_INDEPENDENT_REVIEW_PENDING",
+    "AC24_EXPLICIT_PR69_FULL_EXACT_HEAD_OWNER_LANDING_CONSENT_REQUIRED",
+    "AC24_POST_MERGE_MAIN_AND_LIVE_PAGES_PROOF_PENDING"
+  ],
+  "open_important_review_threads_as_of_last_check": 0,
+  "security_remediation": {
+    "red_sha": "0da59cbf8a49b050ce9c1614c4d016e9660fb119",
+    "green_sha": "6d8f79b95933803029b54d12c06d64ae3ebee79b",
+    "red_quality_run_id": 38378621537,
+    "green_quality_run_id": 38379023765,
+    "green_server_run_id": 38379024518,
+    "reviewed_comment_ids": [
+      4256618135,
+      4256618149
+    ],
+    "review_threads_resolved": true,
+    "final_exact_head_review_still_required": true
+  },
+  "latest_security_review": {
+    "finding_comment_id": 4257964005,
+    "thread_id": "PRRT_kwDOUQgV2c6r1Sxe",
+    "issue": "DISMISSED_CODEX_REVIEW_FINDINGS_BYPASS",
+    "red": {
+      "sha": "d61cde62ed34bace875cdea87794dbeb599809a7",
+      "quality_run_id": 38410902141,
+      "node": "1076/1079; exactly 3 expected security regression failures"
+    },
+    "green": {
+      "sha": "ca8ca7e79a194882f4293732f7d5726cc998bf79",
+      "quality_run_id": 38411130134,
+      "server_run_id": 38411129540,
+      "node": "1079/1079",
+      "python": "76/76",
+      "chromium": "PASS",
+      "offline": "PASS",
+      "pages_assembly": "PASS"
+    },
+    "thread_resolved": true,
+    "requires_final_head_independent_review": true
+  },
+  "latest_review_cycle": {
+    "reviewed_head": "f49966c8edaeeeed8aa91218c2395dba4260c303",
+    "findings": [
+      {
+        "comment_id": 4271245754,
+        "thread": "PRRT_kwDOUQgV2c6sVO8O",
+        "issue": "APPROVAL_CONTRACT_MISMATCH_P1"
+      },
+      {
+        "thread": "PRRT_kwDOUQgV2c6sVO8Y",
+        "issue": "UNICODE_ND_IP_PRIVACY_P2",
+        "comment_id": 4271245771
+      }
+    ],
+    "red": {
+      "sha": "cee4d57541d2b152bcced417e167e7f80d4db5c3",
+      "quality_run_id": 38579831283,
+      "pass": 1093,
+      "fail": 2
+    },
+    "green": {
+      "sha": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
+      "quality_run_id": 38580497809,
+      "server_run_id": 38580497841,
+      "conclusion": "both SUCCESS",
+      "node": "1096/1096",
+      "python": "76/76"
+    },
+    "status": "GREEN_CI_VERIFIED_REVIEW_REPLIES_PENDING",
+    "final_review_required": true
+  },
+  "latest_unicode_privacy_remediation": {
+    "red_sha": "05ebd69ec88e5fae9cd663628f5ae66aa690e31e",
+    "red_quality_run_id": 38564016817,
+    "red_conclusion": "FAILURE_EXPECTED_REGRESSION",
+    "green_sha": "0874428063e339f4facfb78d0faa04fc68e0c7c3",
+    "green_quality_run_id": 38564160025,
+    "green_server_run_id": 38564160053,
+    "green_conclusion": "SUCCESS",
+    "review_comment_id": 4262524189,
+    "review_reply_id": 4270766446,
+    "review_thread_id": "PRRT_kwDOUQgV2c6sAWVT",
+    "thread_resolved": true,
+    "negative_phone_variants": 10,
+    "positive_opaque_controls": 4
+  },
+  "latest_phone_grouping_remediation": {
+    "red_sha": "0c39f392eed6cfbc1bc8e3861a6e7fcfb5f437fd",
+    "red_quality_run_id": 38567104252,
+    "red_node_pass": 1089,
+    "red_node_fail": 1,
+    "green_sha": "26732ddb15da1ead7d5576cf25320df613651f13",
+    "green_quality_run_id": 38567226022,
+    "green_server_run_id": 38567226023,
+    "review_comment_id": 4270842457,
+    "reply_id": 4271010497,
+    "thread_id": "PRRT_kwDOUQgV2c6sUQeb",
+    "resolved": true,
+    "scope": "Shared privacy comparator rejects Unicode punctuation/symbol grouped phone PII at K3 intake and K5 projection without changing stored pseudonym"
+  },
+  "review_disposition_mapping_unknown": {
+    "review_comment_id": 4270842468,
+    "reply_id": 4270993167,
+    "thread_id": "PRRT_kwDOUQgV2c6sUQeh",
+    "resolved": true,
+    "decision": "PRESERVE_NORMATIVE_FAIL_CLOSED_ROW_3A",
+    "reason": "K4 catalog only verifies ACTIVE PUBLIC entries. No authenticated protected/retired inventory exists to classify unknown current-release item; ignoring would falsely claim COMPLETE despite missing public mapping",
+    "spec": "2026-10-11 K5 design section 6.1.1 row 3a",
+    "test": "tests/k5-projection-contract.test.js mapping-only mismatch"
+  },
+  "owner_authorization_for_spec_and_plan": {
+    "approved": true,
+    "at": "2026-10-14T13:03:19Z",
+    "source": "User explicitly replied موافق to question naming both exact blobs",
+    "pr_comment_id": 6169066017,
+    "spec_blob_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "plan_blob_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "scope": "SPEC_AND_PLAN_ONLY_NO_MERGE_AUTHORIZATION",
+    "approval_contract": "AUTHENTICATED_DETACHED_EXACT_BLOB_OWNER_ATTESTATION"
+  },
+  "governance_audit": {
+    "observed_in_quality_run_id": 38580497809,
+    "observed_head": "4e552ff2305a22a16f3569f36689b36eeedef4d0",
+    "approved": true,
+    "spec_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "immutable_spec_status_remains_not_approved_header": true,
+    "owner_comment_id": 6169066017
+  },
+  "latest_special_scheme_url_privacy_remediation": {
+    "review_comment_id": 4339061351,
+    "review_thread_id": "PRRT_kwDOUQgV2c6u2Mfp",
+    "red": {
+      "sha": "de58afa0b643d8e5eafedd6f2295382bd8c440b4",
+      "quality_run_id": 39804317418,
+      "expected": "1099 passed, 1 expected privacy regression failed"
+    },
+    "green": {
+      "sha": "f80bd03b881010a33dc5cb5a4c5d966d11bfa3cf",
+      "quality_run_id": 39804663778,
+      "server_run_id": 39804663835,
+      "results": "1100/1100 Node; 76/76 Python; browser/offline/Pages/quota/audit/server PASS"
+    },
+    "regression_tests": "10 negative special-scheme URL IP forms across K3 intake and K5 export; 5 positive pseudonyms",
+    "approved_spec_sha": "dee75a0b1e5161d09bce0a840ab987c7a6aa2278",
+    "approved_plan_sha": "955fb95abcdd28f615a7104d5868c5d9f0fbf8d2",
+    "review_status_as_of_checkpoint": "PENDING",
+    "owner_landing_authorization": false
+  },
+  "latest_2026_10_23_review_repairs": {
+    "reviewed_head": "609b39ae5d57e463ec3b40c62443313e00770a60",
+    "reviewed_at_utc": "2026-10-23T18:39:44Z",
+    "findings": [
+      {
+        "thread": "PRRT_kwDOUQgV2c6vuy32",
+        "comment_id": 4363059183,
+        "reply_id": 4363171471,
+        "path": "src/mastery/privacy.js",
+        "issue": "IPv6 malformed-port source/export PII bypass",
+        "red_sha": "7c97ddd01b64f4baa0daa93d24bf2a0daf54f5d7",
+        "red_quality_run_id": 40005665547,
+        "green_sha": "484e30b45ea1b9c0add7db712f73d11d495d5022",
+        "green_quality_run_id": 40005799835,
+        "green_server_run_id": 40005799588,
+        "resolved": true
+      },
+      {
+        "thread": "PRRT_kwDOUQgV2c6vuy3v",
+        "comment_id": 4363059172,
+        "reply_id": 4363171944,
+        "path": "src/app.js",
+        "issue": "K4 Close left K5 recorded activity stale",
+        "initial_false_positive_browser_sha": "d26308fea4f755eb3735d78ca909ab6780390e9e",
+        "isolated_red_sha": "7d8fe7bee7f12c2caadb68364c7d5ce36eed14fb",
+        "red_quality_run_id": 40006487993,
+        "green_sha": "442fffedc30c5630d5c46062c1f1458f7be4942e",
+        "green_quality_run_id": 40006765029,
+        "green_server_run_id": 40006764763,
+        "resolved": true
+      }
+    ],
+    "reviewed_result": "Two valid in-scope P2 findings; both fixed test-first, evidence-replied and resolved; new exact-head Codex review not yet received"
+  },
+  "latest_repeated_separator_privacy_remediation": {
+    "review_head": "1fba1c2b5e4b9240fdb68843ffb79d7b1ca5802b",
+    "finding_comment_id": 4363213796,
+    "reply_id": 4363240835,
+    "thread_id": "PRRT_kwDOUQgV2c6vvJ5B",
+    "thread_resolved": true,
+    "red": {
+      "sha": "841d9a4890fee0bcf0935e6789501c18a12066d0",
+      "quality_run_id": 40007791885,
+      "node_pass": 1101,
+      "node_failed": 1,
+      "expected_failure": "Missing expected rejection: http:///[2001:db8::1]:abc/"
+    },
+    "green": {
+      "sha": "f41b73fa323522764666e5929faeae90038e33da",
+      "quality_run_id": 40007922208,
+      "server_run_id": 40007922236,
+      "node_pass": 1102,
+      "python_pass": 76,
+      "browser": "PASS",
+      "offline": "PASS",
+      "pages": "PASS",
+      "quota": "PASS"
+    },
+    "negative_cases": 8,
+    "positive_controls": 3,
+    "state": "GREEN_CI_VERIFIED_REVIEW_PENDING",
+    "numerical_lane": "INACTIVE"
+  },
+  "latest_codex_receipt_audit_fix": {
+    "root_cause": "Previously read-only K5 release auditor accepted Codex only as formal PR review; authenticated clean issue comment on exactly requested head was ignored, producing false INDEPENDENT_REVIEW_NOT_CLEAN despite valid Codex response",
+    "original_reviewed_head": "6fc44472112ca1a1fc7e93ce6889738cd32d1ddf",
+    "owner_request_comment_id": 6372606296,
+    "codex_clean_receipt_comment_id": 6372645165,
+    "red": {
+      "sha": "871afee334869477efe3299e51d8f515c1f67d42",
+      "quality_run_id": 40009149697,
+      "node_total": 1105,
+      "node_pass": 1104,
+      "node_fail": 1,
+      "expected": "authenticated Codex clean issue receipt on requested exact head satisfies independent review gate failed"
+    },
+    "green": {
+      "sha": "6c844f59d4d073980e14fcb4f447fa7dd1f0aa9a",
+      "quality_run_id": 40024476785,
+      "server_run_id": 40024476843,
+      "node_total": 1105,
+      "node_pass": 1105,
+      "python_total": 76,
+      "python_pass": 76,
+      "browser": "PASS",
+      "pages": "PASS",
+      "quota": "PASS"
+    },
+    "scope": "comparison-only authenticated reviewer receipt source without bypass of merge owner consent; exact SHA & bot+owner identities+timestamps+latest request required; spoof/stale/missing checks/unresolved threads/changes requested fail closed",
+    "state": "GREEN_CI_VERIFIED_PENDING_NEW_EXACT_HEAD_CODEX_REVIEW",
+    "numeric_lane": "INACTIVE"
+  }
+}

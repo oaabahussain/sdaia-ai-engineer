@@ -1,0 +1,129 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validatePublicCatalog} from '../src/recommendations/publicCatalog.js';
+import {deriveK5EvidenceSufficiency} from '../src/mastery/projection.js';
+import {fingerprintEvent} from '../src/evidence/jcs.js';
+import {validateK5ObjectiveMap} from '../src/mastery/objectiveMap.js';
+import {readFileSync} from 'node:fs';
+import {readK5Source,computeK5SourceFingerprint} from '../src/mastery/source.js';
+const ID='sdaia-ai-engineer',RELEASE=ID+'.bootstrap.v1';
+const DIGEST='5e48b1e47450f1150c9c8f21386f3a4e31070a3d444f968d10f45ccb9ff418a9';
+const F1=ID+'.core-ai.activation-function.definition.best-description',F2=ID+'.core-ai.backpropagation.definition.other-example';
+const O1=ID+'.objective.core-ai.activation-function.v1',O2=ID+'.objective.core-ai.backpropagation.v1';
+const F3=ID+'.core-ai.activation-function.definition.second-public-example';
+const item=(f,o)=>({question_family_id:f,item_version_id:f+'.v1',objective_id:o,domain_id:'core-ai',visibility:'PUBLIC',lifecycle:'ACTIVE'});
+function catalog(withSibling=false){return validatePublicCatalog({
+ catalog:{schema_version:1,catalog_id:ID+'.public.bootstrap.v1',track_id:ID,
+  content_release_id:RELEASE,question_payload_sha256:DIGEST,source:'MIGRATED_GRANDFATHERED_PUBLIC',
+  items:[item(F1,O1),item(F2,O2),...(withSibling?[item(F3,O1)]:[])]},
+ trackManifest:{id:ID,status:'active'},evidenceContext:{content_release_id:RELEASE,question_payload_sha256:DIGEST},
+ publicQuestions:[{id:F1+'.v1',family_id:F1,domain_id:'core-ai',answer:0},
+  {id:F2+'.v1',family_id:F2,domain_id:'core-ai',answer:0},
+  ...(withSibling?[{id:F3+'.v1',family_id:F3,domain_id:'core-ai',answer:0}]:[])],
+ objectives:{track_id:ID,objectives:[O1,O2].map(objective_id=>({
+  objective_id,track_id:ID,domain_id:'core-ai',concept_ids:[objective_id===O1?'core-ai.activation-function':'core-ai.backpropagation'],status:'provisional'}))}
+});}
+const objectives=await validateK5ObjectiveMap(JSON.parse(readFileSync(
+ new URL('../data/evidence/sdaia-ai-engineer.objectives-v1.json',import.meta.url),'utf8')),ID);
+function event(seq,more={}){return {event_id:'event-'+seq,store_id:'store',store_seq:seq,learner_id:'L',track_id:ID,
+ content_release_id:RELEASE,definition_id:'learner.item.presented@1',mode:'practice',
+ item_interaction_id:'interaction-'+seq,question_family_id:F1,item_version_id:F1+'.v1',
+ objective_id:O1,domain_id:'core-ai',event_fingerprint:'a'.repeat(64),...more};}
+const correction=(seq,target)=>event(seq,{definition_id:'learner.evidence.correction.recorded@1',
+ authority_ref:'forged',payload:{action:'VOID',target_event_id:target}});
+async function project(events=[],acceptedPublicCatalog=catalog()){
+ const verified=await Promise.all(events.map(async event=>{
+  const raw={...event};for(const field of ['store_id','store_seq','accepted_at','event_fingerprint'])delete raw[field];
+  return {...event,event_fingerprint:await fingerprintEvent(raw)};
+ }));
+ const head=verified.length?Math.max(...verified.map(e=>e.store_seq)):0;
+ const store={store_id:'store',
+  getSourceHead:async()=>({store_id:'store',through_store_seq:head}),
+  readRange:async({fromSeq,toSeq,learnerId})=>verified.filter(event=>
+   event.store_seq>=fromSeq&&event.store_seq<=toSeq&&event.learner_id===learnerId)};
+ const source=await readK5Source({store,learnerId:'L',trackId:ID,releaseId:RELEASE,
+  throughStoreSeq:head});
+ return deriveK5EvidenceSufficiency({
+  source,events:source.events,acceptedPublicCatalog,acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'},identityResolutionVersion:null
+ });
+}
+const isNull=r=>['mastery_estimate','readiness_estimate','readiness_probability','confidence_interval','model_validation_ref'].forEach(key=>assert.strictEqual(r[key],null,key));
+test('empty K5 source yields normative deterministic NO_OBSERVATIONS',async()=>{
+ const r=await project();assert.equal(r.integrity_status,'COMPLETE');
+ assert.equal(r.observation_status,'NO_OBSERVATIONS');assert.equal(r.through_store_seq,0);
+ assert.deepEqual(r.reason_codes,['CALIBRATION_NOT_APPROVED','IDENTITY_UNVERIFIED','NO_EVIDENCE','NO_TRUSTED_EVALUATION']);
+ assert.match(r.catalog_canonical_sha256,/^[a-f0-9]{64}$/);isNull(r);assert.deepEqual(r,await project());
+});
+test('public presentation dedup does not infer grade even when SYSTEM event claims score',async()=>{
+ const r=await project([event(1),event(2,{item_interaction_id:'interaction-1'}),
+  event(3,{definition_id:'learner.response.evaluated@1',authority_ref:'SYSTEM',payload:{score:100}})]);
+ assert.equal(r.integrity_status,'COMPLETE');assert.equal(r.observation_status,'OBSERVATIONS_PRESENT');
+ assert.equal(r.observed_distinct_family_count,1);assert.equal(r.observed_distinct_interaction_count,1);
+ assert.ok(r.reason_codes.includes('EXPOSURE_ONLY'));isNull(r);
+});
+test('forged correction quarantines target, retains independent public family',async()=>{
+ const r=await project([event(1),event(2,{question_family_id:F2,item_version_id:F2+'.v1',objective_id:O2}),correction(3,'event-1')]);
+ assert.equal(r.integrity_status,'CONFLICTED');assert.equal(r.observation_status,'QUARANTINED');
+ assert.equal(r.observed_distinct_family_count,1);assert.ok(r.reason_codes.includes('CORRECTION_AUTHORITY_UNVERIFIED'));isNull(r);
+});
+test('unbounded missing correction target is SOURCE_INVALID with zero counts',async()=>{
+ const r=await project([event(1),correction(2,'absent')]);
+ assert.equal(r.integrity_status,'SOURCE_INVALID');assert.equal(r.observation_status,'QUARANTINED');
+ assert.equal(r.observed_distinct_family_count,0);assert.deepEqual(r.objectives,[]);
+ assert.ok(r.reason_codes.includes('SOURCE_INTEGRITY_INVALID'));
+});
+test('mapping-only mismatch maps exactly to INCOMPLETE/INSUFFICIENT_EVIDENCE',async()=>{
+ const r=await project([event(1,{item_version_id:'unmapped'})]);
+ assert.equal(r.integrity_status,'INCOMPLETE');assert.equal(r.observation_status,'INSUFFICIENT_EVIDENCE');
+ assert.ok(r.reason_codes.includes('UNKNOWN_FAMILY_MAPPING'));isNull(r);
+});
+test('competing unauthenticated corrections give ordered union of reasons',async()=>{
+ const r=await project([event(1),correction(2,'event-1'),correction(3,'event-1')]);
+ assert.equal(r.integrity_status,'CONFLICTED');
+ for(const code of ['CORRECTION_AUTHORITY_UNVERIFIED','CORRECTION_CONFLICT'])assert.ok(r.reason_codes.includes(code));
+ assert.deepEqual(r.reason_codes,[...r.reason_codes].sort());
+});
+test('input ordering permutation does not affect same pinned projection',async()=>{
+ const events=[event(1),event(2,{question_family_id:F2,item_version_id:F2+'.v1',objective_id:O2})];
+ const a=await project(events),b=await project([...events].reverse());assert.deepEqual(a,b);
+});
+
+test('arbitrary syntactically valid event and source fingerprints cannot forge COMPLETE exposure',async()=>{
+ const events=[event(1,{item_interaction_id:'tampered-by-caller'})];
+ const source={source_store_id:'store',through_store_seq:1,learner_id:'L',track_id:ID,
+  release_id:RELEASE,source_fingerprint:'f'.repeat(64)};
+ await assert.rejects(deriveK5EvidenceSufficiency({
+  source,events,acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'}
+ }),/fingerprint|replay/i);
+});
+
+test('self-consistent caller-computed hashes do not authenticate an arbitrary replay',async()=>{
+ const source={source_store_id:'store',through_store_seq:0,learner_id:'L',track_id:ID,
+  release_id:RELEASE};
+ source.source_fingerprint=await computeK5SourceFingerprint(source,[]);
+ await assert.rejects(deriveK5EvidenceSufficiency({
+  source,events:[],acceptedPublicCatalog:catalog(),acceptedObjectiveMap:objectives,
+  policy:{policy_id:'K5.EVIDENCE.v1'}
+ }),/same verified K3 replay|verified K3 replay source|trusted replay|source binding/i);
+});
+
+test('shared objective preserves independently observed sibling family under quarantine',async()=>{
+ const r=await project([
+  event(1),
+  event(2,{question_family_id:F3,item_version_id:F3+'.v1',objective_id:O1,
+   item_interaction_id:'interaction-2'}),
+  correction(3,'event-1')
+ ],catalog(true));
+ assert.equal(r.integrity_status,'CONFLICTED');
+ assert.equal(r.observation_status,'QUARANTINED');
+ assert.equal(r.observed_distinct_family_count,1);
+ assert.equal(r.observed_distinct_interaction_count,1);
+ const row=r.objectives.find(item=>item.objective_id===O1);
+ assert.ok(row,'mixed objective should remain visible');
+ assert.equal(row.observed_distinct_family_count,1);
+ assert.equal(row.observed_distinct_interaction_count,1);
+ assert.ok(row.reason_codes.includes('CORRECTION_AUTHORITY_UNVERIFIED'));
+ isNull(r);
+});

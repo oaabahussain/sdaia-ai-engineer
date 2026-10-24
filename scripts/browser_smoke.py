@@ -136,6 +136,12 @@ def main():
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?first-new-version-navigation-offline=1'})
         wait_until(lambda:execute(session,"return document.getElementById('bankCount')?.textContent")==str(EXPECTED_BANK),timeout=20,label='first new-version navigation offline')
         assert execute(session,"return document.getElementById('errorBox').classList.contains('show')") is False
+        # K5 first-entry offline must resolve verified activity before any online visit.
+        # A newly imported module missing from the precache must fail this assertion.
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='NO_OBSERVATIONS'"),
+          timeout=20,label='K5 first feedback-installed service worker offline boot')
+        assert execute(session,"return document.getElementById('k5HomeCard').getAttribute('data-k5-status')")!='SOURCE_INVALID', 'new privacy module must be cached during service-worker install'
         server=start_server()
         wait_http(BASE+'/index.html')
         req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?smoke=1'})
@@ -159,6 +165,28 @@ def main():
         click(session,find(session,'#themeBtn'))
         after=execute(session,"return document.documentElement.dataset.theme")
         assert before!=after, (before,after)
+        # K5_CROSS_RUNTIME: compare real Chromium DOM to an independently executed Node projection.
+        node_k5=json.loads(subprocess.check_output(
+            ['node','scripts/k5_empty_projection_fixture.js'],cwd=ROOT,text=True))
+        assert node_k5['status']=='NO_OBSERVATIONS'
+        assert node_k5['count']==0
+        # K5_BROWSER_ACCEPTANCE: verify the real descriptive-only learner home, not HTML source text.
+        wait_until(lambda:len(finds(session,'#k5HomeCard h2'))==1,label='K5 recorded activity card')
+        assert text(session,find(session,'#k5HomeCard h2'))=='Recorded activity'
+        assert text(session,find(session,'#k5HomeCard h2'))==node_k5['heading']
+        assert node_k5['body'] in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('data-k5-status')")==node_k5['status']
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('data-k5-status')")=='NO_OBSERVATIONS', 'K5 source must be verified on fresh browser'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-live')")=='polite'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('role')")=='region'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='ltr'
+        assert 'readiness estimates are not available' in text(session,find(session,'#k5HomeCard')).lower()
+        assert '%' not in text(session,find(session,'#k5HomeCard'))
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='النشاط المسجل',label='K5 Arabic locale')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='rtl'
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='Recorded activity',label='K5 English locale restored')
         # K4_BROWSER_ACCEPTANCE: test the real single-question screen, not a stub.
         wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 public card')
         assert 'Practice one question' in text(session,find(session,'#k4HomeCard'))
@@ -171,14 +199,13 @@ def main():
         assert 'readiness' not in text(session,find(session,'#k4Practice')).lower()
         click(session,find(session,'#k4Practice .option'))
         wait_until(lambda:'Response saved locally' in text(session,find(session,'#k4Practice')),label='K4 durable response receipt')
-        click(session,find(session,'#langBtn'))
-        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
-        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
-        assert len(finds(session,'#k4Practice .option'))==4
-        click(session,find(session,'#langBtn'))
-        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         wait_until(lambda:execute(session,"return document.getElementById('home').classList.contains('active')"),label='K4 return to public home')
+        # K4 Close must repaint K5 from the newly durable K3 presentation, not wait for a locale/Home click.
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='OBSERVATIONS_PRESENT'"),
+          timeout=20,label='K5 recorded activity refreshed on K4 Close')
+        assert '%' not in text(session,find(session,'#k5HomeCard')), 'K5 readout must remain nonnumeric'
         previous_family=wait_until(
             lambda: execute(session,"return document.getElementById('k4HomeCard').getAttribute('data-k4-family-id')"),
             label='K4 refreshed action after first practice close'
@@ -197,6 +224,12 @@ def main():
         assert alternate_family and alternate_family!=previous_family, 'K4 another must choose a different public family'
         assert execute(session,"const b=document.querySelector('#k4HomeCard button'); if(!b)return false;b.click();return true"), 'K4 alternate start button missing'
         wait_until(lambda:len(finds(session,'#k4Practice .option'))==4,label='K4 alternate practice')
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='rtl',label='K4 Arabic rtl')
+        assert 'تدريب سؤال واحد' in text(session,find(session,'#k4Practice'))
+        assert len(finds(session,'#k4Practice .option'))==4
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.dir")=='ltr',label='K4 English ltr')
         click(session,find(session,'#k4Practice button:last-child'))
         # AC-13: K4 canonical preferences now share the K3 evidence database.
         # Deny that actual transactional port in Chromium (not the legacy DB).
@@ -222,6 +255,7 @@ def main():
         req('POST',f'/session/{session}/window/rect',{'width':390,'height':844})
         assert execute(session,"return window.innerWidth<=450"), 'K4 mobile viewport'
         assert execute(session,"return document.getElementById('k4HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K4 responsive card'
+        assert execute(session,"return document.getElementById('k5HomeCard').getBoundingClientRect().width<=document.documentElement.clientWidth+1"), 'K5 responsive activity region'
         req('POST',f'/session/{session}/window/rect',{'width':1400,'height':1000})
         started=execute(session,"const b=document.getElementById('startFullBtn'); if(!b) return false; b.click(); return true;")
         assert started is True
@@ -274,6 +308,10 @@ def main():
         wait_until(lambda:execute(session,"return document.getElementById('bankCount').textContent")==str(EXPECTED_BANK),timeout=20,label='offline cached home reload')
         assert text(session,find(session,'#brandText'))==PRESENTATION['locales']['en']['brand']
         assert text(session,find(session,'.domainCard h3'))==PRESENTATION['locales']['en']['domain_labels'][first_domain]
+        # K5_OFFLINE_ACCEPTANCE: actual new modules and verified read-only summary boot without network.
+        wait_until(lambda:text(session,find(session,'#k5HomeCard h2'))=='Recorded activity',label='K5 offline activity summary')
+        assert execute(session,"return document.getElementById('k5HomeCard').getAttribute('data-k5-status')")!='SOURCE_INVALID', 'K5 offline source must remain verified'
+        assert '%' not in text(session,find(session,'#k5HomeCard')), 'K5 offline page cannot display readiness percent'
         # K4_OFFLINE_ACCEPTANCE: new public policy and modules work from the installed cache.
         wait_until(lambda:len(finds(session,'#k4HomeCard button'))>=4,label='K4 offline public card')
         click(session,find(session,'#k4HomeCard button'))
@@ -307,6 +345,52 @@ def main():
         assert rating_url.startswith('https://github.com/oaabahussain/sdaia-ai-engineer/issues/new?')
         assert 'template=public-feedback.md' in rating_url
         assert 'Rating+comment+survives' in rating_url
+        # K5 independent fallback: K4 bootstrap errors must not leave an
+        # indefinitely 'verifying' K5 card. Isolate failure to K4 policy fetch.
+        server=start_server()
+        wait_http(BASE+'/index.html')
+        req('POST',f'/session/{session}/goog/cdp/execute',{
+            'cmd':'Page.addScriptToEvaluateOnNewDocument',
+            'params':{'source':"""
+              const priorFetch=window.fetch.bind(window);
+              window.fetch=function(resource,options){
+                if(String(resource).includes('k4-rule-policy-v1.json'))
+                  return Promise.reject(new Error('synthetic K4-only bootstrap failure'));
+                return priorFetch(resource,options);
+              };
+            """}
+        })
+        req('POST',f'/session/{session}/url',{'url':BASE+'/index.html?k5-fallback-on-k4-failure=1'})
+        wait_until(lambda:text(session,find(session,'#bankCount'))==str(EXPECTED_BANK),
+                   label='public bank loads when K4 policy fetch fails')
+        wait_until(lambda:len(text(session,find(session,'#k4HomeCard')))>10,
+                   label='K4 displays its offline failure fallback')
+        wait_until(lambda:execute(session,
+          "return document.getElementById('k5HomeCard').getAttribute('data-k5-status')==='SOURCE_INVALID'"),
+          label='K5 must explicitly fail closed on K4 startup failure')
+        assert 'verifying' not in text(session,find(session,'#k5HomeCard')).lower()
+        assert '%' not in text(session,find(session,'#k5HomeCard'))
+        # P2: the K5 fail-closed fallback must update with app locale
+        # even when the K5 controller never initialized.
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('lang')")=='en'
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='Recorded activity', 'English fallback region must have English accessible name'
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,"return document.documentElement.lang")=='ar',
+                   label='Arabic locale after failed K4 bootstrap')
+        wait_until(lambda:execute(session,
+            "return document.querySelector('#k5HomeCard').getAttribute('lang')==='ar'"),
+            label='K5 fallback reflects Arabic language switch')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='rtl'
+        assert 'لا يمكن التحقق' in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='النشاط المسجل', 'Arabic fallback region must have Arabic accessible name'
+        click(session,find(session,'#langBtn'))
+        wait_until(lambda:execute(session,
+            "return document.querySelector('#k5HomeCard').getAttribute('lang')==='en'"),
+            label='K5 fallback reflects English language switch')
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('dir')")=='ltr'
+        assert 'Recorded activity cannot be verified' in text(session,find(session,'#k5HomeCard'))
+        assert execute(session,"return document.querySelector('#k5HomeCard').getAttribute('aria-label')")=='Recorded activity', 'Restored English fallback must update accessible name'
+
         print(f'BROWSER_SMOKE: PASS bank={EXPECTED_BANK} bilingual=PASS theme=PASS full_exam={EXPECTED_FULL} confidence_optional=PASS durable_learner_evidence=PASS offline_cached_reload=PASS feedback_urls=PASS presentation=PASS')
     finally:
         if session:
